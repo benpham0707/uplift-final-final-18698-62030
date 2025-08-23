@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   User, 
   Brain, 
@@ -15,7 +16,12 @@ import {
   Link,
   Zap,
   Filter,
-  Scale
+  Scale,
+  MessageSquare,
+  Send,
+  Sparkles,
+  X,
+  Maximize2
 } from 'lucide-react';
 import OnboardingFlow from '@/components/portfolio/OnboardingFlow';
 import AssessmentDashboard from '@/components/portfolio/AssessmentDashboard';
@@ -496,6 +502,10 @@ const RecommendedNextStepsDashboard = () => {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [selectedStep, setSelectedStep] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const categories = [
     { id: 'all', name: 'All Categories', count: 24 },
@@ -532,7 +542,8 @@ const RecommendedNextStepsDashboard = () => {
         'Create compelling narratives around academic challenges overcome'
       ],
       deadline: '1 week',
-      relatedGoals: ['College Applications', 'Scholarship Essays']
+      relatedGoals: ['College Applications', 'Scholarship Essays'],
+      isCustomizable: false // Standard documentation process
     },
     {
       id: 2,
@@ -551,7 +562,8 @@ const RecommendedNextStepsDashboard = () => {
         'Create transition plan to balance new roles with existing responsibilities'
       ],
       deadline: '2 weeks to apply',
-      relatedGoals: ['Leadership Development', 'College Applications']
+      relatedGoals: ['Leadership Development', 'College Applications'],
+      isCustomizable: true // Can be personalized to interests and availability
     },
     {
       id: 3,
@@ -570,7 +582,8 @@ const RecommendedNextStepsDashboard = () => {
         'Establish monthly check-in system for progress tracking'
       ],
       deadline: '3 days',
-      relatedGoals: ['Career Planning', 'Goal Setting']
+      relatedGoals: ['Career Planning', 'Goal Setting'],
+      isCustomizable: true // Can be tailored to specific career interests
     },
     {
       id: 4,
@@ -589,7 +602,8 @@ const RecommendedNextStepsDashboard = () => {
         'Execute project with documentation of impact and lessons learned'
       ],
       deadline: '1 month to launch',
-      relatedGoals: ['Community Service', 'Unique Value Proposition']
+      relatedGoals: ['Community Service', 'Unique Value Proposition'],
+      isCustomizable: true // Highly personalizable to interests and community needs
     },
     {
       id: 5,
@@ -608,7 +622,8 @@ const RecommendedNextStepsDashboard = () => {
         'Practice articulating growth narrative in interview settings'
       ],
       deadline: '2 weeks',
-      relatedGoals: ['Personal Branding', 'Essay Writing']
+      relatedGoals: ['Personal Branding', 'Essay Writing'],
+      isCustomizable: true // Personal stories can be tailored to individual experiences
     }
   ];
 
@@ -624,6 +639,54 @@ const RecommendedNextStepsDashboard = () => {
       case 'high': return 'bg-orange-100 text-orange-800 border-orange-300';
       case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
       default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  const handleSendChatMessage = async () => {
+    if (!chatMessage.trim() || !selectedStep) return;
+    
+    setIsLoading(true);
+    
+    // Add user message to chat history
+    const userMessage = { role: 'user', content: chatMessage };
+    setChatHistory(prev => [...prev, userMessage]);
+    
+    try {
+      // Mock API call for now - replace with actual API integration
+      const response = await fetch('/api/customize-task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task: selectedStep,
+          userMessage: chatMessage,
+          chatHistory
+        })
+      });
+      
+      // Mock response for demonstration
+      const aiResponse = {
+        role: 'assistant',
+        content: `I understand you'd like to customize "${selectedStep.title}". Based on your message, here are some personalized suggestions:
+
+• Tailor the approach to align with your specific interests and passions
+• Consider your available time and resources for a more realistic timeline
+• Focus on opportunities that match your unique strengths and background
+• Adapt the steps to fit your local community and school environment
+
+Would you like me to suggest specific modifications to any of the action steps?`
+      };
+      
+      setChatHistory(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      const errorResponse = {
+        role: 'assistant',
+        content: 'Sorry, I encountered an issue. Please try again or contact support if the problem persists.'
+      };
+      setChatHistory(prev => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
+      setChatMessage('');
     }
   };
 
@@ -780,8 +843,23 @@ const RecommendedNextStepsDashboard = () => {
                       setIsDetailModalOpen(true);
                     }}
                   >
-                     View Details
+                    <Maximize2 className="h-4 w-4 mr-2" />
+                    View Details
                   </Button>
+                  {step.isCustomizable && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedStep(step);
+                        setIsDetailModalOpen(true);
+                        setIsChatOpen(true);
+                      }}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Customize
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -812,39 +890,67 @@ const RecommendedNextStepsDashboard = () => {
       {/* Full-Screen Detail Modal */}
       {isDetailModalOpen && selectedStep && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
+          {/* Improved Backdrop */}
           <div 
-            className="absolute inset-0 bg-background/95 backdrop-blur-sm animate-fade-in"
-            onClick={() => setIsDetailModalOpen(false)}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            onClick={() => {
+              setIsDetailModalOpen(false);
+              setIsChatOpen(false);
+              setChatHistory([]);
+            }}
           />
           
-          {/* Modal Content */}
-          <div className="relative z-10 w-full max-w-4xl max-h-[90vh] mx-4 bg-background border border-border rounded-lg shadow-2xl animate-scale-in overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-border bg-gradient-to-r from-primary/10 to-primary/5">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">{selectedStep.title}</h2>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge className={`${getPriorityColor(selectedStep.priority)}`}>
-                    {selectedStep.priority.toUpperCase()}
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {selectedStep.category.replace('_', ' ').toUpperCase()}
-                  </Badge>
+          {/* Modal Content - Almost Full Screen */}
+          <div className="relative z-10 w-[95vw] h-[95vh] bg-background border border-border rounded-lg shadow-2xl overflow-hidden flex">
+            {/* Main Content Area */}
+            <div className={`${isChatOpen && selectedStep.isCustomizable ? 'w-2/3' : 'w-full'} flex flex-col`}>
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-border bg-gradient-to-r from-primary/10 to-primary/5">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">{selectedStep.title}</h2>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className={`${getPriorityColor(selectedStep.priority)}`}>
+                      {selectedStep.priority.toUpperCase()}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {selectedStep.category.replace('_', ' ').toUpperCase()}
+                    </Badge>
+                    {selectedStep.isCustomizable && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        Customizable
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {selectedStep.isCustomizable && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setIsChatOpen(!isChatOpen)}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      {isChatOpen ? 'Hide Chat' : 'Customize Task'}
+                    </Button>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setIsDetailModalOpen(false);
+                      setIsChatOpen(false);
+                      setChatHistory([]);
+                    }}
+                    className="shrink-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setIsDetailModalOpen(false)}
-                className="shrink-0"
-              >
-                ✕ Close
-              </Button>
-            </div>
-            
-            {/* Scrollable Content */}
-            <div className="overflow-y-auto max-h-[calc(90vh-120px)] p-6 space-y-6">
+              
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto flex-1 p-6 space-y-6">
               {/* Impact Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
                 <div className="text-center">
@@ -955,22 +1061,107 @@ const RecommendedNextStepsDashboard = () => {
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Footer Actions */}
-            <div className="flex items-center justify-between p-6 border-t border-border bg-muted/20">
-              <div className="text-sm text-muted-foreground">
-                Ready to transform your portfolio? Start this action today.
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setIsDetailModalOpen(false)}>
-                  Save for Later
-                </Button>
-                <Button className="bg-primary hover:bg-primary/90">
-                  Start This Action Now
-                </Button>
+              
+              {/* Footer Actions */}
+              <div className="flex items-center justify-between p-6 border-t border-border bg-muted/20">
+                <div className="text-sm text-muted-foreground">
+                  Ready to transform your portfolio? Start this action today.
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => {
+                    setIsDetailModalOpen(false);
+                    setIsChatOpen(false);
+                    setChatHistory([]);
+                  }}>
+                    Save for Later
+                  </Button>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    Start This Action Now
+                  </Button>
+                </div>
               </div>
             </div>
+
+            {/* Chat Sidebar */}
+            {isChatOpen && selectedStep.isCustomizable && (
+              <div className="w-1/3 border-l border-border bg-muted/20 flex flex-col">
+                <div className="p-4 border-b border-border bg-primary/5">
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    Personalize Your Task
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Chat with AI to customize this action plan to your specific interests and goals.
+                  </p>
+                </div>
+                
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {chatHistory.length === 0 ? (
+                    <div className="text-center text-muted-foreground text-sm py-8">
+                      <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>Start a conversation to customize this task!</p>
+                      <p className="mt-2 text-xs">Ask about modifying steps, timeline, or focus areas.</p>
+                    </div>
+                  ) : (
+                    chatHistory.map((message, index) => (
+                      <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] p-3 rounded-lg ${
+                          message.role === 'user' 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-background border border-border'
+                        }`}>
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-background border border-border p-3 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Chat Input */}
+                <div className="p-4 border-t border-border bg-background">
+                  <div className="flex gap-2">
+                    <Textarea
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      placeholder="How would you like to customize this task?"
+                      className="flex-1 min-h-[40px] max-h-[120px] text-sm"
+                      disabled={isLoading}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendChatMessage();
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={handleSendChatMessage}
+                      disabled={!chatMessage.trim() || isLoading}
+                      size="sm"
+                      className="shrink-0"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Press Enter to send, Shift+Enter for new line
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

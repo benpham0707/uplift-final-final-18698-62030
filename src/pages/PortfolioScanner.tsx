@@ -30,7 +30,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
 const PortfolioScanner = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [initializing, setInitializing] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
@@ -298,11 +298,14 @@ const PortfolioScanner = () => {
               <h1 className="text-2xl font-bold text-foreground">Portfolio Scanner</h1>
               <p className="text-muted-foreground mt-1">Transform your experiences into compelling narratives</p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex items-center gap-3">
               <Badge variant="secondary" className={`${currentLevel.color} text-white`}>
                 {currentLevel.level}
               </Badge>
               <p className="text-sm text-muted-foreground mt-1">{currentLevel.description}</p>
+              <Button variant="outline" onClick={async () => { await signOut(); navigate('/auth'); }}>
+                Sign Out
+              </Button>
             </div>
           </div>
           

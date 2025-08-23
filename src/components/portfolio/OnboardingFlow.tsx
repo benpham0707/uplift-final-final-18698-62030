@@ -33,21 +33,151 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Save progress and complete onboarding
-      const progressData = {
-        onboarding_complete: true,
-        overall_progress: 20, // Bronze level start
-        onboarding_data: formData,
-        completion_date: new Date().toISOString()
+      // Submit single payload to backend API
+      const payload = {
+        academicLevel: formData.gradeLevel,
+        gpa: formData.gpa || undefined,
+        goals: formData.primaryGoals,
+        challenges: formData.mainChallenges,
+        financialBand: (formData.financialNeed || 'unknown') as 'high' | 'moderate' | 'low' | 'unknown'
       };
-      localStorage.setItem('uplift_portfolio_progress', JSON.stringify(progressData));
-      onComplete();
+      try {
+        // Attach Supabase JWT if available for API auth
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data } = await supabase.auth.getSession();
+        const accessToken = data.session?.access_token;
+        const resp = await fetch('/api/v1/assessment/complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        if (!resp.ok) throw new Error('server_unavailable');
+        onComplete();
+      } catch (e) {
+        // Fallback: write directly from the client using the user's Supabase session
+        try {
+          await completeAssessmentClientSide(payload);
+          onComplete();
+        } catch (err) {
+          // eslint-disable-next-line no-alert
+          alert('Could not complete assessment. Please try again.');
+        }
+      }
     }
   };
+
+  async function completeAssessmentClientSide(payload: {
+    academicLevel: string;
+    gpa?: string;
+    goals: string[];
+    challenges: string[];
+    financialBand: 'high' | 'moderate' | 'low' | 'unknown';
+  }) {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: sess } = await supabase.auth.getSession();
+    const userId = sess.session?.user?.id;
+    if (!userId) throw new Error('not_authenticated');
+
+    // Ensure profile
+    const { data: prof, error: pErr } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (pErr) throw pErr;
+    let profileId = prof?.id as string | undefined;
+    if (!profileId) {
+      const { data: created, error: cErr } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: userId,
+          user_context: 'high_school_11th',
+          status: 'initial'
+        })
+        .select('id')
+        .single();
+      if (cErr) throw cErr;
+      profileId = created.id;
+    }
+
+    const gpaNum = parseGPA(payload.gpa);
+    const { error: aErr } = await supabase
+      .from('academic_records')
+      .upsert({
+        profile_id: profileId,
+        current_grade: payload.academicLevel,
+        gpa: gpaNum ?? null
+      }, { onConflict: 'profile_id' });
+    if (aErr) throw aErr;
+
+    const goals = {
+      primaryGoal: 'exploring_options',
+      desiredOutcomes: payload.goals,
+      timelineUrgency: 'flexible'
+    } as any;
+
+    const constraints = {
+      needsFinancialAid: ['high', 'moderate'].includes(payload.financialBand),
+      financialBand: payload.financialBand,
+      challenges: payload.challenges
+    } as any;
+
+    const completion_details = {
+      overall: 0.35,
+      sections: { basic: 1, goals: 1, academic: 1, enrichment: 0, experience: 0 }
+    } as any;
+
+    const { error: uErr } = await supabase
+      .from('profiles')
+      .update({
+        goals,
+        constraints,
+        completion_score: 0.35,
+        completion_details,
+        has_completed_assessment: true
+      })
+      .eq('id', profileId);
+    if (uErr) throw uErr;
+
+    const { error: sErr } = await supabase
+      .from('assessment_sessions')
+      .insert({
+        profile_id: profileId,
+        session_type: 'initial',
+        total_questions: 5,
+        questions_answered: 5,
+        completion_rate: 1,
+        completed_at: new Date().toISOString(),
+        responses: {
+          academicLevel: payload.academicLevel,
+          gpa: payload.gpa ?? null,
+          goals: payload.goals,
+          challenges: payload.challenges,
+          financialBand: payload.financialBand
+        },
+        insights: {}
+      });
+    if (sErr) throw sErr;
+  }
+
+  function parseGPA(s?: string) {
+    if (!s) return null as number | null;
+    const cleaned = String(s).trim().toLowerCase();
+    if (cleaned.includes('not')) return null;
+    const pct = cleaned.endsWith('%');
+    const num = Number(cleaned.replace(/[,%]/g, ''));
+    if (Number.isNaN(num)) return null;
+    if (pct) return +(Math.min(Math.max(num, 0), 100) / 25).toFixed(2);
+    return +num.toFixed(2);
+  }
 
   const handlePrevious = () => {
     if (currentStep > 1) {

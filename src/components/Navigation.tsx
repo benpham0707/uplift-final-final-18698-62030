@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -38,11 +41,36 @@ const Navigation = () => {
             </a>
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex">
-            <Button className="bg-primary hover:bg-primary-dark text-primary-foreground font-semibold" asChild>
-              <a href="/portfolio-scanner">Start Your Journey</a>
-            </Button>
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-3">
+            {loading ? (
+              <div className="w-20 h-9" />
+            ) : user ? (
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 text-sm text-foreground">
+                  <User className="h-4 w-4" />
+                  <span>{user.email}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => signOut()}
+                  className="flex items-center space-x-1"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/auth">Sign Up</Link>
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -75,10 +103,34 @@ const Navigation = () => {
             <a href="#schools" className="block px-3 py-2 text-foreground hover:text-primary transition-colors">
               For Schools
             </a>
-            <div className="pt-2">
-              <Button className="w-full bg-primary hover:bg-primary-dark text-primary-foreground font-semibold" asChild>
-                <a href="/portfolio-scanner">Start Your Journey</a>
-              </Button>
+            <div className="pt-2 space-y-2">
+              {loading ? (
+                <div className="w-full h-9" />
+              ) : user ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 px-3 py-2 text-sm text-foreground">
+                    <User className="h-4 w-4" />
+                    <span>{user.email}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full flex items-center justify-center space-x-1"
+                    onClick={() => signOut()}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign Out</span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Button variant="ghost" className="w-full" asChild>
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                  <Button className="w-full" asChild>
+                    <Link to="/auth">Sign Up</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

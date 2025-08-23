@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Clock,
   CheckCircle2,
+  CheckCircle,
   Link,
   Zap,
   Filter,
@@ -28,6 +29,9 @@ import {
   Award,
   ChevronDown,
   Calendar,
+  MapPin,
+  AlertTriangle,
+} from 'lucide-react';
   BookOpen,
   Users,
   Settings
@@ -1058,11 +1062,13 @@ Would you like me to suggest specific modifications to any of the action steps?`
             {/* Main Content Area */}
             <div className={`${selectedStep.isCustomizable ? 'w-2/3' : 'w-full'} flex flex-col`}>
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-border bg-gradient-to-r from-primary/10 to-primary/5">
+              <div className="flex items-start justify-between p-6 border-b border-border">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-foreground">{selectedStep.title}</h2>
-                  <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{selectedStep.description}</p>
-                  <div className="flex items-center gap-2 mt-2">
+                  <h2 className="text-2xl font-bold text-foreground mb-2">{selectedStep.title}</h2>
+                  <p className="text-base text-muted-foreground leading-relaxed">
+                    {selectedStep.description}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3">
                     <Badge className={`${getPriorityColor(selectedStep.priority)}`}>
                       {selectedStep.priority.toUpperCase()}
                     </Badge>
@@ -1076,14 +1082,6 @@ Would you like me to suggest specific modifications to any of the action steps?`
                       </Badge>
                     )}
                   </div>
-                </div>
-              {/* Enhanced Header with Better Alignment */}
-              <div className="flex items-start justify-between p-6 border-b border-border">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-foreground mb-2">{selectedStep.title}</h2>
-                  <p className="text-base text-muted-foreground leading-relaxed">
-                    {selectedStep.description}
-                  </p>
                 </div>
                 
                 {/* Related Goals and Close Button */}
@@ -1110,10 +1108,8 @@ Would you like me to suggest specific modifications to any of the action steps?`
                 </div>
               </div>
               
-              <div className="flex-1 flex overflow-hidden">
-                {/* Main Content Area */}
-                <div className={`${selectedStep.isCustomizable ? 'w-2/3' : 'w-full'} overflow-y-auto`}>
-                  <div className="p-6 space-y-8">
+              {/* Main Content */}
+              <div className={`${selectedStep.isCustomizable ? 'w-2/3' : 'w-full'} overflow-y-auto p-6 space-y-8`}>
                     
                   {/* Impact Metrics */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-primary/5 rounded-lg border border-primary/20">

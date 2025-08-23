@@ -31,7 +31,6 @@ import {
   Calendar,
   MapPin,
   AlertTriangle,
-} from 'lucide-react';
   BookOpen,
   Users,
   Settings
@@ -1564,7 +1563,6 @@ Would you like me to suggest specific modifications to any of the action steps?`
                     </div>
                   </div>
                 </div>
-              </div>
               </div>
               
               {/* Footer Actions */}

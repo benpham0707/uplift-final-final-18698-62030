@@ -48,68 +48,64 @@ const PortfolioScanner = () => {
   // Function to get score styling based on value
   const getScoreStyles = (score: number) => {
     if (score >= 9.8) {
-      // Special effects for near-perfect scores
+      // Special effects for near-perfect scores - background AND text effects
       return {
-        backgroundColor: 'linear-gradient(135deg, hsl(220, 100%, 50%), hsl(240, 100%, 70%))',
-        color: 'white',
-        textShadow: '0 0 10px rgba(59, 130, 246, 0.8)',
-        boxShadow: '0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.4)',
-        border: '2px solid hsl(220, 100%, 60%)',
-        animation: 'pulse 2s infinite'
-      };
-    } else if (score >= 9.0) {
-      // Glowing blue for 9-9.8
-      const intensity = (score - 9) / 0.8; // 0 to 1
-      const hue = 220 + (intensity * 20); // 220 to 240
-      const saturation = 90 + (intensity * 10); // 90% to 100%
-      const lightness = 50 + (intensity * 10); // 50% to 60%
-      return {
-        backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-        color: 'white',
-        textShadow: `0 0 8px rgba(59, 130, 246, ${0.4 + intensity * 0.4})`,
-        boxShadow: `0 0 15px rgba(59, 130, 246, ${0.3 + intensity * 0.3})`,
-        border: `2px solid hsl(${hue}, ${saturation}%, ${lightness + 10}%)`
-      };
-    } else if (score >= 7.0) {
-      // Green transitioning to blue for 7-9
-      const progress = (score - 7) / 2; // 0 to 1
-      const hue = 120 - (progress * 100); // 120 (green) to 220 (blue)
-      const saturation = 60 + (progress * 30); // 60% to 90%
-      const lightness = 40 + (progress * 20); // Light green to deeper
-      return {
-        backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-        color: 'white',
-        textShadow: progress > 0.5 ? `0 0 4px rgba(59, 130, 246, ${progress * 0.3})` : 'none',
-        boxShadow: progress > 0.5 ? `0 0 8px rgba(59, 130, 246, ${progress * 0.2})` : 'none'
-      };
-    } else if (score >= 5.0) {
-      // Yellow transitioning from orange for 5-7
-      const progress = (score - 5) / 2; // 0 to 1
-      const hue = 45 + (progress * 15); // 45 (orange-yellow) to 60 (yellow)
-      const saturation = 85 + (progress * 10); // 85% to 95%
-      const lightness = 50 + (progress * 5); // 50% to 55%
-      return {
-        backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-        color: 'white'
-      };
-    } else if (score >= 3.0) {
-      // Orange transitioning from red for 3-5
-      const progress = (score - 3) / 2; // 0 to 1
-      const hue = 0 + (progress * 25); // 0 (red) to 25 (orange)
-      const saturation = 85 + (progress * 10); // 85% to 95%
-      const lightness = 45 + (progress * 10); // 45% to 55%
-      return {
-        backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-        color: 'white'
+        boxStyle: {
+          background: 'linear-gradient(135deg, hsl(220, 100%, 50%), hsl(240, 100%, 70%))',
+          boxShadow: '0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.4)',
+          border: '2px solid hsl(220, 100%, 60%)',
+          animation: 'pulse 2s infinite'
+        },
+        textStyle: {
+          color: 'white',
+          textShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
+        }
       };
     } else {
-      // Red for 0-3
-      const progress = score / 3; // 0 to 1
-      const saturation = 80 + (progress * 15); // 80% to 95%
-      const lightness = 35 + (progress * 15); // 35% to 50%
+      // For all other scores, keep box background as white/10 and only change text color
+      let textColor = '';
+      
+      if (score >= 9.0) {
+        // Glowing blue for 9-9.8
+        const intensity = (score - 9) / 0.8; // 0 to 1
+        const hue = 220 + (intensity * 20); // 220 to 240
+        const saturation = 90 + (intensity * 10); // 90% to 100%
+        const lightness = 60 + (intensity * 10); // 60% to 70%
+        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      } else if (score >= 7.0) {
+        // Green transitioning to blue for 7-9
+        const progress = (score - 7) / 2; // 0 to 1
+        const hue = 120 - (progress * 100); // 120 (green) to 220 (blue)
+        const saturation = 70 + (progress * 20); // 70% to 90%
+        const lightness = 50 + (progress * 20); // 50% to 70%
+        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      } else if (score >= 5.0) {
+        // Yellow transitioning from orange for 5-7
+        const progress = (score - 5) / 2; // 0 to 1
+        const hue = 35 + (progress * 25); // 35 (orange) to 60 (yellow)
+        const saturation = 85 + (progress * 10); // 85% to 95%
+        const lightness = 45 + (progress * 10); // 45% to 55%
+        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      } else if (score >= 3.0) {
+        // Orange transitioning from red for 3-5
+        const progress = (score - 3) / 2; // 0 to 1
+        const hue = 0 + (progress * 35); // 0 (red) to 35 (orange)
+        const saturation = 85 + (progress * 10); // 85% to 95%
+        const lightness = 45 + (progress * 10); // 45% to 55%
+        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      } else {
+        // Red for 0-3
+        const progress = score / 3; // 0 to 1
+        const saturation = 80 + (progress * 15); // 80% to 95%
+        const lightness = 40 + (progress * 15); // 40% to 55%
+        textColor = `hsl(0, ${saturation}%, ${lightness}%)`;
+      }
+
       return {
-        backgroundColor: `hsl(0, ${saturation}%, ${lightness}%)`,
-        color: 'white'
+        boxStyle: {}, // Keep default box styling
+        textStyle: {
+          color: textColor
+        }
       };
     }
   };
@@ -210,46 +206,76 @@ const PortfolioScanner = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
             <div 
-              className="rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.academicExcellence.score)}
+              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              style={getScoreStyles(rubricScores.academicExcellence.score).boxStyle}
             >
-              <div className="text-lg font-semibold">{rubricScores.academicExcellence.score}</div>
-              <div className="text-xs opacity-90">Academic</div>
+              <div 
+                className="text-lg font-semibold transition-colors duration-300" 
+                style={getScoreStyles(rubricScores.academicExcellence.score).textStyle}
+              >
+                {rubricScores.academicExcellence.score}
+              </div>
+              <div className="text-xs opacity-75">Academic</div>
             </div>
             <div 
-              className="rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.leadershipPotential.score)}
+              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              style={getScoreStyles(rubricScores.leadershipPotential.score).boxStyle}
             >
-              <div className="text-lg font-semibold">{rubricScores.leadershipPotential.score}</div>
-              <div className="text-xs opacity-90">Leadership</div>
+              <div 
+                className="text-lg font-semibold transition-colors duration-300" 
+                style={getScoreStyles(rubricScores.leadershipPotential.score).textStyle}
+              >
+                {rubricScores.leadershipPotential.score}
+              </div>
+              <div className="text-xs opacity-75">Leadership</div>
             </div>
             <div 
-              className="rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.personalGrowth.score)}
+              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              style={getScoreStyles(rubricScores.personalGrowth.score).boxStyle}
             >
-              <div className="text-lg font-semibold">{rubricScores.personalGrowth.score}</div>
-              <div className="text-xs opacity-90">Growth</div>
+              <div 
+                className="text-lg font-semibold transition-colors duration-300" 
+                style={getScoreStyles(rubricScores.personalGrowth.score).textStyle}
+              >
+                {rubricScores.personalGrowth.score}
+              </div>
+              <div className="text-xs opacity-75">Growth</div>
             </div>
             <div 
-              className="rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.communityImpact.score)}
+              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              style={getScoreStyles(rubricScores.communityImpact.score).boxStyle}
             >
-              <div className="text-lg font-semibold">{rubricScores.communityImpact.score}</div>
-              <div className="text-xs opacity-90">Community</div>
+              <div 
+                className="text-lg font-semibold transition-colors duration-300" 
+                style={getScoreStyles(rubricScores.communityImpact.score).textStyle}
+              >
+                {rubricScores.communityImpact.score}
+              </div>
+              <div className="text-xs opacity-75">Community</div>
             </div>
             <div 
-              className="rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.uniqueValue.score)}
+              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              style={getScoreStyles(rubricScores.uniqueValue.score).boxStyle}
             >
-              <div className="text-lg font-semibold">{rubricScores.uniqueValue.score}</div>
-              <div className="text-xs opacity-90">Uniqueness</div>
+              <div 
+                className="text-lg font-semibold transition-colors duration-300" 
+                style={getScoreStyles(rubricScores.uniqueValue.score).textStyle}
+              >
+                {rubricScores.uniqueValue.score}
+              </div>
+              <div className="text-xs opacity-75">Uniqueness</div>
             </div>
             <div 
-              className="rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.futureReadiness.score)}
+              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              style={getScoreStyles(rubricScores.futureReadiness.score).boxStyle}
             >
-              <div className="text-lg font-semibold">{rubricScores.futureReadiness.score}</div>
-              <div className="text-xs opacity-90">Readiness</div>
+              <div 
+                className="text-lg font-semibold transition-colors duration-300" 
+                style={getScoreStyles(rubricScores.futureReadiness.score).textStyle}
+              >
+                {rubricScores.futureReadiness.score}
+              </div>
+              <div className="text-xs opacity-75">Readiness</div>
             </div>
           </div>
         </div>

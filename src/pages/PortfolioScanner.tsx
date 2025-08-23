@@ -11,7 +11,11 @@ import {
   TrendingUp,
   ArrowRight,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Link,
+  Zap,
+  Filter,
+  Scale
 } from 'lucide-react';
 import OnboardingFlow from '@/components/portfolio/OnboardingFlow';
 import AssessmentDashboard from '@/components/portfolio/AssessmentDashboard';
@@ -29,11 +33,11 @@ const PortfolioScanner = () => {
   // Mock rubric scores - in real app these would come from API
   const [rubricScores] = useState({
     academicExcellence: { score: 7.2, evidence: ['3.5 GPA while working'], feedback: 'Strong performance given constraints' },
-    leadershipPotential: { score: 8.1, evidence: ['Family coordination', 'Work leadership'], feedback: 'Natural leadership in multiple contexts' },
+    leadershipPotential: { score: 9.9, evidence: ['Family coordination', 'Work leadership'], feedback: 'Natural leadership in multiple contexts' },
     personalGrowth: { score: 6.8, evidence: ['Overcame financial challenges'], feedback: 'Resilience and adaptation' },
     communityImpact: { score: 5.4, evidence: ['Volunteer work'], feedback: 'Room for expansion' },
     uniqueValue: { score: 8.7, evidence: ['Bilingual', 'Cultural bridge'], feedback: 'Distinctive perspective' },
-    futureReadiness: { score: 6.9, evidence: ['Clear goals', 'Planning ahead'], feedback: 'Good direction, needs detail' }
+    futureReadiness: { score: 1.8, evidence: ['Clear goals', 'Planning ahead'], feedback: 'Good direction, needs detail' }
   });
 
   const overallScore = Math.round(
@@ -469,6 +473,332 @@ const PortfolioScanner = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Comprehensive Recommended Next Steps Dashboard */}
+        <Card className="mt-8 shadow-medium">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Recommended Next Steps Dashboard
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RecommendedNextStepsDashboard />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// New comprehensive dashboard component
+const RecommendedNextStepsDashboard = () => {
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+
+  const categories = [
+    { id: 'all', name: 'All Categories', count: 24 },
+    { id: 'academic', name: 'Academic Excellence', count: 5 },
+    { id: 'leadership', name: 'Leadership Development', count: 7 },
+    { id: 'community', name: 'Community Impact', count: 4 },
+    { id: 'personal', name: 'Personal Growth', count: 3 },
+    { id: 'unique', name: 'Unique Value', count: 3 },
+    { id: 'readiness', name: 'Future Readiness', count: 2 }
+  ];
+
+  const priorities = [
+    { id: 'all', name: 'All Priorities' },
+    { id: 'critical', name: 'Critical (Do Now)' },
+    { id: 'high', name: 'High Priority' },
+    { id: 'medium', name: 'Medium Priority' }
+  ];
+
+  const nextSteps = [
+    {
+      id: 1,
+      category: 'academic',
+      priority: 'high',
+      title: 'Document Academic Achievements with Impact Metrics',
+      description: 'Create detailed records of your academic performance including specific projects, research, and quantifiable outcomes. Focus on achievements while managing work responsibilities.',
+      estimatedTime: '2-3 hours',
+      difficulty: 'Medium',
+      potentialImpact: '+0.8 Academic Score',
+      requiredResources: ['Transcripts', 'Project files', 'Teacher feedback'],
+      steps: [
+        'Gather all academic records and project documentation',
+        'Calculate GPA trends and improvements over time',
+        'Document specific achievements and their measurable impact',
+        'Create compelling narratives around academic challenges overcome'
+      ],
+      deadline: '1 week',
+      relatedGoals: ['College Applications', 'Scholarship Essays']
+    },
+    {
+      id: 2,
+      category: 'leadership',
+      priority: 'critical',
+      title: 'Expand Leadership Portfolio Beyond Family Coordination',
+      description: 'While your family leadership is strong (9.9/10), diversifying into formal leadership roles will create a more comprehensive profile for competitive opportunities.',
+      estimatedTime: '4-6 weeks',
+      difficulty: 'High',
+      potentialImpact: '+0.5 Leadership Score, +0.3 Community Impact',
+      requiredResources: ['Time commitment', 'Application materials', 'References'],
+      steps: [
+        'Identify 3-5 leadership opportunities in school or community',
+        'Apply for student government, club officer positions, or volunteer coordination roles',
+        'Document current family leadership with specific examples and outcomes',
+        'Create transition plan to balance new roles with existing responsibilities'
+      ],
+      deadline: '2 weeks to apply',
+      relatedGoals: ['Leadership Development', 'College Applications']
+    },
+    {
+      id: 3,
+      category: 'readiness',
+      priority: 'critical',
+      title: 'Develop Detailed Future Readiness Action Plan',
+      description: 'Your current readiness score (1.8/10) indicates a critical gap. Create specific, measurable goals and timelines to dramatically improve this dimension.',
+      estimatedTime: '3-4 hours',
+      difficulty: 'Medium',
+      potentialImpact: '+3.2 Readiness Score',
+      requiredResources: ['Career research tools', 'Mentorship', 'Planning templates'],
+      steps: [
+        'Research 5 specific career paths aligned with your interests',
+        'Create detailed 2-year and 5-year goal timelines',
+        'Identify required skills, experiences, and credentials',
+        'Establish monthly check-in system for progress tracking'
+      ],
+      deadline: '3 days',
+      relatedGoals: ['Career Planning', 'Goal Setting']
+    },
+    {
+      id: 4,
+      category: 'community',
+      priority: 'high',
+      title: 'Launch Community Impact Initiative',
+      description: 'Create a signature community project that leverages your bilingual skills and cultural bridge-building abilities to make measurable local impact.',
+      estimatedTime: '8-12 weeks',
+      difficulty: 'High',
+      potentialImpact: '+2.1 Community Impact, +0.4 Leadership',
+      requiredResources: ['Community partners', 'Planning materials', 'Small budget'],
+      steps: [
+        'Identify specific community need you can address with your unique skills',
+        'Partner with local organizations or schools',
+        'Develop project proposal with clear metrics and timeline',
+        'Execute project with documentation of impact and lessons learned'
+      ],
+      deadline: '1 month to launch',
+      relatedGoals: ['Community Service', 'Unique Value Proposition']
+    },
+    {
+      id: 5,
+      category: 'personal',
+      priority: 'medium',
+      title: 'Create Personal Growth Narrative Portfolio',
+      description: 'Document your journey of overcoming financial challenges and personal obstacles with compelling stories and evidence of resilience.',
+      estimatedTime: '4-5 hours',
+      difficulty: 'Low',
+      potentialImpact: '+0.6 Personal Growth Score',
+      requiredResources: ['Reflection time', 'Writing materials', 'Photo documentation'],
+      steps: [
+        'Write detailed personal stories of challenges overcome',
+        'Gather supporting evidence and documentation',
+        'Create visual timeline of growth and achievement',
+        'Practice articulating growth narrative in interview settings'
+      ],
+      deadline: '2 weeks',
+      relatedGoals: ['Personal Branding', 'Essay Writing']
+    }
+  ];
+
+  const filteredSteps = nextSteps.filter(step => {
+    const categoryMatch = selectedFilter === 'all' || step.category === selectedFilter;
+    const priorityMatch = priorityFilter === 'all' || step.priority === priorityFilter;
+    return categoryMatch && priorityMatch;
+  });
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical': return 'bg-red-100 text-red-800 border-red-300';
+      case 'high': return 'bg-orange-100 text-orange-800 border-orange-300';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Filter Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 p-4 bg-muted/30 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Filter by:</span>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 flex-1">
+          <div className="flex-1">
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
+              className="w-full px-3 py-2 text-sm border rounded-md bg-background"
+            >
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name} ({category.count})
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="flex-1">
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              className="w-full px-3 py-2 text-sm border rounded-md bg-background"
+            >
+              {priorities.map(priority => (
+                <option key={priority.id} value={priority.id}>
+                  {priority.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Results Summary */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Showing {filteredSteps.length} of {nextSteps.length} recommended actions
+        </p>
+        <Button variant="outline" size="sm">
+          Export Action Plan
+        </Button>
+      </div>
+
+      {/* Action Items Grid */}
+      <div className="grid gap-6">
+        {filteredSteps.map((step) => (
+          <Card key={step.id} className="shadow-soft hover:shadow-medium transition-shadow">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-lg text-foreground">{step.title}</h3>
+                      <Badge className={`text-xs ${getPriorityColor(step.priority)}`}>
+                        {step.priority.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                  </div>
+                  
+                  <div className="text-right ml-4">
+                    <div className="text-lg font-bold text-primary mb-1">{step.potentialImpact}</div>
+                    <div className="text-xs text-muted-foreground">Potential Impact</div>
+                  </div>
+                </div>
+
+                {/* Metrics Bar */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-3 bg-muted/20 rounded-lg">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Time Required</div>
+                    <div className="font-medium text-sm">{step.estimatedTime}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Difficulty</div>
+                    <div className="font-medium text-sm">{step.difficulty}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Deadline</div>
+                    <div className="font-medium text-sm text-red-600">{step.deadline}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Focus Area</div>
+                    <div className="font-medium text-sm capitalize">{step.category.replace('_', ' ')}</div>
+                  </div>
+                </div>
+
+                {/* Detailed Steps */}
+                <div>
+                  <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Action Steps:
+                  </h4>
+                  <div className="space-y-2">
+                    {step.steps.map((actionStep, index) => (
+                      <div key={index} className="flex items-start gap-2 text-sm">
+                        <div className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center mt-0.5 flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <span className="text-muted-foreground">{actionStep}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Resources & Goals */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-2">Required Resources:</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {step.requiredResources.map((resource, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {resource}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-2">Related Goals:</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {step.relatedGoals.map((goal, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {goal}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <Button size="sm" className="flex-1 sm:flex-none">
+                    Start This Action
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Clock className="h-4 w-4 mr-2" />
+                    Schedule Later
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    View Details
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Quick Stats Footer */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-primary">+6.2</div>
+          <div className="text-xs text-muted-foreground">Max Portfolio Boost</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600">3</div>
+          <div className="text-xs text-muted-foreground">Critical Actions</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-600">15-20</div>
+          <div className="text-xs text-muted-foreground">Hours Required</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-purple-600">2-8</div>
+          <div className="text-xs text-muted-foreground">Weeks Timeline</div>
+        </div>
       </div>
     </div>
   );
@@ -638,13 +968,7 @@ const InsightItem = ({ title, description, time, type, impact, pendingGains, rel
             </div>
             <div className="text-right ml-4 min-w-[140px]">
               <div className="text-xs text-muted-foreground mb-2 flex items-center justify-end gap-1 font-medium">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-                  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-                  <path d="M7 21h10"/>
-                  <path d="M12 3v18"/>
-                  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
-                </svg>
+                <Scale className="h-3 w-3" />
                 Estimated Impact
               </div>
               <div className="space-y-1 opacity-50">
@@ -660,18 +984,7 @@ const InsightItem = ({ title, description, time, type, impact, pendingGains, rel
           
           <div className="bg-primary/5 rounded-md p-3 border border-primary/20">
             <h5 className="font-medium text-foreground text-sm mb-2 flex items-center gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="2"/>
-                <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.908 1.395H11.47a2 2 0 0 1-1.908-1.395L7.76 7.76"/>
-                <path d="M18 12h.01"/>
-                <path d="M6 12h.01"/>
-                <path d="M12 18v.01"/>
-                <path d="M12 6v.01"/>
-                <path d="m16.24 16.24 1.42-1.42"/>
-                <path d="m6.34 6.34 1.42-1.42"/>
-                <path d="m8.76 16.24-1.42-1.42"/>
-                <path d="m17.66 6.34-1.42-1.42"/>
-              </svg>
+              <Link className="h-4 w-4" />
               Feature Connections
             </h5>
             <div className="flex flex-wrap gap-2 mb-3">
@@ -685,7 +998,10 @@ const InsightItem = ({ title, description, time, type, impact, pendingGains, rel
           </div>
 
           <div className="bg-secondary/10 rounded-md p-3 border border-secondary/30">
-            <h5 className="font-medium text-foreground text-sm mb-2">⚡ Recommended Actions:</h5>
+            <h5 className="font-medium text-foreground text-sm mb-2 flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Recommended Actions
+            </h5>
             <div className="space-y-2">
               {actionItems.map((item, index) => (
                 <div key={index} className="flex items-center justify-between">

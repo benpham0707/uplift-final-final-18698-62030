@@ -393,12 +393,37 @@ const InsightItem = ({ title, description, time, type, impact, pendingGains, rel
     concern: 'text-red-600'
   };
 
+  const getCheckmarkColor = (type: string, impact: string) => {
+    // Handle special types first
+    if (type === 'warning' && impact === 'medium') {
+      return 'text-muted-foreground'; // Gray for missed opportunity
+    }
+    if (type === 'concern') {
+      return 'text-red-500'; // Red for negative impact
+    }
+    
+    // Use impact-based colors for regular items
+    switch (impact) {
+      case 'high':
+        return 'text-blue-500';
+      case 'medium':
+        return 'text-green-500';
+      case 'low':
+        return 'text-yellow-500';
+      default:
+        return 'text-muted-foreground';
+    }
+  };
+
   const getBorderClass = (type: string, impact: string) => {
-    if (type === 'warning' || type === 'concern') {
+    if (type === 'warning' && impact === 'medium') {
+      return 'border-2 border-muted-foreground/30'; // Gray for missed opportunity
+    }
+    if (type === 'concern') {
       return 'border-2 border-red-500';
     }
     if (impact === 'high') {
-      return 'border-2 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]';
+      return 'border-2 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.8)] hover:shadow-[0_0_35px_rgba(59,130,246,1)]';
     }
     if (impact === 'medium') {
       return 'border-2 border-green-500';
@@ -406,23 +431,49 @@ const InsightItem = ({ title, description, time, type, impact, pendingGains, rel
     return 'border-2 border-yellow-500';
   };
 
-  const impactColors = {
-    high: 'bg-emerald-100 text-emerald-700 border-emerald-300',
-    medium: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-    low: 'bg-slate-100 text-slate-700 border-slate-300'
+  const getImpactBadgeColors = (type: string, impact: string) => {
+    // Handle special types first
+    if (type === 'warning' && impact === 'medium') {
+      return 'bg-muted text-muted-foreground border-muted'; // Gray for missed opportunity
+    }
+    if (type === 'concern') {
+      return 'bg-red-100 text-red-700 border-red-300'; // Red for negative impact
+    }
+    
+    // Use impact-based colors for regular items
+    switch (impact) {
+      case 'high':
+        return 'bg-blue-100 text-blue-700 border-blue-300';
+      case 'medium':
+        return 'bg-green-100 text-green-700 border-green-300';
+      case 'low':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+      default:
+        return 'bg-muted text-muted-foreground border-muted';
+    }
+  };
+
+  const getImpactText = (type: string, impact: string) => {
+    if (type === 'warning' && impact === 'medium') {
+      return 'missed opportunity';
+    }
+    if (type === 'concern') {
+      return 'negative impact';
+    }
+    return `${impact} impact`;
   };
 
   return (
     <div className={`p-5 rounded-lg shadow-soft hover:shadow-medium transition-all duration-200 ${getBorderClass(type, impact)}`}>
       <div className="flex items-start gap-3">
-        <CheckCircle2 className={`h-6 w-6 mt-0.5 ${typeColors[type]} flex-shrink-0`} />
+        <CheckCircle2 className={`h-6 w-6 mt-0.5 ${getCheckmarkColor(type, impact)} flex-shrink-0`} />
         <div className="flex-1 space-y-3">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <h4 className="font-semibold text-foreground text-lg">{title}</h4>
-                <Badge className={`text-xs px-2 py-1 ${impactColors[impact]}`}>
-                  {impact} impact
+                <Badge className={`text-xs px-2 py-1 ${getImpactBadgeColors(type, impact)}`}>
+                  {getImpactText(type, impact)}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{description}</p>

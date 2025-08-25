@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, ArrowRight, ArrowLeft, GraduationCap, X } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Plus, Trash2, ArrowRight, ArrowLeft, GraduationCap, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -45,23 +46,26 @@ interface AcademicJourneyData {
   studiedAbroad: boolean;
   beenHomeschooled: boolean;
   
-  // Course History
-  currentCourses: Array<{
+  // Course History - Restructured to match reference
+  academicYears: Array<{
     id: string;
-    name: string;
-    subjectArea: string;
-    level: string;
-    duration: string;
+    year: string; // e.g., "2022 - 2023"
+    gradeLevel: string; // e.g., "9th", "10th"
+    subjects: {
+      [subjectName: string]: {
+        courses: Array<{
+          name: string;
+          honorsType: string; // AP, IB, Honors, NH (No Honors)
+          selected: boolean;
+          grade1?: string;
+          grade2?: string;
+        }>;
+      };
+    };
+    tookSummerCourses: boolean;
   }>;
   tookMathEarly: boolean;
   tookLanguageEarly: boolean;
-  completedCourses: {
-    english: string[];
-    math: string[];
-    science: string[];
-    socialStudies: string[];
-    worldLanguage: string[];
-  };
   
   // College Coursework
   collegeCoursesTaken: number;
@@ -165,16 +169,9 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
     previousSchools: [],
     studiedAbroad: false,
     beenHomeschooled: false,
-    currentCourses: [],
+    academicYears: [],
     tookMathEarly: false,
     tookLanguageEarly: false,
-    completedCourses: {
-      english: [],
-      math: [],
-      science: [],
-      socialStudies: [],
-      worldLanguage: []
-    },
     collegeCoursesTaken: 0,
     collegeCoursework: [],
     reportTestScores: false,
@@ -684,126 +681,382 @@ const OtherSchoolsStep: React.FC<{ data: AcademicJourneyData; setData: (data: Ac
   );
 };
 
+// Mock data for demonstration - represents predefined course options
+const PREDEFINED_COURSES = {
+  'History/Social Science': [
+    { name: 'AP European History (AP)', honorsType: 'AP' },
+    { name: 'AP Government and Politics Comparative (AP)', honorsType: 'AP' },
+    { name: 'AP Government and Politics United States (AP)', honorsType: 'AP' },
+    { name: 'AP Human Geography (AP)', honorsType: 'AP' },
+    { name: 'AP United States History (AP)', honorsType: 'AP' },
+    { name: 'AP World History (AP)', honorsType: 'AP' },
+    { name: 'Modern World History', honorsType: 'NH' },
+    { name: 'Modern World History APEX', honorsType: 'NH' },
+    { name: 'Modern World History Accelerated', honorsType: 'NH' },
+    { name: 'US Government', honorsType: 'NH' },
+    { name: 'US Government APEX', honorsType: 'NH' },
+    { name: 'US Government Accelerated', honorsType: 'NH' },
+    { name: 'US History', honorsType: 'NH' },
+    { name: 'US History APEX', honorsType: 'NH' },
+  ],
+  'English': [
+    { name: 'AP English Language and Composition (AP)', honorsType: 'AP' },
+    { name: 'AP English Literature and Composition (AP)', honorsType: 'AP' },
+    { name: 'AP Seminar (AP)', honorsType: 'AP' },
+    { name: 'CSU Expository Reading and Writing (CSU)', honorsType: 'NH' },
+    { name: 'Diverse Voices and Media Literacy', honorsType: 'NH' },
+    { name: 'Linked Learning Student Ambassadors', honorsType: 'NH' },
+  ],
+  'Mathematics': [
+    { name: 'AP Calculus AB (AP)', honorsType: 'AP' },
+    { name: 'AP Calculus BC (AP)', honorsType: 'AP' },
+    { name: 'AP Statistics (AP)', honorsType: 'AP' },
+    { name: 'Algebra I', honorsType: 'NH' },
+    { name: 'Algebra II', honorsType: 'NH' },
+    { name: 'Geometry', honorsType: 'NH' },
+    { name: 'Pre-Calculus', honorsType: 'NH' },
+    { name: 'Trigonometry', honorsType: 'NH' },
+  ],
+  'Science': [
+    { name: 'AP Biology (AP)', honorsType: 'AP' },
+    { name: 'AP Chemistry (AP)', honorsType: 'AP' },
+    { name: 'AP Environmental Science (AP)', honorsType: 'AP' },
+    { name: 'AP Physics 1 (AP)', honorsType: 'AP' },
+    { name: 'AP Physics 2 (AP)', honorsType: 'AP' },
+    { name: 'AP Physics C: Electricity and Magnetism (AP)', honorsType: 'AP' },
+    { name: 'AP Physics C: Mechanics (AP)', honorsType: 'AP' },
+    { name: 'Biology', honorsType: 'NH' },
+    { name: 'Chemistry', honorsType: 'NH' },
+    { name: 'Earth Science', honorsType: 'NH' },
+    { name: 'Physics', honorsType: 'NH' },
+  ],
+  'Language Other Than English': [
+    { name: 'AP Spanish Language and Culture (AP)', honorsType: 'AP' },
+    { name: 'AP Spanish Literature and Culture (AP)', honorsType: 'AP' },
+    { name: 'AP French Language and Culture (AP)', honorsType: 'AP' },
+    { name: 'AP German Language and Culture (AP)', honorsType: 'AP' },
+    { name: 'Spanish I', honorsType: 'NH' },
+    { name: 'Spanish II', honorsType: 'NH' },
+    { name: 'Spanish III', honorsType: 'NH' },
+    { name: 'Spanish IV', honorsType: 'NH' },
+    { name: 'French I', honorsType: 'NH' },
+    { name: 'French II', honorsType: 'NH' },
+  ],
+  'Visual and Performing Arts': [
+    { name: 'AP Art History (AP)', honorsType: 'AP' },
+    { name: 'AP Music Theory (AP)', honorsType: 'AP' },
+    { name: 'AP Studio Art 2-D Design (AP)', honorsType: 'AP' },
+    { name: 'AP Studio Art 3-D Design (AP)', honorsType: 'AP' },
+    { name: 'AP Studio Art Drawing (AP)', honorsType: 'AP' },
+    { name: 'Art I', honorsType: 'NH' },
+    { name: 'Art II', honorsType: 'NH' },
+    { name: 'Drama', honorsType: 'NH' },
+    { name: 'Music', honorsType: 'NH' },
+    { name: 'Photography', honorsType: 'NH' },
+  ],
+  'College-Prep Electives': [
+    { name: 'AP Computer Science A (AP)', honorsType: 'AP' },
+    { name: 'AP Computer Science Principles (AP)', honorsType: 'AP' },
+    { name: 'AP Psychology (AP)', honorsType: 'AP' },
+    { name: 'Computer Science', honorsType: 'NH' },
+    { name: 'Psychology', honorsType: 'NH' },
+    { name: 'Journalism', honorsType: 'NH' },
+    { name: 'Business', honorsType: 'NH' },
+    { name: 'Health', honorsType: 'NH' },
+  ]
+};
+
 const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
-  const addCurrentCourse = () => {
-    const newCourse = {
+  const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
+
+  const addAcademicYear = () => {
+    const currentYear = new Date().getFullYear();
+    const nextYear = currentYear + 1;
+    const yearString = `${currentYear} - ${nextYear}`;
+    
+    // Initialize subjects with predefined courses
+    const subjects: { [key: string]: any } = {};
+    Object.entries(PREDEFINED_COURSES).forEach(([subjectName, courses]) => {
+      subjects[subjectName] = {
+        courses: courses.map(course => ({
+          ...course,
+          selected: false,
+          grade1: '',
+          grade2: ''
+        }))
+      };
+    });
+
+    const newYear = {
       id: Date.now().toString(),
-      name: '',
-      subjectArea: '',
-      level: '',
-      duration: ''
+      year: yearString,
+      gradeLevel: '9th', // Default, user can change
+      subjects,
+      tookSummerCourses: false
     };
-    setData({ ...data, currentCourses: [...data.currentCourses, newCourse] });
-  };
 
-  const updateCurrentCourse = (id: string, field: string, value: string) => {
-    const updatedCourses = data.currentCourses.map(course =>
-      course.id === id ? { ...course, [field]: value } : course
-    );
-    setData({ ...data, currentCourses: updatedCourses });
-  };
-
-  const removeCurrentCourse = (id: string) => {
-    setData({ ...data, currentCourses: data.currentCourses.filter(course => course.id !== id) });
-  };
-
-  const updateCompletedCourses = (subject: keyof typeof data.completedCourses, courses: string[]) => {
     setData({ 
       ...data, 
-      completedCourses: { 
-        ...data.completedCourses, 
-        [subject]: courses 
-      } 
+      academicYears: [...data.academicYears, newYear] 
     });
   };
 
+  const updateAcademicYear = (yearId: string, field: string, value: any) => {
+    const updatedYears = data.academicYears.map(year =>
+      year.id === yearId ? { ...year, [field]: value } : year
+    );
+    setData({ ...data, academicYears: updatedYears });
+  };
+
+  const removeAcademicYear = (yearId: string) => {
+    setData({ 
+      ...data, 
+      academicYears: data.academicYears.filter(year => year.id !== yearId) 
+    });
+  };
+
+  const updateCourseSelection = (yearId: string, subjectName: string, courseIndex: number, field: string, value: any) => {
+    const updatedYears = data.academicYears.map(year => {
+      if (year.id === yearId) {
+        const updatedSubjects = { ...year.subjects };
+        const updatedCourses = [...updatedSubjects[subjectName].courses];
+        updatedCourses[courseIndex] = { 
+          ...updatedCourses[courseIndex], 
+          [field]: value 
+        };
+        updatedSubjects[subjectName] = {
+          ...updatedSubjects[subjectName],
+          courses: updatedCourses
+        };
+        return { ...year, subjects: updatedSubjects };
+      }
+      return year;
+    });
+    setData({ ...data, academicYears: updatedYears });
+  };
+
+  const toggleSubject = (yearId: string, subjectName: string) => {
+    const key = `${yearId}-${subjectName}`;
+    setOpenSubjects(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const isSubjectOpen = (yearId: string, subjectName: string) => {
+    return openSubjects[`${yearId}-${subjectName}`] || false;
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Current Year Courses */}
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h4 className="text-lg font-medium">Current Year Courses</h4>
-          <Button type="button" onClick={addCurrentCourse} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Course
-          </Button>
+    <div className="space-y-6 w-full overflow-hidden">
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-medium">Academic Course History</h3>
+          <p className="text-sm text-muted-foreground">
+            Please indicate the academic year and grade that you attended this high school.
+          </p>
         </div>
+        <Button type="button" onClick={addAcademicYear} size="sm">
+          <Plus className="h-4 w-4 mr-2" />
+          Add another grade
+        </Button>
+      </div>
 
-        <div className="space-y-4">
-          {data.currentCourses.map((course, index) => (
-            <Card key={course.id}>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h5 className="font-medium">Course {index + 1}</h5>
-                    <Button type="button" onClick={() => removeCurrentCourse(course.id)} size="sm" variant="outline">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Course Name</Label>
-                      <Input
-                        value={course.name}
-                        onChange={(e) => updateCurrentCourse(course.id, 'name', e.target.value)}
-                        placeholder="e.g., Advanced Biology"
+      <div className="space-y-6">
+        {data.academicYears.map((academicYear, yearIndex) => (
+          <Card key={academicYear.id} className="w-full">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h4 className="text-lg font-semibold">{academicYear.year} academic year</h4>
+                  <div className="flex gap-4 mt-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor={`grade-${academicYear.id}`}>Grade *</Label>
+                      <Select 
+                        value={academicYear.gradeLevel} 
+                        onValueChange={(value) => updateAcademicYear(academicYear.id, 'gradeLevel', value)}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue placeholder="-- select --" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="9th">9th</SelectItem>
+                          <SelectItem value="10th">10th</SelectItem>
+                          <SelectItem value="11th">11th</SelectItem>
+                          <SelectItem value="12th">12th</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox 
+                        id={`summer-${academicYear.id}`}
+                        checked={academicYear.tookSummerCourses}
+                        onCheckedChange={(checked) => 
+                          updateAcademicYear(academicYear.id, 'tookSummerCourses', checked)
+                        }
                       />
-                    </div>
-                    <div>
-                      <Label>Subject Area</Label>
-                      <Select value={course.subjectArea} onValueChange={(value) => updateCurrentCourse(course.id, 'subjectArea', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select subject" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="english">English</SelectItem>
-                          <SelectItem value="math">Mathematics</SelectItem>
-                          <SelectItem value="science">Science</SelectItem>
-                          <SelectItem value="social-studies">Social Studies</SelectItem>
-                          <SelectItem value="world-language">World Language</SelectItem>
-                          <SelectItem value="arts">Arts</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Course Level</Label>
-                      <Select value={course.level} onValueChange={(value) => updateCurrentCourse(course.id, 'level', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ap">AP</SelectItem>
-                          <SelectItem value="ib">IB</SelectItem>
-                          <SelectItem value="honors">Honors</SelectItem>
-                          <SelectItem value="regular">Regular</SelectItem>
-                          <SelectItem value="dual-enrollment">Dual Enrollment</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Duration</Label>
-                      <Select value={course.duration} onValueChange={(value) => updateCurrentCourse(course.id, 'duration', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select duration" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="full-year">Full Year</SelectItem>
-                          <SelectItem value="semester">Semester</SelectItem>
-                          <SelectItem value="trimester">Trimester</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor={`summer-${academicYear.id}`}>I took summer courses after this grade</Label>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <Button 
+                  type="button" 
+                  onClick={() => removeAcademicYear(academicYear.id)} 
+                  size="sm" 
+                  variant="outline"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {Object.entries(academicYear.subjects).map(([subjectName, subjectData]) => {
+                const isOpen = isSubjectOpen(academicYear.id, subjectName);
+                const selectedCourses = subjectData.courses.filter((course: any) => course.selected);
+                
+                return (
+                  <div key={subjectName} className="border rounded-lg">
+                    <Collapsible 
+                      open={isOpen} 
+                      onOpenChange={() => toggleSubject(academicYear.id, subjectName)}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-4 h-auto font-medium text-left hover:bg-muted/50"
+                        >
+                          <span>{academicYear.gradeLevel} {subjectName}</span>
+                          {isOpen ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="px-4 pb-4">
+                        <div className="space-y-3">
+                          {subjectData.courses.map((course: any, courseIndex: number) => (
+                            <div key={courseIndex}>
+                              <div className="flex items-center justify-between py-2">
+                                <div className="flex items-center space-x-3 flex-1">
+                                  <Checkbox
+                                    id={`course-${academicYear.id}-${subjectName}-${courseIndex}`}
+                                    checked={course.selected}
+                                    onCheckedChange={(checked) =>
+                                      updateCourseSelection(
+                                        academicYear.id,
+                                        subjectName,
+                                        courseIndex,
+                                        'selected',
+                                        checked
+                                      )
+                                    }
+                                  />
+                                  <Label
+                                    htmlFor={`course-${academicYear.id}-${subjectName}-${courseIndex}`}
+                                    className="flex-1 cursor-pointer"
+                                  >
+                                    {course.name}
+                                  </Label>
+                                </div>
+                                <div className="text-sm text-muted-foreground min-w-[40px] text-right">
+                                  {course.honorsType}
+                                </div>
+                              </div>
+                              
+                              {course.selected && (
+                                <div className="ml-6 flex gap-4 mt-2">
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground">Grade 1</Label>
+                                    <Select
+                                      value={course.grade1 || ''}
+                                      onValueChange={(value) =>
+                                        updateCourseSelection(
+                                          academicYear.id,
+                                          subjectName,
+                                          courseIndex,
+                                          'grade1',
+                                          value
+                                        )
+                                      }
+                                    >
+                                      <SelectTrigger className="w-16 h-8">
+                                        <SelectValue placeholder="--" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="A+">A+</SelectItem>
+                                        <SelectItem value="A">A</SelectItem>
+                                        <SelectItem value="A-">A-</SelectItem>
+                                        <SelectItem value="B+">B+</SelectItem>
+                                        <SelectItem value="B">B</SelectItem>
+                                        <SelectItem value="B-">B-</SelectItem>
+                                        <SelectItem value="C+">C+</SelectItem>
+                                        <SelectItem value="C">C</SelectItem>
+                                        <SelectItem value="C-">C-</SelectItem>
+                                        <SelectItem value="D+">D+</SelectItem>
+                                        <SelectItem value="D">D</SelectItem>
+                                        <SelectItem value="F">F</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground">Grade 2</Label>
+                                    <Select
+                                      value={course.grade2 || ''}
+                                      onValueChange={(value) =>
+                                        updateCourseSelection(
+                                          academicYear.id,
+                                          subjectName,
+                                          courseIndex,
+                                          'grade2',
+                                          value
+                                        )
+                                      }
+                                    >
+                                      <SelectTrigger className="w-16 h-8">
+                                        <SelectValue placeholder="--" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="A+">A+</SelectItem>
+                                        <SelectItem value="A">A</SelectItem>
+                                        <SelectItem value="A-">A-</SelectItem>
+                                        <SelectItem value="B+">B+</SelectItem>
+                                        <SelectItem value="B">B</SelectItem>
+                                        <SelectItem value="B-">B-</SelectItem>
+                                        <SelectItem value="C+">C+</SelectItem>
+                                        <SelectItem value="C">C</SelectItem>
+                                        <SelectItem value="C-">C-</SelectItem>
+                                        <SelectItem value="D+">D+</SelectItem>
+                                        <SelectItem value="D">D</SelectItem>
+                                        <SelectItem value="F">F</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                );
+              })}
+              
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={`no-courses-${academicYear.id}`}
+                  />
+                  <Label htmlFor={`no-courses-${academicYear.id}`} className="text-sm">
+                    I don't see my courses.
+                  </Label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Separator />
@@ -826,33 +1079,6 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
             onCheckedChange={(checked) => setData({ ...data, tookLanguageEarly: checked as boolean })}
           />
           <Label htmlFor="language-early">I took language other than English in 7th or 8th grade</Label>
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Completed Courses by Subject */}
-      <div>
-        <h4 className="text-lg font-medium mb-4">Key Completed Courses by Subject Area</h4>
-        <div className="grid md:grid-cols-2 gap-6">
-          {Object.entries(data.completedCourses).map(([subject, courses]) => (
-            <div key={subject}>
-              <Label className="text-sm font-medium capitalize">
-                {subject === 'socialStudies' ? 'Social Studies' : 
-                 subject === 'worldLanguage' ? 'World Language' : subject}
-              </Label>
-              <Textarea
-                value={courses.join('\n')}
-                onChange={(e) => updateCompletedCourses(
-                  subject as keyof typeof data.completedCourses, 
-                  e.target.value.split('\n').filter(course => course.trim())
-                )}
-                placeholder={`Enter ${subject === 'socialStudies' ? 'Social Studies' : 
-                            subject === 'worldLanguage' ? 'World Language' : subject} courses, one per line`}
-                rows={4}
-              />
-            </div>
-          ))}
         </div>
       </div>
     </div>

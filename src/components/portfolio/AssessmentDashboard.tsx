@@ -8,7 +8,8 @@ import {
   Briefcase, 
   GraduationCap,
   Heart,
-  Trophy,
+  Target,
+  Users2,
   BookOpen,
   Plus,
   ArrowRight,
@@ -18,6 +19,11 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import ExperiencesWizard from '@/components/portfolio/ExperiencesWizard';
 import BasicInformationWizard from '@/components/portfolio/BasicInformationWizard';
+import AcademicJourneyWizard from '@/components/portfolio/AcademicJourneyWizard';
+import FamilyResponsibilitiesWizard from '@/components/portfolio/FamilyResponsibilitiesWizard';
+import GoalsAspirationsWizard from '@/components/portfolio/GoalsAspirationsWizard';
+import SupportNetworkWizard from '@/components/portfolio/SupportNetworkWizard';
+import PersonalGrowthWizard from '@/components/portfolio/PersonalGrowthWizard';
 
 interface AssessmentDashboardProps {
   onProgressUpdate: (progress: number) => void;
@@ -33,7 +39,17 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
       icon: User,
       progress: 85,
       status: 'completed',
-      items: ['Basic info', 'Academic record', 'Goals & aspirations'],
+      items: ['Basic info', 'Background & demographics', 'Family context'],
+      unlocked: true
+    },
+    {
+      id: 'academic',
+      title: 'Academic Journey',
+      description: 'School, courses, and academic performance',
+      icon: GraduationCap,
+      progress: 30,
+      status: 'not-started',
+      items: ['Current school', 'Academic performance', 'Course history', 'Standardized testing'],
       unlocked: true
     },
     {
@@ -41,50 +57,40 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
       title: 'Experiences & Activities',
       description: 'Work, volunteer, and extracurricular activities',
       icon: Briefcase,
-      progress: 40,
-      status: 'in-progress', 
-      items: ['Work experience', 'Volunteer work', 'School activities', 'Personal projects'],
-      unlocked: true
-    },
-    {
-      id: 'academic',
-      title: 'Academic Journey',
-      description: 'Courses, achievements, and learning experiences',
-      icon: GraduationCap,
-      progress: 60,
-      status: 'in-progress',
-      items: ['Course history', 'Test scores', 'Academic awards', 'Learning challenges'],
-      unlocked: true
-    },
-    {
-      id: 'community',
-      title: 'Community & Family',
-      description: 'Service, leadership, and personal responsibilities',
-      icon: Heart,
       progress: 20,
-      status: 'not-started',
-      items: ['Community service', 'Family responsibilities', 'Cultural contributions'],
-      unlocked: currentProgress >= 30
+      status: 'not-started', 
+      items: ['Work experience', 'Volunteer service', 'Extracurriculars', 'Personal projects'],
+      unlocked: true
     },
     {
-      id: 'achievements',
-      title: 'Awards & Recognition',
-      description: 'Formal and informal acknowledgments',
-      icon: Trophy,
-      progress: 10,
-      status: 'not-started',
-      items: ['Awards & honors', 'Recognition', 'Competition results'],
-      unlocked: currentProgress >= 50
-    },
-    {
-      id: 'reflection',
-      title: 'Personal Growth & Stories',
-      description: 'Challenges, growth moments, and narratives',
-      icon: BookOpen,
+      id: 'family',
+      title: 'Family Responsibilities & Circumstances',
+      description: 'Family duties and challenging circumstances',
+      icon: Heart,
       progress: 0,
-      status: 'locked',
-      items: ['Growth stories', 'Challenge reflections', 'Future vision'],
-      unlocked: currentProgress >= 70
+      status: 'not-started',
+      items: ['Family responsibilities', 'Life circumstances'],
+      unlocked: currentProgress >= 20
+    },
+    {
+      id: 'goals',
+      title: 'Goals & Aspirations',
+      description: 'Academic interests and college plans',
+      icon: Target,
+      progress: 0,
+      status: 'not-started',
+      items: ['Academic interests', 'Career goals', 'College application plans'],
+      unlocked: currentProgress >= 40
+    },
+    {
+      id: 'support',
+      title: 'Support Network & Resources',
+      description: 'Educational support and documentation',
+      icon: Users2,
+      progress: 0,
+      status: 'not-started',
+      items: ['Educational support', 'Community organizations', 'Portfolio items'],
+      unlocked: currentProgress >= 60
     }
   ]);
 
@@ -154,6 +160,74 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
         ))}
       </div>
 
+      {/* Personal Growth & Stories - Full Width Section */}
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-lg bg-primary">
+                <BookOpen className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Personal Growth & Stories</CardTitle>
+                <p className="text-muted-foreground">Share your unique experiences, challenges, and personal narrative</p>
+              </div>
+            </div>
+            <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+              {currentProgress >= 80 ? 'Ready to Start' : 'Locked'}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {currentProgress >= 80 ? (
+            <div className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>Meaningful experiences</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>Personal challenges</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>Additional context</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                This is the most important section of your portfolio. Share the stories that make you unique and help colleges understand who you are beyond grades and test scores.
+              </p>
+              <Button 
+                size="lg" 
+                className="w-full md:w-auto"
+                onClick={() => setOpenSection('growth')}
+              >
+                Start Personal Growth Section
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h4 className="font-medium text-lg mb-2">Complete More Sections to Unlock</h4>
+              <p className="text-muted-foreground mb-4">
+                Complete at least 80% of other sections to unlock Personal Growth & Stories
+              </p>
+              <div className="w-full bg-muted rounded-full h-2">
+                <div 
+                  className="bg-primary h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${Math.min(currentProgress, 100)}%` }}
+                />
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                {currentProgress}% complete • {80 - currentProgress}% remaining
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Next Steps Recommendations */}
       <Card>
         <CardHeader>
@@ -183,14 +257,36 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
         </CardContent>
       </Card>
       {/* Wizards */}
+      <Dialog open={openSection === 'personal'} onOpenChange={(v) => setOpenSection(v ? 'personal' : null)}>
+        <DialogContent className="max-w-3xl w-full">
+          <BasicInformationWizard 
+            onComplete={() => {
+              setAssessmentSections((prev) => prev.map((s) => s.id === 'personal' ? { ...s, status: 'completed', progress: 100 } : s));
+              setOpenSection(null);
+            }}
+            onCancel={() => setOpenSection(null)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSection === 'academic'} onOpenChange={(v) => setOpenSection(v ? 'academic' : null)}>
+        <DialogContent className="max-w-4xl w-full">
+          <AcademicJourneyWizard
+            onComplete={() => {
+              setAssessmentSections((prev) => prev.map((s) => s.id === 'academic' ? { ...s, status: 'completed', progress: 100 } : s));
+              setOpenSection(null);
+            }}
+            onCancel={() => setOpenSection(null)}
+          />
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={openSection === 'experiences'} onOpenChange={(v) => setOpenSection(v ? 'experiences' : null)}>
         <DialogContent className="max-w-3xl w-full">
           <ExperiencesWizard
             onAdded={() => {
-              // Optional: update section status to in-progress if previously not-started
               setAssessmentSections((prev) => prev.map((s) => s.id === 'experiences' ? { ...s, status: 'in-progress' } : s));
               if (typeof onProgressUpdate === 'function') {
-                // leave as-is; full dynamic progress can be wired later
                 onProgressUpdate(currentProgress);
               }
             }}
@@ -198,11 +294,47 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
           />
         </DialogContent>
       </Dialog>
-      <Dialog open={openSection === 'personal'} onOpenChange={(v) => setOpenSection(v ? 'personal' : null)}>
+
+      <Dialog open={openSection === 'family'} onOpenChange={(v) => setOpenSection(v ? 'family' : null)}>
         <DialogContent className="max-w-3xl w-full">
-          <BasicInformationWizard 
+          <FamilyResponsibilitiesWizard
             onComplete={() => {
-              setAssessmentSections((prev) => prev.map((s) => s.id === 'personal' ? { ...s, status: 'completed', progress: 100 } : s));
+              setAssessmentSections((prev) => prev.map((s) => s.id === 'family' ? { ...s, status: 'completed', progress: 100 } : s));
+              setOpenSection(null);
+            }}
+            onCancel={() => setOpenSection(null)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSection === 'goals'} onOpenChange={(v) => setOpenSection(v ? 'goals' : null)}>
+        <DialogContent className="max-w-3xl w-full">
+          <GoalsAspirationsWizard
+            onComplete={() => {
+              setAssessmentSections((prev) => prev.map((s) => s.id === 'goals' ? { ...s, status: 'completed', progress: 100 } : s));
+              setOpenSection(null);
+            }}
+            onCancel={() => setOpenSection(null)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSection === 'support'} onOpenChange={(v) => setOpenSection(v ? 'support' : null)}>
+        <DialogContent className="max-w-3xl w-full">
+          <SupportNetworkWizard
+            onComplete={() => {
+              setAssessmentSections((prev) => prev.map((s) => s.id === 'support' ? { ...s, status: 'completed', progress: 100 } : s));
+              setOpenSection(null);
+            }}
+            onCancel={() => setOpenSection(null)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSection === 'growth'} onOpenChange={(v) => setOpenSection(v ? 'growth' : null)}>
+        <DialogContent className="max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+          <PersonalGrowthWizard
+            onComplete={() => {
               setOpenSection(null);
             }}
             onCancel={() => setOpenSection(null)}

@@ -819,15 +819,20 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
     const updatedYears = data.academicYears.map(year => {
       if (year.id === yearId) {
         const updatedSubjects = { ...year.subjects };
-        const updatedCourses = [...updatedSubjects[subjectName].courses];
-        updatedCourses[courseIndex] = { 
-          ...updatedCourses[courseIndex], 
-          [field]: value 
-        };
-        updatedSubjects[subjectName] = {
-          ...updatedSubjects[subjectName],
-          courses: updatedCourses
-        };
+        // Add safety check for courses array
+        if (updatedSubjects[subjectName]?.courses) {
+          const updatedCourses = [...updatedSubjects[subjectName].courses];
+          if (updatedCourses[courseIndex]) {
+            updatedCourses[courseIndex] = { 
+              ...updatedCourses[courseIndex], 
+              [field]: value 
+            };
+            updatedSubjects[subjectName] = {
+              ...updatedSubjects[subjectName],
+              courses: updatedCourses
+            };
+          }
+        }
         return { ...year, subjects: updatedSubjects };
       }
       return year;
@@ -863,7 +868,7 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
       </div>
 
       <div className="space-y-6">
-        {data.academicYears.map((academicYear, yearIndex) => (
+        {(data.academicYears || []).map((academicYear, yearIndex) => (
           <Card key={academicYear.id} className="w-full">
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -910,9 +915,11 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {Object.entries(academicYear.subjects).map(([subjectName, subjectData]) => {
+              {Object.entries(academicYear.subjects || {}).map(([subjectName, subjectData]) => {
                 const isOpen = isSubjectOpen(academicYear.id, subjectName);
-                const selectedCourses = subjectData.courses.filter((course: any) => course.selected);
+                // Add safety check for courses array
+                const courses = subjectData?.courses || [];
+                const selectedCourses = courses.filter((course: any) => course.selected);
                 
                 return (
                   <div key={subjectName} className="border rounded-lg">
@@ -936,7 +943,7 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
                       
                       <CollapsibleContent className="px-4 pb-4">
                         <div className="space-y-3">
-                          {subjectData.courses.map((course: any, courseIndex: number) => (
+                          {courses.map((course: any, courseIndex: number) => (
                             <div key={courseIndex}>
                               <div className="flex items-center justify-between py-2">
                                 <div className="flex items-center space-x-3 flex-1">

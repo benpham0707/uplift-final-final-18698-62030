@@ -62,9 +62,9 @@ export async function completePersonal(req: Request, res: Response, next: NextFu
     const raceEthnicity: string[] = (() => {
       const values = [...(demo.raceEthnicity || [])];
       if (values.includes("other") && demo.raceOther) {
-        values.push(`other:${demo.raceOther}`);
+        values.push("other");
       }
-      return values as string[];
+      return values;
     })();
 
     const hispanicBackground: string | null = demo.hispanicLatino === "yes"

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import ExperiencesWizard from '@/components/portfolio/ExperiencesWizard';
-import PersonalInfoWizard from '@/components/portfolio/PersonalInfoWizard';
+import BasicInformationWizard from '@/components/portfolio/BasicInformationWizard';
 
 interface AssessmentDashboardProps {
   onProgressUpdate: (progress: number) => void;
@@ -200,7 +200,13 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
       </Dialog>
       <Dialog open={openSection === 'personal'} onOpenChange={(v) => setOpenSection(v ? 'personal' : null)}>
         <DialogContent className="max-w-3xl w-full">
-          <PersonalInfoWizard onComplete={() => setOpenSection(null)} />
+          <BasicInformationWizard 
+            onComplete={() => {
+              setAssessmentSections((prev) => prev.map((s) => s.id === 'personal' ? { ...s, status: 'completed', progress: 100 } : s));
+              setOpenSection(null);
+            }}
+            onCancel={() => setOpenSection(null)}
+          />
         </DialogContent>
       </Dialog>
     </div>

@@ -11,10 +11,6 @@ import NotFound from "./pages/NotFound";
 import PersonalInfo from "./pages/PersonalInfo";
 import CollegeApplication from "./pages/CollegeApplication";
 import PersonalInfoHub from "./pages/personal-info/PersonalInfoHub";
-import BasicInformation from "./pages/personal-info/BasicInformation";
-import Demographics from "./pages/personal-info/Demographics";
-import FamilyContext from "./pages/personal-info/FamilyContext";
-import Communications from "./pages/personal-info/Communications";
 
 const queryClient = new QueryClient();
 
@@ -28,11 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/portfolio-scanner" element={<PortfolioScanner />} />
-            <Route path="/personal-info" element={<PersonalInfoHub />} />
-            <Route path="/personal-info/basic" element={<BasicInformation />} />
-            <Route path="/personal-info/demographics" element={<Demographics />} />
-            <Route path="/personal-info/family" element={<FamilyContext />} />
-            <Route path="/personal-info/communications" element={<Communications />} />
+        <Route path="/personal-info" element={<PersonalInfoHub />} />
             <Route path="/college-application" element={<CollegeApplication />} />
             <Route path="/auth" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -17,40 +17,27 @@ export async function completePersonal(req: Request, res: Response, next: NextFu
       .single();
     if (pErr || !prof) throw pErr || new Error("profile_not_found");
 
-    // Merge demographics
+    // Merge demographics with new structure
     const demographics = {
       ...(prof.demographics as any ?? {}),
-      basics: input.basics,
-      background: input.background,
-      communications: input.communications,
+      personalInfo: {
+        basicInfo: input.basicInfo,
+        demographics: input.demographics,
+        familyContext: input.familyContext,
+        communications: input.communications,
+      }
     } as any;
 
     // Bump completion
     const details = (prof.completion_details as any) ?? { overall: 0, sections: { basic: 0, goals: 0, academic: 0, enrichment: 0, experience: 0 } };
     const nextDetails = { ...details, sections: { ...details.sections, basic: 1 } };
-    const nextScore = Math.max(Number(prof.completion_score ?? 0), 0.5);
+    const nextScore = Math.max(Number(prof.completion_score ?? 0), 0.6);
 
     const { error: uErr } = await supabaseAdmin
       .from("profiles")
       .update({ demographics, completion_details: nextDetails, completion_score: nextScore })
       .eq("id", prof.id);
     if (uErr) throw uErr;
-
-    // Upsert academic_records.school
-    const { error: aErr } = await supabaseAdmin
-      .from("academic_records")
-      .upsert({
-        profile_id: prof.id,
-        current_grade: (await currentGradeOrDefault(prof.id)) ?? "unknown",
-        school: {
-          name: input.school.name,
-          city: input.school.city ?? "",
-          state: input.school.state ?? "",
-          country: input.school.country ?? "USA",
-          type: input.school.type,
-        } as any,
-      }, { onConflict: "profile_id" });
-    if (aErr) throw aErr;
 
     // Event
     await supabaseAdmin.from("profile_events").insert({

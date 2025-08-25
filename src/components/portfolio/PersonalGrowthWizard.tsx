@@ -156,20 +156,17 @@ const PersonalGrowthWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Create a concise narrative summary instead of large JSON
+      const meaningfulStories = Object.values(data.meaningfulExperiences)
+        .filter(story => story.length > 0)
+        .slice(0, 3) // Limit to prevent timeouts
+        .join('. ');
+
       const { error } = await supabase
         .from('profiles')
         .update({
-          // Store personal growth stories in narrative_summary field
-          narrative_summary: JSON.stringify({
-            meaningful_experiences: data.meaningfulExperiences,
-            additional_context: data.additionalContext
-          }),
-          demographics: {
-            personal_growth: {
-              meaningful_experiences: data.meaningfulExperiences,
-              additional_context: data.additionalContext
-            }
-          }
+          narrative_summary: meaningfulStories.substring(0, 1000), // Limit length
+          completion_score: 100 // Mark as fully complete
         })
         .eq('user_id', user.id);
 

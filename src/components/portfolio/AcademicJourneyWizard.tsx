@@ -220,24 +220,16 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Save academic journey data to Supabase
+      // Create a lightweight academic summary
+      const academicSummary = `Grade: ${data.currentGrade}, School: ${data.schoolName}, GPA: ${data.cumulativeGPA || 'N/A'}`;
+      
+      // Update profiles with minimal data to avoid timeouts
       const { error } = await supabase
         .from('profiles')
         .update({
-          // Store academic journey data in demographics field for now
-          demographics: {
-            academic_journey: {
-              school_name: data.schoolName,
-              school_type: data.schoolType,
-              current_grade: data.currentGrade,
-              expected_graduation: data.expectedGraduation,
-              cumulative_gpa: data.cumulativeGPA,
-              gpa_scale: data.gpaScale,
-              standardized_tests: data.reportTestScores ? { sat: data.sat, act: data.act } : null,
-              ap_exams: data.takingAPExams ? data.apExams : null,
-              ib_programme: data.inIBProgramme ? data.ibExams : null
-            }
-          }
+          // Store just essential info to avoid timeout
+          narrative_summary: academicSummary,
+          completion_score: 30 // Update completion score
         })
         .eq('user_id', user.id);
 

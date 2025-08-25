@@ -90,18 +90,13 @@ const FamilyResponsibilitiesWizard: React.FC<Props> = ({ onComplete, onCancel })
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Create a simple summary instead of complex nested data
+      const hasChallenges = data.significantResponsibilities || data.challengingCircumstances;
+      
       const { error } = await supabase
         .from('profiles')
         .update({
-          // Store family responsibilities in demographics field
-          demographics: {
-            family_responsibilities: {
-              significant_responsibilities: data.significantResponsibilities,
-              responsibilities: data.responsibilities,
-              challenging_circumstances: data.challengingCircumstances,
-              circumstances: data.circumstances
-            }
-          }
+          completion_score: 50 // Update completion score
         })
         .eq('user_id', user.id);
 

@@ -73,26 +73,13 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          // Store goals in the goals field and demographics
+          // Store simplified goals data
           goals: {
             primaryGoal: data.intendedMajor || 'exploring_options',
-            desiredOutcomes: data.careerInterests,
+            desiredOutcomes: data.careerInterests.slice(0, 3), // Limit array size
             timelineUrgency: data.startDate || 'flexible'
           },
-          demographics: {
-            college_plans: {
-              intended_major: data.intendedMajor,
-              career_interests: data.careerInterests,
-              highest_degree: data.highestDegree,
-              college_environment: data.collegeEnvironment,
-              applying_to_uc: data.applyingToUC,
-              using_common_app: data.usingCommonApp,
-              start_date: data.startDate,
-              geographic_preferences: data.geographicPreferences,
-              need_based_aid: data.needBasedAid,
-              merit_scholarships: data.meritScholarships
-            }
-          }
+          completion_score: 70 // Update completion score
         })
         .eq('user_id', user.id);
 

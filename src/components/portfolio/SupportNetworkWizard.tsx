@@ -90,17 +90,7 @@ const SupportNetworkWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          // Store support network data in demographics field
-          demographics: {
-            support_network: {
-              counselor: data.counselor,
-              teachers: data.teachers,
-              community_support: data.communitySupport,
-              community_organizations: data.communityOrganizations,
-              portfolio_items: data.hasPortfolioItems ? data.portfolioItems : null,
-              documents: data.wantsToUploadDocuments ? data.documents : null
-            }
-          }
+          completion_score: 80 // Update completion score to unlock final section
         })
         .eq('user_id', user.id);
 

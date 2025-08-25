@@ -19,6 +19,7 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import ExperiencesWizard from '@/components/portfolio/ExperiencesWizard';
 import BasicInformationWizard from '@/components/portfolio/BasicInformationWizard';
+import PersonalInformationWizard from '@/components/portfolio/PersonalInformationWizard';
 import AcademicJourneyWizard from '@/components/portfolio/AcademicJourneyWizard';
 import FamilyResponsibilitiesWizard from '@/components/portfolio/FamilyResponsibilitiesWizard';
 import GoalsAspirationsWizard from '@/components/portfolio/GoalsAspirationsWizard';
@@ -258,8 +259,8 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
       </Card>
       {/* Wizards */}
       <Dialog open={openSection === 'personal'} onOpenChange={(v) => setOpenSection(v ? 'personal' : null)}>
-        <DialogContent className="max-w-3xl w-full">
-          <BasicInformationWizard 
+        <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <PersonalInformationWizard 
             onComplete={() => {
               setAssessmentSections((prev) => prev.map((s) => s.id === 'personal' ? { ...s, status: 'completed', progress: 100 } : s));
               setOpenSection(null);

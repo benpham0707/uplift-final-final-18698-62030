@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, ArrowRight, ArrowLeft, GraduationCap } from 'lucide-react';
+import { Plus, Trash2, ArrowRight, ArrowLeft, GraduationCap, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -35,6 +35,7 @@ interface AcademicJourneyData {
   // Other Schools
   otherSchoolsAttended: number;
   previousSchools: Array<{
+    id: string;
     name: string;
     cityState: string;
     startDate: string;
@@ -46,6 +47,7 @@ interface AcademicJourneyData {
   
   // Course History
   currentCourses: Array<{
+    id: string;
     name: string;
     subjectArea: string;
     level: string;
@@ -64,6 +66,7 @@ interface AcademicJourneyData {
   // College Coursework
   collegeCoursesTaken: number;
   collegeCoursework: Array<{
+    id: string;
     college: string;
     setting: string;
     courseName: string;
@@ -94,6 +97,7 @@ interface AcademicJourneyData {
   // AP Exams
   takingAPExams: boolean;
   apExams: Array<{
+    id: string;
     subject: string;
     date: string;
     score: string;
@@ -102,6 +106,7 @@ interface AcademicJourneyData {
   // IB Programme
   inIBProgramme: boolean;
   ibExams: Array<{
+    id: string;
     subject: string;
     level: string;
     score: string;
@@ -124,9 +129,15 @@ interface Props {
 }
 
 const STEPS = [
-  { id: 1, title: 'School & Performance', description: 'Current school and academic performance' },
-  { id: 2, title: 'History & Coursework', description: 'Previous schools, course history, and college coursework' },
-  { id: 3, title: 'Testing & Exams', description: 'Standardized tests, AP, IB, and proficiency exams' }
+  { id: 1, title: 'Current School', description: 'Basic school information and graduation plans' },
+  { id: 2, title: 'Academic Performance', description: 'GPA, class rank, and academic standing' },
+  { id: 3, title: 'Other Schools Attended', description: 'Previous schools and study abroad experience' },
+  { id: 4, title: 'Course History', description: 'Current and completed coursework by subject' },
+  { id: 5, title: 'College Coursework', description: 'College courses taken during high school' },
+  { id: 6, title: 'Standardized Testing', description: 'SAT, ACT, and other test scores' },
+  { id: 7, title: 'AP Exams', description: 'Advanced Placement exam scores' },
+  { id: 8, title: 'IB Programme', description: 'International Baccalaureate coursework and scores' },
+  { id: 9, title: 'English Proficiency', description: 'English proficiency test scores (if applicable)' }
 ];
 
 const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
@@ -250,62 +261,23 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return (
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Current School Information</h3>
-              <CurrentSchoolStep data={data} setData={setData} />
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Academic Performance</h3>
-              <AcademicPerformanceStep data={data} setData={setData} />
-            </div>
-          </div>
-        );
+        return <CurrentSchoolStep data={data} setData={setData} />;
       case 2:
-        return (
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Previous Schools & Study History</h3>
-              <OtherSchoolsStep data={data} setData={setData} />
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Course History</h3>
-              <CourseHistoryStep data={data} setData={setData} />
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold mb-4">College Coursework</h3>
-              <CollegeCourseworkStep data={data} setData={setData} />
-            </div>
-          </div>
-        );
+        return <AcademicPerformanceStep data={data} setData={setData} />;
       case 3:
-        return (
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Standardized Testing</h3>
-              <StandardizedTestingStep data={data} setData={setData} />
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold mb-4">AP Exams</h3>
-              <APExamsStep data={data} setData={setData} />
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold mb-4">IB Programme</h3>
-              <IBProgrammeStep data={data} setData={setData} />
-            </div>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-semibold mb-4">English Proficiency</h3>
-              <EnglishProficiencyStep data={data} setData={setData} />
-            </div>
-          </div>
-        );
+        return <OtherSchoolsStep data={data} setData={setData} />;
+      case 4:
+        return <CourseHistoryStep data={data} setData={setData} />;
+      case 5:
+        return <CollegeCourseworkStep data={data} setData={setData} />;
+      case 6:
+        return <StandardizedTestingStep data={data} setData={setData} />;
+      case 7:
+        return <APExamsStep data={data} setData={setData} />;
+      case 8:
+        return <IBProgrammeStep data={data} setData={setData} />;
+      case 9:
+        return <EnglishProficiencyStep data={data} setData={setData} />;
       default:
         return null;
     }
@@ -573,72 +545,458 @@ const AcademicPerformanceStep: React.FC<{ data: AcademicJourneyData; setData: (d
 // Additional step components would follow similar patterns...
 // For brevity, I'm including placeholders for the remaining steps
 
-const OtherSchoolsStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
-  <div className="space-y-6">
-    <div>
-      <Label>Have you attended other high schools?</Label>
-      <Select value={data.otherSchoolsAttended.toString()} onValueChange={(value) => setData({ ...data, otherSchoolsAttended: parseInt(value) })}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select number" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="0">0</SelectItem>
-          <SelectItem value="1">1</SelectItem>
-          <SelectItem value="2">2</SelectItem>
-          <SelectItem value="3">3+</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    
-    <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="studied-abroad"
-          checked={data.studiedAbroad}
-          onCheckedChange={(checked) => setData({ ...data, studiedAbroad: checked as boolean })}
-        />
-        <Label htmlFor="studied-abroad">I have studied abroad during high school</Label>
+const OtherSchoolsStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
+  const addPreviousSchool = () => {
+    const newSchool = {
+      id: Date.now().toString(),
+      name: '',
+      cityState: '',
+      startDate: '',
+      endDate: '',
+      reasonForLeaving: ''
+    };
+    setData({ ...data, previousSchools: [...data.previousSchools, newSchool] });
+  };
+
+  const updatePreviousSchool = (id: string, field: string, value: string) => {
+    const updatedSchools = data.previousSchools.map(school =>
+      school.id === id ? { ...school, [field]: value } : school
+    );
+    setData({ ...data, previousSchools: updatedSchools });
+  };
+
+  const removePreviousSchool = (id: string) => {
+    setData({ ...data, previousSchools: data.previousSchools.filter(school => school.id !== id) });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Label>Have you attended other high schools?</Label>
+        <Select value={data.otherSchoolsAttended.toString()} onValueChange={(value) => setData({ ...data, otherSchoolsAttended: parseInt(value) })}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select number" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">0</SelectItem>
+            <SelectItem value="1">1</SelectItem>
+            <SelectItem value="2">2</SelectItem>
+            <SelectItem value="3">3+</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {data.otherSchoolsAttended > 0 && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h4 className="font-medium">Previous Schools</h4>
+            <Button type="button" onClick={addPreviousSchool} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add School
+            </Button>
+          </div>
+
+          {data.previousSchools.map((school, index) => (
+            <Card key={school.id}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">Previous School {index + 1}</h5>
+                    <Button type="button" onClick={() => removePreviousSchool(school.id)} size="sm" variant="outline">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>School Name</Label>
+                      <Input
+                        value={school.name}
+                        onChange={(e) => updatePreviousSchool(school.id, 'name', e.target.value)}
+                        placeholder="Previous school name"
+                      />
+                    </div>
+                    <div>
+                      <Label>City/State</Label>
+                      <Input
+                        value={school.cityState}
+                        onChange={(e) => updatePreviousSchool(school.id, 'cityState', e.target.value)}
+                        placeholder="City, State"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Start Date</Label>
+                      <Input
+                        type="month"
+                        value={school.startDate}
+                        onChange={(e) => updatePreviousSchool(school.id, 'startDate', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label>End Date</Label>
+                      <Input
+                        type="month"
+                        value={school.endDate}
+                        onChange={(e) => updatePreviousSchool(school.id, 'endDate', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Reason for Leaving</Label>
+                    <Textarea
+                      value={school.reasonForLeaving}
+                      onChange={(e) => updatePreviousSchool(school.id, 'reasonForLeaving', e.target.value)}
+                      placeholder="Explain why you left this school"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
       
-      <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="been-homeschooled"
-          checked={data.beenHomeschooled}
-          onCheckedChange={(checked) => setData({ ...data, beenHomeschooled: checked as boolean })}
-        />
-        <Label htmlFor="been-homeschooled">I have been homeschooled at any point</Label>
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="studied-abroad"
+            checked={data.studiedAbroad}
+            onCheckedChange={(checked) => setData({ ...data, studiedAbroad: checked as boolean })}
+          />
+          <Label htmlFor="studied-abroad">I have studied abroad during high school</Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="been-homeschooled"
+            checked={data.beenHomeschooled}
+            onCheckedChange={(checked) => setData({ ...data, beenHomeschooled: checked as boolean })}
+          />
+          <Label htmlFor="been-homeschooled">I have been homeschooled at any point</Label>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
-const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
-  <div className="space-y-6">
-    <div className="text-center py-8">
-      <h3 className="text-lg font-medium mb-2">Course History</h3>
-      <p className="text-muted-foreground">This section will include current courses and completed coursework by subject area.</p>
-    </div>
-  </div>
-);
+const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
+  const addCurrentCourse = () => {
+    const newCourse = {
+      id: Date.now().toString(),
+      name: '',
+      subjectArea: '',
+      level: '',
+      duration: ''
+    };
+    setData({ ...data, currentCourses: [...data.currentCourses, newCourse] });
+  };
 
-const CollegeCourseworkStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
-  <div className="space-y-6">
-    <div>
-      <Label>Have you taken college courses while in high school?</Label>
-      <Select value={data.collegeCoursesTaken.toString()} onValueChange={(value) => setData({ ...data, collegeCoursesTaken: parseInt(value) })}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select number" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="0">0</SelectItem>
-          <SelectItem value="1">1</SelectItem>
-          <SelectItem value="2">2</SelectItem>
-          <SelectItem value="3">3+</SelectItem>
-        </SelectContent>
-      </Select>
+  const updateCurrentCourse = (id: string, field: string, value: string) => {
+    const updatedCourses = data.currentCourses.map(course =>
+      course.id === id ? { ...course, [field]: value } : course
+    );
+    setData({ ...data, currentCourses: updatedCourses });
+  };
+
+  const removeCurrentCourse = (id: string) => {
+    setData({ ...data, currentCourses: data.currentCourses.filter(course => course.id !== id) });
+  };
+
+  const updateCompletedCourses = (subject: keyof typeof data.completedCourses, courses: string[]) => {
+    setData({ 
+      ...data, 
+      completedCourses: { 
+        ...data.completedCourses, 
+        [subject]: courses 
+      } 
+    });
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Current Year Courses */}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-lg font-medium">Current Year Courses</h4>
+          <Button type="button" onClick={addCurrentCourse} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Course
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          {data.currentCourses.map((course, index) => (
+            <Card key={course.id}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">Course {index + 1}</h5>
+                    <Button type="button" onClick={() => removeCurrentCourse(course.id)} size="sm" variant="outline">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Course Name</Label>
+                      <Input
+                        value={course.name}
+                        onChange={(e) => updateCurrentCourse(course.id, 'name', e.target.value)}
+                        placeholder="e.g., Advanced Biology"
+                      />
+                    </div>
+                    <div>
+                      <Label>Subject Area</Label>
+                      <Select value={course.subjectArea} onValueChange={(value) => updateCurrentCourse(course.id, 'subjectArea', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="english">English</SelectItem>
+                          <SelectItem value="math">Mathematics</SelectItem>
+                          <SelectItem value="science">Science</SelectItem>
+                          <SelectItem value="social-studies">Social Studies</SelectItem>
+                          <SelectItem value="world-language">World Language</SelectItem>
+                          <SelectItem value="arts">Arts</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Course Level</Label>
+                      <Select value={course.level} onValueChange={(value) => updateCurrentCourse(course.id, 'level', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ap">AP</SelectItem>
+                          <SelectItem value="ib">IB</SelectItem>
+                          <SelectItem value="honors">Honors</SelectItem>
+                          <SelectItem value="regular">Regular</SelectItem>
+                          <SelectItem value="dual-enrollment">Dual Enrollment</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Duration</Label>
+                      <Select value={course.duration} onValueChange={(value) => updateCurrentCourse(course.id, 'duration', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select duration" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="full-year">Full Year</SelectItem>
+                          <SelectItem value="semester">Semester</SelectItem>
+                          <SelectItem value="trimester">Trimester</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Early Math/Language */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="math-early"
+            checked={data.tookMathEarly}
+            onCheckedChange={(checked) => setData({ ...data, tookMathEarly: checked as boolean })}
+          />
+          <Label htmlFor="math-early">I took high school-level math in 7th or 8th grade</Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="language-early"
+            checked={data.tookLanguageEarly}
+            onCheckedChange={(checked) => setData({ ...data, tookLanguageEarly: checked as boolean })}
+          />
+          <Label htmlFor="language-early">I took language other than English in 7th or 8th grade</Label>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Completed Courses by Subject */}
+      <div>
+        <h4 className="text-lg font-medium mb-4">Key Completed Courses by Subject Area</h4>
+        <div className="grid md:grid-cols-2 gap-6">
+          {Object.entries(data.completedCourses).map(([subject, courses]) => (
+            <div key={subject}>
+              <Label className="text-sm font-medium capitalize">
+                {subject === 'socialStudies' ? 'Social Studies' : 
+                 subject === 'worldLanguage' ? 'World Language' : subject}
+              </Label>
+              <Textarea
+                value={courses.join('\n')}
+                onChange={(e) => updateCompletedCourses(
+                  subject as keyof typeof data.completedCourses, 
+                  e.target.value.split('\n').filter(course => course.trim())
+                )}
+                placeholder={`Enter ${subject === 'socialStudies' ? 'Social Studies' : 
+                            subject === 'worldLanguage' ? 'World Language' : subject} courses, one per line`}
+                rows={4}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+const CollegeCourseworkStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
+  const addCollegeCourse = () => {
+    const newCourse = {
+      id: Date.now().toString(),
+      college: '',
+      setting: '',
+      courseName: '',
+      termYear: '',
+      grade: '',
+      courseType: ''
+    };
+    setData({ ...data, collegeCoursework: [...data.collegeCoursework, newCourse] });
+  };
+
+  const updateCollegeCourse = (id: string, field: string, value: string) => {
+    const updatedCourses = data.collegeCoursework.map(course =>
+      course.id === id ? { ...course, [field]: value } : course
+    );
+    setData({ ...data, collegeCoursework: updatedCourses });
+  };
+
+  const removeCollegeCourse = (id: string) => {
+    setData({ ...data, collegeCoursework: data.collegeCoursework.filter(course => course.id !== id) });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Label>Have you taken college courses while in high school?</Label>
+        <Select value={data.collegeCoursesTaken.toString()} onValueChange={(value) => setData({ ...data, collegeCoursesTaken: parseInt(value) })}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select number" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">0</SelectItem>
+            <SelectItem value="1">1</SelectItem>
+            <SelectItem value="2">2</SelectItem>
+            <SelectItem value="3">3+</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {data.collegeCoursesTaken > 0 && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h4 className="font-medium">College Courses</h4>
+            <Button type="button" onClick={addCollegeCourse} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Course
+            </Button>
+          </div>
+
+          {data.collegeCoursework.map((course, index) => (
+            <Card key={course.id}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">College Course {index + 1}</h5>
+                    <Button type="button" onClick={() => removeCollegeCourse(course.id)} size="sm" variant="outline">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>College/University Name</Label>
+                      <Input
+                        value={course.college}
+                        onChange={(e) => updateCollegeCourse(course.id, 'college', e.target.value)}
+                        placeholder="College or university name"
+                      />
+                    </div>
+                    <div>
+                      <Label>Course Setting</Label>
+                      <Select value={course.setting} onValueChange={(value) => updateCollegeCourse(course.id, 'setting', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select setting" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="dual-enrollment">Dual enrollment through HS</SelectItem>
+                          <SelectItem value="summer-program">Summer program</SelectItem>
+                          <SelectItem value="independent">Independent enrollment</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Course Name</Label>
+                      <Input
+                        value={course.courseName}
+                        onChange={(e) => updateCollegeCourse(course.id, 'courseName', e.target.value)}
+                        placeholder="e.g., Introduction to Psychology"
+                      />
+                    </div>
+                    <div>
+                      <Label>Term/Year Taken</Label>
+                      <Input
+                        value={course.termYear}
+                        onChange={(e) => updateCollegeCourse(course.id, 'termYear', e.target.value)}
+                        placeholder="e.g., Fall 2023"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Grade/Credit Received</Label>
+                      <Input
+                        value={course.grade}
+                        onChange={(e) => updateCollegeCourse(course.id, 'grade', e.target.value)}
+                        placeholder="e.g., A, 3.5, Pass"
+                      />
+                    </div>
+                    <div>
+                      <Label>Course Type</Label>
+                      <Select value={course.courseType} onValueChange={(value) => updateCollegeCourse(course.id, 'courseType', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="for-credit">For credit</SelectItem>
+                          <SelectItem value="audit">Audit</SelectItem>
+                          <SelectItem value="non-credit">Non-credit</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const StandardizedTestingStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
   <div className="space-y-6">
@@ -743,31 +1101,219 @@ const StandardizedTestingStep: React.FC<{ data: AcademicJourneyData; setData: (d
   </div>
 );
 
-const APExamsStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
-  <div className="space-y-6">
-    <div className="flex items-center space-x-2">
-      <Checkbox 
-        id="taking-ap"
-        checked={data.takingAPExams}
-        onCheckedChange={(checked) => setData({ ...data, takingAPExams: checked as boolean })}
-      />
-      <Label htmlFor="taking-ap">I have taken or plan to take AP exams</Label>
-    </div>
-  </div>
-);
+const APExamsStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
+  const addAPExam = () => {
+    const newExam = {
+      id: Date.now().toString(),
+      subject: '',
+      date: '',
+      score: ''
+    };
+    setData({ ...data, apExams: [...data.apExams, newExam] });
+  };
 
-const IBProgrammeStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
-  <div className="space-y-6">
-    <div className="flex items-center space-x-2">
-      <Checkbox 
-        id="in-ib"
-        checked={data.inIBProgramme}
-        onCheckedChange={(checked) => setData({ ...data, inIBProgramme: checked as boolean })}
-      />
-      <Label htmlFor="in-ib">I am in the IB Diploma Programme</Label>
+  const updateAPExam = (id: string, field: string, value: string) => {
+    const updatedExams = data.apExams.map(exam =>
+      exam.id === id ? { ...exam, [field]: value } : exam
+    );
+    setData({ ...data, apExams: updatedExams });
+  };
+
+  const removeAPExam = (id: string) => {
+    setData({ ...data, apExams: data.apExams.filter(exam => exam.id !== id) });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <Checkbox 
+          id="taking-ap"
+          checked={data.takingAPExams}
+          onCheckedChange={(checked) => setData({ ...data, takingAPExams: checked as boolean })}
+        />
+        <Label htmlFor="taking-ap">I have taken or plan to take AP exams</Label>
+      </div>
+
+      {data.takingAPExams && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h4 className="font-medium">AP Exams</h4>
+            <Button type="button" onClick={addAPExam} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add AP Exam
+            </Button>
+          </div>
+
+          {data.apExams.map((exam, index) => (
+            <Card key={exam.id}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">AP Exam {index + 1}</h5>
+                    <Button type="button" onClick={() => removeAPExam(exam.id)} size="sm" variant="outline">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <Label>Subject</Label>
+                      <Input
+                        value={exam.subject}
+                        onChange={(e) => updateAPExam(exam.id, 'subject', e.target.value)}
+                        placeholder="e.g., AP Biology"
+                      />
+                    </div>
+                    <div>
+                      <Label>Exam Date (or planned date)</Label>
+                      <Input
+                        type="month"
+                        value={exam.date}
+                        onChange={(e) => updateAPExam(exam.id, 'date', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Score</Label>
+                      <Select value={exam.score} onValueChange={(value) => updateAPExam(exam.id, 'score', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select score" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="5">5</SelectItem>
+                          <SelectItem value="4">4</SelectItem>
+                          <SelectItem value="3">3</SelectItem>
+                          <SelectItem value="2">2</SelectItem>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="planned">Planned/Not yet taken</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
+
+const IBProgrammeStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
+  const addIBExam = () => {
+    const newExam = {
+      id: Date.now().toString(),
+      subject: '',
+      level: '',
+      score: '',
+      examDate: ''
+    };
+    setData({ ...data, ibExams: [...data.ibExams, newExam] });
+  };
+
+  const updateIBExam = (id: string, field: string, value: string) => {
+    const updatedExams = data.ibExams.map(exam =>
+      exam.id === id ? { ...exam, [field]: value } : exam
+    );
+    setData({ ...data, ibExams: updatedExams });
+  };
+
+  const removeIBExam = (id: string) => {
+    setData({ ...data, ibExams: data.ibExams.filter(exam => exam.id !== id) });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <Checkbox 
+          id="in-ib"
+          checked={data.inIBProgramme}
+          onCheckedChange={(checked) => setData({ ...data, inIBProgramme: checked as boolean })}
+        />
+        <Label htmlFor="in-ib">I am in the IB Diploma Programme</Label>
+      </div>
+
+      {data.inIBProgramme && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h4 className="font-medium">IB Exams</h4>
+            <Button type="button" onClick={addIBExam} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add IB Exam
+            </Button>
+          </div>
+
+          {data.ibExams.map((exam, index) => (
+            <Card key={exam.id}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">IB Exam {index + 1}</h5>
+                    <Button type="button" onClick={() => removeIBExam(exam.id)} size="sm" variant="outline">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Subject</Label>
+                      <Input
+                        value={exam.subject}
+                        onChange={(e) => updateIBExam(exam.id, 'subject', e.target.value)}
+                        placeholder="e.g., IB Biology HL"
+                      />
+                    </div>
+                    <div>
+                      <Label>Level</Label>
+                      <Select value={exam.level} onValueChange={(value) => updateIBExam(exam.id, 'level', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="higher">Higher Level (HL)</SelectItem>
+                          <SelectItem value="standard">Standard Level (SL)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Score</Label>
+                      <Select value={exam.score} onValueChange={(value) => updateIBExam(exam.id, 'score', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select score" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="7">7</SelectItem>
+                          <SelectItem value="6">6</SelectItem>
+                          <SelectItem value="5">5</SelectItem>
+                          <SelectItem value="4">4</SelectItem>
+                          <SelectItem value="3">3</SelectItem>
+                          <SelectItem value="2">2</SelectItem>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="predicted">Predicted</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Exam Date</Label>
+                      <Input
+                        type="month"
+                        value={exam.examDate}
+                        onChange={(e) => updateIBExam(exam.id, 'examDate', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const EnglishProficiencyStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
   <div className="space-y-6">

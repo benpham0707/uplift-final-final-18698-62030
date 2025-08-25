@@ -2,14 +2,18 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import PersonalBasicsStep from './steps/PersonalBasicsStep';
 import ExperiencesActivitiesStep from './steps/ExperiencesActivitiesStep';
 import AcademicJourneyStep from './steps/AcademicJourneyStep';
 import CommunityFamilyStep from './steps/CommunityFamilyStep';
 import AwardsRecognitionStep from './steps/AwardsRecognitionStep';
 import PersonalGrowthStep from './steps/PersonalGrowthStep';
+import ApplicationReview from './ApplicationReview';
 import type { 
   PersonalBasicsData, 
   ExperiencesActivitiesData, 
@@ -31,8 +35,10 @@ const STEPS = [
 export default function ApplicationWizard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   
   const progress = useMemo(() => (currentStep / STEPS.length) * 100, [currentStep]);
 
@@ -136,11 +142,51 @@ export default function ApplicationWizard() {
     shortAnswers: []
   });
 
+  // Load saved progress from localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem('college-application-progress');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setPersonalBasics(parsed.personalBasics || personalBasics);
+        setExperiencesActivities(parsed.experiencesActivities || experiencesActivities);
+        setAcademicJourney(parsed.academicJourney || academicJourney);
+        setCommunityFamily(parsed.communityFamily || communityFamily);
+        setAwardsRecognition(parsed.awardsRecognition || awardsRecognition);
+        setPersonalGrowth(parsed.personalGrowth || personalGrowth);
+        if (parsed.currentStep) {
+          setCurrentStep(parsed.currentStep);
+        }
+      } catch (error) {
+        console.error('Error loading saved progress:', error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (user?.email) {
       setPersonalBasics(prev => ({ ...prev, email: user.email! }));
     }
   }, [user?.email]);
+
+  // Auto-save progress
+  useEffect(() => {
+    const saveProgress = () => {
+      const progressData = {
+        currentStep,
+        personalBasics,
+        experiencesActivities,
+        academicJourney,
+        communityFamily,
+        awardsRecognition,
+        personalGrowth
+      };
+      localStorage.setItem('college-application-progress', JSON.stringify(progressData));
+    };
+
+    const timeoutId = setTimeout(saveProgress, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [currentStep, personalBasics, experiencesActivities, academicJourney, communityFamily, awardsRecognition, personalGrowth]);
 
   const getCurrentStepData = () => {
     switch (currentStep) {
@@ -185,7 +231,41 @@ export default function ApplicationWizard() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
+    setSubmitting(true);
+    try {
+      const applicationData = {
+        personalBasics,
+        experiencesActivities,
+        academicJourney,
+        communityFamily,
+        awardsRecognition,
+        personalGrowth
+      };
+
+      // Save to localStorage
+      localStorage.setItem('college-application-saved', JSON.stringify(applicationData));
+      
+      toast({
+        title: "Application Saved",
+        description: "Your progress has been saved successfully.",
+      });
+      
+      // Show review dialog
+      setShowReview(true);
+    } catch (error) {
+      console.error('Error saving application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save your application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleFinalSubmit = async () => {
     setSubmitting(true);
     try {
       const applicationData = {
@@ -198,13 +278,26 @@ export default function ApplicationWizard() {
       };
 
       // TODO: Submit to API
-      console.log('Application data:', applicationData);
+      console.log('Final application data:', applicationData);
+      
+      // Clear saved progress
+      localStorage.removeItem('college-application-progress');
+      localStorage.removeItem('college-application-saved');
+      
+      toast({
+        title: "Application Submitted",
+        description: "Your college application has been submitted successfully!",
+      });
       
       // Navigate to portfolio scanner
       navigate('/portfolio-scanner');
     } catch (error) {
       console.error('Error submitting application:', error);
-      // Handle error
+      toast({
+        title: "Error",
+        description: "Failed to submit your application. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -351,24 +444,66 @@ export default function ApplicationWizard() {
               Step {currentStep} of {STEPS.length}
             </div>
 
-            {currentStep < STEPS.length ? (
+            <div className="flex gap-2">
               <Button
-                onClick={handleNext}
-                disabled={!canProceed() || submitting}
+                variant="outline"
+                onClick={handleSave}
+                disabled={submitting}
               >
-                Next
+                {submitting ? 'Saving...' : 'Save Progress'}
               </Button>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={!canProceed() || submitting}
-              >
-                {submitting ? 'Submitting...' : 'Complete Application'}
-              </Button>
-            )}
+              {currentStep < STEPS.length ? (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canProceed() || submitting}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSave}
+                  disabled={!canProceed() || submitting}
+                >
+                  {submitting ? 'Saving...' : 'Save & Review'}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Review Dialog */}
+      <Dialog open={showReview} onOpenChange={setShowReview}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Review Your Application</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[70vh]">
+            <ApplicationReview
+              personalBasics={personalBasics}
+              experiencesActivities={experiencesActivities}
+              academicJourney={academicJourney}
+              communityFamily={communityFamily}
+              awardsRecognition={awardsRecognition}
+              personalGrowth={personalGrowth}
+            />
+          </ScrollArea>
+          <div className="flex justify-between pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setShowReview(false)}
+            >
+              Continue Editing
+            </Button>
+            <Button
+              onClick={handleFinalSubmit}
+              disabled={submitting}
+            >
+              {submitting ? 'Submitting...' : 'Submit Application'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

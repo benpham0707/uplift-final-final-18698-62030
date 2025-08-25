@@ -188,7 +188,7 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
   }
 
   return (
-    <Card className="shadow-medium">
+    <Card className="shadow-medium max-h-[80vh] overflow-y-auto">
       <CardHeader>
         <CardTitle className="text-foreground">
           {step === 1 && 'What kind of experience is this?'}
@@ -196,10 +196,33 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
           {step === 3 && 'What did you do?'}
           {step === 4 && 'What impact did you have?'}
         </CardTitle>
+        {step === 1 && category === 'school_activity' && (
+          <p className="text-sm text-muted-foreground">
+            <strong>Goal:</strong> Add at least 3 extracurricular activities to show colleges your engagement and interests
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {category === 'school_activity' && (
+              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                <h4 className="font-semibold text-primary mb-2">🎯 Extracurricular Activities - Add as Many as Possible!</h4>
+                <p className="text-sm text-muted-foreground mb-2">
+                  <strong>Minimum requirement: 3 activities</strong> - but colleges want to see breadth and depth of engagement.
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Sports teams, clubs, student government, honor societies</li>
+                  <li>• Music, theater, debate, academic competitions</li>
+                  <li>• Community service, religious activities, cultural groups</li>
+                  <li>• Part-time jobs, internships, research projects</li>
+                </ul>
+                <p className="text-sm font-medium text-primary mt-2">
+                  💡 Pro tip: Include leadership roles, time commitment, and measurable impact!
+                </p>
+              </div>
+            )}
+            
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <Label className="mb-1 block">Category</Label>
@@ -216,11 +239,11 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
               </div>
               <div>
                 <Label className="mb-1 block">Role / Title</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Barista" />
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === 'school_activity' ? 'e.g., President, Captain, Member' : 'e.g., Barista'} />
               </div>
               <div>
                 <Label className="mb-1 block">Organization</Label>
-                <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="e.g., Blue Bottle Coffee or Self" />
+                <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder={category === 'school_activity' ? 'e.g., Debate Team, NHS, Soccer Team' : 'e.g., Blue Bottle Coffee or Self'} />
               </div>
             </div>
           </div>

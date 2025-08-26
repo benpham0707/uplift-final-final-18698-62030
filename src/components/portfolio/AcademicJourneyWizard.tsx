@@ -1120,40 +1120,52 @@ const PREDEFINED_COURSES = {
 
 const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
   const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
+  const [showYearForm, setShowYearForm] = useState(false);
+  const [newYearData, setNewYearData] = useState({ startYear: '', endYear: '', gradeLevel: '9th' });
 
   const addAcademicYear = () => {
-    const currentYear = new Date().getFullYear();
-    const nextYear = currentYear + 1;
-    const yearString = `${currentYear} - ${nextYear}`;
-    
-    // Initialize subjects with predefined courses for 9th grade by default
-    const subjects: { [key: string]: any } = {};
-    const gradeLevel = '9th'; // Default to 9th grade
-    const coursesForGrade = PREDEFINED_COURSES[gradeLevel] || PREDEFINED_COURSES['9th'];
-    
-    Object.entries(coursesForGrade).forEach(([subjectName, courses]) => {
-      subjects[subjectName] = {
-        courses: courses.map(course => ({
-          ...course,
-          selected: false,
-          grade1: '',
-          grade2: ''
-        }))
+    if (showYearForm && newYearData.startYear && newYearData.endYear) {
+      const yearString = `${newYearData.startYear} - ${newYearData.endYear}`;
+      
+      // Initialize subjects with predefined courses based on selected grade
+      const subjects: { [key: string]: any } = {};
+      const coursesForGrade = PREDEFINED_COURSES[newYearData.gradeLevel] || PREDEFINED_COURSES['9th'];
+      
+      Object.entries(coursesForGrade).forEach(([subjectName, courses]) => {
+        subjects[subjectName] = {
+          courses: (courses as any[]).map(course => ({
+            ...course,
+            selected: false,
+            grade1: '',
+            grade2: ''
+          }))
+        };
+      });
+
+      const newYear = {
+        id: Date.now().toString(),
+        year: yearString,
+        gradeLevel: newYearData.gradeLevel,
+        subjects,
+        tookSummerCourses: false
       };
-    });
 
-    const newYear = {
-      id: Date.now().toString(),
-      year: yearString,
-      gradeLevel: '9th', // Default, user can change
-      subjects,
-      tookSummerCourses: false
-    };
+      setData({ 
+        ...data, 
+        academicYears: [...data.academicYears, newYear] 
+      });
+      
+      // Reset form
+      setShowYearForm(false);
+      setNewYearData({ startYear: '', endYear: '', gradeLevel: '9th' });
+    } else {
+      setShowYearForm(true);
+    }
+  };
 
-    setData({ 
-      ...data, 
-      academicYears: [...data.academicYears, newYear] 
-    });
+  const cancelAddYear = () => {
+    setShowYearForm(false);
+    setNewYearData({ startYear: '', endYear: '', gradeLevel: '9th' });
   };
 
   const updateAcademicYear = (yearId: string, field: string, value: any) => {
@@ -1218,11 +1230,81 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
         </div>
         <Button type="button" onClick={addAcademicYear} size="sm">
           <Plus className="h-4 w-4 mr-2" />
-          Add another grade
+          Add Academic Year
         </Button>
       </div>
 
       <div className="space-y-6">
+        {showYearForm && (
+          <Card className="w-full border-dashed">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <h4 className="text-lg font-semibold">Add Academic Year</h4>
+                <Button type="button" onClick={cancelAddYear} size="sm" variant="outline">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="startYear">Start Year *</Label>
+                  <Input
+                    id="startYear"
+                    type="number"
+                    placeholder="2020"
+                    value={newYearData.startYear}
+                    onChange={(e) => setNewYearData({...newYearData, startYear: e.target.value})}
+                    min="1990"
+                    max="2050"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="endYear">End Year *</Label>
+                  <Input
+                    id="endYear"
+                    type="number"
+                    placeholder="2021"
+                    value={newYearData.endYear}
+                    onChange={(e) => setNewYearData({...newYearData, endYear: e.target.value})}
+                    min="1990"
+                    max="2050"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="gradeLevel">Grade Level *</Label>
+                  <Select 
+                    value={newYearData.gradeLevel} 
+                    onValueChange={(value) => setNewYearData({...newYearData, gradeLevel: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="-- select --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="9th">9th</SelectItem>
+                      <SelectItem value="10th">10th</SelectItem>
+                      <SelectItem value="11th">11th</SelectItem>
+                      <SelectItem value="12th">12th</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" onClick={cancelAddYear} variant="outline">
+                  Cancel
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={addAcademicYear}
+                  disabled={!newYearData.startYear || !newYearData.endYear}
+                >
+                  Add Year
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {(data.academicYears || []).map((academicYear, yearIndex) => (
           <Card key={academicYear.id} className="w-full">
             <CardHeader>

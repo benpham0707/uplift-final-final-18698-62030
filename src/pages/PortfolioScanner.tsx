@@ -547,9 +547,35 @@ const PortfolioScanner = () => {
               <Lightbulb className="h-5 w-5" />
               Recent Insights & Cross-Feature Analysis
             </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Showing 2 of 5 insights • Scroll to see more
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div 
+              className="insights-scroll h-[800px] overflow-y-auto space-y-6 pr-2 scroll-smooth"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'hsl(var(--border)) transparent'
+              }}
+            >
+              <style dangerouslySetInnerHTML={{
+                __html: `
+                  .insights-scroll::-webkit-scrollbar {
+                    width: 6px;
+                  }
+                  .insights-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                  }
+                  .insights-scroll::-webkit-scrollbar-thumb {
+                    background: hsl(var(--border));
+                    border-radius: 3px;
+                  }
+                  .insights-scroll::-webkit-scrollbar-thumb:hover {
+                    background: hsl(var(--foreground) / 0.3);
+                  }
+                `
+              }} />
               <InsightItem
                 title="Leadership Pattern Recognition Across Features"
                 description="Smart Journal entries reveal consistent leadership themes: coordinating family responsibilities (mentioned 3x), leading group projects, and organizing community events. Your Calendar Intelligence shows 15+ leadership commitments this month. This aligns with your high Leadership Potential score (8.1/10) and suggests readiness for executive roles in college applications."

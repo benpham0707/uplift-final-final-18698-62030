@@ -681,124 +681,715 @@ const OtherSchoolsStep: React.FC<{ data: AcademicJourneyData; setData: (data: Ac
   );
 };
 
-// Mock data for demonstration - represents predefined course options
+// Comprehensive course catalog by grade - predefined course options
 const PREDEFINED_COURSES = {
-  'History/Social Science': [
-    { name: 'AP European History (AP)', honorsType: 'AP' },
-    { name: 'AP Government and Politics Comparative (AP)', honorsType: 'AP' },
-    { name: 'AP Government and Politics United States (AP)', honorsType: 'AP' },
-    { name: 'AP Human Geography (AP)', honorsType: 'AP' },
-    { name: 'AP United States History (AP)', honorsType: 'AP' },
-    { name: 'AP World History (AP)', honorsType: 'AP' },
-    { name: 'Modern World History', honorsType: 'NH' },
-    { name: 'Modern World History APEX', honorsType: 'NH' },
-    { name: 'Modern World History Accelerated', honorsType: 'NH' },
-    { name: 'US Government', honorsType: 'NH' },
-    { name: 'US Government APEX', honorsType: 'NH' },
-    { name: 'US Government Accelerated', honorsType: 'NH' },
-    { name: 'US History', honorsType: 'NH' },
-    { name: 'US History APEX', honorsType: 'NH' },
-  ],
-  'English': [
-    { name: 'AP English Language and Composition (AP)', honorsType: 'AP' },
-    { name: 'AP English Literature and Composition (AP)', honorsType: 'AP' },
-    { name: 'AP Seminar (AP)', honorsType: 'AP' },
-    { name: 'CSU Expository Reading and Writing (CSU)', honorsType: 'NH' },
-    { name: 'Diverse Voices and Media Literacy', honorsType: 'NH' },
-    { name: 'Linked Learning Student Ambassadors', honorsType: 'NH' },
-  ],
-  'Mathematics': [
-    { name: 'AP Calculus AB (AP)', honorsType: 'AP' },
-    { name: 'AP Calculus BC (AP)', honorsType: 'AP' },
-    { name: 'AP Statistics (AP)', honorsType: 'AP' },
-    { name: 'Algebra I', honorsType: 'NH' },
-    { name: 'Algebra II', honorsType: 'NH' },
-    { name: 'Geometry', honorsType: 'NH' },
-    { name: 'Pre-Calculus', honorsType: 'NH' },
-    { name: 'Trigonometry', honorsType: 'NH' },
-  ],
-  'Science': [
-    { name: 'AP Biology (AP)', honorsType: 'AP' },
-    { name: 'AP Chemistry (AP)', honorsType: 'AP' },
-    { name: 'AP Environmental Science (AP)', honorsType: 'AP' },
-    { name: 'AP Physics 1 (AP)', honorsType: 'AP' },
-    { name: 'AP Physics 2 (AP)', honorsType: 'AP' },
-    { name: 'AP Physics C: Electricity and Magnetism (AP)', honorsType: 'AP' },
-    { name: 'AP Physics C: Mechanics (AP)', honorsType: 'AP' },
-    { name: 'Biology', honorsType: 'NH' },
-    { name: 'Chemistry', honorsType: 'NH' },
-    { name: 'Earth Science', honorsType: 'NH' },
-    { name: 'Physics', honorsType: 'NH' },
-  ],
-  'Language Other Than English': [
-    { name: 'AP Spanish Language and Culture (AP)', honorsType: 'AP' },
-    { name: 'AP Spanish Literature and Culture (AP)', honorsType: 'AP' },
-    { name: 'AP French Language and Culture (AP)', honorsType: 'AP' },
-    { name: 'AP German Language and Culture (AP)', honorsType: 'AP' },
-    { name: 'Spanish I', honorsType: 'NH' },
-    { name: 'Spanish II', honorsType: 'NH' },
-    { name: 'Spanish III', honorsType: 'NH' },
-    { name: 'Spanish IV', honorsType: 'NH' },
-    { name: 'French I', honorsType: 'NH' },
-    { name: 'French II', honorsType: 'NH' },
-  ],
-  'Visual and Performing Arts': [
-    { name: 'AP Art History (AP)', honorsType: 'AP' },
-    { name: 'AP Music Theory (AP)', honorsType: 'AP' },
-    { name: 'AP Studio Art 2-D Design (AP)', honorsType: 'AP' },
-    { name: 'AP Studio Art 3-D Design (AP)', honorsType: 'AP' },
-    { name: 'AP Studio Art Drawing (AP)', honorsType: 'AP' },
-    { name: 'Art I', honorsType: 'NH' },
-    { name: 'Art II', honorsType: 'NH' },
-    { name: 'Drama', honorsType: 'NH' },
-    { name: 'Music', honorsType: 'NH' },
-    { name: 'Photography', honorsType: 'NH' },
-  ],
-  'College-Prep Electives': [
-    { name: 'AP Computer Science A (AP)', honorsType: 'AP' },
-    { name: 'AP Computer Science Principles (AP)', honorsType: 'AP' },
-    { name: 'AP Psychology (AP)', honorsType: 'AP' },
-    { name: 'Computer Science', honorsType: 'NH' },
-    { name: 'Psychology', honorsType: 'NH' },
-    { name: 'Journalism', honorsType: 'NH' },
-    { name: 'Business', honorsType: 'NH' },
-    { name: 'Health', honorsType: 'NH' },
-  ]
+  '9th': {
+    'History/Social Science': [
+      { name: 'AP European History (AP)', honorsType: 'AP' },
+      { name: 'AP Government and Politics Comparative (AP)', honorsType: 'AP' },
+      { name: 'AP Government and Politics United States (AP)', honorsType: 'AP' },
+      { name: 'AP Human Geography (AP)', honorsType: 'AP' },
+      { name: 'AP United States History (AP)', honorsType: 'AP' },
+      { name: 'AP World History (AP)', honorsType: 'AP' },
+      { name: 'Modern World History', honorsType: 'NH' },
+      { name: 'Modern World History APEX', honorsType: 'NH' },
+      { name: 'Modern World History Accelerated', honorsType: 'NH' },
+      { name: 'US Government', honorsType: 'NH' },
+      { name: 'US Government APEX', honorsType: 'NH' },
+      { name: 'US Government Accelerated', honorsType: 'NH' },
+      { name: 'US History', honorsType: 'NH' },
+      { name: 'US History APEX', honorsType: 'NH' },
+    ],
+    'English': [
+      { name: 'AP English Language and Composition (AP)', honorsType: 'AP' },
+      { name: 'AP English Literature and Composition (AP)', honorsType: 'AP' },
+      { name: 'AP Seminar (AP)', honorsType: 'AP' },
+      { name: 'CSU Expository Reading and Writing (CSU)', honorsType: 'CSU' },
+      { name: 'Diverse Voices and Media Literacy', honorsType: 'NH' },
+      { name: 'English 1-2', honorsType: 'NH' },
+      { name: 'English 1-2 APEX', honorsType: 'NH' },
+      { name: 'English 1-2 Accelerated', honorsType: 'NH' },
+      { name: 'English 3-4', honorsType: 'NH' },
+      { name: 'English 3-4 APEX', honorsType: 'NH' },
+      { name: 'English 3-4 Accelerated', honorsType: 'NH' },
+      { name: 'English 5-6', honorsType: 'NH' },
+      { name: 'English 5-6 APEX', honorsType: 'NH' },
+      { name: 'English 7-8 APEX', honorsType: 'NH' },
+      { name: 'Linked Learning Student Ambassadors', honorsType: 'NH' },
+    ],
+    'Mathematics': [
+      { name: 'AP Calculus AB (AP)', honorsType: 'AP' },
+      { name: 'AP Calculus BC (AP)', honorsType: 'AP' },
+      { name: 'AP Computer Science A (AP)', honorsType: 'AP' },
+      { name: 'AP Statistics (AP)', honorsType: 'AP' },
+      { name: 'Algebra 1', honorsType: 'NH' },
+      { name: 'Algebra 1 APEX', honorsType: 'NH' },
+      { name: 'Algebra 2', honorsType: 'NH' },
+      { name: 'Algebra 2 APEX', honorsType: 'NH' },
+      { name: 'Algebra 2 Accelerated', honorsType: 'NH' },
+      { name: 'Algebra AB', honorsType: 'NH' },
+      { name: 'Algebra CD', honorsType: 'NH' },
+      { name: 'Finite Math', honorsType: 'NH' },
+      { name: 'Functions/Statistics/Trigonometry', honorsType: 'NH' },
+      { name: 'Geometry', honorsType: 'NH' },
+      { name: 'Geometry APEX', honorsType: 'NH' },
+      { name: 'Geometry Accelerated', honorsType: 'NH' },
+      { name: 'Intensified Algebra', honorsType: 'NH' },
+      { name: 'Introduction to Data Science AB (Center X)', honorsType: 'NH' },
+      { name: 'Pre Calculus', honorsType: 'NH' },
+      { name: 'Pre Calculus Honors', honorsType: 'HL' },
+    ],
+    'Science': [
+      { name: 'AP Biology (AP)', honorsType: 'AP' },
+      { name: 'AP Chemistry (AP)', honorsType: 'AP' },
+      { name: 'AP Computer Science Principles (AP)', honorsType: 'AP' },
+      { name: 'AP Environmental Science (AP)', honorsType: 'AP' },
+      { name: 'AP Physics 1 (AP)', honorsType: 'AP' },
+      { name: 'AP Physics C: Mechanics (AP)', honorsType: 'AP' },
+      { name: 'Anatomy/Physiology Honors', honorsType: 'HL' },
+      { name: 'Biology 1-2 APEX', honorsType: 'NH' },
+      { name: 'Biology: The Living Earth', honorsType: 'NH' },
+      { name: 'Biology: The Living Earth APEX', honorsType: 'NH' },
+      { name: 'Biomedical Research', honorsType: 'NH' },
+      { name: 'Chemistry 1-2 APEX', honorsType: 'NH' },
+      { name: 'Chemistry 1-2 Honors', honorsType: 'HL' },
+      { name: 'Chemistry in the Earth System', honorsType: 'NH' },
+      { name: 'Chemistry in the Earth System APEX', honorsType: 'NH' },
+      { name: 'Earth Science 1-2 APEX', honorsType: 'NH' },
+      { name: 'Environmental Geoscience', honorsType: 'NH' },
+      { name: 'Honors PLTW Civil Engineering and Architecture (PLTW)', honorsType: 'PLTW' },
+      { name: 'Honors PLTW Cybersecurity (PLTW)', honorsType: 'PLTW' },
+      { name: 'Honors PLTW Engineering Design and Development (PLTW)', honorsType: 'PLTW' },
+      { name: 'Marine Biology 1-2', honorsType: 'NH' },
+      { name: 'Medical Biology 1-2', honorsType: 'NH' },
+      { name: 'Medical Chemistry 1-2', honorsType: 'NH' },
+      { name: 'PLTW Civil Engineering and Architecture (PLTW)', honorsType: 'PLTW' },
+      { name: 'PLTW Computer Science Essentials (PLTW)', honorsType: 'PLTW' },
+      { name: 'PLTW Engineering Design and Development (PLTW)', honorsType: 'PLTW' },
+      { name: 'Physics 1-2 APEX', honorsType: 'NH' },
+      { name: 'Physics of the Universe', honorsType: 'NH' },
+    ],
+    'Language Other Than English': [
+      { name: 'AP Chinese Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'AP French Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'AP Japanese Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'AP Spanish Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'Chinese 1-2', honorsType: 'NH' },
+      { name: 'Chinese 3-4', honorsType: 'NH' },
+      { name: 'Chinese 5-6', honorsType: 'NH' },
+      { name: 'Chinese 7-8', honorsType: 'NH' },
+      { name: 'French 1-2', honorsType: 'NH' },
+      { name: 'French 3-4', honorsType: 'NH' },
+      { name: 'French 5-6', honorsType: 'NH' },
+      { name: 'French I', honorsType: 'NH' },
+      { name: 'French II', honorsType: 'NH' },
+      { name: 'Japanese 1-2', honorsType: 'NH' },
+      { name: 'Japanese 3-4', honorsType: 'NH' },
+      { name: 'Japanese 5-6', honorsType: 'NH' },
+      { name: 'Japanese 5-6 Honors', honorsType: 'HL' },
+      { name: 'Japanese 7-8', honorsType: 'NH' },
+      { name: 'Spanish 1-2', honorsType: 'NH' },
+      { name: 'Spanish 1-2 APEX', honorsType: 'NH' },
+      { name: 'Spanish 3-4', honorsType: 'NH' },
+      { name: 'Spanish 3-4 APEX', honorsType: 'NH' },
+      { name: 'Spanish 5-6', honorsType: 'NH' },
+      { name: 'Spanish 5-6 APEX', honorsType: 'NH' },
+      { name: 'Spanish for Spanish 1-2', honorsType: 'NH' },
+      { name: 'Spanish for Spanish 3-4', honorsType: 'NH' },
+      { name: 'Spanish for Spanish 5-6', honorsType: 'NH' },
+    ],
+    'Visual and Performing Arts': [
+      { name: 'AP 2D Art and Design (AP)', honorsType: 'AP' },
+      { name: 'AP 3D Art and Design (AP)', honorsType: 'AP' },
+      { name: 'AP Art History (AP)', honorsType: 'AP' },
+      { name: 'AP Drawing (AP)', honorsType: 'AP' },
+      { name: 'Advanced Chamber Orchestra 3-8', honorsType: 'NH' },
+      { name: 'Advanced Contemporary Video', honorsType: 'NH' },
+      { name: 'Advanced Stage Technology', honorsType: 'NH' },
+      { name: 'Advanced Theatre Arts', honorsType: 'NH' },
+      { name: 'Art 1-2: Foundations', honorsType: 'NH' },
+      { name: 'Art 3-4: Drawing & Painting', honorsType: 'NH' },
+      { name: 'Art 3-4: Three-Dimensional Art', honorsType: 'NH' },
+      { name: 'Art 5-6: Drawing & Painting', honorsType: 'NH' },
+      { name: 'Art 5-6: Three-Dimensional Art', honorsType: 'NH' },
+      { name: 'Art 7-8: Drawing & Painting', honorsType: 'NH' },
+      { name: 'Band 1-2', honorsType: 'NH' },
+      { name: 'Band 3-8', honorsType: 'NH' },
+      { name: 'Cecilian Singers 1-2', honorsType: 'NH' },
+      { name: 'Cecilian Singers 3-8', honorsType: 'NH' },
+      { name: 'Chorus/Voice 1-2', honorsType: 'NH' },
+      { name: 'Chorus/Voice 3-8', honorsType: 'NH' },
+      { name: 'Contemporary Video', honorsType: 'NH' },
+      { name: 'Dance 5-6', honorsType: 'NH' },
+      { name: 'Dance 7-8', honorsType: 'NH' },
+      { name: 'Digital Art & Imaging 1-2', honorsType: 'NH' },
+      { name: 'Digital Art & Imaging 3-4', honorsType: 'NH' },
+      { name: 'Digital Art & Imaging 5-6', honorsType: 'NH' },
+      { name: 'Exploring Art 1-2 APEX', honorsType: 'NH' },
+      { name: 'Graphic Design and Printmaking 1-2', honorsType: 'NH' },
+      { name: 'Instruments 1-2', honorsType: 'NH' },
+      { name: 'Intermediate String Orchestra', honorsType: 'NH' },
+      { name: 'Intermediate Theatre Arts', honorsType: 'NH' },
+      { name: 'Introduction to Design 1, 2 (PLTW)', honorsType: 'PLTW' },
+      { name: 'Introduction to Songwriting', honorsType: 'NH' },
+      { name: 'Introduction to Theatre Arts', honorsType: 'NH' },
+      { name: 'Jazz Band 1-2', honorsType: 'NH' },
+      { name: 'Jazz Band 3-8', honorsType: 'NH' },
+      { name: 'Music Appreciation APEX', honorsType: 'NH' },
+      { name: 'Orchestra 1-2', honorsType: 'NH' },
+      { name: 'Orchestra 3-4', honorsType: 'NH' },
+      { name: 'Orchestra 5-6', honorsType: 'NH' },
+      { name: 'Orchestra 7-8', honorsType: 'NH' },
+      { name: 'Photo and Video 1-2', honorsType: 'NH' },
+      { name: 'Play Production 1-2', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 1-2', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 3-4', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 5-6', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 7-8', honorsType: 'NH' },
+      { name: 'Symphonic Winds 1-2', honorsType: 'NH' },
+      { name: 'Symphonic Winds 3-8', honorsType: 'NH' },
+      { name: 'Varsity Chorale 3-8', honorsType: 'NH' },
+      { name: 'Vocal Ensemble/Chamber Singers 1-2', honorsType: 'NH' },
+      { name: 'Vocal Ensemble/Chamber Singers 3-8', honorsType: 'NH' },
+    ],
+    'College-Prep Electives': [
+      { name: 'AP Macroeconomics (AP)', honorsType: 'AP' },
+      { name: 'AP Microeconomics (AP)', honorsType: 'AP' },
+      { name: 'AP Psychology (AP)', honorsType: 'AP' },
+      { name: 'AP Research (AP)', honorsType: 'AP' },
+      { name: 'Advanced Journalism: Edit, Design, Manage', honorsType: 'NH' },
+      { name: 'Applied Medical Occupations and Terminology', honorsType: 'NH' },
+      { name: 'Automotive and Transportation Technology 1-2', honorsType: 'NH' },
+      { name: 'Automotive and Transportation Technology 3-4', honorsType: 'NH' },
+      { name: 'Computer Applications', honorsType: 'NH' },
+      { name: 'Creative Writing 1-2', honorsType: 'NH' },
+      { name: 'Creative Writing 1-2 APEX', honorsType: 'NH' },
+      { name: 'Criminal/Civil Law', honorsType: 'NH' },
+      { name: 'Developing Future Mental and Behavioral Health Professionals Through Mentorships and Internships (UCCI)', honorsType: 'UCCI' },
+      { name: 'Digital Media', honorsType: 'NH' },
+      { name: 'Economics', honorsType: 'NH' },
+      { name: 'Economics APEX', honorsType: 'NH' },
+      { name: 'Economics Accelerated', honorsType: 'NH' },
+      { name: 'Elements of Journalism', honorsType: 'NH' },
+      { name: 'Elements of Oral Communication', honorsType: 'NH' },
+      { name: 'Environmental Science APEX', honorsType: 'NH' },
+      { name: 'Ethnic and Identity Studies', honorsType: 'NH' },
+      { name: 'Forensic Science', honorsType: 'NH' },
+      { name: 'Geography', honorsType: 'NH' },
+      { name: 'Health and Career Exploration', honorsType: 'NH' },
+      { name: 'Healthcare Administrative Technology', honorsType: 'NH' },
+      { name: 'International Business', honorsType: 'NH' },
+      { name: 'International Marketing', honorsType: 'NH' },
+      { name: 'International Relations', honorsType: 'NH' },
+      { name: 'Introduction to Entrepreneurship', honorsType: 'NH' },
+      { name: 'Introduction to Psychology', honorsType: 'NH' },
+      { name: 'Introduction to Sociology', honorsType: 'NH' },
+      { name: 'Journalism: Production/Management', honorsType: 'NH' },
+      { name: 'Medical Administrative Assistant', honorsType: 'NH' },
+      { name: 'Medical/Clerical Occupations', honorsType: 'NH' },
+      { name: 'Model United Nations', honorsType: 'NH' },
+      { name: 'Psychology', honorsType: 'NH' },
+      { name: 'Senior Capstone Business', honorsType: 'NH' },
+      { name: 'Social Work and Health Advocacy in Action (UCCI)', honorsType: 'UCCI' },
+    ]
+  },
+  '10th': {
+    'History/Social Science': [
+      { name: 'AP Government and Politics Comparative (AP)', honorsType: 'AP' },
+      { name: 'AP Government and Politics United States (AP)', honorsType: 'AP' },
+      { name: 'AP Human Geography (AP)', honorsType: 'AP' },
+      { name: 'AP United States History (AP)', honorsType: 'AP' },
+      { name: 'AP World History (AP)', honorsType: 'AP' },
+      { name: 'Modern World History', honorsType: 'NH' },
+      { name: 'Modern World History APEX', honorsType: 'NH' },
+      { name: 'Modern World History Accelerated', honorsType: 'NH' },
+      { name: 'US Government', honorsType: 'NH' },
+      { name: 'US Government APEX', honorsType: 'NH' },
+      { name: 'US Government Accelerated', honorsType: 'NH' },
+      { name: 'US History', honorsType: 'NH' },
+      { name: 'US History APEX', honorsType: 'NH' },
+    ],
+    'English': [
+      { name: 'AP English Language and Composition (AP)', honorsType: 'AP' },
+      { name: 'AP English Literature and Composition (AP)', honorsType: 'AP' },
+      { name: 'AP Seminar (AP)', honorsType: 'AP' },
+      { name: 'Advanced ELD', honorsType: 'NH' },
+      { name: 'CSU Expository Reading and Writing (CSU)', honorsType: 'CSU' },
+      { name: 'Diverse Voices and Media Literacy', honorsType: 'NH' },
+      { name: 'English 1-2', honorsType: 'NH' },
+      { name: 'English 1-2 APEX', honorsType: 'NH' },
+      { name: 'English 1-2 Accelerated', honorsType: 'NH' },
+      { name: 'English 3-4', honorsType: 'NH' },
+      { name: 'English 3-4 APEX', honorsType: 'NH' },
+      { name: 'English 3-4 Accelerated', honorsType: 'NH' },
+      { name: 'English 5-6', honorsType: 'NH' },
+      { name: 'English 5-6 APEX', honorsType: 'NH' },
+      { name: 'English 7-8 APEX', honorsType: 'NH' },
+      { name: 'Pathway Ambassadors 1-2', honorsType: 'NH' },
+    ],
+    'Mathematics': [
+      { name: 'AP Calculus AB (AP)', honorsType: 'AP' },
+      { name: 'AP Calculus BC (AP)', honorsType: 'AP' },
+      { name: 'AP Computer Science A (AP)', honorsType: 'AP' },
+      { name: 'AP Precalculus (AP)', honorsType: 'AP' },
+      { name: 'AP Statistics (AP)', honorsType: 'AP' },
+      { name: 'Algebra 1', honorsType: 'NH' },
+      { name: 'Algebra 1 APEX', honorsType: 'NH' },
+      { name: 'Algebra 2', honorsType: 'NH' },
+      { name: 'Algebra 2 APEX', honorsType: 'NH' },
+      { name: 'Algebra 2 Accelerated', honorsType: 'NH' },
+      { name: 'Algebra AB', honorsType: 'NH' },
+      { name: 'Algebra CD', honorsType: 'NH' },
+      { name: 'Finite Math', honorsType: 'NH' },
+      { name: 'Functions/Statistics/Trigonometry', honorsType: 'NH' },
+      { name: 'Geometry', honorsType: 'NH' },
+      { name: 'Geometry APEX', honorsType: 'NH' },
+      { name: 'Geometry Accelerated', honorsType: 'NH' },
+      { name: 'Intensified Algebra', honorsType: 'NH' },
+      { name: 'Introduction to Data Science AB (Center X)', honorsType: 'NH' },
+      { name: 'Pre Calculus', honorsType: 'NH' },
+    ],
+    'Science': [
+      { name: 'AP Biology (AP)', honorsType: 'AP' },
+      { name: 'AP Chemistry (AP)', honorsType: 'AP' },
+      { name: 'AP Computer Science Principles (AP)', honorsType: 'AP' },
+      { name: 'AP Environmental Science (AP)', honorsType: 'AP' },
+      { name: 'AP Physics 1 (AP)', honorsType: 'AP' },
+      { name: 'AP Physics C: Mechanics (AP)', honorsType: 'AP' },
+      { name: 'Anatomy/Physiology', honorsType: 'NH' },
+      { name: 'Anatomy/Physiology Honors', honorsType: 'HL' },
+      { name: 'Biology 1-2 APEX', honorsType: 'NH' },
+      { name: 'Biology: The Living Earth', honorsType: 'NH' },
+      { name: 'Biology: The Living Earth APEX', honorsType: 'NH' },
+      { name: 'Biomedical Research', honorsType: 'NH' },
+      { name: 'Chemistry 1-2 APEX', honorsType: 'NH' },
+      { name: 'Chemistry 1-2 Honors', honorsType: 'HL' },
+      { name: 'Chemistry in the Earth System', honorsType: 'NH' },
+      { name: 'Chemistry in the Earth System APEX', honorsType: 'NH' },
+      { name: 'Earth Science 1-2 APEX', honorsType: 'NH' },
+      { name: 'Environmental Geoscience', honorsType: 'NH' },
+      { name: 'Food Science', honorsType: 'NH' },
+      { name: 'Honors PLTW Civil Engineering and Architecture (PLTW)', honorsType: 'PLTW' },
+      { name: 'Honors PLTW Cybersecurity (PLTW)', honorsType: 'PLTW' },
+      { name: 'Honors PLTW Engineering Design and Development (PLTW)', honorsType: 'PLTW' },
+      { name: 'Marine Biology 1-2', honorsType: 'NH' },
+      { name: 'Medical Biology 1-2', honorsType: 'NH' },
+      { name: 'Medical Chemistry 1-2', honorsType: 'NH' },
+      { name: 'PLTW Civil Engineering and Architecture (PLTW)', honorsType: 'PLTW' },
+      { name: 'PLTW Computer Science Essentials (PLTW)', honorsType: 'PLTW' },
+      { name: 'PLTW Engineering Design and Development (PLTW)', honorsType: 'PLTW' },
+      { name: 'Physical Oceanography', honorsType: 'NH' },
+      { name: 'Physics 1-2 APEX', honorsType: 'NH' },
+      { name: 'Physics of the Universe', honorsType: 'NH' },
+    ],
+    'Language Other Than English': [
+      { name: 'AP Chinese Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'AP French Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'AP Japanese Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'AP Spanish Language and Culture (AP)', honorsType: 'AP' },
+      { name: 'Chinese 1-2', honorsType: 'NH' },
+      { name: 'Chinese 3-4', honorsType: 'NH' },
+      { name: 'Chinese 5-6', honorsType: 'NH' },
+      { name: 'Chinese 7-8', honorsType: 'NH' },
+      { name: 'French 1-2', honorsType: 'NH' },
+      { name: 'French 3-4', honorsType: 'NH' },
+      { name: 'French 5-6', honorsType: 'NH' },
+      { name: 'French I', honorsType: 'NH' },
+      { name: 'French II', honorsType: 'NH' },
+      { name: 'Japanese 1-2', honorsType: 'NH' },
+      { name: 'Japanese 3-4', honorsType: 'NH' },
+      { name: 'Japanese 5-6', honorsType: 'NH' },
+      { name: 'Japanese 5-6 Honors', honorsType: 'HL' },
+      { name: 'Japanese 7-8', honorsType: 'NH' },
+      { name: 'Spanish 1-2', honorsType: 'NH' },
+      { name: 'Spanish 1-2 APEX', honorsType: 'NH' },
+      { name: 'Spanish 3-4', honorsType: 'NH' },
+      { name: 'Spanish 3-4 APEX', honorsType: 'NH' },
+      { name: 'Spanish 5-6', honorsType: 'NH' },
+      { name: 'Spanish 5-6 APEX', honorsType: 'NH' },
+      { name: 'Spanish for Spanish 1-2', honorsType: 'NH' },
+      { name: 'Spanish for Spanish 3-4', honorsType: 'NH' },
+      { name: 'Spanish for Spanish 5-6', honorsType: 'NH' },
+    ],
+    'Visual and Performing Arts': [
+      { name: 'AP 2D Art and Design (AP)', honorsType: 'AP' },
+      { name: 'AP 3D Art and Design (AP)', honorsType: 'AP' },
+      { name: 'AP Art History (AP)', honorsType: 'AP' },
+      { name: 'AP Drawing (AP)', honorsType: 'AP' },
+      { name: 'AP Music Theory (AP)', honorsType: 'AP' },
+      { name: 'Advanced Chamber Orchestra 3-8', honorsType: 'NH' },
+      { name: 'Advanced Contemporary Video', honorsType: 'NH' },
+      { name: 'Advanced Stage Technology', honorsType: 'NH' },
+      { name: 'Advanced Theatre Arts', honorsType: 'NH' },
+      { name: 'Art 1-2: Foundations', honorsType: 'NH' },
+      { name: 'Art 3-4: Ceramics', honorsType: 'NH' },
+      { name: 'Art 3-4: Drawing & Painting', honorsType: 'NH' },
+      { name: 'Art 3-4: Three-Dimensional Art', honorsType: 'NH' },
+      { name: 'Art 5-6: Drawing & Painting', honorsType: 'NH' },
+      { name: 'Art 5-6: Three-Dimensional Art', honorsType: 'NH' },
+      { name: 'Art 7-8: Drawing & Painting', honorsType: 'NH' },
+      { name: 'Band 1-2', honorsType: 'NH' },
+      { name: 'Band 3-8', honorsType: 'NH' },
+      { name: 'Cecilian Singers 1-2', honorsType: 'NH' },
+      { name: 'Cecilian Singers 3-8', honorsType: 'NH' },
+      { name: 'Chorus/Voice 1-2', honorsType: 'NH' },
+      { name: 'Chorus/Voice 3-8', honorsType: 'NH' },
+      { name: 'Contemporary Video', honorsType: 'NH' },
+      { name: 'Dance 5-6', honorsType: 'NH' },
+      { name: 'Dance 7-8', honorsType: 'NH' },
+      { name: 'Digital Art & Imaging 1-2', honorsType: 'NH' },
+      { name: 'Digital Art & Imaging 3-4', honorsType: 'NH' },
+      { name: 'Digital Art & Imaging 5-6', honorsType: 'NH' },
+      { name: 'Exploring Art 1-2 APEX', honorsType: 'NH' },
+      { name: 'Graphic Design and Printmaking 1-2', honorsType: 'NH' },
+      { name: 'Instruments 1-2', honorsType: 'NH' },
+      { name: 'Intermediate String Orchestra', honorsType: 'NH' },
+      { name: 'Intermediate Theatre Arts', honorsType: 'NH' },
+      { name: 'Introduction to Design & Engineering', honorsType: 'NH' },
+      { name: 'Introduction to Songwriting', honorsType: 'NH' },
+      { name: 'Introduction to Theatre Arts', honorsType: 'NH' },
+      { name: 'Jazz Band 1-2', honorsType: 'NH' },
+      { name: 'Jazz Band 3-8', honorsType: 'NH' },
+      { name: 'Music Appreciation APEX', honorsType: 'NH' },
+      { name: 'Orchestra 1-2', honorsType: 'NH' },
+      { name: 'Orchestra 3-4', honorsType: 'NH' },
+      { name: 'Orchestra 5-6', honorsType: 'NH' },
+      { name: 'Orchestra 7-8', honorsType: 'NH' },
+      { name: 'Photo and Video 1-2', honorsType: 'NH' },
+      { name: 'Photo and Video 3-4', honorsType: 'NH' },
+      { name: 'Play Production 1-2', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 1-2', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 3-4', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 5-6', honorsType: 'NH' },
+      { name: 'Studio Vocal Jazz Singers 7-8', honorsType: 'NH' },
+      { name: 'Symphonic Winds 1-2', honorsType: 'NH' },
+      { name: 'Symphonic Winds 3-8', honorsType: 'NH' },
+      { name: 'Varsity Chorale 3-8', honorsType: 'NH' },
+      { name: 'Vocal Ensemble/Chamber Singers 1-2', honorsType: 'NH' },
+      { name: 'Vocal Ensemble/Chamber Singers 3-8', honorsType: 'NH' },
+    ],
+    'College-Prep Electives': [
+      { name: 'AP Macroeconomics (AP)', honorsType: 'AP' },
+      { name: 'AP Microeconomics (AP)', honorsType: 'AP' },
+      { name: 'AP Psychology (AP)', honorsType: 'AP' },
+      { name: 'AP Research (AP)', honorsType: 'AP' },
+      { name: 'Advanced Journalism: Edit, Design, Manage', honorsType: 'NH' },
+      { name: 'Applied Medical Occupations and Terminology', honorsType: 'NH' },
+      { name: 'Automotive and Transportation Technology 1-2', honorsType: 'NH' },
+      { name: 'Automotive and Transportation Technology 3-4', honorsType: 'NH' },
+      { name: 'Computer Applications', honorsType: 'NH' },
+      { name: 'Creative Writing 1-2', honorsType: 'NH' },
+      { name: 'Creative Writing 1-2 APEX', honorsType: 'NH' },
+      { name: 'Criminal/Civil Law', honorsType: 'NH' },
+      { name: 'Developing Future Mental and Behavioral Health Professionals Through Mentorships and Internships (UCCI)', honorsType: 'UCCI' },
+      { name: 'Digital Design and Yearbook Publication 1-2', honorsType: 'NH' },
+      { name: 'Digital Design and Yearbook Publication 3-8', honorsType: 'NH' },
+      { name: 'Digital Media', honorsType: 'NH' },
+      { name: 'Economics', honorsType: 'NH' },
+      { name: 'Economics APEX', honorsType: 'NH' },
+      { name: 'Economics Accelerated', honorsType: 'NH' },
+      { name: 'Elements of Journalism', honorsType: 'NH' },
+      { name: 'Elements of Oral Communication', honorsType: 'NH' },
+      { name: 'Environmental Science APEX', honorsType: 'NH' },
+      { name: 'Ethnic Studies APEX', honorsType: 'NH' },
+      { name: 'Ethnic and Identity Studies', honorsType: 'NH' },
+      { name: 'Forensic Science', honorsType: 'NH' },
+      { name: 'Geography', honorsType: 'NH' },
+      { name: 'Health and Career Exploration', honorsType: 'NH' },
+      { name: 'Healthcare Administrative Technology', honorsType: 'NH' },
+      { name: 'History of Rock & Roll', honorsType: 'NH' },
+      { name: 'International Business', honorsType: 'NH' },
+      { name: 'International Marketing', honorsType: 'NH' },
+      { name: 'International Relations', honorsType: 'NH' },
+      { name: 'Introduction to Entrepreneurship', honorsType: 'NH' },
+      { name: 'Introduction to Psychology', honorsType: 'NH' },
+      { name: 'Introduction to Sociology', honorsType: 'NH' },
+      { name: 'Journalism: Production/Management', honorsType: 'NH' },
+      { name: 'Medical Administrative Assistant', honorsType: 'NH' },
+      { name: 'Medical/Clerical Occupations', honorsType: 'NH' },
+      { name: 'Model United Nations', honorsType: 'NH' },
+      { name: 'Model United Nations II / Leadership', honorsType: 'NH' },
+      { name: 'Pathway Ambassadors 3-4', honorsType: 'NH' },
+      { name: 'Psychology', honorsType: 'NH' },
+      { name: 'Senior Capstone Business', honorsType: 'NH' },
+      { name: 'Senior Project', honorsType: 'NH' },
+      { name: 'Social Work and Health Advocacy in Action (UCCI)', honorsType: 'UCCI' },
+    ]
+  },
+  '11th': {
+    "History/Social Science": [
+      { name: "AP African American Studies", honors: "AP" },
+      { name: "AP Government and Politics Comparative", honors: "AP" },
+      { name: "AP Government and Politics United States", honors: "AP" },
+      { name: "AP Human Geography", honors: "AP" },
+      { name: "AP United States History", honors: "AP" },
+      { name: "AP World History", honors: "AP" },
+      { name: "Modern World History", honors: "NH" },
+      { name: "Modern World History APEX", honors: "NH" },
+      { name: "Modern World History Accelerated", honors: "HL" },
+      { name: "US Government", honors: "NH" },
+      { name: "US Government APEX", honors: "NH" },
+      { name: "US Government Accelerated", honors: "HL" },
+      { name: "US History", honors: "NH" },
+      { name: "US History APEX", honors: "NH" },
+    ],
+    "English": [
+      { name: "AP English Language and Composition", honors: "AP" },
+      { name: "AP English Literature and Composition", honors: "AP" },
+      { name: "AP Seminar", honors: "AP" },
+      { name: "Advanced ELD", honors: "HL" },
+      { name: "CSU Expository Reading and Writing", honors: "CSU" },
+      { name: "Diverse Voices and Media Literacy", honors: "NH" },
+      { name: "English 1-2", honors: "NH" },
+      { name: "English 1-2 APEX", honors: "NH" },
+      { name: "English 1-2 Accelerated", honors: "HL" },
+      { name: "English 3-4", honors: "NH" },
+      { name: "English 3-4 APEX", honors: "NH" },
+      { name: "English 3-4 Accelerated", honors: "HL" },
+      { name: "English 5-6", honors: "NH" },
+      { name: "English 5-6 APEX", honors: "NH" },
+      { name: "English 7-8 APEX", honors: "NH" },
+      { name: "Pathway Ambassadors 1-2", honors: "NH" },
+    ],
+    "Mathematics": [
+      { name: "AP Calculus AB", honors: "AP" },
+      { name: "AP Calculus BC", honors: "AP" },
+      { name: "AP Computer Science A", honors: "AP" },
+      { name: "AP Precalculus", honors: "AP" },
+      { name: "AP Statistics", honors: "AP" },
+      { name: "Algebra 1", honors: "NH" },
+      { name: "Algebra 1 APEX", honors: "NH" },
+      { name: "Algebra 2", honors: "NH" },
+      { name: "Algebra 2 APEX", honors: "NH" },
+      { name: "Algebra 2 Accelerated", honors: "HL" },
+      { name: "Algebra AB", honors: "NH" },
+      { name: "Algebra CD", honors: "NH" },
+      { name: "Functions/Statistics/Trigonometry", honors: "NH" },
+      { name: "Geometry", honors: "NH" },
+      { name: "Geometry APEX", honors: "NH" },
+      { name: "Geometry Accelerated", honors: "HL" },
+      { name: "Introduction to Data Science AB (Center X)", honors: "NH" },
+      { name: "Pre Calculus", honors: "NH" },
+    ],
+    "Science": [
+      { name: "AP Biology", honors: "AP" },
+      { name: "AP Chemistry", honors: "AP" },
+      { name: "AP Computer Science Principles", honors: "AP" },
+      { name: "AP Environmental Science", honors: "AP" },
+      { name: "AP Physics 1", honors: "AP" },
+      { name: "AP Physics C: Mechanics", honors: "AP" },
+      { name: "Anatomy/Physiology", honors: "NH" },
+      { name: "Anatomy/Physiology Honors", honors: "HL" },
+      { name: "Biology 1-2 APEX", honors: "NH" },
+      { name: "Biology: The Living Earth", honors: "NH" },
+      { name: "Biology: The Living Earth APEX", honors: "NH" },
+      { name: "Biomedical Research", honors: "NH" },
+      { name: "Chemistry 1-2 APEX", honors: "NH" },
+      { name: "Chemistry 1-2 Honors", honors: "HL" },
+      { name: "Chemistry in the Earth System", honors: "NH" },
+      { name: "Chemistry in the Earth System APEX", honors: "NH" },
+      { name: "Earth Science 1-2 APEX", honors: "NH" },
+      { name: "Environmental Geoscience", honors: "NH" },
+      { name: "Food Science", honors: "NH" },
+      { name: "Honors PLTW Civil Engineering and Architecture", honors: "PLTW" },
+      { name: "Honors PLTW Cybersecurity", honors: "PLTW" },
+      { name: "Honors PLTW Engineering Design and Development", honors: "PLTW" },
+      { name: "Marine Biology 1-2", honors: "NH" },
+      { name: "Medical Biology 1-2", honors: "NH" },
+      { name: "Medical Chemistry 1-2", honors: "NH" },
+      { name: "PLTW Computer Science Essentials", honors: "PLTW" },
+      { name: "Physical Oceanography", honors: "NH" },
+      { name: "Physics 1-2 APEX", honors: "NH" },
+      { name: "Physics of the Universe", honors: "NH" },
+      { name: "Physics of the Universe APEX", honors: "NH" },
+    ],
+    "Language Other Than English": [
+      { name: "AP Chinese Language and Culture", honors: "AP" },
+      { name: "AP French Language and Culture", honors: "AP" },
+      { name: "AP Japanese Language and Culture", honors: "AP" },
+      { name: "AP Spanish Language and Culture", honors: "AP" },
+      { name: "Chinese 1-2", honors: "NH" },
+      { name: "Chinese 3-4", honors: "NH" },
+      { name: "Chinese 5-6", honors: "NH" },
+      { name: "Chinese 7-8", honors: "NH" },
+      { name: "French 1-2", honors: "NH" },
+      { name: "French 3-4", honors: "NH" },
+      { name: "French 5-6", honors: "NH" },
+      { name: "French I", honors: "NH" },
+      { name: "French II", honors: "NH" },
+      { name: "Japanese 1-2", honors: "NH" },
+      { name: "Japanese 3-4", honors: "NH" },
+      { name: "Japanese 5-6", honors: "NH" },
+      { name: "Japanese 5-6 Honors", honors: "HL" },
+      { name: "Japanese 7-8", honors: "NH" },
+      { name: "Khmer For Khmer Speakers 1-2", honors: "NH" },
+      { name: "Spanish 1-2", honors: "NH" },
+      { name: "Spanish 1-2 APEX", honors: "NH" },
+      { name: "Spanish 3-4", honors: "NH" },
+      { name: "Spanish 3-4 APEX", honors: "NH" },
+      { name: "Spanish 5-6", honors: "NH" },
+      { name: "Spanish 5-6 APEX", honors: "NH" },
+      { name: "Spanish for Spanish 1-2", honors: "NH" },
+      { name: "Spanish for Spanish 3-4", honors: "NH" },
+      { name: "Spanish for Spanish 5-6", honors: "NH" },
+    ],
+    "Visual and Performing Arts": [
+      { name: "AP 2D Art and Design", honors: "AP" },
+      { name: "AP 3D Art and Design", honors: "AP" },
+      { name: "AP Art History", honors: "AP" },
+      { name: "AP Drawing", honors: "AP" },
+      { name: "AP Music Theory", honors: "AP" },
+      { name: "Advanced Chamber Orchestra 3-8", honors: "HL" },
+      { name: "Advanced Stage Technology", honors: "HL" },
+      { name: "Advanced Theatre Arts", honors: "HL" },
+      { name: "Art 1-2: Foundations", honors: "NH" },
+      { name: "Art 3-4: Ceramics", honors: "NH" },
+      { name: "Art 3-4: Drawing & Painting", honors: "NH" },
+      { name: "Art 3-4: Three-Dimensional Art", honors: "NH" },
+      { name: "Art 5-6: Ceramics", honors: "NH" },
+      { name: "Art 5-6: Drawing & Painting", honors: "NH" },
+      { name: "Art 5-6: Three-Dimensional Art", honors: "NH" },
+      { name: "Art 7-8: Drawing & Painting", honors: "NH" },
+      { name: "Band 1-2", honors: "NH" },
+      { name: "Band 3-8", honors: "NH" },
+      { name: "Cecilian Singers 1-2", honors: "NH" },
+      { name: "Cecilian Singers 3-8", honors: "NH" },
+      { name: "Chorus/Voice 1-2", honors: "NH" },
+      { name: "Chorus/Voice 3-8", honors: "NH" },
+      { name: "Contemporary Video", honors: "NH" },
+      { name: "Dance 5-6", honors: "NH" },
+      { name: "Dance 7-8", honors: "NH" },
+      { name: "Digital Art & Imaging 1-2", honors: "NH" },
+      { name: "Digital Art & Imaging 3-4", honors: "NH" },
+      { name: "Digital Art & Imaging 5-6", honors: "NH" },
+      { name: "Exploring Art 1-2 APEX", honors: "NH" },
+      { name: "Global Art Studies ELD", honors: "NH" },
+      { name: "Instruments 1-2", honors: "NH" },
+      { name: "Intermediate String Orchestra", honors: "NH" },
+      { name: "Intermediate Theatre Arts", honors: "NH" },
+      { name: "Introduction to Design & Engineering", honors: "NH" },
+      { name: "Introduction to Songwriting", honors: "NH" },
+      { name: "Introduction to Theatre Arts", honors: "NH" },
+      { name: "Jazz Band 1-2", honors: "NH" },
+      { name: "Jazz Band 3-8", honors: "NH" },
+      { name: "Music Appreciation APEX", honors: "NH" },
+      { name: "Orchestra 1-2", honors: "NH" },
+      { name: "Orchestra 3-4", honors: "NH" },
+      { name: "Orchestra 5-6", honors: "NH" },
+      { name: "Orchestra 7-8", honors: "NH" },
+      { name: "Photo and Video 1-2", honors: "NH" },
+      { name: "Photo and Video 3-4", honors: "NH" },
+      { name: "Photo and Video 5-6", honors: "NH" },
+      { name: "Play Production 1-2", honors: "NH" },
+      { name: "Studio Vocal Jazz Singers 1-2", honors: "NH" },
+      { name: "Studio Vocal Jazz Singers 3-4", honors: "NH" },
+      { name: "Studio Vocal Jazz Singers 5-6", honors: "NH" },
+      { name: "Studio Vocal Jazz Singers 7-8", honors: "NH" },
+      { name: "Symphonic Winds 1-2", honors: "NH" },
+      { name: "Symphonic Winds 3-8", honors: "NH" },
+      { name: "Varsity Chorale 3-8", honors: "NH" },
+      { name: "Vocal Ensemble/Chamber Singers 1-2", honors: "NH" },
+      { name: "Vocal Ensemble/Chamber Singers 3-8", honors: "NH" },
+    ],
+    "College-Prep Electives": [
+      { name: "AP Macroeconomics", honors: "AP" },
+      { name: "AP Microeconomics", honors: "AP" },
+      { name: "AP Psychology", honors: "AP" },
+      { name: "AP Research", honors: "AP" },
+      { name: "Advanced Journalism: Edit, Design, Manage", honors: "HL" },
+      { name: "Applied Medical Occupations and Terminology", honors: "NH" },
+      { name: "Automotive and Transportation Technology 1-2", honors: "NH" },
+      { name: "Automotive and Transportation Technology 3-4", honors: "NH" },
+      { name: "Computer Applications", honors: "NH" },
+      { name: "Creative Writing 1-2", honors: "NH" },
+      { name: "Creative Writing 1-2 APEX", honors: "NH" },
+      { name: "Criminal/Civil Law", honors: "NH" },
+      { name: "Developing Future Mental and Behavioral Health Professionals Through Mentorships and Internships", honors: "UCCI" },
+      { name: "Digital Design and Yearbook Publication 1-2", honors: "NH" },
+      { name: "Digital Design and Yearbook Publication 3-8", honors: "NH" },
+      { name: "Digital Literacy for Career and College Readiness", honors: "NH" },
+      { name: "Digital Media", honors: "NH" },
+      { name: "Economics", honors: "NH" },
+      { name: "Economics APEX", honors: "NH" },
+      { name: "Economics Accelerated", honors: "HL" },
+      { name: "Elements of Journalism", honors: "NH" },
+      { name: "Elements of Oral Communication", honors: "NH" },
+      { name: "Environmental Science APEX", honors: "NH" },
+      { name: "Ethnic Studies APEX", honors: "NH" },
+      { name: "Ethnic and Identity Studies", honors: "NH" },
+      { name: "Forensic Science", honors: "NH" },
+      { name: "Geography", honors: "NH" },
+      { name: "Health and Career Exploration", honors: "NH" },
+      { name: "Healthcare Administrative Technology", honors: "NH" },
+      { name: "History of Rock & Roll", honors: "NH" },
+      { name: "International Business", honors: "NH" },
+      { name: "International Marketing", honors: "NH" },
+      { name: "International Relations", honors: "NH" },
+      { name: "Introduction to Entrepreneurship", honors: "NH" },
+      { name: "Introduction to Psychology", honors: "NH" },
+      { name: "Introduction to Sociology", honors: "NH" },
+      { name: "Journalism: Production/Management", honors: "NH" },
+      { name: "Medical Administrative Assistant", honors: "NH" },
+      { name: "Medical/Clerical Occupations", honors: "NH" },
+      { name: "Model United Nations", honors: "NH" },
+      { name: "Model United Nations II / Leadership", honors: "NH" },
+      { name: "Pathway Ambassadors 3-4", honors: "NH" },
+      { name: "Psychology", honors: "NH" },
+      { name: "Senior Capstone Business", honors: "NH" },
+      { name: "Senior Project", honors: "NH" },
+      { name: "Social Work and Health Advocacy in Action", honors: "UCCI" },
+    ]
+  }
 };
 
 const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => {
   const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
+  const [showYearForm, setShowYearForm] = useState(false);
+  const [newYearData, setNewYearData] = useState({ startYear: '', endYear: '', gradeLevel: '9th' });
 
   const addAcademicYear = () => {
-    const currentYear = new Date().getFullYear();
-    const nextYear = currentYear + 1;
-    const yearString = `${currentYear} - ${nextYear}`;
-    
-    // Initialize subjects with predefined courses
-    const subjects: { [key: string]: any } = {};
-    Object.entries(PREDEFINED_COURSES).forEach(([subjectName, courses]) => {
-      subjects[subjectName] = {
-        courses: courses.map(course => ({
-          ...course,
-          selected: false,
-          grade1: '',
-          grade2: ''
-        }))
+    if (showYearForm && newYearData.startYear && newYearData.endYear) {
+      const yearString = `${newYearData.startYear} - ${newYearData.endYear}`;
+      
+      // Initialize subjects with predefined courses based on selected grade
+      const subjects: { [key: string]: any } = {};
+      const coursesForGrade = PREDEFINED_COURSES[newYearData.gradeLevel] || PREDEFINED_COURSES['9th'];
+      
+      Object.entries(coursesForGrade).forEach(([subjectName, courses]) => {
+        subjects[subjectName] = {
+          courses: (courses as any[]).map(course => ({
+            ...course,
+            selected: false,
+            grade1: '',
+            grade2: ''
+          }))
+        };
+      });
+
+      const newYear = {
+        id: Date.now().toString(),
+        year: yearString,
+        gradeLevel: newYearData.gradeLevel,
+        subjects,
+        tookSummerCourses: false
       };
-    });
 
-    const newYear = {
-      id: Date.now().toString(),
-      year: yearString,
-      gradeLevel: '9th', // Default, user can change
-      subjects,
-      tookSummerCourses: false
-    };
+      setData({ 
+        ...data, 
+        academicYears: [...data.academicYears, newYear] 
+      });
+      
+      // Reset form
+      setShowYearForm(false);
+      setNewYearData({ startYear: '', endYear: '', gradeLevel: '9th' });
+    } else {
+      setShowYearForm(true);
+    }
+  };
 
-    setData({ 
-      ...data, 
-      academicYears: [...data.academicYears, newYear] 
-    });
+  const cancelAddYear = () => {
+    setShowYearForm(false);
+    setNewYearData({ startYear: '', endYear: '', gradeLevel: '9th' });
   };
 
   const updateAcademicYear = (yearId: string, field: string, value: any) => {
@@ -863,11 +1454,81 @@ const CourseHistoryStep: React.FC<{ data: AcademicJourneyData; setData: (data: A
         </div>
         <Button type="button" onClick={addAcademicYear} size="sm">
           <Plus className="h-4 w-4 mr-2" />
-          Add another grade
+          Add Academic Year
         </Button>
       </div>
 
       <div className="space-y-6">
+        {showYearForm && (
+          <Card className="w-full border-dashed">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <h4 className="text-lg font-semibold">Add Academic Year</h4>
+                <Button type="button" onClick={cancelAddYear} size="sm" variant="outline">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="startYear">Start Year *</Label>
+                  <Input
+                    id="startYear"
+                    type="number"
+                    placeholder="2020"
+                    value={newYearData.startYear}
+                    onChange={(e) => setNewYearData({...newYearData, startYear: e.target.value})}
+                    min="1990"
+                    max="2050"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="endYear">End Year *</Label>
+                  <Input
+                    id="endYear"
+                    type="number"
+                    placeholder="2021"
+                    value={newYearData.endYear}
+                    onChange={(e) => setNewYearData({...newYearData, endYear: e.target.value})}
+                    min="1990"
+                    max="2050"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="gradeLevel">Grade Level *</Label>
+                  <Select 
+                    value={newYearData.gradeLevel} 
+                    onValueChange={(value) => setNewYearData({...newYearData, gradeLevel: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="-- select --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="9th">9th</SelectItem>
+                      <SelectItem value="10th">10th</SelectItem>
+                      <SelectItem value="11th">11th</SelectItem>
+                      <SelectItem value="12th">12th</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" onClick={cancelAddYear} variant="outline">
+                  Cancel
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={addAcademicYear}
+                  disabled={!newYearData.startYear || !newYearData.endYear}
+                >
+                  Add Year
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {(data.academicYears || []).map((academicYear, yearIndex) => (
           <Card key={academicYear.id} className="w-full">
             <CardHeader>

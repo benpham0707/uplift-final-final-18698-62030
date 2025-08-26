@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,8 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { createExperience } from '@/app/experiences/api';
-
-type WizardStep = 1 | 2 | 3 | 4;
+import { Trash2, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const EXPERIENCE_TYPE = [
   { id: 'work', label: 'Work' },
@@ -26,6 +26,43 @@ const TIME_COMMITMENT = [
   { id: 'one_time', label: 'One-time' },
 ] as const;
 
+interface Experience {
+  id?: string;
+  category: string;
+  title: string;
+  organization: string;
+  startDate: string;
+  endDate: string;
+  isOngoing: boolean;
+  timeCommitment: string;
+  totalHours: string;
+  description: string;
+  responsibilities: string[];
+  achievements: string[];
+  skills: string[];
+  verificationUrl: string;
+  supervisorName: string;
+  canContact: boolean;
+}
+
+const createEmptyExperience = (): Experience => ({
+  category: '',
+  title: '',
+  organization: '',
+  startDate: '',
+  endDate: '',
+  isOngoing: false,
+  timeCommitment: '',
+  totalHours: '',
+  description: '',
+  responsibilities: [],
+  achievements: [],
+  skills: [],
+  verificationUrl: '',
+  supervisorName: '',
+  canContact: false,
+});
+
 interface Props {
   onAdded?: (payload: { id: string }) => void;
   onClose?: () => void;
@@ -33,110 +70,91 @@ interface Props {
 
 export default function ExperiencesWizard({ onAdded, onClose }: Props) {
   const { toast } = useToast();
-  const [step, setStep] = useState<WizardStep>(1);
+  const [experiences, setExperiences] = useState<Experience[]>([
+    createEmptyExperience(),
+    createEmptyExperience(),
+    createEmptyExperience(),
+  ]);
   const [saving, setSaving] = useState(false);
-  const [savedId, setSavedId] = useState<string | null>(null);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  // Step 1
-  const [category, setCategory] = useState<typeof EXPERIENCE_TYPE[number]['id'] | ''>('');
-  const [title, setTitle] = useState('');
-  const [organization, setOrganization] = useState('');
+  const addExperience = () => {
+    setExperiences([...experiences, createEmptyExperience()]);
+  };
 
-  // Step 2
-  const [startDate, setStartDate] = useState('');
-  const [isOngoing, setIsOngoing] = useState(false);
-  const [endDate, setEndDate] = useState('');
-  const [timeCommitment, setTimeCommitment] = useState<typeof TIME_COMMITMENT[number]['id'] | ''>('');
-  const [totalHours, setTotalHours] = useState<string>('');
-
-  // Step 3
-  const [description, setDescription] = useState('');
-  const [responsibilities, setResponsibilities] = useState<string[]>([]);
-  const [achievements, setAchievements] = useState<string[]>([]);
-  const [respInput, setRespInput] = useState('');
-  const [achInput, setAchInput] = useState('');
-
-  // Step 4
-  const [metrics, setMetrics] = useState<Record<string, string | number>>({});
-  const [metricKey, setMetricKey] = useState('');
-  const [metricValue, setMetricValue] = useState('');
-  const [skills, setSkills] = useState<string[]>([]);
-  const [skillInput, setSkillInput] = useState('');
-  const [verificationUrl, setVerificationUrl] = useState('');
-  const [supervisorName, setSupervisorName] = useState('');
-  const [canContact, setCanContact] = useState(false);
-
-  const canContinue = useMemo(() => {
-    if (step === 1) {
-      return Boolean(category && title.trim().length >= 2 && organization.trim().length >= 1);
+  const removeExperience = (index: number) => {
+    if (experiences.length > 3) {
+      setExperiences(experiences.filter((_, i) => i !== index));
+      if (expandedIndex === index) setExpandedIndex(null);
     }
-    if (step === 2) {
-      const hasStart = startDate && startDate.length >= 10;
-      const endOk = isOngoing || !endDate || endDate.length >= 10;
-      const timeOk = Boolean(timeCommitment);
-      return hasStart && endOk && timeOk;
-    }
-    if (step === 3) {
-      return description.trim().length >= 10;
-    }
-    return true;
-  }, [step, category, title, organization, startDate, endDate, isOngoing, timeCommitment, description]);
+  };
 
-  const addChip = (current: string[], set: (v: string[]) => void, value: string) => {
+  const updateExperience = (index: number, field: keyof Experience, value: any) => {
+    const updated = [...experiences];
+    updated[index] = { ...updated[index], [field]: value };
+    setExperiences(updated);
+  };
+
+  const addChip = (index: number, field: 'responsibilities' | 'achievements' | 'skills', value: string) => {
     const v = value.trim();
     if (!v) return;
+    const current = experiences[index][field] as string[];
     if (current.includes(v)) return;
-    set([...current, v]);
+    updateExperience(index, field, [...current, v]);
   };
 
-  const removeChip = (current: string[], set: (v: string[]) => void, value: string) => {
-    set(current.filter((c) => c !== value));
+  const removeChip = (index: number, field: 'responsibilities' | 'achievements' | 'skills', value: string) => {
+    const current = experiences[index][field] as string[];
+    updateExperience(index, field, current.filter((c) => c !== value));
   };
 
-  const addMetric = () => {
-    const k = metricKey.trim();
-    const val = metricValue.trim();
-    if (!k || !val) return;
-    const num = Number(val);
-    const parsed = isFinite(num) && val !== '' && /^[-+]?\d*\.?\d+$/.test(val) ? num : val;
-    setMetrics({ ...metrics, [k]: parsed });
-    setMetricKey('');
-    setMetricValue('');
-  };
-
-  const removeMetric = (key: string) => {
-    const next = { ...metrics };
-    delete next[key];
-    setMetrics(next);
-  };
-
-  const submit = async () => {
+  const saveAllExperiences = async () => {
     try {
       setSaving(true);
-      const payload = {
-        category,
-        title: title.trim(),
-        organization: organization.trim() || 'Self',
-        startDate,
-        endDate: isOngoing ? null : endDate || null,
-        isOngoing,
-        timeCommitment,
-        totalHours: totalHours ? Number(totalHours) : undefined,
-        description: description.trim(),
-        responsibilities,
-        achievements,
-        challenges: [],
-        metrics,
-        skills,
-        verificationUrl,
-        supervisorName: supervisorName || undefined,
-        canContact,
-      } as const;
+      const validExperiences = experiences.filter(exp => 
+        exp.category && exp.title.trim().length >= 2 && exp.description.trim().length >= 10
+      );
 
-      const res = await createExperience(payload as any);
-      setSavedId(res.id);
-      toast({ title: 'Added ✓', description: 'Your experience was saved.' });
-      if (onAdded) onAdded({ id: res.id });
+      if (validExperiences.length < 3) {
+        toast({ 
+          title: 'Minimum requirement not met', 
+          description: 'Please complete at least 3 experiences before saving.' 
+        });
+        return;
+      }
+
+      const savedIds = [];
+      for (const exp of validExperiences) {
+        const payload = {
+          category: exp.category,
+          title: exp.title.trim(),
+          organization: exp.organization.trim() || 'Self',
+          startDate: exp.startDate,
+          endDate: exp.isOngoing ? null : exp.endDate || null,
+          isOngoing: exp.isOngoing,
+          timeCommitment: exp.timeCommitment,
+          totalHours: exp.totalHours ? Number(exp.totalHours) : undefined,
+          description: exp.description.trim(),
+          responsibilities: exp.responsibilities,
+          achievements: exp.achievements,
+          challenges: [],
+          metrics: {},
+          skills: exp.skills,
+          verificationUrl: exp.verificationUrl,
+          supervisorName: exp.supervisorName || undefined,
+          canContact: exp.canContact,
+        };
+
+        const res = await createExperience(payload as any);
+        savedIds.push(res.id);
+      }
+
+      toast({ 
+        title: `${savedIds.length} experiences saved!`, 
+        description: 'Your experiences have been added to your portfolio.' 
+      });
+      if (onAdded && savedIds.length > 0) onAdded({ id: savedIds[0] });
+      if (onClose) onClose();
     } catch (e: any) {
       toast({ title: 'Save failed', description: e?.message || 'Please try again.' });
     } finally {
@@ -144,245 +162,332 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
     }
   };
 
-  const resetForm = () => {
-    setStep(1);
-    setCategory('');
-    setTitle('');
-    setOrganization('');
-    setStartDate('');
-    setIsOngoing(false);
-    setEndDate('');
-    setTimeCommitment('');
-    setTotalHours('');
-    setDescription('');
-    setResponsibilities([]);
-    setAchievements([]);
-    setRespInput('');
-    setAchInput('');
-    setMetrics({});
-    setMetricKey('');
-    setMetricValue('');
-    setSkills([]);
-    setSkillInput('');
-    setVerificationUrl('');
-    setSupervisorName('');
-    setCanContact(false);
-    setSavedId(null);
+  const getCompletionRate = () => {
+    const validExperiences = experiences.filter(exp => 
+      exp.category && exp.title.trim().length >= 2 && exp.description.trim().length >= 10
+    );
+    return Math.min(100, Math.round((validExperiences.length / 3) * 100));
   };
 
-  if (savedId) {
-    return (
-      <Card className="shadow-medium">
-        <CardHeader>
-          <CardTitle className="text-foreground">Experience added</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">You can add another or continue.</p>
-          <div className="flex gap-2">
-            <Button onClick={resetForm}>Add another</Button>
-            <Button variant="outline" onClick={onClose}>Continue</Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="shadow-medium max-h-[80vh] overflow-y-auto">
-      <CardHeader>
-        <CardTitle className="text-foreground">
-          {step === 1 && 'What kind of experience is this?'}
-          {step === 2 && 'When did you do it and how much time did it take?'}
-          {step === 3 && 'What did you do?'}
-          {step === 4 && 'What impact did you have?'}
-        </CardTitle>
-        {step === 1 && category === 'school_activity' && (
-          <p className="text-sm text-muted-foreground">
-            <strong>Goal:</strong> Add at least 3 extracurricular activities to show colleges your engagement and interests
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto p-6 space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold text-foreground">Experiences & Activities</h1>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Build a comprehensive portfolio of your work, volunteer service, extracurricular activities, and personal projects. 
+            <strong className="text-primary"> Minimum 3 experiences required.</strong>
           </p>
-        )}
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {step === 1 && (
-          <div className="space-y-6">
-            {category === 'school_activity' && (
-              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <h4 className="font-semibold text-primary mb-2">🎯 Extracurricular Activities - Add as Many as Possible!</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  <strong>Minimum requirement: 3 activities</strong> - but colleges want to see breadth and depth of engagement.
-                </p>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Sports teams, clubs, student government, honor societies</li>
-                  <li>• Music, theater, debate, academic competitions</li>
-                  <li>• Community service, religious activities, cultural groups</li>
-                  <li>• Part-time jobs, internships, research projects</li>
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-4xl mx-auto">
+            <h3 className="font-semibold text-primary mb-2">🎯 What colleges want to see:</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+              <div>
+                <p className="font-medium mb-1">Leadership & Initiative:</p>
+                <ul className="space-y-1">
+                  <li>• Student government, club officer roles</li>
+                  <li>• Starting new organizations or projects</li>
+                  <li>• Mentoring or tutoring others</li>
                 </ul>
-                <p className="text-sm font-medium text-primary mt-2">
-                  💡 Pro tip: Include leadership roles, time commitment, and measurable impact!
-                </p>
-              </div>
-            )}
-            
-            <div className="grid md:grid-cols-3 gap-4">
-              <div>
-                <Label className="mb-1 block">Category</Label>
-                <Select value={category} onValueChange={(v) => setCategory(v as any)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPERIENCE_TYPE.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               <div>
-                <Label className="mb-1 block">Role / Title</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === 'school_activity' ? 'e.g., President, Captain, Member' : 'e.g., Barista'} />
-              </div>
-              <div>
-                <Label className="mb-1 block">Organization</Label>
-                <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder={category === 'school_activity' ? 'e.g., Debate Team, NHS, Soccer Team' : 'e.g., Blue Bottle Coffee or Self'} />
+                <p className="font-medium mb-1">Community Impact:</p>
+                <ul className="space-y-1">
+                  <li>• Volunteer work with measurable hours</li>
+                  <li>• Community service projects</li>
+                  <li>• Work experience and responsibility</li>
+                </ul>
               </div>
             </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-4 gap-4">
-              <div>
-                <Label className="mb-1 block">Start date</Label>
-                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              </div>
-              <div>
-                <Label className="mb-1 block">End date</Label>
-                <Input type="date" value={endDate} disabled={isOngoing} onChange={(e) => setEndDate(e.target.value)} />
-                <div className="flex items-center gap-2 mt-2">
-                  <Checkbox id="ongoing" checked={isOngoing} onCheckedChange={(v: any) => setIsOngoing(Boolean(v))} />
-                  <Label htmlFor="ongoing" className="text-sm text-muted-foreground">Still doing this</Label>
-                </div>
-              </div>
-              <div>
-                <Label className="mb-1 block">Time commitment</Label>
-                <Select value={timeCommitment} onValueChange={(v) => setTimeCommitment(v as any)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIME_COMMITMENT.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="mb-1 block">Total hours (optional)</Label>
-                <Input type="number" inputMode="numeric" min={0} value={totalHours} onChange={(e) => setTotalHours(e.target.value)} placeholder="e.g., 320" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-4">
-            <div>
-              <Label className="mb-1 block">Short description</Label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What did you do?" />
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label className="mb-1 block">Responsibilities</Label>
-                <div className="flex gap-2 mb-2">
-                  <Input value={respInput} onChange={(e) => setRespInput(e.target.value)} placeholder="Add and press Enter" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addChip(responsibilities, setResponsibilities, respInput); setRespInput(''); } }} />
-                  <Button type="button" variant="outline" onClick={() => { addChip(responsibilities, setResponsibilities, respInput); setRespInput(''); }}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {responsibilities.map((r) => (
-                    <Badge key={r} variant="secondary" className="text-xs cursor-pointer" onClick={() => removeChip(responsibilities, setResponsibilities, r)}>{r} ×</Badge>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <Label className="mb-1 block">Notable achievements</Label>
-                <div className="flex gap-2 mb-2">
-                  <Input value={achInput} onChange={(e) => setAchInput(e.target.value)} placeholder="Add and press Enter" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addChip(achievements, setAchievements, achInput); setAchInput(''); } }} />
-                  <Button type="button" variant="outline" onClick={() => { addChip(achievements, setAchievements, achInput); setAchInput(''); }}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {achievements.map((a) => (
-                    <Badge key={a} variant="secondary" className="text-xs cursor-pointer" onClick={() => removeChip(achievements, setAchievements, a)}>{a} ×</Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label className="mb-1 block">Metrics (optional)</Label>
-                <div className="flex gap-2 mb-2">
-                  <Input value={metricKey} onChange={(e) => setMetricKey(e.target.value)} placeholder="# customers, $ raised, etc." />
-                  <Input value={metricValue} onChange={(e) => setMetricValue(e.target.value)} placeholder="Value" />
-                  <Button variant="outline" onClick={addMetric}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(metrics).map(([k, v]) => (
-                    <Badge key={k} variant="outline" className="text-xs cursor-pointer" onClick={() => removeMetric(k)}>{k}: {String(v)} ×</Badge>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <Label className="mb-1 block">Skills used (optional)</Label>
-                <div className="flex gap-2 mb-2">
-                  <Input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} placeholder="Add and press Enter" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addChip(skills, setSkills, skillInput); setSkillInput(''); } }} />
-                  <Button type="button" variant="outline" onClick={() => { addChip(skills, setSkills, skillInput); setSkillInput(''); }}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {skills.map((s) => (
-                    <Badge key={s} variant="secondary" className="text-xs cursor-pointer" onClick={() => removeChip(skills, setSkills, s)}>{s} ×</Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              <div>
-                <Label className="mb-1 block">Supervisor (optional)</Label>
-                <Input value={supervisorName} onChange={(e) => setSupervisorName(e.target.value)} placeholder="Name" />
-              </div>
-              <div>
-                <Label className="mb-1 block">Link to proof (optional)</Label>
-                <Input value={verificationUrl} onChange={(e) => setVerificationUrl(e.target.value)} placeholder="https://..." />
-              </div>
-              <div className="flex items-center gap-2 pt-6">
-                <Checkbox id="canContact" checked={canContact} onCheckedChange={(v: any) => setCanContact(Boolean(v))} />
-                <Label htmlFor="canContact" className="text-sm">OK to contact</Label>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between pt-2">
-          <div className="text-sm text-muted-foreground">Step {step} of 4</div>
-          <div className="flex gap-2">
-            {step > 1 && (
-              <Button variant="outline" onClick={() => setStep((s) => (Math.max(1, (s - 1)) as WizardStep))}>Back</Button>
-            )}
-            {step < 4 && (
-              <Button disabled={!canContinue} onClick={() => setStep((s) => (Math.min(4, (s + 1)) as WizardStep))}>Continue</Button>
-            )}
-            {step === 4 && (
-              <Button onClick={submit} disabled={saving}>{saving ? 'Saving...' : 'Save experience'}</Button>
-            )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {experiences.map((experience, index) => (
+            <Card key={index} className="shadow-medium">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">
+                    Experience #{index + 1}
+                    {index >= 3 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeExperience(index)}
+                        className="ml-2 p-1 h-6 w-6 text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                  >
+                    {expandedIndex === index ? 'Collapse' : 'Edit'}
+                  </Button>
+                </div>
+                {experience.category && (
+                  <Badge variant="secondary" className="w-fit">
+                    {EXPERIENCE_TYPE.find(t => t.id === experience.category)?.label}
+                  </Badge>
+                )}
+              </CardHeader>
+              
+              {expandedIndex === index && (
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Category</Label>
+                      <Select 
+                        value={experience.category} 
+                        onValueChange={(v) => updateExperience(index, 'category', v)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {EXPERIENCE_TYPE.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Title/Role</Label>
+                      <Input 
+                        value={experience.title}
+                        onChange={(e) => updateExperience(index, 'title', e.target.value)}
+                        placeholder="e.g., Team Captain, Volunteer Coordinator"
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Organization</Label>
+                      <Input 
+                        value={experience.organization}
+                        onChange={(e) => updateExperience(index, 'organization', e.target.value)}
+                        placeholder="e.g., National Honor Society, Local Food Bank"
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-sm font-medium">Start Date</Label>
+                        <Input 
+                          type="date"
+                          value={experience.startDate}
+                          onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">End Date</Label>
+                        <Input 
+                          type="date"
+                          value={experience.endDate}
+                          disabled={experience.isOngoing}
+                          onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`ongoing-${index}`}
+                        checked={experience.isOngoing}
+                        onCheckedChange={(checked) => updateExperience(index, 'isOngoing', checked)}
+                      />
+                      <Label htmlFor={`ongoing-${index}`} className="text-sm">Currently ongoing</Label>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Time Commitment</Label>
+                      <Select 
+                        value={experience.timeCommitment} 
+                        onValueChange={(v) => updateExperience(index, 'timeCommitment', v)}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select commitment level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TIME_COMMITMENT.map((t) => (
+                            <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Description</Label>
+                      <Textarea 
+                        value={experience.description}
+                        onChange={(e) => updateExperience(index, 'description', e.target.value)}
+                        placeholder="Describe what you did, your responsibilities, and impact..."
+                        className="mt-1 min-h-[120px]"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Key Responsibilities</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input 
+                          placeholder="Add responsibility and press Enter"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addChip(index, 'responsibilities', e.currentTarget.value);
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {experience.responsibilities.map((resp, respIndex) => (
+                          <Badge 
+                            key={respIndex} 
+                            variant="outline" 
+                            className="cursor-pointer text-xs"
+                            onClick={() => removeChip(index, 'responsibilities', resp)}
+                          >
+                            {resp} ×
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Achievements</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input 
+                          placeholder="Add achievement and press Enter"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addChip(index, 'achievements', e.currentTarget.value);
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {experience.achievements.map((achievement, achIndex) => (
+                          <Badge 
+                            key={achIndex} 
+                            variant="outline" 
+                            className="cursor-pointer text-xs"
+                            onClick={() => removeChip(index, 'achievements', achievement)}
+                          >
+                            {achievement} ×
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Skills Developed</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input 
+                          placeholder="Add skill and press Enter"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addChip(index, 'skills', e.currentTarget.value);
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {experience.skills.map((skill, skillIndex) => (
+                          <Badge 
+                            key={skillIndex} 
+                            variant="secondary" 
+                            className="cursor-pointer text-xs"
+                            onClick={() => removeChip(index, 'skills', skill)}
+                          >
+                            {skill} ×
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Supervisor/Contact</Label>
+                        <Input 
+                          value={experience.supervisorName}
+                          onChange={(e) => updateExperience(index, 'supervisorName', e.target.value)}
+                          placeholder="Name (optional)"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">Verification Link</Label>
+                        <Input 
+                          value={experience.verificationUrl}
+                          onChange={(e) => updateExperience(index, 'verificationUrl', e.target.value)}
+                          placeholder="https://... (optional)"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`contact-${index}`}
+                        checked={experience.canContact}
+                        onCheckedChange={(checked) => updateExperience(index, 'canContact', checked)}
+                      />
+                      <Label htmlFor={`contact-${index}`} className="text-sm">OK to contact for verification</Label>
+                    </div>
+                  </div>
+                </CardContent>
+              )}
+              
+              {expandedIndex !== index && experience.title && (
+                <CardContent>
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">{experience.title}</h4>
+                    <p className="text-xs text-muted-foreground">{experience.organization}</p>
+                    {experience.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {experience.description.slice(0, 100)}...
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button onClick={addExperience} variant="outline" size="lg">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Another Experience
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              {experiences.filter(exp => exp.category && exp.title.trim() && exp.description.trim().length >= 10).length} / {Math.max(3, experiences.length)} completed
+            </div>
+          </div>
+          
+          <div className="flex gap-4 items-center">
+            <div className="text-sm text-muted-foreground">
+              Completion: {getCompletionRate()}%
+            </div>
+            <Button onClick={saveAllExperiences} disabled={saving || getCompletionRate() < 100} size="lg">
+              {saving ? 'Saving...' : 'Save All Experiences'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,6 +77,7 @@ interface PersonalInformationData {
 interface Props {
   onComplete: () => void;
   onCancel: () => void;
+  onProgressRefresh?: () => void;
 }
 
 const STEPS = [
@@ -85,7 +86,7 @@ const STEPS = [
   { id: 3, title: 'Family Context', description: 'Living situation and family information' }
 ];
 
-export default function BasicInformationWizard({ onComplete, onCancel }: Props) {
+export default function BasicInformationWizard({ onComplete, onCancel, onProgressRefresh }: Props) {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -334,6 +335,65 @@ export default function BasicInformationWizard({ onComplete, onCancel }: Props) 
     }
   };
 
+  // Progress calculation (required-only fields)
+  const progress = useMemo(() => {
+    const isFilled = (v: any) => {
+      if (v === null || v === undefined) return false;
+      if (typeof v === 'string') return v.trim().length > 0;
+      if (typeof v === 'number') return !Number.isNaN(v);
+      if (Array.isArray(v)) return v.length > 0;
+      if (typeof v === 'object') return Object.values(v).some((x) => isFilled(x));
+      return Boolean(v);
+    };
+
+    // Basic info required fields
+    const basicRequired = [
+      data.firstName,
+      data.lastName,
+      data.dateOfBirth,
+      data.primaryEmail,
+      data.primaryPhone,
+      data.pronouns,
+      data.genderIdentity,
+      data.permanentAddress.street,
+      data.permanentAddress.city,
+      data.permanentAddress.state,
+      data.permanentAddress.zip,
+      data.permanentAddress.country,
+    ];
+
+    // Background required fields
+    const backgroundRequired = [
+      data.hispanicLatino,
+      data.citizenshipStatus,
+      data.primaryLanguage,
+    ];
+
+    // Family context required fields
+    const pg1 = data.parentGuardians?.[0] || { relationship: '', educationLevel: '', occupation: '' };
+    const familyRequired = [
+      data.livingSituation,
+      pg1.relationship,
+      pg1.educationLevel,
+      pg1.occupation,
+      data.firstGenStatus, // treat as required selection
+    ];
+
+    const all = [...basicRequired, ...backgroundRequired, ...familyRequired];
+    const completed = all.filter(isFilled).length;
+    const total = all.length; // optional fields excluded by design
+
+    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    const sectionComplete = {
+      basic: basicRequired.every(isFilled),
+      background: backgroundRequired.every(isFilled),
+      family: familyRequired.every(isFilled),
+    };
+
+    return { percent, sectionComplete };
+  }, [data]);
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
@@ -361,12 +421,22 @@ export default function BasicInformationWizard({ onComplete, onCancel }: Props) 
           {STEPS.map((step, index) => (
             <React.Fragment key={step.id}>
               <div className={`flex items-center gap-2 ${
-                currentStep === step.id ? 'text-primary' : 
-                currentStep > step.id ? 'text-green-600' : 'text-muted-foreground'
+                currentStep === step.id
+                  ? 'text-primary'
+                  : (step.id === 1 && progress.sectionComplete.basic) ||
+                    (step.id === 2 && progress.sectionComplete.background) ||
+                    (step.id === 3 && progress.sectionComplete.family)
+                  ? 'text-green-600'
+                  : 'text-muted-foreground'
               }`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep === step.id ? 'bg-primary text-primary-foreground' :
-                  currentStep > step.id ? 'bg-green-600 text-white' : 'bg-muted'
+                  currentStep === step.id
+                    ? 'bg-primary text-primary-foreground'
+                    : (step.id === 1 && progress.sectionComplete.basic) ||
+                      (step.id === 2 && progress.sectionComplete.background) ||
+                      (step.id === 3 && progress.sectionComplete.family)
+                    ? 'bg-green-600 text-white'
+                    : 'bg-muted'
                 }`}>
                   {currentStep > step.id ? <CheckCircle2 className="h-5 w-5" /> : step.id}
                 </div>
@@ -379,7 +449,7 @@ export default function BasicInformationWizard({ onComplete, onCancel }: Props) 
           ))}
         </div>
         
-        <Progress value={(currentStep / STEPS.length) * 100} className="h-2 max-w-md mx-auto" />
+        <Progress value={progress.percent} className="h-2 max-w-md mx-auto" />
       </div>
 
       {/* Step Content */}
@@ -460,6 +530,7 @@ export default function BasicInformationWizard({ onComplete, onCancel }: Props) 
                 // progress bump light
                 await supabase.from('profiles').update({ completion_score: Math.max(Number(profile.completion_score ?? 0), 0.3) }).eq('id', profile.id);
                 toast({ title: 'Progress saved', description: 'You can come back anytime.' });
+                onProgressRefresh?.();
               } catch (e) {
                 toast({ title: 'Save failed', description: 'Try again later.', variant: 'destructive' });
               } finally {

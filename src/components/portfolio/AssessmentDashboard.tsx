@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -24,6 +24,7 @@ import FamilyResponsibilitiesWizard from '@/components/portfolio/FamilyResponsib
 import GoalsAspirationsWizard from '@/components/portfolio/GoalsAspirationsWizard';
 import SupportNetworkWizard from '@/components/portfolio/SupportNetworkWizard';
 import PersonalGrowthWizard from '@/components/portfolio/PersonalGrowthWizard';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AssessmentDashboardProps {
   onProgressUpdate: (progress: number) => void;
@@ -37,8 +38,8 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
       title: 'Personal Information',
       description: 'Basic profile and background',
       icon: User,
-      progress: 85,
-      status: 'completed',
+      progress: 0,
+      status: 'not-started',
       items: ['Basic info', 'Background & demographics', 'Family context'],
       unlocked: true
     },
@@ -95,6 +96,92 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
   ]);
 
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const [personalItemStatuses, setPersonalItemStatuses] = useState<boolean[] | undefined>(undefined);
+
+  // Load personal info progress from DB
+  const refreshPersonalProgress = async () => {
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user?.id;
+      if (!uid) return;
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', uid)
+        .maybeSingle();
+      if (!prof?.id) return;
+      const { data: pi } = await supabase
+        .from('personal_information')
+        .select('*')
+        .eq('profile_id', prof.id)
+        .maybeSingle();
+
+      const isFilled = (v: any) => {
+        if (v === null || v === undefined) return false;
+        if (typeof v === 'string') return v.trim().length > 0;
+        if (typeof v === 'number') return !Number.isNaN(v);
+        if (Array.isArray(v)) return v.length > 0;
+        if (typeof v === 'object') return Object.values(v).some((x) => isFilled(x));
+        return Boolean(v);
+      };
+
+      const addr = (pi?.permanent_address as any) || {};
+      const basicRequired = [
+        pi?.first_name,
+        pi?.last_name,
+        pi?.date_of_birth,
+        pi?.primary_email,
+        pi?.primary_phone,
+        pi?.pronouns,
+        pi?.gender_identity,
+        addr?.street,
+        addr?.city,
+        addr?.state,
+        addr?.zip,
+        addr?.country,
+      ];
+      const backgroundRequired = [
+        pi?.hispanic_latino,
+        pi?.citizenship_status,
+        pi?.primary_language,
+      ];
+      const parent1 = Array.isArray(pi?.parent_guardians as any) ? (pi?.parent_guardians as any)?.[0] : undefined;
+      const familyRequired = [
+        pi?.living_situation,
+        parent1?.relationship,
+        parent1?.education_level,
+        parent1?.occupation_category,
+        pi?.first_gen !== undefined ? (pi?.first_gen === true || pi?.first_gen === false ? 'set' : '') : '',
+      ];
+
+      const all = [...basicRequired, ...backgroundRequired, ...familyRequired];
+      const completed = all.filter(isFilled).length;
+      const total = all.length;
+      const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+      const basicDone = basicRequired.every(isFilled);
+      const backDone = backgroundRequired.every(isFilled);
+      const famDone = familyRequired.every(isFilled);
+      setPersonalItemStatuses([basicDone, backDone, famDone]);
+
+      setAssessmentSections(prev => prev.map(s => s.id === 'personal' ? {
+        ...s,
+        progress: percent,
+        status: percent === 0 ? 'not-started' : percent === 100 ? 'completed' : 'in-progress'
+      } : s));
+
+      if (typeof onProgressUpdate === 'function') {
+        onProgressUpdate(percent);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Could not load personal progress');
+    }
+  };
+
+  useEffect(() => {
+    refreshPersonalProgress();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -153,6 +240,7 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
           <AssessmentSectionCard
             key={section.id}
             section={section}
+            itemStatuses={section.id === 'personal' ? personalItemStatuses : undefined}
             onOpen={() => {
               if (section.unlocked) setOpenSection(section.id);
             }}
@@ -257,14 +345,22 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
         </CardContent>
       </Card>
       {/* Wizards */}
-      <Dialog open={openSection === 'personal'} onOpenChange={(v) => setOpenSection(v ? 'personal' : null)}>
+      <Dialog open={openSection === 'personal'} onOpenChange={(v) => {
+        setOpenSection(v ? 'personal' : null);
+        if (!v) {
+          // After closing, refresh progress
+          refreshPersonalProgress();
+        }
+      }}>
         <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           <BasicInformationWizard 
             onComplete={() => {
               setAssessmentSections((prev) => prev.map((s) => s.id === 'personal' ? { ...s, status: 'completed', progress: 100 } : s));
               setOpenSection(null);
+              refreshPersonalProgress();
             }}
             onCancel={() => setOpenSection(null)}
+            onProgressRefresh={refreshPersonalProgress}
           />
         </DialogContent>
       </Dialog>
@@ -359,9 +455,10 @@ interface AssessmentSection {
 interface AssessmentSectionCardProps {
   section: AssessmentSection;
   onOpen: () => void;
+  itemStatuses?: boolean[];
 }
 
-const AssessmentSectionCard = ({ section, onOpen }: AssessmentSectionCardProps) => {
+const AssessmentSectionCard = ({ section, onOpen, itemStatuses }: AssessmentSectionCardProps) => {
   const Icon = section.icon;
   
   return (
@@ -397,12 +494,15 @@ const AssessmentSectionCard = ({ section, onOpen }: AssessmentSectionCardProps) 
             </div>
 
             <div className="space-y-2 mb-4">
-              {section.items.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
-                  <CheckCircle2 className="h-3 w-3 text-green-600" />
-                  <span className="text-muted-foreground">{item}</span>
-                </div>
-              ))}
+              {section.items.map((item, index) => {
+                const done = itemStatuses ? Boolean(itemStatuses[index]) : true;
+                return (
+                  <div key={index} className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className={`h-3 w-3 ${done ? 'text-green-600' : 'text-muted-foreground'}`} />
+                    <span className={done ? 'text-foreground' : 'text-muted-foreground'}>{item}</span>
+                  </div>
+                );
+              })}
             </div>
 
             <Button 

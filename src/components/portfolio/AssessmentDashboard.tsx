@@ -316,7 +316,7 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
         </CardContent>
       </Card>
 
-      {/* Next Steps Recommendations */}
+      {/* Recommended Next Steps */}
       <Card>
         <CardHeader>
           <CardTitle>Recommended Next Steps</CardTitle>

@@ -371,7 +371,7 @@ const AssessmentDashboard = ({ onProgressUpdate, currentProgress }: AssessmentDa
       </Dialog>
 
       <Dialog open={openSection === 'experiences'} onOpenChange={(v) => setOpenSection(v ? 'experiences' : null)}>
-        <DialogContent className="max-w-3xl w-full">
+        <DialogContent className="max-w-[95vw] w-full max-h-[95vh] overflow-hidden">
           <ExperiencesWizard
             onAdded={() => {
               setAssessmentSections((prev) => prev.map((s) => s.id === 'experiences' ? { ...s, status: 'in-progress' } : s));

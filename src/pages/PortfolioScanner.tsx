@@ -478,15 +478,18 @@ const PortfolioScanner = () => {
       </div>
       </section>
 
-      {/* Main Dashboard */}
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        
-        {/* Assessment Section */}
-        <section id="assessment">
-        <AssessmentDashboard
-          onProgressUpdate={setOverallProgress}
-          currentProgress={overallProgress}
-        />
+      {/* Assessment Section - Full Width */}
+      <section id="assessment" className="w-full bg-background">
+        <div className="w-full px-4 lg:px-6 xl:px-8 py-8">
+          <AssessmentDashboard
+            onProgressUpdate={setOverallProgress}
+            currentProgress={overallProgress}
+          />
+        </div>
+      </section>
+
+      {/* Main Dashboard - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-4 space-y-8">
 
         {/* Enhanced Progress Cards */}
         <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -669,8 +672,6 @@ const PortfolioScanner = () => {
             </div>
           </CardContent>
         </Card>
-
-        </section>
       </div>
     </div>
   );

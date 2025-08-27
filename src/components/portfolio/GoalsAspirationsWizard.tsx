@@ -115,69 +115,70 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="h-full flex flex-col space-y-4">
+      {/* Compact Header */}
       <div className="text-center space-y-2">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Target className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-semibold">Goals & Aspirations</h2>
+        <div className="flex items-center justify-center gap-2">
+          <Target className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Goals & Aspirations</h2>
         </div>
         
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center space-x-2 mb-6">
+        {/* Compact Progress Steps */}
+        <div className="flex items-center justify-center space-x-2">
           {STEPS.map((step, index) => (
             <React.Fragment key={step.id}>
-              <div className={`flex items-center gap-2 ${
+              <div className={`flex items-center gap-1 ${
                 currentStep === step.id ? 'text-primary' : 
                 currentStep > step.id ? 'text-green-600' : 'text-muted-foreground'
               }`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                   currentStep === step.id ? 'bg-primary text-primary-foreground' :
                   currentStep > step.id ? 'bg-green-600 text-white' : 'bg-muted'
                 }`}>
                   {step.id}
                 </div>
-                <span className="text-sm font-medium hidden sm:block">{step.title}</span>
+                <span className="text-xs font-medium hidden sm:block">{step.title}</span>
               </div>
               {index < STEPS.length - 1 && (
-                <div className={`w-8 h-0.5 ${currentStep > step.id ? 'bg-green-600' : 'bg-muted'}`} />
+                <div className={`w-6 h-0.5 ${currentStep > step.id ? 'bg-green-600' : 'bg-muted'}`} />
               )}
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      {/* Step Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5" />
+      {/* Main Content - Scrollable */}
+      <Card className="flex-1 flex flex-col min-h-0">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Lightbulb className="h-4 w-4" />
             {STEPS[currentStep - 1]?.title}
           </CardTitle>
-          <p className="text-muted-foreground">{STEPS[currentStep - 1]?.description}</p>
+          <p className="text-sm text-muted-foreground">{STEPS[currentStep - 1]?.description}</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto">
           {renderCurrentStep()}
         </CardContent>
       </Card>
 
-      {/* Navigation */}
-      <div className="flex justify-between">
+      {/* Compact Navigation */}
+      <div className="flex justify-between pt-2">
         <Button 
           variant="outline" 
+          size="sm"
           onClick={currentStep === 1 ? onCancel : handlePrevious}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 mr-1" />
           {currentStep === 1 ? 'Cancel' : 'Previous'}
         </Button>
 
         {currentStep < STEPS.length ? (
-          <Button onClick={handleNext}>
+          <Button size="sm" onClick={handleNext}>
             Continue
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         ) : (
-          <Button onClick={handleSubmit} disabled={isLoading}>
+          <Button size="sm" onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Complete'}
           </Button>
         )}
@@ -274,7 +275,7 @@ const AcademicInterestsStep: React.FC<{
 
       <div>
         <Label>Career Interests (select all that apply)</Label>
-        <div className="grid md:grid-cols-3 gap-3 mt-2">
+        <div className="grid md:grid-cols-3 gap-2 mt-2 max-h-48 overflow-y-auto pr-2">
           {careerFields.map(field => (
             <div key={field} className="flex items-center space-x-2">
               <Checkbox
@@ -311,7 +312,7 @@ const AcademicInterestsStep: React.FC<{
 
       <div>
         <Label>College Environment Preferences (select all that appeal to you)</Label>
-        <div className="grid md:grid-cols-2 gap-3 mt-2">
+        <div className="grid md:grid-cols-2 gap-2 mt-2 max-h-48 overflow-y-auto pr-2">
           {collegeEnvironments.map(env => (
             <div key={env} className="flex items-center space-x-2">
               <Checkbox
@@ -404,7 +405,7 @@ const ApplicationPlansStep: React.FC<{
 
       <div>
         <Label>Geographic Preferences for College (select all that apply)</Label>
-        <div className="grid md:grid-cols-2 gap-3 mt-2">
+        <div className="grid md:grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto pr-2">
           {geographicOptions.map(option => (
             <div key={option} className="flex items-center space-x-2">
               <Checkbox

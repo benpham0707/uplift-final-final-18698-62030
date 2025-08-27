@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { ArrowRight, ArrowLeft, Heart, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 interface FamilyResponsibilitiesData {
-  significantResponsibilities: boolean;
+  hoursPerWeek: string;
   responsibilities: {
     caringForSiblings: boolean;
     householdDuties: boolean;
@@ -48,7 +49,7 @@ const FamilyResponsibilitiesWizard: React.FC<Props> = ({ onComplete, onCancel })
   const [isLoading, setIsLoading] = useState(false);
   
   const [data, setData] = useState<FamilyResponsibilitiesData>({
-    significantResponsibilities: false,
+    hoursPerWeek: '',
     responsibilities: {
       caringForSiblings: false,
       householdDuties: false,
@@ -91,7 +92,7 @@ const FamilyResponsibilitiesWizard: React.FC<Props> = ({ onComplete, onCancel })
       if (!user) throw new Error('Not authenticated');
 
       // Create a simple summary instead of complex nested data
-      const hasChallenges = data.significantResponsibilities || data.challengingCircumstances;
+      const hasChallenges = (data.hoursPerWeek && parseInt(data.hoursPerWeek) > 0) || data.challengingCircumstances;
       
       const { error } = await supabase
         .from('profiles')
@@ -132,69 +133,70 @@ const FamilyResponsibilitiesWizard: React.FC<Props> = ({ onComplete, onCancel })
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="h-full flex flex-col space-y-4">
+      {/* Compact Header */}
       <div className="text-center space-y-2">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Heart className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-semibold">Family Responsibilities & Circumstances</h2>
+        <div className="flex items-center justify-center gap-2">
+          <Heart className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Family Responsibilities & Circumstances</h2>
         </div>
         
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center space-x-2 mb-6">
+        {/* Compact Progress Steps */}
+        <div className="flex items-center justify-center space-x-2">
           {STEPS.map((step, index) => (
             <React.Fragment key={step.id}>
-              <div className={`flex items-center gap-2 ${
+              <div className={`flex items-center gap-1 ${
                 currentStep === step.id ? 'text-primary' : 
                 currentStep > step.id ? 'text-green-600' : 'text-muted-foreground'
               }`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                   currentStep === step.id ? 'bg-primary text-primary-foreground' :
                   currentStep > step.id ? 'bg-green-600 text-white' : 'bg-muted'
                 }`}>
                   {step.id}
                 </div>
-                <span className="text-sm font-medium hidden sm:block">{step.title}</span>
+                <span className="text-xs font-medium hidden sm:block">{step.title}</span>
               </div>
               {index < STEPS.length - 1 && (
-                <div className={`w-8 h-0.5 ${currentStep > step.id ? 'bg-green-600' : 'bg-muted'}`} />
+                <div className={`w-6 h-0.5 ${currentStep > step.id ? 'bg-green-600' : 'bg-muted'}`} />
               )}
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      {/* Step Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+      {/* Main Content - Scrollable */}
+      <Card className="flex-1 flex flex-col min-h-0">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Users className="h-4 w-4" />
             {STEPS[currentStep - 1]?.title}
           </CardTitle>
-          <p className="text-muted-foreground">{STEPS[currentStep - 1]?.description}</p>
+          <p className="text-sm text-muted-foreground">{STEPS[currentStep - 1]?.description}</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto">
           {renderCurrentStep()}
         </CardContent>
       </Card>
 
-      {/* Navigation */}
-      <div className="flex justify-between">
+      {/* Compact Navigation */}
+      <div className="flex justify-between pt-2">
         <Button 
           variant="outline" 
+          size="sm"
           onClick={currentStep === 1 ? onCancel : handlePrevious}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 mr-1" />
           {currentStep === 1 ? 'Cancel' : 'Previous'}
         </Button>
 
         {currentStep < STEPS.length ? (
-          <Button onClick={handleNext}>
+          <Button size="sm" onClick={handleNext}>
             Continue
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         ) : (
-          <Button onClick={handleSubmit} disabled={isLoading}>
+          <Button size="sm" onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Complete'}
           </Button>
         )}
@@ -207,30 +209,36 @@ const ResponsibilitiesStep: React.FC<{
   data: FamilyResponsibilitiesData;
   setData: (data: FamilyResponsibilitiesData) => void;
 }> = ({ data, setData }) => {
+  // Hard coded data values: Input component for collecting hours per week from users
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="significant-responsibilities"
-            checked={data.significantResponsibilities}
-            onCheckedChange={(checked) => setData({ 
-              ...data, 
-              significantResponsibilities: checked as boolean 
-            })}
-          />
-          <Label htmlFor="significant-responsibilities" className="font-medium">
-            I spend 4+ hours per week on family responsibilities
+    <div className="space-y-4">
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="hours-per-week" className="font-medium">
+            How many hours per week do you spend on family responsibilities?
           </Label>
+          <Input
+            id="hours-per-week"
+            type="number"
+            min="0"
+            max="168"
+            placeholder="Enter hours per week"
+            value={data.hoursPerWeek}
+            onChange={(e) => setData({ 
+              ...data, 
+              hoursPerWeek: e.target.value 
+            })}
+            className="mt-1"
+          />
         </div>
 
-        {data.significantResponsibilities && (
-          <div className="ml-6 space-y-4 border-l-2 border-muted pl-4">
-            <p className="text-sm text-muted-foreground mb-4">
+        {data.hoursPerWeek && parseInt(data.hoursPerWeek) > 0 && (
+          <div className="space-y-4 border-l-2 border-muted pl-4 ml-2">
+            <p className="text-sm text-muted-foreground">
               Select all responsibilities that apply to you:
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
               <div className="flex items-start space-x-2">
                 <Checkbox 
                   id="caring-siblings"

@@ -126,9 +126,9 @@ const SupportNetworkWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-screen max-h-screen flex flex-col">
       {/* Header */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 flex-shrink-0 p-6">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Users2 className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-semibold">Support Network & Resources</h2>
@@ -159,21 +159,21 @@ const SupportNetworkWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       </div>
 
       {/* Step Content */}
-      <Card>
-        <CardHeader>
+      <Card className="flex-1 flex flex-col mx-6">
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center gap-2">
             <Users2 className="h-5 w-5" />
             {STEPS[currentStep - 1]?.title}
           </CardTitle>
           <p className="text-muted-foreground">{STEPS[currentStep - 1]?.description}</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto min-h-0">
           {renderCurrentStep()}
         </CardContent>
       </Card>
 
       {/* Navigation */}
-      <div className="flex justify-between">
+      <div className="flex justify-between p-6 flex-shrink-0">
         <Button 
           variant="outline" 
           onClick={currentStep === 1 ? onCancel : handlePrevious}

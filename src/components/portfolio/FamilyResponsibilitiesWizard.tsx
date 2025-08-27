@@ -234,7 +234,7 @@ const ResponsibilitiesStep: React.FC<{
           type="number"
           min="0"
           max="168"
-          value={data.hoursPerWeek}
+          value={data.hoursPerWeek === 0 ? '' : data.hoursPerWeek}
           onChange={(e) => setData({ ...data, hoursPerWeek: parseInt(e.target.value) || 0 })}
           placeholder="Enter hours per week"
           className="mt-2"

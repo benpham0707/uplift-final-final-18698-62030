@@ -115,9 +115,9 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4">
+    <div className="h-full flex flex-col space-y-3">
       {/* Compact Header */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 flex-shrink-0">
         <div className="flex items-center justify-center gap-2">
           <Target className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold">Goals & Aspirations</h2>
@@ -150,14 +150,7 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <Card className="h-full flex flex-col">
-          <CardHeader className="pb-3 flex-shrink-0">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Lightbulb className="h-4 w-4" />
-              {STEPS[currentStep - 1]?.title}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">{STEPS[currentStep - 1]?.description}</p>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto">
+          <CardContent className="flex-1 overflow-y-auto p-4">
             <div className="max-h-full">
               {renderCurrentStep()}
             </div>
@@ -166,7 +159,7 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
       </div>
 
       {/* Compact Navigation */}
-      <div className="flex justify-between pt-2">
+      <div className="flex justify-between pt-2 flex-shrink-0">
         <Button 
           variant="outline" 
           size="sm"
@@ -260,8 +253,9 @@ const AcademicInterestsStep: React.FC<{
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-      <div className="space-y-4">
+    <div className="space-y-4 h-full">
+      {/* Top Row - Side by Side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="intended-major">Intended Major or Field of Study</Label>
           <Select value={data.intendedMajor} onValueChange={(value) => setData({ ...data, intendedMajor: value })}>
@@ -297,13 +291,14 @@ const AcademicInterestsStep: React.FC<{
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div>
+      {/* Bottom Row - Full Width with More Space */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+        <div className="flex flex-col">
           <Label>Career Interests (select all that apply)</Label>
-          <div className="mt-2 h-32 overflow-y-auto border rounded-lg p-2">
-            <div className="grid grid-cols-1 gap-1">
+          <div className="mt-2 flex-1 min-h-0 overflow-y-auto border rounded-lg p-3">
+            <div className="space-y-2">
               {careerFields.map(field => (
-                <div key={field} className="flex items-center space-x-2 p-1">
+                <div key={field} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded">
                   <Checkbox
                     id={`career-${field}`}
                     checked={data.careerInterests.includes(field)}
@@ -312,19 +307,19 @@ const AcademicInterestsStep: React.FC<{
                       careerInterests: toggleArrayItem(data.careerInterests, field)
                     })}
                   />
-                  <Label htmlFor={`career-${field}`} className="text-sm">{field}</Label>
+                  <Label htmlFor={`career-${field}`} className="text-sm cursor-pointer">{field}</Label>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div>
+        <div className="flex flex-col">
           <Label>College Environment Preferences (select all that appeal to you)</Label>
-          <div className="mt-2 h-32 overflow-y-auto border rounded-lg p-2">
-            <div className="grid grid-cols-1 gap-1">
+          <div className="mt-2 flex-1 min-h-0 overflow-y-auto border rounded-lg p-3">
+            <div className="space-y-2">
               {collegeEnvironments.map(env => (
-                <div key={env} className="flex items-center space-x-2 p-1">
+                <div key={env} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded">
                   <Checkbox
                     id={`env-${env}`}
                     checked={data.collegeEnvironment.includes(env)}
@@ -333,7 +328,7 @@ const AcademicInterestsStep: React.FC<{
                       collegeEnvironment: toggleArrayItem(data.collegeEnvironment, env)
                     })}
                   />
-                  <Label htmlFor={`env-${env}`} className="text-sm">{env}</Label>
+                  <Label htmlFor={`env-${env}`} className="text-sm cursor-pointer">{env}</Label>
                 </div>
               ))}
             </div>

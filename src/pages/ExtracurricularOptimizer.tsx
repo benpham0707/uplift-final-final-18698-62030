@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
@@ -37,7 +37,6 @@ import {
 
 const AcademicPlanningIntelligence = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("academic");
   const [isPlanningDropdownOpen, setIsPlanningDropdownOpen] = useState(false);
 
   // Hard coded dashboard data representing strategic planning categories with detailed progress tracking
@@ -151,12 +150,9 @@ const AcademicPlanningIntelligence = () => {
                         <button
                           key={area.id}
                           onClick={() => {
-                            setActiveTab(area.id);
                             setIsPlanningDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors flex items-center space-x-2 ${
-                            activeTab === area.id ? 'bg-muted text-primary font-medium' : 'text-foreground'
-                          }`}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors flex items-center space-x-2 text-foreground"
                         >
                           <area.icon className="h-4 w-4" />
                           <span>{area.title}</span>

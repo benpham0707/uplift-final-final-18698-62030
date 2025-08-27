@@ -2,161 +2,146 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookOpen, 
   Target, 
   TrendingUp, 
-  Users, 
   Brain, 
-  Clock, 
-  AlertCircle, 
-  Calendar, 
-  Flag, 
-  ExternalLink,
+  GraduationCap,
+  Lightbulb,
+  Users,
+  BarChart3,
+  Calendar,
   CheckCircle2,
   ArrowRight,
   Zap,
   Star,
-  ChevronRight,
+  Settings,
+  Search,
+  PlusCircle,
+  MapPin,
+  Award,
+  Code,
+  MessageSquare,
+  Briefcase,
+  Globe,
+  Building,
   Play
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
-const ExtracurricularOptimizer = () => {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+const AcademicPlanningIntelligence = () => {
+  const [activeTab, setActiveTab] = useState("academic");
 
-  // Hard coded mock data for recommended actions - represents AI-generated personalized optimization recommendations
-  const mockRecommendations = [
+  // Hard coded data representing AI-powered academic planning features
+  const academicPlanningFeatures = [
     {
-      id: 1,
-      title: "Document Academic Achievements with Impact Metrics",
-      category: "Academic Planning",
-      priority: "HIGH",
-      scoreIncrease: "+0.8 Academic Score",
-      timeRequired: "2-3 hours",
-      difficulty: "Medium",
-      deadline: "1 week",
-      focusArea: "Academic",
-      description: "Create detailed records of your academic performance including specific projects, research, and quantifiable outcomes. Focus on achievements while managing work responsibilities.",
-      actionSteps: [
-        "Gather all academic records and project documentation",
-        "Calculate GPA trends and improvements over time",
-        "Document specific achievements and their measurable impact",
-        "Create compelling narratives around academic challenges overcome"
-      ],
-      resources: ["Transcripts", "Project files", "Teacher feedback"],
-      relatedGoals: ["College Applications", "Scholarship Essays"],
-      potentialImpact: "Demonstrates academic resilience and achievement despite challenging circumstances"
+      icon: GraduationCap,
+      title: "Course Recommendation Engine",
+      description: "Multi-horizon planning for next semester, next year, and graduation requirements",
+      features: ["Strategic sequencing", "Prerequisite optimization", "Workload balancing", "Professor intelligence"]
     },
     {
-      id: 2,
-      title: "Optimize Leadership Pipeline in Student Government",
-      category: "Extracurricular Strategy",
-      priority: "MEDIUM",
-      scoreIncrease: "+1.2 Leadership Score",
-      timeRequired: "5-6 hours weekly",
-      difficulty: "High",
-      deadline: "3 weeks",
-      focusArea: "Leadership",
-      description: "Strategic positioning for student government leadership roles with focus on community impact initiatives that align with your background.",
-      actionSteps: [
-        "Research current student government priorities and gaps",
-        "Develop proposal for new community outreach initiative",
-        "Build coalition with other student leaders",
-        "Present comprehensive leadership plan to advisors"
-      ],
-      resources: ["Student handbook", "Previous meeting minutes", "Community data"],
-      relatedGoals: ["Leadership Development", "Community Impact"],
-      potentialImpact: "Establishes leadership trajectory and community connection"
+      icon: BarChart3,
+      title: "Grade Optimization Strategy", 
+      description: "Strategic grade targeting and effort allocation for maximum impact",
+      features: ["When A's matter vs B's", "Recovery planning", "Risk management", "Context-aware advice"]
+    },
+    {
+      icon: MapPin,
+      title: "Special Scenarios",
+      description: "Tailored strategies for unique academic paths and situations",
+      features: ["Transfer students", "Double majors", "Pre-professional tracks", "Study abroad timing"]
     }
   ];
 
-  const coreFeatures = [
+  const projectIncubationFeatures = [
     {
-      icon: BookOpen,
-      title: "Academic Planning Intelligence",
-      description: "Strategic course selection and grade optimization based on your goals, capacity, and market demands",
-      features: [
-        "Course Recommendation Engine with multi-horizon planning",
-        "Strategic sequencing and workload balancing",
-        "Professor intelligence and hidden opportunities",
-        "Grade optimization and effort allocation strategies"
-      ]
+      icon: Search,
+      title: "Project Discovery Process",
+      description: "Start with passions and curiosities to find real problems worth solving",
+      features: ["Interest mining", "Problem identification", "Skill inventory matching", "Resource reality check"]
     },
     {
-      icon: Target,
-      title: "Project Incubation System", 
-      description: "AI-collaborative project development that ensures uniqueness and maximum impact",
-      features: [
-        "Socratic discovery process for authentic projects",
-        "Uniqueness preservation and saturation tracking",
-        "Technical and social impact project guidance",
-        "Launch planning and audience building"
-      ]
-    },
-    {
-      icon: TrendingUp,
-      title: "Extracurricular Strategy Engine",
-      description: "Strategic involvement optimization for maximum impact and personal growth",
-      features: [
-        "Leadership ladder mapping and time ROI calculation",
-        "Depth vs breadth optimization strategies",
-        "Competition selection and team formation",
-        "Club founding and initiative creation guidance"
-      ]
-    },
-    {
-      icon: Brain,
-      title: "Skill Development Accelerator",
-      description: "Strategic skill building aligned with your goals and market demands",
-      features: [
-        "Personalized skill gap analysis and prioritization",
-        "Learning style matching and pace optimization",
-        "Technical stack development sequencing",
-        "Soft skills and domain knowledge building"
-      ]
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: Zap,
-      title: "10x Faster Results",
-      description: "AI-powered optimization cuts months of trial and error into focused action plans"
-    },
-    {
-      icon: Target,
-      title: "Guaranteed Uniqueness",
-      description: "Stand out with projects and experiences no one else has through AI collaboration"
+      icon: MessageSquare,
+      title: "AI Collaboration Modes",
+      description: "Socratic questioning and development partnership for unique project ideas",
+      features: ["Probing questions", "Technical architecture", "Feature prioritization", "Launch planning"]
     },
     {
       icon: Star,
-      title: "Maximum Impact",
-      description: "Every hour invested strategically positioned for college admissions and career success"
+      title: "Uniqueness Preservation",
+      description: "Ensure your projects stand out in a crowded landscape",
+      features: ["Saturation tracking", "Variation suggestions", "Niche identification", "Personal story integration"]
     }
   ];
 
-  const processSteps = [
+  const extracurricularFeatures = [
     {
-      step: 1,
-      title: "AI Assessment",
-      description: "Complete comprehensive analysis of your current situation, goals, and constraints"
+      icon: TrendingUp,
+      title: "Involvement Portfolio Analysis",
+      description: "Strategic assessment of your activities for maximum impact",
+      features: ["Leadership ladder mapping", "Time ROI calculation", "Skill development mapping", "Network value assessment"]
     },
     {
-      step: 2,
-      title: "Strategic Planning",
-      description: "Receive personalized roadmap with prioritized actions and timeline optimization"
+      icon: Target,
+      title: "Strategic Recommendations",
+      description: "Depth vs breadth optimization for your specific goals",
+      features: ["When to go deep", "Leadership development pathway", "Impact amplification", "Position targeting"]
     },
     {
-      step: 3,
-      title: "Smart Execution",
-      description: "Follow AI-guided implementation with real-time adjustments and progress tracking"
+      icon: Award,
+      title: "Competition & Creation Strategy",
+      description: "Win competitions and create new opportunities",
+      features: ["Competition selection", "Team formation strategy", "Club founding guidance", "Event organization"]
+    }
+  ];
+
+  const skillDevelopmentFeatures = [
+    {
+      icon: Brain,
+      title: "Skill Gap Analysis",
+      description: "Identify and prioritize the skills that matter most for your goals",
+      features: ["Current state assessment", "Target state definition", "Gap prioritization", "Learning path optimization"]
     },
     {
-      step: 4,
-      title: "Continuous Optimization",
-      description: "Ongoing strategy refinement based on results and changing circumstances"
+      icon: Settings,
+      title: "Learning Strategy Personalization",
+      description: "Optimize your learning approach based on your style and pace",
+      features: ["Learning style matching", "Pace optimization", "Resource curation", "Practice integration"]
+    },
+    {
+      icon: Code,
+      title: "Skill Categories & Strategies",
+      description: "Comprehensive approach to technical, soft, and domain skills",
+      features: ["Technical stack development", "Communication skills", "Industry knowledge", "Certification strategy"]
+    }
+  ];
+
+  // Hard coded project examples - represents real AI-generated project ideas
+  const projectExamples = [
+    {
+      category: "Technical",
+      title: "AI-Powered Study Group Matcher",
+      description: "App that matches students based on learning styles, schedules, and course difficulty",
+      skills: ["React Native", "Machine Learning", "Database Design"],
+      uniqueness: "Addresses real problem of ineffective study groups with data-driven matching"
+    },
+    {
+      category: "Social Impact", 
+      title: "Local Food Waste Reduction Platform",
+      description: "Connect restaurants with food banks and community organizations",
+      skills: ["Project Management", "Stakeholder Engagement", "Impact Measurement"],
+      uniqueness: "Focuses on hyperlocal solutions rather than broad national approaches"
+    },
+    {
+      category: "Creative",
+      title: "Interactive College Prep Podcast Series",
+      description: "Student-hosted podcast with interactive elements and community features",
+      skills: ["Content Creation", "Audio Production", "Community Building"],
+      uniqueness: "Combines traditional podcasting with interactive digital experiences"
     }
   ];
 
@@ -169,237 +154,307 @@ const ExtracurricularOptimizer = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 px-4 py-2 text-sm">
-              🚀 AI-Powered Academic Strategy
+              🎯 Academic Planning Intelligence
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 gradient-text">
-              Extracurricular Optimizer
+              Strategic Academic Planning
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Transform your academic journey with AI-powered strategic planning. 
-              Optimize every aspect from course selection to project development for maximum impact.
+              AI-powered planner and project generator that helps you navigate the right choices across academics, projects, extracurriculars, and skill development.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button size="lg" className="px-8 py-6 text-lg">
-                Start Free Optimization
+                Start Your Strategic Plan
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
                 <Play className="mr-2 h-5 w-5" />
-                Watch Demo
+                See How It Works
               </Button>
             </div>
             
             {/* Key Stats */}
             <div className="grid md:grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">89%</div>
-                <div className="text-sm text-muted-foreground">Success Rate Improvement</div>
+                <div className="text-3xl font-bold text-primary">94%</div>
+                <div className="text-sm text-muted-foreground">Better Decision Making</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">3.2x</div>
+                <div className="text-3xl font-bold text-primary">5.2x</div>
                 <div className="text-sm text-muted-foreground">Faster Goal Achievement</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">156hrs</div>
-                <div className="text-sm text-muted-foreground">Average Time Saved</div>
+                <div className="text-3xl font-bold text-primary">200+</div>
+                <div className="text-sm text-muted-foreground">Hours Saved Planning</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Core Features */}
+      {/* Main Planning Sections */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Four Pillars of Academic Excellence
+              Four Strategic Pillars for Academic Success
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Our AI analyzes every aspect of your academic journey to create a comprehensive optimization strategy
+              Comprehensive AI-powered guidance across every aspect of your academic journey
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {coreFeatures.map((feature, index) => (
-              <Card key={index} className="border-2 hover:border-primary/20 transition-colors">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <feature.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">{feature.title}</CardTitle>
-                      <p className="text-muted-foreground">{feature.description}</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {feature.features.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              How Optimization Works
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              From assessment to achievement in four strategic steps
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {processSteps.map((step, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
-                    {step.step}
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
-                  {index < processSteps.length - 1 && (
-                    <ChevronRight className="h-6 w-6 text-muted-foreground mx-auto mt-4 hidden lg:block" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-6xl mx-auto">
+            <TabsList className="grid grid-cols-4 w-full mb-12">
+              <TabsTrigger value="academic" className="flex flex-col gap-2 p-4">
+                <BookOpen className="h-5 w-5" />
+                <span className="text-sm">Academic Planning</span>
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="flex flex-col gap-2 p-4">
+                <Lightbulb className="h-5 w-5" />
+                <span className="text-sm">Project Incubation</span>
+              </TabsTrigger>
+              <TabsTrigger value="extracurricular" className="flex flex-col gap-2 p-4">
+                <Users className="h-5 w-5" />
+                <span className="text-sm">Extracurricular Strategy</span>
+              </TabsTrigger>
+              <TabsTrigger value="skills" className="flex flex-col gap-2 p-4">
+                <Brain className="h-5 w-5" />
+                <span className="text-sm">Skill Development</span>
+              </TabsTrigger>
+            </TabsList>
 
-      {/* Benefits */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Students Choose Our Optimizer
-            </h2>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {benefits.map((benefit, index) => (
-              <Card key={index} className="text-center border-2 hover:border-primary/20 transition-colors">
-                <CardContent className="pt-8 pb-6">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <benefit.icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-xl mb-2">{benefit.title}</h3>
-                  <p className="text-muted-foreground">{benefit.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Live Recommendations Preview */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              See AI Recommendations in Action
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Real examples of personalized optimization strategies
-            </p>
-          </div>
-          
-          <div className="max-w-6xl mx-auto space-y-6">
-            {mockRecommendations.map((rec) => (
-              <Card key={rec.id} className="border-2 hover:border-primary/20 transition-colors">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+            <TabsContent value="academic" className="space-y-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-4">Academic Planning Intelligence</h3>
+                <p className="text-muted-foreground text-lg">Strategic course selection and grade optimization based on your goals, capacity, and market demands</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {academicPlanningFeatures.map((feature, index) => (
+                  <Card key={index} className="border-2 hover:border-primary/20 transition-colors">
+                    <CardHeader>
                       <div className="flex items-center gap-3 mb-2">
-                        <CardTitle className="text-xl">{rec.title}</CardTitle>
-                        <Badge variant={rec.priority === 'HIGH' ? 'destructive' : 'secondary'}>
-                          {rec.priority}
-                        </Badge>
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <feature.icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg">{feature.title}</CardTitle>
                       </div>
-                      <div className="flex items-center gap-6 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="h-4 w-4" />
-                          {rec.scoreIncrease}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {rec.timeRequired}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <AlertCircle className="h-4 w-4" />
-                          {rec.difficulty}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {rec.deadline}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Flag className="h-4 w-4" />
-                          {rec.focusArea}
-                        </div>
-                      </div>
-                      <p className="text-muted-foreground mb-4">{rec.description}</p>
-                    </div>
-                    <Button size="sm" className="ml-4">
-                      Start Action
-                      <ExternalLink className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        Action Steps:
-                      </h4>
-                      <ol className="text-sm space-y-1 pl-6">
-                        {rec.actionSteps.map((step, idx) => (
-                          <li key={idx} className="list-decimal">{step}</li>
+                      <p className="text-muted-foreground text-sm">{feature.description}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {feature.features.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{item}</span>
+                          </li>
                         ))}
-                      </ol>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Required Resources:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {rec.resources.map((resource, idx) => (
-                            <Badge key={idx} variant="outline">{resource}</Badge>
-                          ))}
+                      </ul>
+                      <Button className="w-full mt-4" variant="outline">
+                        Start Academic Planning
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="projects" className="space-y-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-4">Project Incubation System</h3>
+                <p className="text-muted-foreground text-lg">AI-collaborative project development that ensures uniqueness and maximum impact</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6 mb-12">
+                {projectIncubationFeatures.map((feature, index) => (
+                  <Card key={index} className="border-2 hover:border-primary/20 transition-colors">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <feature.icon className="h-5 w-5 text-primary" />
                         </div>
+                        <CardTitle className="text-lg">{feature.title}</CardTitle>
                       </div>
-                      <div>
-                        <h4 className="font-medium mb-2">Related Goals:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {rec.relatedGoals.map((goal, idx) => (
-                            <Badge key={idx} variant="secondary">{goal}</Badge>
-                          ))}
+                      <p className="text-muted-foreground text-sm">{feature.description}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {feature.features.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button className="w-full mt-4" variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Start Project Discovery
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Project Examples */}
+              <div className="bg-muted/30 rounded-lg p-6">
+                <h4 className="text-xl font-semibold mb-4">AI-Generated Project Examples</h4>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {projectExamples.map((project, index) => (
+                    <Card key={index} className="border">
+                      <CardHeader>
+                        <Badge variant="secondary" className="w-fit">{project.category}</Badge>
+                        <CardTitle className="text-lg">{project.title}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{project.description}</p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-medium mb-1">Skills Developed:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {project.skills.map((skill, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">{skill}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium mb-1">Uniqueness Factor:</p>
+                            <p className="text-xs text-muted-foreground">{project.uniqueness}</p>
+                          </div>
                         </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="extracurricular" className="space-y-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-4">Extracurricular Strategy Engine</h3>
+                <p className="text-muted-foreground text-lg">Strategic involvement optimization for maximum impact and personal growth</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {extracurricularFeatures.map((feature, index) => (
+                  <Card key={index} className="border-2 hover:border-primary/20 transition-colors">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <feature.icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg">{feature.title}</CardTitle>
                       </div>
+                      <p className="text-muted-foreground text-sm">{feature.description}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {feature.features.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button className="w-full mt-4" variant="outline">
+                        Optimize Activities
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="skills" className="space-y-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-4">Skill Development Accelerator</h3>
+                <p className="text-muted-foreground text-lg">Strategic skill building aligned with your goals and market demands</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {skillDevelopmentFeatures.map((feature, index) => (
+                  <Card key={index} className="border-2 hover:border-primary/20 transition-colors">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <feature.icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg">{feature.title}</CardTitle>
+                      </div>
+                      <p className="text-muted-foreground text-sm">{feature.description}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {feature.features.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button className="w-full mt-4" variant="outline">
+                        Analyze Skills Gap
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Skill Categories */}
+              <div className="grid md:grid-cols-3 gap-6 mt-8">
+                <Card className="border">
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <Code className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-lg">Technical Skills</CardTitle>
                     </div>
-                  </div>
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-900 mb-1">Potential Impact:</h4>
-                    <p className="text-sm text-blue-800">{rec.potentialImpact}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1 text-sm">
+                      <li>• Stack development</li>
+                      <li>• Tool mastery sequencing</li>
+                      <li>• Certification strategy</li>
+                      <li>• Portfolio building</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="border">
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-lg">Soft Skills</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1 text-sm">
+                      <li>• Communication development</li>
+                      <li>• Leadership building</li>
+                      <li>• Collaboration skills</li>
+                      <li>• Cultural intelligence</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="border">
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-lg">Domain Knowledge</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1 text-sm">
+                      <li>• Industry learning</li>
+                      <li>• Business acumen</li>
+                      <li>• Research skills</li>
+                      <li>• Market dynamics</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
 
@@ -408,18 +463,18 @@ const ExtracurricularOptimizer = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Optimize Your Academic Journey?
+              Ready to Transform Your Academic Strategy?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Join thousands of students who have transformed their academic outcomes with AI-powered optimization
+              Get AI-powered guidance across academics, projects, extracurriculars, and skill development
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" className="px-8 py-6 text-lg">
-                Start Free Assessment
+                Start Strategic Planning
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" className="px-8 py-6 text-lg bg-white/10 border-white text-white hover:bg-white/20">
-                Schedule Demo Call
+                Book Strategy Session
               </Button>
             </div>
           </div>
@@ -431,4 +486,4 @@ const ExtracurricularOptimizer = () => {
   );
 };
 
-export default ExtracurricularOptimizer;
+export default AcademicPlanningIntelligence;

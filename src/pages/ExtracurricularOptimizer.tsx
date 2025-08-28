@@ -303,30 +303,24 @@ const AcademicPlanningIntelligence = () => {
                           }`}>
                             <Icon className="h-6 w-6" />
                           </div>
-                          <div>
-                            <h3 className="text-lg font-bold mb-2">
-                              {domain.title.split(' ')[0]}
-                            </h3>
-                            <div className="flex items-center space-x-3">
-                              {/* 10-level indicator using portfolio scanner colors */}
-                              <div className="flex items-center space-x-0.5">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                                  <div 
-                                    key={i}
-                                    className={`w-1.5 h-3 rounded-full transition-all duration-300 ${
-                                      i <= opportunityScore
-                                        ? ''
-                                        : 'bg-white/20'
-                                    }`}
-                                    style={{
-                                      backgroundColor: i <= opportunityScore ? getIndicatorColor(i) : undefined,
-                                      boxShadow: i <= opportunityScore && opportunityScore >= 9 ? `0 0 6px ${getIndicatorColor(i)}` : undefined
-                                    }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
+                            <div>
+                             <h3 className="text-lg font-bold mb-2">
+                               {domain.title.split(' ')[0]}
+                             </h3>
+                             <div className="flex items-center space-x-3">
+                               {/* New opportunity indicator */}
+                               {domain.id === 'projects' && (
+                                 <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs px-2 py-1">
+                                   Recommended
+                                 </Badge>
+                               )}
+                               {domain.id === 'skills' && (
+                                 <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs px-2 py-1">
+                                   New Insights
+                                 </Badge>
+                               )}
+                             </div>
+                           </div>
                         </div>
                         
                         {/* Arrow Indicator */}

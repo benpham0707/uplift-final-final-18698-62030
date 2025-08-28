@@ -58,7 +58,7 @@ const AcademicPlanningIntelligence = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Scroll-based fade effect with faster fade transitions
+  // Scroll-based fade effect - new section appears slowly, old section fades quickly
   useEffect(() => {
     const observerOptions = {
       threshold: Array.from({length: 101}, (_, i) => i * 0.01), // 0 to 1 in 0.01 increments
@@ -70,11 +70,16 @@ const AcademicPlanningIntelligence = () => {
         const sectionId = entry.target.id;
         const ratio = entry.intersectionRatio;
         
-        // Calculate opacity with faster fade transitions
-        // Previous section disappears when next section is 50% visible
+        // Calculate opacity - new sections appear slowly, old sections fade quickly
         let opacity = 0;
-        if (ratio > 0.3) {
-          opacity = Math.min(1, (ratio - 0.3) / 0.2); // Faster transition from 30% to 50%
+        if (ratio > 0.1) {
+          // New section appears slowly over 80% visibility range (10% to 90%)
+          opacity = Math.min(1, (ratio - 0.1) / 0.8); 
+        }
+        
+        // For sections going out of view, fade them quickly
+        if (ratio < 0.5 && ratio > 0) {
+          opacity = ratio * 2; // Quick fade out
         }
         
         setSectionOpacity(prev => ({
@@ -102,38 +107,45 @@ const AcademicPlanningIntelligence = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Dynamic background gradient with theme colors - alternating light/dark
+  // Dynamic background gradient with theme colors - horizontal transitions
   const getBackgroundGradient = () => {
     const progress = scrollProgress;
     
-    if (progress < 0.25) {
+    // Smooth horizontal transitions between sections
+    if (progress < 0.2) {
       // Start light (background color)
       return `hsl(var(--background))`;
-    } else if (progress < 0.5) {
-      // Transition to dark (primary navy)
-      const localProgress = (progress - 0.25) / 0.25;
-      return `linear-gradient(135deg, 
-        hsl(var(--background)) ${Math.max(0, 100 - localProgress * 100)}%, 
-        hsl(var(--primary)) ${Math.min(100, localProgress * 100)}%)`;
-    } else if (progress < 0.75) {
-      // Transition back to light
-      const localProgress = (progress - 0.5) / 0.25;
-      return `linear-gradient(135deg, 
-        hsl(var(--primary)) ${Math.max(0, 100 - localProgress * 100)}%, 
-        hsl(var(--background)) ${Math.min(100, localProgress * 100)}%)`;
+    } else if (progress < 0.4) {
+      // Gradual horizontal transition to dark (primary navy)
+      const localProgress = (progress - 0.2) / 0.2;
+      const smoothProgress = localProgress * localProgress * (3 - 2 * localProgress); // Smooth ease
+      return `linear-gradient(to right, 
+        hsl(var(--background)) ${Math.max(0, 100 - smoothProgress * 100)}%, 
+        hsl(var(--primary)) ${Math.min(100, smoothProgress * 100)}%)`;
+    } else if (progress < 0.6) {
+      // Stay dark for the full dark section
+      return `hsl(var(--primary))`;
+    } else if (progress < 0.8) {
+      // Gradual horizontal transition back to light
+      const localProgress = (progress - 0.6) / 0.2;
+      const smoothProgress = localProgress * localProgress * (3 - 2 * localProgress); // Smooth ease
+      return `linear-gradient(to right, 
+        hsl(var(--primary)) ${Math.max(0, 100 - smoothProgress * 100)}%, 
+        hsl(var(--background)) ${Math.min(100, smoothProgress * 100)}%)`;
     } else {
-      // Transition to dark again
-      const localProgress = (progress - 0.75) / 0.25;
-      return `linear-gradient(135deg, 
-        hsl(var(--background)) ${Math.max(0, 100 - localProgress * 100)}%, 
-        hsl(var(--primary)) ${Math.min(100, localProgress * 100)}%)`;
+      // Gradual horizontal transition to dark again
+      const localProgress = (progress - 0.8) / 0.2;
+      const smoothProgress = localProgress * localProgress * (3 - 2 * localProgress); // Smooth ease
+      return `linear-gradient(to right, 
+        hsl(var(--background)) ${Math.max(0, 100 - smoothProgress * 100)}%, 
+        hsl(var(--primary)) ${Math.min(100, smoothProgress * 100)}%)`;
     }
   };
 
   // Get text color based on current background
   const getTextColor = () => {
     const progress = scrollProgress;
-    if ((progress >= 0.25 && progress < 0.5) || progress >= 0.75) {
+    if ((progress >= 0.4 && progress < 0.6) || progress >= 0.8) {
       return 'text-primary-foreground'; // White text on dark background
     }
     return 'text-foreground'; // Dark text on light background

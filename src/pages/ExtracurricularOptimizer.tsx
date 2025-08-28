@@ -70,13 +70,14 @@ const AcademicPlanningIntelligence = () => {
         const sectionId = entry.target.id;
         const ratio = entry.intersectionRatio;
         
-        // Simple opacity calculation based on visibility ratio
-        // Sections fade in slowly as they become visible
-        // Sections fade out quickly as they become less visible
+        // Improved fade logic: old sections fade out fast, new sections fade in slow
         let opacity = 0;
-        if (ratio > 0.1) {
-          // Smooth fade in from 10% to 90% visibility
-          opacity = Math.min(1, (ratio - 0.1) / 0.8);
+        if (ratio > 0.5) {
+          // Section is mostly visible - fade in slowly
+          opacity = Math.min(1, (ratio - 0.5) / 0.4);
+        } else if (ratio > 0.1) {
+          // Section is leaving view - fade out fast
+          opacity = (ratio - 0.1) / 0.4;
         }
         
         setSectionOpacity(prev => ({
@@ -104,39 +105,12 @@ const AcademicPlanningIntelligence = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Dynamic background gradient with theme colors - vertical transitions
-  const getBackgroundGradient = () => {
+  // Static vertical gradient background that responds to scroll position
+  const getBackgroundPosition = () => {
     const progress = scrollProgress;
-    
-    // Smooth vertical transitions between sections
-    if (progress < 0.2) {
-      // Start light (background color)
-      return `hsl(var(--background))`;
-    } else if (progress < 0.4) {
-      // Gradual vertical transition to dark (primary navy)
-      const localProgress = (progress - 0.2) / 0.2;
-      const smoothProgress = localProgress * localProgress * (3 - 2 * localProgress); // Smooth ease
-      return `linear-gradient(to bottom, 
-        hsl(var(--background)) ${Math.max(0, 100 - smoothProgress * 100)}%, 
-        hsl(var(--primary)) ${Math.min(100, smoothProgress * 100)}%)`;
-    } else if (progress < 0.6) {
-      // Stay dark for the full dark section
-      return `hsl(var(--primary))`;
-    } else if (progress < 0.8) {
-      // Gradual vertical transition back to light
-      const localProgress = (progress - 0.6) / 0.2;
-      const smoothProgress = localProgress * localProgress * (3 - 2 * localProgress); // Smooth ease
-      return `linear-gradient(to bottom, 
-        hsl(var(--primary)) ${Math.max(0, 100 - smoothProgress * 100)}%, 
-        hsl(var(--background)) ${Math.min(100, smoothProgress * 100)}%)`;
-    } else {
-      // Gradual vertical transition to dark again
-      const localProgress = (progress - 0.8) / 0.2;
-      const smoothProgress = localProgress * localProgress * (3 - 2 * localProgress); // Smooth ease
-      return `linear-gradient(to bottom, 
-        hsl(var(--background)) ${Math.max(0, 100 - smoothProgress * 100)}%, 
-        hsl(var(--primary)) ${Math.min(100, smoothProgress * 100)}%)`;
-    }
+    // Map scroll progress to background position percentage
+    // This moves the gradient based on scroll position
+    return `50% ${progress * 100}%`;
   };
 
   // Get text color based on current background
@@ -233,7 +207,19 @@ const AcademicPlanningIntelligence = () => {
   ];
 
   return (
-    <div className="min-h-screen transition-all duration-1000 ease-out" style={{ background: getBackgroundGradient() }}>
+    <div 
+      className="min-h-screen transition-all duration-300 ease-out" 
+      style={{ 
+        background: `linear-gradient(to bottom, 
+          hsl(var(--background)) 0%, 
+          hsl(var(--primary)) 25%, 
+          hsl(var(--background)) 50%, 
+          hsl(var(--primary)) 75%, 
+          hsl(var(--background)) 100%)`,
+        backgroundSize: '100% 400%',
+        backgroundPosition: getBackgroundPosition()
+      }}
+    >
       {/* Compact Navigation */}
       <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

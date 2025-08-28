@@ -50,6 +50,7 @@ const AcademicPlanningIntelligence = () => {
       keyBenefit: 'Take the right classes at the right time to maximize your goals',
       exampleInsight: 'Take Statistics next semester (easier professor) to free up time for your internship application season',
       progress: 65,
+      impact: 'High',
       status: 'Ready',
       color: 'from-blue-500/20 to-indigo-500/20',
       iconBg: 'bg-blue-500/10',
@@ -69,6 +70,7 @@ const AcademicPlanningIntelligence = () => {
       keyBenefit: 'Build projects that actually matter and stand out',
       exampleInsight: 'Based on your interests, here\'s a unique project idea that solves a real problem in your community',
       progress: 40,
+      impact: 'Very High',
       status: 'Ready',
       color: 'from-yellow-500/20 to-orange-500/20',
       iconBg: 'bg-yellow-500/10',
@@ -88,6 +90,7 @@ const AcademicPlanningIntelligence = () => {
       keyBenefit: 'Join the right activities and pursue leadership strategically',
       exampleInsight: 'Focus on depth over breadth - aim for leadership in 2-3 clubs rather than joining 8',
       progress: 55,
+      impact: 'High',
       status: 'Ready',
       color: 'from-green-500/20 to-emerald-500/20',
       iconBg: 'bg-green-500/10',
@@ -107,6 +110,7 @@ const AcademicPlanningIntelligence = () => {
       keyBenefit: 'Learn skills that actually move you toward your career goals',
       exampleInsight: 'Python is more valuable than Java for your data science goals - here\'s the fastest way to learn it',
       progress: 30,
+      impact: 'Very High',
       status: 'Ready',
       color: 'from-purple-500/20 to-violet-500/20',
       iconBg: 'bg-purple-500/10',
@@ -218,49 +222,58 @@ const AcademicPlanningIntelligence = () => {
               Get strategic guidance that actually fits your goals, timeline, and current situation. 
               Your AI-powered strategic advisor for academic, professional, and personal development.
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
+            
+            {/* Strategic Domain Navigation */}
+            <div className="flex justify-center items-center space-x-3 max-w-5xl mx-auto mb-12">
               {strategicDomains.map((domain) => {
                 const Icon = domain.icon;
-                const needsImprovement = domain.progress < 50;
+                const hasHighImpact = domain.impact === 'Very High';
                 
                 return (
-                  <Card 
+                  <div 
                     key={domain.id} 
-                    className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                      needsImprovement ? 'bg-amber-50 border-amber-200 hover:bg-amber-100' : 'hover:shadow-medium'
+                    className={`group cursor-pointer transition-all duration-200 hover:scale-105 ${
+                      hasHighImpact ? 'animate-pulse' : ''
                     }`}
                     onClick={() => {
                       const element = document.getElementById(domain.id);
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
                   >
-                    <CardContent className="p-6 text-center">
-                      <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 ${domain.iconBg}`}>
-                        <Icon className={`h-6 w-6 ${domain.iconColor}`} />
-                      </div>
-                      <h3 className="font-semibold text-sm text-foreground mb-2">
-                        {domain.title.split(' ')[0]}
-                      </h3>
-                      <div className="space-y-2">
-                        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                          <div 
-                            className={`h-full transition-all duration-300 ${
-                              needsImprovement ? 'bg-amber-500' : 'bg-primary'
-                            }`}
-                            style={{ width: `${domain.progress}%` }}
-                          />
+                    <div className={`relative px-4 py-3 rounded-xl border transition-all duration-200 group-hover:shadow-lg ${
+                      hasHighImpact 
+                        ? 'bg-primary/95 border-primary text-primary-foreground' 
+                        : 'bg-primary/80 border-primary/50 text-primary-foreground'
+                    }`}>
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <Icon className="h-4 w-4" />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">{domain.progress}%</span>
-                          {needsImprovement && (
-                            <Badge variant="outline" className="text-xs bg-amber-100 text-amber-800 border-amber-300">
-                              Focus
-                            </Badge>
-                          )}
+                        <div className="text-center">
+                          <div className="text-sm font-medium">
+                            {domain.title.split(' ')[0]}
+                          </div>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <div className="flex space-x-1">
+                              {[1, 2, 3].map((i) => (
+                                <div 
+                                  key={i}
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    i <= (domain.impact === 'Very High' ? 3 : domain.impact === 'High' ? 2 : 1)
+                                      ? 'bg-current'
+                                      : 'bg-current/30'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            {hasHighImpact && (
+                              <span className="text-xs font-medium">Priority</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })}
             </div>

@@ -236,94 +236,99 @@ const AcademicPlanningIntelligence = () => {
       </div>
 
       {/* Academic Planning Intelligence Section */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <div className="mb-16">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="p-4 bg-blue-500/10 rounded-2xl">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-            </div>
-            <div>
-              <h2 className="text-4xl font-bold text-foreground">Academic Planning Intelligence</h2>
-              <p className="text-xl text-muted-foreground mt-2">Strategic course selection and grade optimization</p>
-            </div>
-          </div>
-          
-          <Card className="group relative bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent border border-blue-200/50 hover:shadow-2xl transition-all duration-500 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <CardContent className="relative p-8">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <div>
-                  <div className="mb-6">
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-0 mb-4">
-                      Ready to Launch
-                    </Badge>
-                    <h3 className="text-2xl font-bold text-foreground mb-4">
-                      Take the right classes at the right time to maximize your goals
-                    </h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      Never wonder if you're making the right academic choices. Our AI analyzes your goals, 
-                      tracks professor quality, and maps optimal sequences to keep you ahead of the curve.
-                    </p>
-                  </div>
-                  
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center">
-                        <Lightbulb className="h-4 w-4 text-amber-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-amber-900 mb-2">Strategic Insight Example</h4>
-                        <p className="text-amber-800 leading-relaxed">
-                          "Take Statistics next semester with Professor Chen (4.8 rating, manageable workload) 
-                          to free up time for your internship application season in spring."
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button size="lg" className="w-full group-hover:scale-105 transition-transform duration-300">
-                    <Play className="h-5 w-5 mr-2" />
-                    Start Academic Planning
-                    <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-                
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-foreground mb-4">Capabilities Overview</h4>
-                  {strategicDomains[0].items.map((item, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border border-border/50">
-                      <CheckCircle2 className={`h-5 w-5 mt-0.5 ${item.completed ? 'text-green-600' : 'text-muted-foreground'}`} />
-                      <div>
-                        <h5 className="font-medium text-foreground">{item.name}</h5>
-                        <p className="text-sm text-muted-foreground">{item.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <div className="mt-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-foreground">Setup Progress</span>
-                      <span className="text-sm font-semibold text-blue-600">65%</span>
-                    </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div className="h-2 bg-blue-600 rounded-full transition-all duration-500" style={{ width: '65%' }} />
-                    </div>
-                  </div>
-                </div>
+      <div className="section-divider gradient-section">
+        <div className="max-w-7xl mx-auto px-4 py-20">
+          <div className="mb-16">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="p-4 bg-primary/10 rounded-2xl">
+                <BookOpen className="h-8 w-8 text-primary" />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <h2 className="text-4xl font-bold text-foreground">Academic Planning Intelligence</h2>
+                <p className="text-xl text-muted-foreground mt-2">Strategic course selection and grade optimization</p>
+              </div>
+            </div>
+            
+            <Card className="group relative bg-card border border-border hover:shadow-strong transition-all duration-500 overflow-hidden flowing-gradient">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <CardContent className="relative p-8">
+                <div className="grid lg:grid-cols-2 gap-8">
+                  <div>
+                    <div className="mb-6">
+                      <Badge variant="secondary" className="bg-green-100 text-green-800 border-0 mb-4">
+                        Ready to Launch
+                      </Badge>
+                      <h3 className="text-2xl font-bold text-foreground mb-4">
+                        Take the right classes at the right time to maximize your goals
+                      </h3>
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        Never wonder if you're making the right academic choices. Our AI analyzes your goals, 
+                        tracks professor quality, and maps optimal sequences to keep you ahead of the curve.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                          <Lightbulb className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-primary mb-2">Strategic Insight Example</h4>
+                          <p className="text-foreground leading-relaxed">
+                            "Take Statistics next semester with Professor Chen (4.8 rating, manageable workload) 
+                            to free up time for your internship application season in spring."
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Button size="lg" className="w-full group-hover:scale-105 transition-transform duration-300">
+                      <Play className="h-5 w-5 mr-2" />
+                      Start Academic Planning
+                      <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-foreground mb-4">Capabilities Overview</h4>
+                    {strategicDomains[0].items.map((item, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border border-border/50">
+                        <CheckCircle2 className={`h-5 w-5 mt-0.5 ${item.completed ? 'text-green-600' : 'text-muted-foreground'}`} />
+                        <div>
+                          <h5 className="font-medium text-foreground">{item.name}</h5>
+                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <div className="mt-6">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-foreground">Setup Progress</span>
+                        <span className="text-sm font-semibold text-primary">65%</span>
+                      </div>
+                      <div className="w-full bg-secondary/30 rounded-full h-2">
+                        <div className="h-2 bg-primary rounded-full transition-all duration-500" style={{ width: '65%' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
+      {/* Smooth transition divider */}
+      <div className="h-20 bg-gradient-to-b from-transparent via-primary/5 to-transparent"></div>
+
       {/* Project Incubation System Section */}
-      <div className="bg-gradient-to-br from-yellow-500/5 to-orange-500/5 py-20">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="gradient-accent">
+        <div className="max-w-7xl mx-auto px-4 py-20">
           <div className="mb-16">
             <div className="flex items-center space-x-4 mb-6">
-              <div className="p-4 bg-yellow-500/10 rounded-2xl">
-                <Lightbulb className="h-8 w-8 text-yellow-600" />
+              <div className="p-4 bg-primary/10 rounded-2xl">
+                <Lightbulb className="h-8 w-8 text-primary" />
               </div>
               <div>
                 <h2 className="text-4xl font-bold text-foreground">Project Incubation System</h2>
@@ -331,8 +336,8 @@ const AcademicPlanningIntelligence = () => {
               </div>
             </div>
             
-            <Card className="group relative bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent border border-yellow-200/50 hover:shadow-2xl transition-all duration-500 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Card className="group relative bg-card border border-border hover:shadow-strong transition-all duration-500 overflow-hidden flowing-gradient">
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <CardContent className="relative p-8">
                 <div className="grid lg:grid-cols-2 gap-8">
@@ -350,14 +355,14 @@ const AcademicPlanningIntelligence = () => {
                       </p>
                     </div>
                     
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 mb-6">
+                    <div className="bg-secondary/5 border border-secondary/20 rounded-xl p-6 mb-6">
                       <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                          <Star className="h-4 w-4 text-emerald-600" />
+                        <div className="flex-shrink-0 w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
+                          <Star className="h-4 w-4 text-secondary" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-emerald-900 mb-2">Unique Project Idea</h4>
-                          <p className="text-emerald-800 leading-relaxed">
+                          <h4 className="font-semibold text-secondary mb-2">Unique Project Idea</h4>
+                          <p className="text-foreground leading-relaxed">
                             "Create a community food waste app that connects local restaurants with food banks, 
                             incorporating your interest in sustainability and mobile development."
                           </p>
@@ -387,10 +392,10 @@ const AcademicPlanningIntelligence = () => {
                     <div className="mt-6">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-foreground">Setup Progress</span>
-                        <span className="text-sm font-semibold text-yellow-600">40%</span>
+                        <span className="text-sm font-semibold text-primary">40%</span>
                       </div>
-                      <div className="w-full bg-secondary rounded-full h-2">
-                        <div className="h-2 bg-yellow-600 rounded-full transition-all duration-500" style={{ width: '40%' }} />
+                      <div className="w-full bg-secondary/30 rounded-full h-2">
+                        <div className="h-2 bg-primary rounded-full transition-all duration-500" style={{ width: '40%' }} />
                       </div>
                     </div>
                   </div>
@@ -401,95 +406,103 @@ const AcademicPlanningIntelligence = () => {
         </div>
       </div>
 
+      {/* Smooth transition divider */}
+      <div className="h-20 bg-gradient-to-b from-transparent via-primary/5 to-transparent"></div>
+
       {/* Extracurricular Strategy Engine Section */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <div className="mb-16">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="p-4 bg-green-500/10 rounded-2xl">
-              <Users className="h-8 w-8 text-green-600" />
-            </div>
-            <div>
-              <h2 className="text-4xl font-bold text-foreground">Extracurricular Strategy Engine</h2>
-              <p className="text-xl text-muted-foreground mt-2">Strategic involvement optimization for maximum impact</p>
-            </div>
-          </div>
-          
-          <Card className="group relative bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border border-green-200/50 hover:shadow-2xl transition-all duration-500 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            <CardContent className="relative p-8">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <div>
-                  <div className="mb-6">
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-0 mb-4">
-                      Ready to Launch
-                    </Badge>
-                    <h3 className="text-2xl font-bold text-foreground mb-4">
-                      Join the right activities and pursue leadership strategically
-                    </h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      Transform scattered activities into a coherent leadership story. We help you choose 
-                      high-impact opportunities and build authentic leadership experiences that matter.
-                    </p>
-                  </div>
-                  
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                        <Target className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-blue-900 mb-2">Strategic Recommendation</h4>
-                        <p className="text-blue-800 leading-relaxed">
-                          "Focus on depth over breadth - aim for leadership positions in 2-3 meaningful clubs 
-                          rather than passive membership in 8 different organizations."
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button size="lg" className="w-full group-hover:scale-105 transition-transform duration-300">
-                    <Users className="h-5 w-5 mr-2" />
-                    Optimize My Activities
-                    <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-                
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-foreground mb-4">Strategic Areas</h4>
-                  {strategicDomains[2].items.map((item, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border border-border/50">
-                      <CheckCircle2 className={`h-5 w-5 mt-0.5 ${item.completed ? 'text-green-600' : 'text-muted-foreground'}`} />
-                      <div>
-                        <h5 className="font-medium text-foreground">{item.name}</h5>
-                        <p className="text-sm text-muted-foreground">{item.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <div className="mt-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-foreground">Setup Progress</span>
-                      <span className="text-sm font-semibold text-green-600">55%</span>
-                    </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div className="h-2 bg-green-600 rounded-full transition-all duration-500" style={{ width: '55%' }} />
-                    </div>
-                  </div>
-                </div>
+      <div className="section-divider gradient-section">
+        <div className="max-w-7xl mx-auto px-4 py-20">
+          <div className="mb-16">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="p-4 bg-primary/10 rounded-2xl">
+                <Users className="h-8 w-8 text-primary" />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <h2 className="text-4xl font-bold text-foreground">Extracurricular Strategy Engine</h2>
+                <p className="text-xl text-muted-foreground mt-2">Strategic involvement optimization for maximum impact</p>
+              </div>
+            </div>
+            
+            <Card className="group relative bg-card border border-border hover:shadow-strong transition-all duration-500 overflow-hidden flowing-gradient">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <CardContent className="relative p-8">
+                <div className="grid lg:grid-cols-2 gap-8">
+                  <div>
+                    <div className="mb-6">
+                      <Badge variant="secondary" className="bg-green-100 text-green-800 border-0 mb-4">
+                        Ready to Launch
+                      </Badge>
+                      <h3 className="text-2xl font-bold text-foreground mb-4">
+                        Join the right activities and pursue leadership strategically
+                      </h3>
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        Transform scattered activities into a coherent leadership story. We help you choose 
+                        high-impact opportunities and build authentic leadership experiences that matter.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                          <Target className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-primary mb-2">Strategic Recommendation</h4>
+                          <p className="text-foreground leading-relaxed">
+                            "Focus on depth over breadth - aim for leadership positions in 2-3 meaningful clubs 
+                            rather than passive membership in 8 different organizations."
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Button size="lg" className="w-full group-hover:scale-105 transition-transform duration-300">
+                      <Users className="h-5 w-5 mr-2" />
+                      Optimize My Activities
+                      <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-foreground mb-4">Strategic Areas</h4>
+                    {strategicDomains[2].items.map((item, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border border-border/50">
+                        <CheckCircle2 className={`h-5 w-5 mt-0.5 ${item.completed ? 'text-green-600' : 'text-muted-foreground'}`} />
+                        <div>
+                          <h5 className="font-medium text-foreground">{item.name}</h5>
+                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <div className="mt-6">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-foreground">Setup Progress</span>
+                        <span className="text-sm font-semibold text-primary">55%</span>
+                      </div>
+                      <div className="w-full bg-secondary/30 rounded-full h-2">
+                        <div className="h-2 bg-primary rounded-full transition-all duration-500" style={{ width: '55%' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
+      {/* Smooth transition divider */}
+      <div className="h-20 bg-gradient-to-b from-transparent via-primary/5 to-transparent"></div>
+
       {/* Skill Development Accelerator Section */}
-      <div className="bg-gradient-to-br from-purple-500/5 to-violet-500/5 py-20">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="gradient-accent">
+        <div className="max-w-7xl mx-auto px-4 py-20">
           <div className="mb-16">
             <div className="flex items-center space-x-4 mb-6">
-              <div className="p-4 bg-purple-500/10 rounded-2xl">
-                <Brain className="h-8 w-8 text-purple-600" />
+              <div className="p-4 bg-primary/10 rounded-2xl">
+                <Brain className="h-8 w-8 text-primary" />
               </div>
               <div>
                 <h2 className="text-4xl font-bold text-foreground">Skill Development Accelerator</h2>
@@ -497,8 +510,8 @@ const AcademicPlanningIntelligence = () => {
               </div>
             </div>
             
-            <Card className="group relative bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent border border-purple-200/50 hover:shadow-2xl transition-all duration-500 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-violet-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Card className="group relative bg-card border border-border hover:shadow-strong transition-all duration-500 overflow-hidden flowing-gradient">
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <CardContent className="relative p-8">
                 <div className="grid lg:grid-cols-2 gap-8">
@@ -516,14 +529,14 @@ const AcademicPlanningIntelligence = () => {
                       </p>
                     </div>
                     
-                    <div className="bg-violet-50 border border-violet-200 rounded-xl p-6 mb-6">
+                    <div className="bg-secondary/5 border border-secondary/20 rounded-xl p-6 mb-6">
                       <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-violet-500/20 rounded-full flex items-center justify-center">
-                          <Code className="h-4 w-4 text-violet-600" />
+                        <div className="flex-shrink-0 w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
+                          <Code className="h-4 w-4 text-secondary" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-violet-900 mb-2">Skill Priority Insight</h4>
-                          <p className="text-violet-800 leading-relaxed">
+                          <h4 className="font-semibold text-secondary mb-2">Skill Priority Insight</h4>
+                          <p className="text-foreground leading-relaxed">
                             "Python is more valuable than Java for your data science goals. Here's the optimal 
                             3-month learning path with projects that build your portfolio."
                           </p>
@@ -553,10 +566,10 @@ const AcademicPlanningIntelligence = () => {
                     <div className="mt-6">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-foreground">Setup Progress</span>
-                        <span className="text-sm font-semibold text-purple-600">30%</span>
+                        <span className="text-sm font-semibold text-primary">30%</span>
                       </div>
-                      <div className="w-full bg-secondary rounded-full h-2">
-                        <div className="h-2 bg-purple-600 rounded-full transition-all duration-500" style={{ width: '30%' }} />
+                      <div className="w-full bg-secondary/30 rounded-full h-2">
+                        <div className="h-2 bg-primary rounded-full transition-all duration-500" style={{ width: '30%' }} />
                       </div>
                     </div>
                   </div>
@@ -566,6 +579,9 @@ const AcademicPlanningIntelligence = () => {
           </div>
         </div>
       </div>
+
+      {/* Final transition */}
+      <div className="h-20 bg-gradient-to-b from-transparent via-primary/5 to-transparent"></div>
 
       {/* Continuous Progress Loop */}
       <div className="bg-muted/30 py-16">

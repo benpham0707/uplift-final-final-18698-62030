@@ -48,10 +48,13 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(209 52% 25%), hsl(205 17% 42%));
     --gradient-secondary: linear-gradient(135deg, hsl(205 17% 42%), hsl(210 11% 91%));
     --gradient-hero: linear-gradient(135deg, hsl(209 52% 25%) 0%, hsl(205 17% 42%) 100%);
+    --gradient-section: linear-gradient(135deg, hsl(var(--primary) / 0.03), hsl(var(--primary) / 0.08));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--secondary) / 0.08));
     
     --shadow-soft: 0 2px 20px -2px hsl(209 52% 25% / 0.1);
     --shadow-medium: 0 8px 30px -4px hsl(209 52% 25% / 0.15);
     --shadow-strong: 0 20px 40px -8px hsl(209 52% 25% / 0.2);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.1);
 
     --radius: 0.75rem;
 
@@ -146,11 +149,39 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-strong);
   }
   
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .gradient-section {
+    background: var(--gradient-section);
+  }
+  
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
   .hover-lift {
     @apply transition-all duration-300 hover:shadow-medium hover:-translate-y-1;
   }
   
-  .path-connector {
-    @apply relative before:absolute before:top-1/2 before:-right-4 before:w-8 before:h-0.5 before:bg-secondary before:transform before:-translate-y-1/2;
+  .section-divider {
+    @apply relative before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-border before:to-transparent;
+  }
+  
+  .flowing-gradient {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .flowing-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+    animation: flow 8s linear infinite;
   }
 }

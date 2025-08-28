@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   BookOpen, 
   Target, 
@@ -37,6 +38,7 @@ import {
 
 const AcademicPlanningIntelligence = () => {
   const navigate = useNavigate();
+  const { user, signOut, loading } = useAuth();
   const [isPlanningDropdownOpen, setIsPlanningDropdownOpen] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState(null);
 
@@ -190,16 +192,34 @@ const AcademicPlanningIntelligence = () => {
                 )}
               </div>
               
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/portfolio-scanner')}>
                 Portfolio Scanner
               </Button>
+            </div>
 
-              <div className="flex items-center space-x-3">
-                <Badge variant="secondary" className="hidden sm:flex">
-                  <Brain className="h-3 w-3 mr-1" />
-                  Strategic Planning
-                </Badge>
-              </div>
+            {/* Right Side - Auth/Profile */}
+            <div className="flex items-center space-x-3">
+              {loading ? (
+                <div className="h-4 w-16 bg-muted animate-pulse rounded"></div>
+              ) : user ? (
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-muted-foreground">
+                    {user.email}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/auth')}>
+                    Sign In
+                  </Button>
+                  <Button variant="default" size="sm" onClick={() => navigate('/auth')}>
+                    Sign Up
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -247,7 +247,34 @@ const AcademicPlanningIntelligence = () => {
             <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
               {strategicDomains.map((domain) => {
                 const Icon = domain.icon;
-                const fireIntensity = domain.impact === 'Very High' ? 'intense' : domain.impact === 'High' ? 'medium' : 'low';
+                // Generate opportunity score based on domain (hardcoded for demo)
+                const opportunityScore = domain.id === 'projects' ? 10 : 
+                                       domain.id === 'skills' ? 8 : 
+                                       domain.id === 'academic' ? 6 : 
+                                       domain.id === 'extracurricular' ? 4 : 5;
+
+                // Get color based on portfolio scanner rubric logic
+                const getIndicatorColor = (score: number) => {
+                  if (score >= 9.0) {
+                    return 'hsl(220, 95%, 65%)'; // Blue
+                  } else if (score >= 7.0) {
+                    const progress = (score - 7) / 2;
+                    const hue = 120 - (progress * 100);
+                    return `hsl(${hue}, 85%, 60%)`;
+                  } else if (score >= 5.0) {
+                    const progress = (score - 5) / 2;
+                    const hue = 35 + (progress * 25);
+                    return `hsl(${hue}, 90%, 55%)`;
+                  } else if (score >= 3.0) {
+                    const progress = (score - 3) / 2;
+                    const hue = 0 + (progress * 35);
+                    return `hsl(${hue}, 90%, 55%)`;
+                  } else {
+                    return 'hsl(0, 90%, 55%)'; // Red
+                  }
+                };
+
+                const shouldGlow = opportunityScore === 10;
                 
                 return (
                   <div 
@@ -258,74 +285,53 @@ const AcademicPlanningIntelligence = () => {
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
                   >
-                    {/* Fire Border Effect */}
-                    <div className={`absolute inset-0 rounded-2xl transition-all duration-500 group-hover:scale-110 ${
-                      fireIntensity === 'intense' 
-                        ? 'shadow-[0_0_30px_#3b82f6,0_0_60px_#3b82f6,0_0_90px_#60a5fa,inset_0_0_30px_#3b82f6] animate-pulse' 
-                        : fireIntensity === 'medium'
-                        ? 'shadow-[0_0_20px_#3b82f6,0_0_40px_#3b82f6,inset_0_0_20px_#3b82f6]'
-                        : 'shadow-[0_0_10px_#3b82f6,inset_0_0_10px_#3b82f6]'
-                    } bg-gradient-to-r from-primary/20 via-blue-500/30 to-primary/20`}></div>
-                    
-                    {/* Animated Fire Particles */}
-                    {fireIntensity === 'intense' && (
-                      <>
-                        <div className="absolute -top-2 -left-2 w-4 h-4 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
-                        <div className="absolute -top-1 -right-3 w-3 h-3 bg-blue-300 rounded-full animate-bounce delay-75 opacity-40"></div>
-                        <div className="absolute -bottom-2 -left-3 w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-150 opacity-50"></div>
-                        <div className="absolute -bottom-1 -right-2 w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-300 opacity-60"></div>
-                      </>
+                    {/* Subtle blue fire effect - only glow at score 10 */}
+                    {shouldGlow && (
+                      <div className="absolute inset-0 rounded-2xl transition-all duration-500 group-hover:scale-105 shadow-[0_0_20px_#3b82f6,0_0_40px_#3b82f6,inset_0_0_15px_#3b82f6] bg-gradient-to-r from-primary/10 via-blue-500/20 to-primary/10"></div>
                     )}
                     
                     {/* Main Card */}
-                    <div className={`relative px-6 py-5 rounded-2xl border-2 transition-all duration-300 group-hover:border-blue-400 ${
-                      fireIntensity === 'intense' 
-                        ? 'bg-gradient-to-br from-primary/95 to-blue-600/95 border-blue-400 text-primary-foreground' 
-                        : fireIntensity === 'medium'
-                        ? 'bg-gradient-to-br from-primary/85 to-blue-500/85 border-blue-500/50 text-primary-foreground'
-                        : 'bg-gradient-to-br from-primary/75 to-blue-400/75 border-blue-600/30 text-primary-foreground'
+                    <div className={`relative px-8 py-6 rounded-2xl border transition-all duration-300 group-hover:border-blue-400/50 ${
+                      shouldGlow 
+                        ? 'bg-gradient-to-br from-primary/90 to-blue-600/90 border-blue-400 text-primary-foreground' 
+                        : 'bg-gradient-to-br from-primary/70 to-blue-500/70 border-blue-600/30 text-primary-foreground'
                     }`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                           <div className={`p-3 rounded-xl transition-all duration-300 group-hover:scale-110 ${
-                            fireIntensity === 'intense' ? 'bg-white/20 shadow-lg' : 'bg-white/15'
+                            shouldGlow ? 'bg-white/20 shadow-lg' : 'bg-white/15'
                           }`}>
                             <Icon className="h-6 w-6" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-bold mb-1">
+                            <h3 className="text-lg font-bold mb-2">
                               {domain.title.split(' ')[0]}
                             </h3>
                             <div className="flex items-center space-x-3">
-                              {/* Fire Intensity Indicator */}
-                              <div className="flex items-center space-x-1">
-                                {[1, 2, 3].map((i) => (
+                              {/* 10-level indicator using portfolio scanner colors */}
+                              <div className="flex items-center space-x-0.5">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
                                   <div 
                                     key={i}
-                                    className={`transition-all duration-300 ${
-                                      i <= (fireIntensity === 'intense' ? 3 : fireIntensity === 'medium' ? 2 : 1)
-                                        ? 'w-2 h-4 bg-orange-300 shadow-[0_0_8px_#fbbf24]'
-                                        : 'w-2 h-2 bg-white/30'
-                                    } rounded-full ${
-                                      i <= (fireIntensity === 'intense' ? 3 : fireIntensity === 'medium' ? 2 : 1) && fireIntensity === 'intense'
-                                        ? 'animate-pulse'
-                                        : ''
+                                    className={`w-1.5 h-3 rounded-full transition-all duration-300 ${
+                                      i <= opportunityScore
+                                        ? ''
+                                        : 'bg-white/20'
                                     }`}
+                                    style={{
+                                      backgroundColor: i <= opportunityScore ? getIndicatorColor(i) : undefined,
+                                      boxShadow: i <= opportunityScore && opportunityScore >= 9 ? `0 0 6px ${getIndicatorColor(i)}` : undefined
+                                    }}
                                   />
                                 ))}
                               </div>
-                              {fireIntensity === 'intense' && (
-                                <span className="text-sm font-bold text-orange-200 animate-pulse">
-                                  🔥 Priority
-                                </span>
-                              )}
                             </div>
                           </div>
                         </div>
                         
                         {/* Arrow Indicator */}
                         <div className={`transition-all duration-300 group-hover:translate-x-2 ${
-                          fireIntensity === 'intense' ? 'text-orange-200' : 'text-white/70'
+                          shouldGlow ? 'text-blue-200' : 'text-white/70'
                         }`}>
                           <ArrowRight className="h-5 w-5" />
                         </div>

@@ -42,18 +42,34 @@ const AcademicPlanningIntelligence = () => {
   const [isPlanningDropdownOpen, setIsPlanningDropdownOpen] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [visibleSections, setVisibleSections] = useState(new Set());
+  const [sectionOpacity, setSectionOpacity] = useState<Record<string, number>>({});
 
-  // Scroll-based fade effect
+  // Scroll-based fade effect with full fade in/out
   useEffect(() => {
     const observerOptions = {
-      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-      rootMargin: '-10% 0px -10% 0px'
+      threshold: Array.from({length: 101}, (_, i) => i * 0.01), // 0 to 1 in 0.01 increments
+      rootMargin: '-5% 0px -5% 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const sectionId = entry.target.id;
-        if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+        const ratio = entry.intersectionRatio;
+        
+        // Calculate opacity based on intersection ratio
+        // Section becomes visible when 20% is in view, fully visible at 80%
+        let opacity = 0;
+        if (ratio > 0.2) {
+          opacity = Math.min(1, (ratio - 0.2) / 0.6); // Smooth transition from 20% to 80%
+        }
+        
+        setSectionOpacity(prev => ({
+          ...prev,
+          [sectionId]: opacity
+        }));
+
+        // Track visibility for other logic
+        if (ratio > 0.3) {
           setVisibleSections(prev => new Set([...prev, sectionId]));
         } else {
           setVisibleSections(prev => {
@@ -391,13 +407,13 @@ const AcademicPlanningIntelligence = () => {
       <div 
         id="academic" 
         data-scroll-section
-        className={`transition-all duration-1000 ease-out ${
-          visibleSections.has('academic') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-30 translate-y-8'
-        }`}
+        className="transition-all duration-[1500ms] ease-out transform"
+        style={{
+          opacity: sectionOpacity.academic || 0,
+          transform: `translateY(${20 * (1 - (sectionOpacity.academic || 0))}px)`
+        }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="mb-16">
             <div className="flex items-center space-x-4 mb-6">
               <div className="p-4 bg-primary/10 rounded-2xl">
@@ -483,13 +499,13 @@ const AcademicPlanningIntelligence = () => {
       <div 
         id="projects" 
         data-scroll-section
-        className={`transition-all duration-1000 ease-out ${
-          visibleSections.has('projects') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-30 translate-y-8'
-        }`}
+        className="transition-all duration-[1500ms] ease-out transform"
+        style={{
+          opacity: sectionOpacity.projects || 0,
+          transform: `translateY(${20 * (1 - (sectionOpacity.projects || 0))}px)`
+        }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="mb-16">
             <div className="flex items-center space-x-4 mb-6">
               <div className="p-4 bg-primary/10 rounded-2xl">
@@ -575,13 +591,13 @@ const AcademicPlanningIntelligence = () => {
       <div 
         id="extracurricular" 
         data-scroll-section
-        className={`transition-all duration-1000 ease-out ${
-          visibleSections.has('extracurricular') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-30 translate-y-8'
-        }`}
+        className="transition-all duration-[1500ms] ease-out transform"
+        style={{
+          opacity: sectionOpacity.extracurricular || 0,
+          transform: `translateY(${20 * (1 - (sectionOpacity.extracurricular || 0))}px)`
+        }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="mb-16">
             <div className="flex items-center space-x-4 mb-6">
               <div className="p-4 bg-primary/10 rounded-2xl">
@@ -667,13 +683,13 @@ const AcademicPlanningIntelligence = () => {
       <div 
         id="skills" 
         data-scroll-section
-        className={`transition-all duration-1000 ease-out ${
-          visibleSections.has('skills') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-30 translate-y-8'
-        }`}
+        className="transition-all duration-[1500ms] ease-out transform"
+        style={{
+          opacity: sectionOpacity.skills || 0,
+          transform: `translateY(${20 * (1 - (sectionOpacity.skills || 0))}px)`
+        }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="mb-16">
             <div className="flex items-center space-x-4 mb-6">
               <div className="p-4 bg-primary/10 rounded-2xl">

@@ -43,6 +43,20 @@ const AcademicPlanningIntelligence = () => {
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [visibleSections, setVisibleSections] = useState(new Set());
   const [sectionOpacity, setSectionOpacity] = useState<Record<string, number>>({});
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Scroll progress tracking for background gradient
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = Math.min(scrolled / maxScroll, 1);
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Scroll-based fade effect with full fade in/out
   useEffect(() => {
@@ -87,6 +101,41 @@ const AcademicPlanningIntelligence = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  // Dynamic background gradient based on scroll progress
+  const getBackgroundGradient = () => {
+    const progress = scrollProgress;
+    
+    if (progress < 0.25) {
+      // Hero to Academic (blue to light blue)
+      const localProgress = progress / 0.25;
+      return `linear-gradient(135deg, 
+        hsl(${209 + localProgress * 10}, ${52 + localProgress * 10}%, ${25 + localProgress * 15}%) 0%, 
+        hsl(${205 + localProgress * 15}, ${17 + localProgress * 20}%, ${42 + localProgress * 20}%) 50%,
+        hsl(${210 + localProgress * 20}, ${11 + localProgress * 30}%, ${91 - localProgress * 10}%) 100%)`;
+    } else if (progress < 0.5) {
+      // Academic to Projects (blue to yellow)
+      const localProgress = (progress - 0.25) / 0.25;
+      return `linear-gradient(135deg, 
+        hsl(${219 - localProgress * 174}, ${62 - localProgress * 17}%, ${40 + localProgress * 20}%) 0%, 
+        hsl(${220 - localProgress * 175}, ${37 + localProgress * 53}%, ${62 - localProgress * 7}%) 50%,
+        hsl(${230 - localProgress * 185}, ${41 + localProgress * 49}%, ${81 - localProgress * 21}%) 100%)`;
+    } else if (progress < 0.75) {
+      // Projects to Extracurricular (yellow to green)
+      const localProgress = (progress - 0.5) / 0.25;
+      return `linear-gradient(135deg, 
+        hsl(${45 + localProgress * 75}, ${90 - localProgress * 5}%, ${60 + localProgress * 5}%) 0%, 
+        hsl(${90 + localProgress * 30}, ${90 - localProgress * 5}%, ${55 + localProgress * 5}%) 50%,
+        hsl(${135 + localProgress * 15}, ${90 - localProgress * 10}%, ${60 + localProgress * 20}%) 100%)`;
+    } else {
+      // Extracurricular to Skills (green to purple)
+      const localProgress = (progress - 0.75) / 0.25;
+      return `linear-gradient(135deg, 
+        hsl(${120 + localProgress * 150}, ${85 - localProgress * 20}%, ${65 - localProgress * 10}%) 0%, 
+        hsl(${150 + localProgress * 120}, ${85 - localProgress * 20}%, ${60 - localProgress * 10}%) 50%,
+        hsl(${180 + localProgress * 90}, ${80 - localProgress * 15}%, ${70 - localProgress * 15}%) 100%)`;
+    }
+  };
 
   // Hard coded strategic domain data representing the Next Moves Engine's five core areas
   const strategicDomains = [
@@ -173,7 +222,7 @@ const AcademicPlanningIntelligence = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen transition-all duration-1000 ease-out" style={{ background: getBackgroundGradient() }}>
       {/* Compact Navigation */}
       <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

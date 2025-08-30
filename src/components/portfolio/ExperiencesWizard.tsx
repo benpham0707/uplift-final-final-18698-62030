@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,7 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { createExperience } from '@/app/experiences/api';
+import { supabase } from '@/integrations/supabase/client';
+import { Progress } from '@/components/ui/progress';
 import { Trash2, Plus, Edit, ChevronDown } from 'lucide-react';
 
 const EXPERIENCE_TYPE = [
@@ -27,7 +28,7 @@ const TIME_COMMITMENT = [
 ] as const;
 
 interface Experience {
-  id?: string;
+  id: string;
   category: string;
   title: string;
   organization: string;
@@ -46,6 +47,7 @@ interface Experience {
 }
 
 const createEmptyExperience = (): Experience => ({
+  id: `${Date.now()}_${Math.random().toString(36).slice(2)}`,
   category: '',
   title: '',
   organization: '',
@@ -77,6 +79,82 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
   ]);
   const [saving, setSaving] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [descriptionDrafts, setDescriptionDrafts] = useState<Record<string, string>>({});
+
+  // Ensure stable IDs for any pre-existing items (after hot reloads)
+  useEffect(() => {
+    setExperiences((prev) => prev.map((e) => e?.id ? e : { ...e, id: `${Date.now()}_${Math.random().toString(36).slice(2)}` }));
+  }, []);
+
+  // Prefill from experiences_activities
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (!profile?.id) return;
+        setProfileId(profile.id);
+
+        const { data: ea } = await supabase
+          .from('experiences_activities')
+          .select('*')
+          .eq('profile_id', profile.id)
+          .maybeSingle();
+        if (!ea) return;
+
+        const flatten = (arr: any[] | null | undefined) => Array.isArray(arr) ? arr : [];
+        const toExp = (item: any, category: string): Experience => ({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2)}`,
+          category,
+          title: item.title || '',
+          organization: item.organization || '',
+          startDate: item.start_date || '',
+          endDate: item.end_date || '',
+          isOngoing: Boolean(item.is_ongoing),
+          timeCommitment: item.time_commitment || '',
+          totalHours: item.total_hours?.toString?.() || '',
+          description: item.description || '',
+          responsibilities: item.responsibilities || [],
+          achievements: item.achievements || [],
+          skills: item.skills || item.skills_demonstrated?.map?.((s: any) => s.name) || [],
+          verificationUrl: item.verification_url || '',
+          supervisorName: item.supervisor_name || '',
+          canContact: Boolean(item.can_contact),
+        });
+
+        const merged: Experience[] = [
+          ...flatten(ea.work_experiences).map((i: any) => toExp(i, 'work')),
+          ...flatten(ea.volunteer_service).map((i: any) => toExp(i, 'volunteer')),
+          ...flatten(ea.extracurriculars).map((i: any) => toExp(i, 'school_activity')),
+          ...flatten(ea.personal_projects).map((i: any) => toExp(i, 'project')),
+        ];
+
+        const padded = [...merged];
+        while (padded.length < 3) padded.push(createEmptyExperience());
+        setExperiences(padded);
+        // seed drafts from loaded data
+        const seed: Record<string, string> = {};
+        padded.forEach((e) => { if (e.id) seed[e.id] = e.description; });
+        setDescriptionDrafts(seed);
+      } catch {
+        // ignore prefill errors
+      }
+    })();
+  }, []);
+
+  const progress = useMemo(() => {
+    const valid = experiences.filter(exp => 
+      exp.category && exp.title.trim().length >= 2 && exp.description.trim().length >= 10
+    );
+    const percent = Math.min(100, Math.round((valid.length / 3) * 100));
+    return percent;
+  }, [experiences]);
 
   const addExperience = () => {
     setExperiences([...experiences, createEmptyExperience()]);
@@ -90,9 +168,11 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
   };
 
   const updateExperience = (index: number, field: keyof Experience, value: any) => {
-    const updated = [...experiences];
-    updated[index] = { ...updated[index], [field]: value };
-    setExperiences(updated);
+    setExperiences((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value } as Experience;
+      return copy;
+    });
   };
 
   const addChip = (index: number, field: 'responsibilities' | 'achievements' | 'skills', value: string) => {
@@ -108,52 +188,94 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
     updateExperience(index, field, current.filter((c) => c !== value));
   };
 
+  const buildPayload = () => {
+    const mapItem = (exp: Experience) => ({
+      title: exp.title.trim(),
+      organization: exp.organization.trim() || null,
+      start_date: exp.startDate || null,
+      end_date: exp.isOngoing ? null : (exp.endDate || null),
+      is_ongoing: Boolean(exp.isOngoing),
+      time_commitment: exp.timeCommitment || null,
+      total_hours: exp.totalHours ? Number(exp.totalHours) : null,
+      description: (descriptionDrafts[exp.id] ?? exp.description).trim(),
+      responsibilities: exp.responsibilities || [],
+      achievements: exp.achievements || [],
+      skills: exp.skills || [],
+      verification_url: exp.verificationUrl || null,
+      supervisor_name: exp.supervisorName || null,
+      can_contact: Boolean(exp.canContact),
+    });
+
+    const work = experiences.filter(e => e.category === 'work' && e.title && e.description).map(mapItem);
+    const volunteer = experiences.filter(e => e.category === 'volunteer' && e.title && e.description).map(mapItem);
+    const school = experiences.filter(e => e.category === 'school_activity' && e.title && e.description).map(mapItem);
+    const projects = experiences.filter(e => e.category === 'project' && e.title && e.description).map(mapItem);
+
+    return { work, volunteer, school, projects };
+  };
+
+  const upsertExperiences = async (isFinal: boolean) => {
+    if (!profileId) throw new Error('Profile not loaded');
+    const { work, volunteer, school, projects } = buildPayload();
+
+    const row = {
+      profile_id: profileId,
+      work_experiences: work,
+      volunteer_service: volunteer,
+      extracurriculars: school,
+      personal_projects: projects,
+    } as any;
+
+    const { data: existing, error: fetchErr } = await supabase
+      .from('experiences_activities')
+      .select('id')
+      .eq('profile_id', profileId)
+      .maybeSingle();
+    if (fetchErr) throw fetchErr;
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from('experiences_activities')
+        .update(row)
+        .eq('id', existing.id as string);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from('experiences_activities')
+        .insert(row);
+      if (error) throw error;
+    }
+
+    const bump = isFinal ? 0.75 : 0.45;
+    await supabase.from('profiles').update({ completion_score: bump }).eq('id', profileId);
+  };
+
   const saveAllExperiences = async () => {
     try {
       setSaving(true);
       const validExperiences = experiences.filter(exp => 
         exp.category && exp.title.trim().length >= 2 && exp.description.trim().length >= 10
       );
-
       if (validExperiences.length < 3) {
-        toast({ 
-          title: 'Minimum requirement not met', 
-          description: 'Please complete at least 3 experiences before saving.' 
-        });
+        toast({ title: 'Minimum requirement not met', description: 'Please complete at least 3 experiences before saving.' });
         return;
       }
 
-      const savedIds = [];
-      for (const exp of validExperiences) {
-        const payload = {
-          category: exp.category,
-          title: exp.title.trim(),
-          organization: exp.organization.trim() || 'Self',
-          startDate: exp.startDate,
-          endDate: exp.isOngoing ? null : exp.endDate || null,
-          isOngoing: exp.isOngoing,
-          timeCommitment: exp.timeCommitment,
-          totalHours: exp.totalHours ? Number(exp.totalHours) : undefined,
-          description: exp.description.trim(),
-          responsibilities: exp.responsibilities,
-          achievements: exp.achievements,
-          challenges: [],
-          metrics: {},
-          skills: exp.skills,
-          verificationUrl: exp.verificationUrl,
-          supervisorName: exp.supervisorName || undefined,
-          canContact: exp.canContact,
-        };
+      await upsertExperiences(true);
+      toast({ title: 'Experiences saved!', description: 'Your experiences have been recorded.' });
+      if (onClose) onClose();
+    } catch (e: any) {
+      toast({ title: 'Save failed', description: e?.message || 'Please try again.' });
+    } finally {
+      setSaving(false);
+    }
+  };
 
-        const res = await createExperience(payload as any);
-        savedIds.push(res.id);
-      }
-
-      toast({ 
-        title: `${savedIds.length} experiences saved!`, 
-        description: 'Your experiences have been added to your portfolio.' 
-      });
-      if (onAdded && savedIds.length > 0) onAdded({ id: savedIds[0] });
+  const saveAndQuit = async () => {
+    try {
+      setSaving(true);
+      await upsertExperiences(false);
+      toast({ title: 'Progress saved', description: 'You can come back anytime.' });
       if (onClose) onClose();
     } catch (e: any) {
       toast({ title: 'Save failed', description: e?.message || 'Please try again.' });
@@ -176,6 +298,16 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
   const ExperienceCard = ({ experience, index }: { experience: Experience; index: number }) => {
     const isExpanded = expandedIndex === index;
     const isComplete = isExperienceComplete(experience);
+    const descValue = descriptionDrafts[experience.id] ?? experience.description;
+    const [localTitle, setLocalTitle] = useState(experience.title);
+    const [localOrg, setLocalOrg] = useState(experience.organization);
+    const [localTotalHours, setLocalTotalHours] = useState(experience.totalHours);
+
+    useEffect(() => {
+      setLocalTitle(experience.title);
+      setLocalOrg(experience.organization);
+      setLocalTotalHours(experience.totalHours);
+    }, [experience.id]);
     
     return (
       <Card className={`transition-all duration-200 ${isExpanded ? 'border-primary shadow-lg' : 'shadow-medium hover:shadow-lg'}`}>
@@ -267,7 +399,13 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setExpandedIndex(null)}
+                    onClick={() => {
+                      const d = descValue;
+                      if (typeof d === 'string') {
+                        updateExperience(index, 'description', d);
+                      }
+                      setExpandedIndex(null);
+                    }}
                   >
                     Collapse
                   </Button>
@@ -310,10 +448,13 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
 
                     {/* Title/Role */}
                     <div>
-                      <Label className="text-sm font-medium">Title/Role *</Label>
+                      <Label className="text-sm font-medium" htmlFor={`title-${experience.id}`}>Title/Role *</Label>
                       <Input 
-                        value={experience.title}
-                        onChange={(e) => updateExperience(index, 'title', e.target.value)}
+                        id={`title-${experience.id}`}
+                        name={`title-${experience.id}`}
+                        value={localTitle}
+                        onChange={(e) => setLocalTitle(e.target.value)}
+                        onBlur={() => updateExperience(index, 'title', localTitle)}
                         placeholder="e.g., Team Captain, Volunteer Coordinator"
                         className="mt-2"
                       />
@@ -321,10 +462,13 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
 
                     {/* Organization */}
                     <div>
-                      <Label className="text-sm font-medium">Organization</Label>
+                      <Label className="text-sm font-medium" htmlFor={`org-${experience.id}`}>Organization</Label>
                       <Input 
-                        value={experience.organization}
-                        onChange={(e) => updateExperience(index, 'organization', e.target.value)}
+                        id={`org-${experience.id}`}
+                        name={`org-${experience.id}`}
+                        value={localOrg}
+                        onChange={(e) => setLocalOrg(e.target.value)}
+                        onBlur={() => updateExperience(index, 'organization', localOrg)}
                         placeholder="e.g., National Honor Society, Local Food Bank"
                         className="mt-2"
                       />
@@ -333,18 +477,22 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-sm font-medium">Start Date</Label>
+                        <Label className="text-sm font-medium" htmlFor={`start-${experience.id}`}>Start Date</Label>
                         <Input 
                           type="date"
+                          id={`start-${experience.id}`}
+                          name={`start-${experience.id}`}
                           value={experience.startDate}
                           onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
                           className="mt-2"
                         />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium">End Date</Label>
+                        <Label className="text-sm font-medium" htmlFor={`end-${experience.id}`}>End Date</Label>
                         <Input 
                           type="date"
+                          id={`end-${experience.id}`}
+                          name={`end-${experience.id}`}
                           value={experience.endDate}
                           disabled={experience.isOngoing}
                           onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
@@ -382,11 +530,14 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
 
                     {/* Total Hours */}
                     <div>
-                      <Label className="text-sm font-medium">Total Hours (approximate)</Label>
+                      <Label className="text-sm font-medium" htmlFor={`hours-${experience.id}`}>Total Hours (approximate)</Label>
                       <Input 
                         type="number"
-                        value={experience.totalHours}
-                        onChange={(e) => updateExperience(index, 'totalHours', e.target.value)}
+                        id={`hours-${experience.id}`}
+                        name={`hours-${experience.id}`}
+                        value={localTotalHours}
+                        onChange={(e) => setLocalTotalHours(e.target.value)}
+                        onBlur={() => updateExperience(index, 'totalHours', localTotalHours)}
                         placeholder="e.g., 100"
                         className="mt-2"
                       />
@@ -397,10 +548,14 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                   <div className="space-y-6">
                     {/* Description */}
                     <div>
-                      <Label className="text-sm font-medium">Description *</Label>
+                      <Label className="text-sm font-medium" htmlFor={`desc-${experience.id}`}>Description *</Label>
                       <Textarea 
-                        value={experience.description}
-                        onChange={(e) => updateExperience(index, 'description', e.target.value)}
+                        key={`desc_${experience.id}`}
+                        id={`desc-${experience.id}`}
+                        name={`desc-${experience.id}`}
+                        defaultValue={descValue}
+                        onChange={(e) => setDescriptionDrafts((prev) => ({ ...prev, [experience.id]: e.target.value }))}
+                        onBlur={() => updateExperience(index, 'description', descriptionDrafts[experience.id] ?? experience.description)}
                         placeholder="Describe what you did, your responsibilities, and impact..."
                         className="mt-2 min-h-[150px] resize-none"
                       />
@@ -492,8 +647,10 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
 
                     {/* Contact Information */}
                     <div>
-                      <Label className="text-sm font-medium">Supervisor/Contact</Label>
+                      <Label className="text-sm font-medium" htmlFor={`supervisor-${experience.id}`}>Supervisor/Contact</Label>
                       <Input 
+                        id={`supervisor-${experience.id}`}
+                        name={`supervisor-${experience.id}`}
                         value={experience.supervisorName}
                         onChange={(e) => updateExperience(index, 'supervisorName', e.target.value)}
                         placeholder="Name (optional)"
@@ -502,8 +659,10 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                     </div>
 
                     <div>
-                      <Label className="text-sm font-medium">Verification Link</Label>
+                      <Label className="text-sm font-medium" htmlFor={`verify-${experience.id}`}>Verification Link</Label>
                       <Input 
+                        id={`verify-${experience.id}`}
+                        name={`verify-${experience.id}`}
                         value={experience.verificationUrl}
                         onChange={(e) => updateExperience(index, 'verificationUrl', e.target.value)}
                         placeholder="https://... (optional)"
@@ -546,8 +705,8 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                 {experiences.filter(exp => isExperienceComplete(exp)).length} of {Math.max(3, experiences.length)} completed
               </span>
             </div>
-            <div className="text-xs text-muted-foreground">
-              Completion: <span className="font-medium text-primary">{getCompletionRate()}%</span>
+            <div className="mt-1">
+              <Progress value={progress} className="h-2 w-48 ml-auto" />
             </div>
           </div>
         </div>
@@ -569,7 +728,7 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-6xl mx-auto space-y-4">
           {experiences.map((experience, index) => (
-            <ExperienceCard key={index} experience={experience} index={index} />
+            <ExperienceCard key={experience.id} experience={experience} index={index} />
           ))}
         </div>
       </div>
@@ -580,14 +739,23 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
           <Plus className="h-4 w-4" />
           Add Experience
         </Button>
-        
-        <Button 
-          onClick={saveAllExperiences} 
-          disabled={saving || getCompletionRate() < 100} 
-          className="min-w-[140px]"
-        >
-          {saving ? 'Saving...' : 'Save All'}
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="secondary"
+            onClick={saveAndQuit}
+            disabled={saving}
+          >
+            Save & Quit
+          </Button>
+          <Button 
+            onClick={saveAllExperiences} 
+            disabled={saving || progress < 100} 
+            className="min-w-[140px]"
+          >
+            {saving ? 'Saving...' : 'Save All'}
+          </Button>
+        </div>
       </div>
     </div>
   );

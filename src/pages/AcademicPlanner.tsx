@@ -144,100 +144,120 @@ const AcademicPlanner = () => {
   // GPA Line Chart Component
   const GPALineChart = () => {
     return (
-      <div className="space-y-4">
-        <div className="h-80">
+      <div className="space-y-6">
+        <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={gpaTimeData}
               margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 20,
+                top: 30,
+                right: 40,
+                left: 30,
+                bottom: 30,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
+              <CartesianGrid strokeDasharray="2 2" stroke="#f1f5f9" strokeWidth={1} />
               <XAxis 
                 dataKey="semester" 
-                tick={{ fontSize: 12 }}
-                axisLine={{ stroke: '#6b7280' }}
-                tickLine={{ stroke: '#6b7280' }}
+                tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
+                axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                height={50}
               />
               <YAxis 
-                domain={[2.5, 4.0]}
-                tick={{ fontSize: 12 }}
-                axisLine={{ stroke: '#6b7280' }}
-                tickLine={{ stroke: '#6b7280' }}
-                label={{ value: 'GPA', angle: -90, position: 'insideLeft' }}
+                domain={[2.4, 4.0]}
+                ticks={[2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0]}
+                tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
+                axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                label={{ 
+                  value: 'GPA', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  style: { textAnchor: 'middle', fontSize: '14px', fontWeight: '600', fill: '#475569' }
+                }}
+                width={60}
               />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                  fontSize: '14px',
+                  fontWeight: '500'
                 }}
+                labelStyle={{ color: '#334155', fontWeight: '600' }}
               />
               <Legend 
-                wrapperStyle={{ paddingTop: '20px' }}
+                wrapperStyle={{ 
+                  paddingTop: '24px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
               />
               
-              {/* Reference lines for target and school average */}
+              {/* Reference line for target GPA only */}
               <ReferenceLine 
                 y={gpaData.target} 
                 stroke="#dc2626" 
-                strokeDasharray="8 4" 
+                strokeDasharray="6 3" 
                 strokeWidth={2}
-                label={{ value: "Target GPA", position: "top", fill: "#dc2626", fontWeight: "bold" }}
-              />
-              <ReferenceLine 
-                y={gpaData.schoolAverage} 
-                stroke="#6b7280" 
-                strokeDasharray="8 4" 
-                strokeWidth={2}
-                label={{ value: "School Average", position: "top", fill: "#6b7280", fontWeight: "bold" }}
+                label={{ 
+                  value: "Target GPA", 
+                  position: "top", 
+                  fill: "#dc2626", 
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  offset: 10
+                }}
               />
               
-              {/* GPA lines */}
+              {/* GPA lines with professional styling */}
               <Line 
                 type="monotone" 
                 dataKey="yourGPA" 
-                stroke="#2563eb" 
-                strokeWidth={3}
-                dot={{ fill: '#2563eb', strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 7, stroke: '#2563eb', strokeWidth: 2 }}
+                stroke="#1e40af" 
+                strokeWidth={4}
+                dot={{ fill: '#1e40af', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
+                activeDot={{ r: 8, stroke: '#1e40af', strokeWidth: 3, fill: '#ffffff' }}
                 name="Your GPA"
               />
               <Line 
                 type="monotone" 
                 dataKey="majorAverage" 
-                stroke="#f59e0b" 
-                strokeWidth={3}
-                dot={{ fill: '#f59e0b', strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 7, stroke: '#f59e0b', strokeWidth: 2 }}
+                stroke="#d97706" 
+                strokeWidth={4}
+                dot={{ fill: '#d97706', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
+                activeDot={{ r: 8, stroke: '#d97706', strokeWidth: 3, fill: '#ffffff' }}
                 name="Major Average"
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
         
-        {/* Summary stats */}
-        <div className="grid grid-cols-4 gap-4 mt-6">
-          <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="text-xl font-bold text-blue-600">{gpaData.current}</div>
-            <div className="text-xs text-blue-700">Current GPA</div>
+        {/* Compact summary stats */}
+        <div className="flex justify-center gap-8">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-blue-700 rounded-full"></div>
+            <div className="text-sm">
+              <span className="font-semibold text-slate-700">Your GPA:</span>
+              <span className="ml-1 font-bold text-blue-700">{gpaData.current}</span>
+            </div>
           </div>
-          <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <div className="text-xl font-bold text-amber-600">{gpaData.majorRecommended}</div>
-            <div className="text-xs text-amber-700">Major Average</div>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-amber-600 rounded-full"></div>
+            <div className="text-sm">
+              <span className="font-semibold text-slate-700">Major Average:</span>
+              <span className="ml-1 font-bold text-amber-600">{gpaData.majorRecommended}</span>
+            </div>
           </div>
-          <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
-            <div className="text-xl font-bold text-red-600">{gpaData.target}</div>
-            <div className="text-xs text-red-700">Target GPA</div>
-          </div>
-          <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-xl font-bold text-gray-600">{gpaData.schoolAverage}</div>
-            <div className="text-xs text-gray-700">School Average</div>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-red-600 rounded-full"></div>
+            <div className="text-sm">
+              <span className="font-semibold text-slate-700">Target:</span>
+              <span className="ml-1 font-bold text-red-600">{gpaData.target}</span>
+            </div>
           </div>
         </div>
       </div>

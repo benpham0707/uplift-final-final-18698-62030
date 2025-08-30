@@ -393,72 +393,120 @@ const PortfolioScanner = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
             <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.academicExcellence.score).boxStyle}
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
+              style={{
+                ...getScoreStyles(rubricScores.academicExcellence.score).boxStyle,
+                borderColor: getScoreStyles(rubricScores.academicExcellence.score).boxStyle.borderColor,
+                boxShadow: getScoreStyles(rubricScores.academicExcellence.score).boxStyle.boxShadow
+              }}
             >
               <div 
                 className="text-lg font-semibold transition-colors duration-300" 
-                style={getScoreStyles(rubricScores.academicExcellence.score).textStyle}
+                style={{
+                  ...getScoreStyles(rubricScores.academicExcellence.score).textStyle,
+                  color: getScoreStyles(rubricScores.academicExcellence.score).textStyle.color,
+                  textShadow: getScoreStyles(rubricScores.academicExcellence.score).textStyle.textShadow
+                }}
               >
                 {rubricScores.academicExcellence.score}
               </div>
               <div className="text-xs opacity-75">Academic</div>
             </div>
             <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.leadershipPotential.score).boxStyle}
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
+              style={{
+                ...getScoreStyles(rubricScores.leadershipPotential.score).boxStyle,
+                borderColor: getScoreStyles(rubricScores.leadershipPotential.score).boxStyle.borderColor,
+                boxShadow: getScoreStyles(rubricScores.leadershipPotential.score).boxStyle.boxShadow
+              }}
             >
               <div 
                 className="text-lg font-semibold transition-colors duration-300" 
-                style={getScoreStyles(rubricScores.leadershipPotential.score).textStyle}
+                style={{
+                  ...getScoreStyles(rubricScores.leadershipPotential.score).textStyle,
+                  color: getScoreStyles(rubricScores.leadershipPotential.score).textStyle.color,
+                  textShadow: getScoreStyles(rubricScores.leadershipPotential.score).textStyle.textShadow
+                }}
               >
                 {rubricScores.leadershipPotential.score}
               </div>
               <div className="text-xs opacity-75">Leadership</div>
             </div>
             <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.personalGrowth.score).boxStyle}
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
+              style={{
+                ...getScoreStyles(rubricScores.personalGrowth.score).boxStyle,
+                borderColor: getScoreStyles(rubricScores.personalGrowth.score).boxStyle.borderColor,
+                boxShadow: getScoreStyles(rubricScores.personalGrowth.score).boxStyle.boxShadow
+              }}
             >
               <div 
                 className="text-lg font-semibold transition-colors duration-300" 
-                style={getScoreStyles(rubricScores.personalGrowth.score).textStyle}
+                style={{
+                  ...getScoreStyles(rubricScores.personalGrowth.score).textStyle,
+                  color: getScoreStyles(rubricScores.personalGrowth.score).textStyle.color,
+                  textShadow: getScoreStyles(rubricScores.personalGrowth.score).textStyle.textShadow
+                }}
               >
                 {rubricScores.personalGrowth.score}
               </div>
               <div className="text-xs opacity-75">Growth</div>
             </div>
             <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.communityImpact.score).boxStyle}
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
+              style={{
+                ...getScoreStyles(rubricScores.communityImpact.score).boxStyle,
+                borderColor: getScoreStyles(rubricScores.communityImpact.score).boxStyle.borderColor,
+                boxShadow: getScoreStyles(rubricScores.communityImpact.score).boxStyle.boxShadow
+              }}
             >
               <div 
                 className="text-lg font-semibold transition-colors duration-300" 
-                style={getScoreStyles(rubricScores.communityImpact.score).textStyle}
+                style={{
+                  ...getScoreStyles(rubricScores.communityImpact.score).textStyle,
+                  color: getScoreStyles(rubricScores.communityImpact.score).textStyle.color,
+                  textShadow: getScoreStyles(rubricScores.communityImpact.score).textStyle.textShadow
+                }}
               >
                 {rubricScores.communityImpact.score}
               </div>
               <div className="text-xs opacity-75">Community</div>
             </div>
             <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.uniqueValue.score).boxStyle}
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
+              style={{
+                ...getScoreStyles(rubricScores.uniqueValue.score).boxStyle,
+                borderColor: getScoreStyles(rubricScores.uniqueValue.score).boxStyle.borderColor,
+                boxShadow: getScoreStyles(rubricScores.uniqueValue.score).boxStyle.boxShadow
+              }}
             >
               <div 
                 className="text-lg font-semibold transition-colors duration-300" 
-                style={getScoreStyles(rubricScores.uniqueValue.score).textStyle}
+                style={{
+                  ...getScoreStyles(rubricScores.uniqueValue.score).textStyle,
+                  color: getScoreStyles(rubricScores.uniqueValue.score).textStyle.color,
+                  textShadow: getScoreStyles(rubricScores.uniqueValue.score).textStyle.textShadow
+                }}
               >
                 {rubricScores.uniqueValue.score}
               </div>
               <div className="text-xs opacity-75">Uniqueness</div>
             </div>
             <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
-              style={getScoreStyles(rubricScores.futureReadiness.score).boxStyle}
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
+              style={{
+                ...getScoreStyles(rubricScores.futureReadiness.score).boxStyle,
+                borderColor: getScoreStyles(rubricScores.futureReadiness.score).boxStyle.borderColor,
+                boxShadow: getScoreStyles(rubricScores.futureReadiness.score).boxStyle.boxShadow
+              }}
             >
               <div 
                 className="text-lg font-semibold transition-colors duration-300" 
-                style={getScoreStyles(rubricScores.futureReadiness.score).textStyle}
+                style={{
+                  ...getScoreStyles(rubricScores.futureReadiness.score).textStyle,
+                  color: getScoreStyles(rubricScores.futureReadiness.score).textStyle.color,
+                  textShadow: getScoreStyles(rubricScores.futureReadiness.score).textStyle.textShadow
+                }}
               >
                 {rubricScores.futureReadiness.score}
               </div>

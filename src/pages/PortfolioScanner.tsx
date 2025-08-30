@@ -86,66 +86,81 @@ const PortfolioScanner = () => {
 
   // Function to get score styling based on value
   const getScoreStyles = (score: number) => {
+    let textColor = '';
+    let borderColor = '';
+    let boxShadow = '';
+    let textShadow = '';
+    
     if (score >= 9.8) {
-      // Special effects for near-perfect scores - background AND text effects, fully opaque
-      return {
-        boxStyle: {
-          background: 'linear-gradient(135deg, hsl(220, 100%, 50%), hsl(240, 100%, 70%))',
-          boxShadow: '0 0 25px rgba(59, 130, 246, 1), 0 0 50px rgba(59, 130, 246, 0.8), 0 0 75px rgba(59, 130, 246, 0.6)',
-          border: '2px solid hsl(220, 100%, 60%)'
-        },
-        textStyle: {
-          color: 'white',
-          textShadow: '0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(255, 255, 255, 0.8)'
-        }
-      };
+      // Near-perfect scores - strongest glow but still balanced
+      textColor = 'hsl(220, 100%, 65%)';
+      borderColor = 'hsl(220, 100%, 60%)';
+      boxShadow = '0 0 8px hsl(220, 100%, 60% / 0.4), 0 0 16px hsl(220, 100%, 60% / 0.2)';
+      textShadow = '0 0 8px hsl(220, 100%, 60% / 0.6)';
+    } else if (score >= 9.0) {
+      // High scores - blue glow
+      const intensity = (score - 9) / 0.8;
+      const hue = 220 + (intensity * 20);
+      const saturation = 90 + (intensity * 10);
+      const lightness = 55 + (intensity * 10);
+      textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      borderColor = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+      boxShadow = `0 0 6px hsl(${hue}, ${saturation}%, ${lightness}% / 0.3), 0 0 12px hsl(${hue}, ${saturation}%, ${lightness}% / 0.15)`;
+      textShadow = `0 0 6px hsl(${hue}, ${saturation}%, ${lightness}% / 0.5)`;
+    } else if (score >= 7.0) {
+      // Good scores - green to blue transition
+      const progress = (score - 7) / 2;
+      const hue = 120 + (progress * 100);
+      const saturation = 70 + (progress * 20);
+      const lightness = 50 + (progress * 15);
+      textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      borderColor = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+      boxShadow = `0 0 5px hsl(${hue}, ${saturation}%, ${lightness}% / 0.25), 0 0 10px hsl(${hue}, ${saturation}%, ${lightness}% / 0.12)`;
+      textShadow = `0 0 5px hsl(${hue}, ${saturation}%, ${lightness}% / 0.4)`;
+    } else if (score >= 5.0) {
+      // Moderate scores - yellow/orange glow
+      const progress = (score - 5) / 2;
+      const hue = 35 + (progress * 25);
+      const saturation = 85 + (progress * 10);
+      const lightness = 50 + (progress * 10);
+      textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      borderColor = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+      boxShadow = `0 0 4px hsl(${hue}, ${saturation}%, ${lightness}% / 0.25), 0 0 8px hsl(${hue}, ${saturation}%, ${lightness}% / 0.12)`;
+      textShadow = `0 0 4px hsl(${hue}, ${saturation}%, ${lightness}% / 0.4)`;
+    } else if (score >= 3.0) {
+      // Low-moderate scores - orange glow
+      const progress = (score - 3) / 2;
+      const hue = 15 + (progress * 20);
+      const saturation = 85 + (progress * 10);
+      const lightness = 50 + (progress * 10);
+      textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      borderColor = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+      boxShadow = `0 0 4px hsl(${hue}, ${saturation}%, ${lightness}% / 0.2), 0 0 8px hsl(${hue}, ${saturation}%, ${lightness}% / 0.1)`;
+      textShadow = `0 0 4px hsl(${hue}, ${saturation}%, ${lightness}% / 0.35)`;
     } else {
-      // For all other scores, keep box background as white/10 and only change text color
-      let textColor = '';
-      
-      if (score >= 9.0) {
-        // Glowing blue for 9-9.8
-        const intensity = (score - 9) / 0.8; // 0 to 1
-        const hue = 220 + (intensity * 20); // 220 to 240
-        const saturation = 90 + (intensity * 10); // 90% to 100%
-        const lightness = 60 + (intensity * 10); // 60% to 70%
-        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      } else if (score >= 7.0) {
-        // Green transitioning to blue for 7-9
-        const progress = (score - 7) / 2; // 0 to 1
-        const hue = 120 - (progress * 100); // 120 (green) to 220 (blue)
-        const saturation = 70 + (progress * 20); // 70% to 90%
-        const lightness = 50 + (progress * 20); // 50% to 70%
-        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      } else if (score >= 5.0) {
-        // Yellow transitioning from orange for 5-7
-        const progress = (score - 5) / 2; // 0 to 1
-        const hue = 35 + (progress * 25); // 35 (orange) to 60 (yellow)
-        const saturation = 85 + (progress * 10); // 85% to 95%
-        const lightness = 45 + (progress * 10); // 45% to 55%
-        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      } else if (score >= 3.0) {
-        // Orange transitioning from red for 3-5
-        const progress = (score - 3) / 2; // 0 to 1
-        const hue = 0 + (progress * 35); // 0 (red) to 35 (orange)
-        const saturation = 85 + (progress * 10); // 85% to 95%
-        const lightness = 45 + (progress * 10); // 45% to 55%
-        textColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      } else {
-        // Red for 0-3
-        const progress = score / 3; // 0 to 1
-        const saturation = 80 + (progress * 15); // 80% to 95%
-        const lightness = 40 + (progress * 15); // 40% to 55%
-        textColor = `hsl(0, ${saturation}%, ${lightness}%)`;
-      }
-
-      return {
-        boxStyle: {}, // Keep default box styling
-        textStyle: {
-          color: textColor
-        }
-      };
+      // Low scores - red glow
+      const progress = score / 3;
+      const saturation = 80 + (progress * 15);
+      const lightness = 45 + (progress * 15);
+      textColor = `hsl(0, ${saturation}%, ${lightness}%)`;
+      borderColor = `hsl(0, ${saturation}%, ${lightness - 10}%)`;
+      boxShadow = `0 0 3px hsl(0, ${saturation}%, ${lightness}% / 0.2), 0 0 6px hsl(0, ${saturation}%, ${lightness}% / 0.1)`;
+      textShadow = `0 0 3px hsl(0, ${saturation}%, ${lightness}% / 0.3)`;
     }
+
+    return {
+      boxStyle: {
+        borderColor: borderColor,
+        boxShadow: boxShadow,
+        borderWidth: '1.5px',
+        borderStyle: 'solid'
+      },
+      textStyle: {
+        color: textColor,
+        textShadow: textShadow,
+        fontWeight: '600'
+      }
+    };
   };
 
   // Guard route and load profile state from Supabase

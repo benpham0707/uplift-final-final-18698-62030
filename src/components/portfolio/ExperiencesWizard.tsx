@@ -342,8 +342,10 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
       setLocalTotalHours(experience.totalHours);
       setLocalSupervisor(experience.supervisorName);
       setLocalVerification(experience.verificationUrl);
-      setLocalDescription(descriptionDrafts[experience.id] ?? experience.description);
-    }, [experience.id, descriptionDrafts]);
+      // Only set description from drafts on mount, not on every draft change
+      const initialDesc = descriptionDrafts[experience.id] ?? experience.description;
+      setLocalDescription(initialDesc);
+    }, [experience.id]);
     
     return (
       <Card className={`transition-all duration-200 ${isExpanded ? 'border-primary shadow-lg' : 'shadow-medium hover:shadow-lg'}`}>

@@ -328,6 +328,8 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
     const descValue = descriptionDrafts[experience.id] ?? experience.description;
     const [localTitle, setLocalTitle] = useState(experience.title);
     const [localOrg, setLocalOrg] = useState(experience.organization);
+    const [localStartDate, setLocalStartDate] = useState(experience.startDate);
+    const [localEndDate, setLocalEndDate] = useState(experience.endDate);
     const [localTotalHours, setLocalTotalHours] = useState(experience.totalHours);
     const [localSupervisor, setLocalSupervisor] = useState(experience.supervisorName);
     const [localVerification, setLocalVerification] = useState(experience.verificationUrl);
@@ -335,6 +337,8 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
     useEffect(() => {
       setLocalTitle(experience.title);
       setLocalOrg(experience.organization);
+      setLocalStartDate(experience.startDate);
+      setLocalEndDate(experience.endDate);
       setLocalTotalHours(experience.totalHours);
       setLocalSupervisor(experience.supervisorName);
       setLocalVerification(experience.verificationUrl);
@@ -433,6 +437,11 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                     onClick={() => {
                       // Save all current field values to experience
                       const currentDesc = descriptionDrafts[experience.id] ?? experience.description;
+                      updateExperience(index, 'title', localTitle);
+                      updateExperience(index, 'organization', localOrg);
+                      updateExperience(index, 'startDate', localStartDate);
+                      updateExperience(index, 'endDate', localEndDate);
+                      updateExperience(index, 'totalHours', localTotalHours);
                       updateExperience(index, 'description', currentDesc);
                       updateExperience(index, 'supervisorName', localSupervisor);
                       updateExperience(index, 'verificationUrl', localVerification);
@@ -514,8 +523,9 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                           type="date"
                           id={`start-${experience.id}`}
                           name={`start-${experience.id}`}
-                          value={experience.startDate}
-                          onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
+                          value={localStartDate}
+                          onChange={(e) => setLocalStartDate(e.target.value)}
+                          onBlur={() => updateExperience(index, 'startDate', localStartDate)}
                           className="mt-2"
                         />
                       </div>
@@ -525,9 +535,10 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                           type="date"
                           id={`end-${experience.id}`}
                           name={`end-${experience.id}`}
-                          value={experience.endDate}
+                          value={localEndDate}
                           disabled={experience.isOngoing}
-                          onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
+                          onChange={(e) => setLocalEndDate(e.target.value)}
+                          onBlur={() => updateExperience(index, 'endDate', localEndDate)}
                           className="mt-2"
                         />
                       </div>

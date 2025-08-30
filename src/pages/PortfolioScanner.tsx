@@ -393,7 +393,7 @@ const PortfolioScanner = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
             <div 
-              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
               style={getScoreStyles(rubricScores.academicExcellence.score).boxStyle}
             >
               <div 
@@ -405,7 +405,7 @@ const PortfolioScanner = () => {
               <div className="text-xs opacity-75">Academic</div>
             </div>
             <div 
-              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
               style={getScoreStyles(rubricScores.leadershipPotential.score).boxStyle}
             >
               <div 
@@ -417,7 +417,7 @@ const PortfolioScanner = () => {
               <div className="text-xs opacity-75">Leadership</div>
             </div>
             <div 
-              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
               style={getScoreStyles(rubricScores.personalGrowth.score).boxStyle}
             >
               <div 
@@ -429,7 +429,7 @@ const PortfolioScanner = () => {
               <div className="text-xs opacity-75">Growth</div>
             </div>
             <div 
-              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
               style={getScoreStyles(rubricScores.communityImpact.score).boxStyle}
             >
               <div 
@@ -441,7 +441,7 @@ const PortfolioScanner = () => {
               <div className="text-xs opacity-75">Community</div>
             </div>
             <div 
-              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
               style={getScoreStyles(rubricScores.uniqueValue.score).boxStyle}
             >
               <div 
@@ -453,7 +453,7 @@ const PortfolioScanner = () => {
               <div className="text-xs opacity-75">Uniqueness</div>
             </div>
             <div 
-              className="bg-white/10 rounded-lg p-3 transition-all duration-300"
+              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300"
               style={getScoreStyles(rubricScores.futureReadiness.score).boxStyle}
             >
               <div 

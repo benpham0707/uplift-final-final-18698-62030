@@ -145,15 +145,28 @@ const AcademicPlanner = () => {
       target: getPosition(gpaData.target)
     };
 
+    // Sort positions to handle overlapping labels
+    const sortedItems = [
+      { key: 'schoolAvg', position: positions.schoolAvg, label: 'School Avg', color: 'gray', gpa: gpaData.schoolAverage },
+      { key: 'current', position: positions.current, label: 'Your GPA', color: 'blue', gpa: gpaData.current },
+      { key: 'target', position: positions.target, label: 'Target', color: 'green', gpa: gpaData.target }
+    ].sort((a, b) => a.position - b.position);
+
+    // Assign alternating top/bottom positions to avoid overlap
+    const labelPositions = sortedItems.map((item, index) => {
+      const isAbove = index % 2 === 0;
+      return { ...item, isAbove };
+    });
+
     return (
       <div className="space-y-6">
         {/* Enhanced Chart */}
-        <div className="relative">
-          <div className="h-12 bg-gradient-to-r from-red-200 via-yellow-200 via-orange-200 to-green-200 rounded-lg relative overflow-hidden">
+        <div className="relative" style={{ height: '100px', marginTop: '20px', marginBottom: '20px' }}>
+          <div className="h-12 bg-gradient-to-r from-red-500 via-yellow-500 via-orange-500 to-green-500 rounded-lg relative overflow-visible" style={{ top: '30px' }}>
             {/* Grid lines */}
             <div className="absolute inset-0 flex">
               {[0, 25, 50, 75, 100].map((pos, i) => (
-                <div key={i} className="flex-1 border-r border-white/30 last:border-r-0" />
+                <div key={i} className="flex-1 border-r border-white/40 last:border-r-0" />
               ))}
             </div>
             
@@ -166,112 +179,83 @@ const AcademicPlanner = () => {
               <span>4.0</span>
             </div>
             
-            {/* Dark vertical reference lines */}
-            <div 
-              className="absolute top-0 bottom-0 w-0.5 bg-gray-800"
-              style={{ left: `${positions.schoolAvg}%`, transform: 'translateX(-50%)' }}
-            />
-            <div 
-              className="absolute top-0 bottom-0 w-0.5 bg-blue-800"
-              style={{ left: `${positions.current}%`, transform: 'translateX(-50%)' }}
-            />
-            <div 
-              className="absolute top-0 bottom-0 w-0.5 bg-green-800"
-              style={{ left: `${positions.target}%`, transform: 'translateX(-50%)' }}
-            />
-            
-            {/* Markers with enhanced styling */}
-            <div 
-              className="absolute top-1 w-4 h-4 bg-gray-500 border-2 border-white rounded-full shadow-md transition-all hover:scale-110"
-              style={{ left: `${positions.schoolAvg}%`, transform: 'translateX(-50%)' }}
-            />
-            <div 
-              className="absolute top-1 w-5 h-5 bg-blue-600 border-2 border-white rounded-full shadow-lg transition-all hover:scale-110 z-10"
-              style={{ left: `${positions.current}%`, transform: 'translateX(-50%)' }}
-            />
-            <div 
-              className="absolute top-1 w-4 h-4 bg-green-600 border-2 border-white rounded-full shadow-md transition-all hover:scale-110"
-              style={{ left: `${positions.target}%`, transform: 'translateX(-50%)' }}
-            />
-            
-            {/* Horizontal label lines */}
-            <div 
-              className="absolute top-6 h-0.5 bg-gray-600"
-              style={{ 
-                left: `${positions.schoolAvg}%`, 
-                width: `${Math.max(30, 100 - positions.schoolAvg)}px`,
-                transform: 'translateX(-2px)'
-              }}
-            />
-            <div 
-              className="absolute top-6 h-0.5 bg-blue-600"
-              style={{ 
-                left: `${positions.current}%`, 
-                width: `${Math.max(30, 100 - positions.current)}px`,
-                transform: 'translateX(-2px)'
-              }}
-            />
-            <div 
-              className="absolute top-6 h-0.5 bg-green-600"
-              style={{ 
-                left: `${positions.target}%`, 
-                width: `${Math.max(30, 100 - positions.target)}px`,
-                transform: 'translateX(-2px)'
-              }}
-            />
-            
-            {/* Labels */}
-            <div 
-              className="absolute text-xs font-medium text-gray-700"
-              style={{ 
-                left: `${positions.schoolAvg}%`, 
-                top: '28px',
-                transform: 'translateX(32px)'
-              }}
-            >
-              School Avg
-            </div>
-            <div 
-              className="absolute text-xs font-medium text-blue-700"
-              style={{ 
-                left: `${positions.current}%`, 
-                top: '28px',
-                transform: 'translateX(32px)'
-              }}
-            >
-              Your GPA
-            </div>
-            <div 
-              className="absolute text-xs font-medium text-green-700"
-              style={{ 
-                left: `${positions.target}%`, 
-                top: '28px',
-                transform: 'translateX(32px)'
-              }}
-            >
-              Target
-            </div>
+            {/* Dark vertical reference lines and diagonal-horizontal connectors */}
+            {labelPositions.map((item) => (
+              <React.Fragment key={item.key}>
+                {/* Vertical line on bar */}
+                <div 
+                  className={`absolute top-0 bottom-0 w-0.5 ${
+                    item.color === 'gray' ? 'bg-gray-800' :
+                    item.color === 'blue' ? 'bg-blue-800' : 'bg-green-800'
+                  }`}
+                  style={{ left: `${item.position}%`, transform: 'translateX(-50%)' }}
+                />
+                
+                {/* Diagonal line */}
+                <div 
+                  className={`absolute w-6 h-0.5 ${
+                    item.color === 'gray' ? 'bg-gray-600' :
+                    item.color === 'blue' ? 'bg-blue-600' : 'bg-green-600'
+                  }`}
+                  style={{ 
+                    left: `${item.position}%`, 
+                    top: item.isAbove ? '24px' : '60px',
+                    transform: item.isAbove ? 'translateX(-2px) rotate(-45deg)' : 'translateX(-2px) rotate(45deg)',
+                    transformOrigin: 'left center'
+                  }}
+                />
+                
+                {/* Horizontal line */}
+                <div 
+                  className={`absolute h-0.5 ${
+                    item.color === 'gray' ? 'bg-gray-600' :
+                    item.color === 'blue' ? 'bg-blue-600' : 'bg-green-600'
+                  }`}
+                  style={{ 
+                    left: `${item.position}%`, 
+                    top: item.isAbove ? '20px' : '64px',
+                    width: '40px',
+                    transform: 'translateX(2px)'
+                  }}
+                />
+                
+                {/* Label */}
+                <div 
+                  className={`absolute text-xs font-medium whitespace-nowrap ${
+                    item.color === 'gray' ? 'text-gray-700' :
+                    item.color === 'blue' ? 'text-blue-700' : 'text-green-700'
+                  }`}
+                  style={{ 
+                    left: `${item.position}%`, 
+                    top: item.isAbove ? '16px' : '68px',
+                    transform: 'translateX(44px)'
+                  }}
+                >
+                  {item.label}
+                </div>
+              </React.Fragment>
+            ))}
           </div>
         </div>
         
         {/* Legend with enhanced styling */}
-        <div className="grid grid-cols-3 gap-3 mt-12">
+        <div className="grid grid-cols-3 gap-3 mt-8">
           <div className="flex items-center gap-3 p-2 rounded-lg bg-blue-50 border border-blue-200">
-            <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-sm"></div>
+            <div className="w-2 h-2 bg-blue-600 rounded-sm"></div>
             <div>
               <span className="font-medium text-blue-900">Your GPA</span>
               <div className="text-sm text-blue-700">{gpaData.current}</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 border border-gray-200">
-            <div className="w-3 h-3 bg-gray-500 rounded-full border border-white shadow-sm"></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-sm"></div>
             <div>
               <span className="font-medium text-gray-900">School Avg</span>
               <div className="text-sm text-gray-700">{gpaData.schoolAverage}</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-2 rounded-lg bg-green-50 border border-green-200">
-            <div className="w-3 h-3 bg-green-600 rounded-full border border-white shadow-sm"></div>
+            <div className="w-2 h-2 bg-green-600 rounded-sm"></div>
             <div>
               <span className="font-medium text-green-900">Target</span>
               <div className="text-sm text-green-700">{gpaData.target}</div>

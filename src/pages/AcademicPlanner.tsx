@@ -162,7 +162,7 @@ const AcademicPlanner = () => {
       <div className="space-y-6">
         {/* Enhanced Chart */}
         <div className="relative" style={{ height: '100px', marginTop: '20px', marginBottom: '20px' }}>
-          <div className="h-12 bg-gradient-to-r from-red-500 via-yellow-500 via-orange-500 to-blue-500 rounded-lg relative overflow-visible" style={{ top: '30px' }}>
+          <div className="h-8 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-green-500 to-blue-500 rounded-lg relative overflow-visible" style={{ top: '32px' }}>
             {/* Grid lines */}
             <div className="absolute inset-0 flex">
               {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((pos, i) => (
@@ -190,22 +190,16 @@ const AcademicPlanner = () => {
               <React.Fragment key={item.key}>
                 {/* Vertical line on bar */}
                 <div 
-                  className={`absolute top-0 bottom-0 w-0.5 ${
-                    item.color === 'gray' ? 'bg-gray-800' :
-                    item.color === 'blue' ? 'bg-blue-800' : 'bg-green-800'
-                  }`}
+                  className="absolute top-0 bottom-0 w-0.5 bg-black"
                   style={{ left: `${item.position}%`, transform: 'translateX(-50%)' }}
                 />
                 
                 {/* Diagonal line */}
                 <div 
-                  className={`absolute w-6 h-0.5 ${
-                    item.color === 'gray' ? 'bg-gray-600' :
-                    item.color === 'blue' ? 'bg-blue-600' : 'bg-green-600'
-                  }`}
+                  className="absolute w-6 h-0.5 bg-black"
                   style={{ 
                     left: `${item.position}%`, 
-                    top: item.isAbove ? '24px' : '60px',
+                    top: item.isAbove ? '32px' : '40px',
                     transform: item.isAbove ? 'translateX(-2px) rotate(-45deg)' : 'translateX(-2px) rotate(45deg)',
                     transformOrigin: 'left center'
                   }}
@@ -213,13 +207,10 @@ const AcademicPlanner = () => {
                 
                 {/* Horizontal line */}
                 <div 
-                  className={`absolute h-0.5 ${
-                    item.color === 'gray' ? 'bg-gray-600' :
-                    item.color === 'blue' ? 'bg-blue-600' : 'bg-green-600'
-                  }`}
+                  className="absolute h-0.5 bg-black"
                   style={{ 
                     left: `${item.position}%`, 
-                    top: item.isAbove ? '20px' : '64px',
+                    top: item.isAbove ? '28px' : '44px',
                     width: '24px',
                     transform: 'translateX(2.2px)'
                   }}
@@ -228,12 +219,13 @@ const AcademicPlanner = () => {
                  {/* Label */}
                 <div 
                   className={`absolute text-xs font-medium whitespace-nowrap ${
-                    item.color === 'gray' ? 'text-gray-700' :
-                    item.color === 'blue' ? 'text-blue-700' : 'text-green-700'
+                    item.key === 'current' ? 'text-black' :
+                    item.key === 'target' ? 'text-red-500 drop-shadow-[0_0_4px_rgba(239,68,68,0.6)]' :
+                    'text-gray-500'
                   }`}
                   style={{ 
                     left: `${item.position}%`, 
-                    top: item.isAbove ? '16px' : '68px',
+                    top: item.isAbove ? '24px' : '48px',
                     transform: 'translateX(28px)'
                   }}
                 >

@@ -25,7 +25,8 @@ import {
   TrendingDown,
   Clock,
   Star,
-  Calculator
+  Calculator,
+  X
 } from 'lucide-react';
 
 const AcademicPlanner = () => {
@@ -105,6 +106,7 @@ const AcademicPlanner = () => {
   ];
 
   const [expandedInsights, setExpandedInsights] = useState<string[]>(['course-requirements']);
+  const [expandedAG, setExpandedAG] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     {

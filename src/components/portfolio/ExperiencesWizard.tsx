@@ -601,9 +601,11 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                         value={localDescription}
                         onChange={(e) => {
                           setLocalDescription(e.target.value);
-                          setDescriptionDrafts((prev) => ({ ...prev, [experience.id]: e.target.value }));
                         }}
-                        onBlur={() => updateExperience(index, 'description', localDescription)}
+                        onBlur={() => {
+                          setDescriptionDrafts((prev) => ({ ...prev, [experience.id]: localDescription }));
+                          updateExperience(index, 'description', localDescription);
+                        }}
                         placeholder="Describe what you did, your responsibilities, and impact..."
                         className="mt-2 min-h-[150px] resize-none"
                       />

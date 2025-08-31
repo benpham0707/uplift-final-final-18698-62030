@@ -265,7 +265,7 @@ const AcademicPlanner = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       {/* Full Width Main Content */}
       <div className="w-full p-6">
         <div className="max-w-7xl mx-auto">

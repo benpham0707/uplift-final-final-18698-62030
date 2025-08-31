@@ -145,7 +145,7 @@ const AcademicPlanner = () => {
   const GPALineChart = () => {
     return (
       <div className="space-y-4">
-        <div className="h-[600px]">
+        <div className="h-[320px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={gpaTimeData}
@@ -165,8 +165,8 @@ const AcademicPlanner = () => {
                 height={60}
               />
               <YAxis 
-                domain={[2.0, 4.4]}
-                ticks={[2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4]}
+                domain={[3.0, 4.0]}
+                ticks={[3.0, 3.2, 3.4, 3.6, 3.8, 4.0]}
                 tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
                 axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
                 tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
@@ -276,7 +276,7 @@ const AcademicPlanner = () => {
           </div>
 
           {/* Expanded Stats Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Academic Standing - Expanded */}
             <Card className="lg:col-span-1">
               <CardHeader className="pb-3">
@@ -313,8 +313,8 @@ const AcademicPlanner = () => {
               </CardContent>
             </Card>
 
-            {/* GPA Analysis - Much Wider */}
-            <Card className="lg:col-span-3">
+            {/* GPA Analysis - Equal Width */}
+            <Card className="lg:col-span-1">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <BarChart3 className="h-5 w-5" />

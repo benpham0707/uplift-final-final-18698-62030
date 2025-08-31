@@ -144,16 +144,16 @@ const AcademicPlanner = () => {
   // GPA Line Chart Component
   const GPALineChart = () => {
     return (
-      <div className="space-y-6">
-        <div className="h-96">
+      <div className="space-y-2">
+        <div className="h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={gpaTimeData}
               margin={{
-                top: 30,
-                right: 40,
-                left: 30,
-                bottom: 30,
+                top: 40,
+                right: 50,
+                left: 40,
+                bottom: 40,
               }}
             >
               <CartesianGrid strokeDasharray="2 2" stroke="#f1f5f9" strokeWidth={1} />
@@ -162,11 +162,11 @@ const AcademicPlanner = () => {
                 tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
                 axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
                 tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
-                height={50}
+                height={60}
               />
               <YAxis 
-                domain={[2.4, 4.0]}
-                ticks={[2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0]}
+                domain={[2.8, 4.0]}
+                ticks={[2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0]}
                 tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
                 axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
                 tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
@@ -176,7 +176,7 @@ const AcademicPlanner = () => {
                   position: 'insideLeft',
                   style: { textAnchor: 'middle', fontSize: '14px', fontWeight: '600', fill: '#475569' }
                 }}
-                width={60}
+                width={70}
               />
               <Tooltip 
                 contentStyle={{
@@ -191,7 +191,7 @@ const AcademicPlanner = () => {
               />
               <Legend 
                 wrapperStyle={{ 
-                  paddingTop: '24px',
+                  paddingTop: '8px',
                   fontSize: '14px',
                   fontWeight: '500'
                 }}
@@ -237,7 +237,7 @@ const AcademicPlanner = () => {
         </div>
         
         {/* Compact summary stats */}
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-8 pt-1">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-blue-700 rounded-full"></div>
             <div className="text-sm">
@@ -268,7 +268,7 @@ const AcademicPlanner = () => {
     <div className="min-h-screen bg-background">
       {/* Full Width Main Content */}
       <div className="w-full p-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Compact Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-foreground mb-1">Academic Planning</h1>
@@ -276,9 +276,9 @@ const AcademicPlanner = () => {
           </div>
 
           {/* Expanded Stats Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Academic Standing */}
-            <Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Academic Standing - Expanded */}
+            <Card className="lg:col-span-1">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <GraduationCap className="h-5 w-5" />
@@ -286,37 +286,39 @@ const AcademicPlanner = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="text-2xl font-bold text-blue-600">{currentGPA.weighted}</div>
-                    <div className="text-xs text-blue-700">Weighted GPA</div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-3xl font-bold text-blue-600">{currentGPA.weighted}</div>
+                      <div className="text-sm text-blue-700">Weighted GPA</div>
+                    </div>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-3xl font-bold text-blue-600">{currentGPA.unweighted}</div>
+                      <div className="text-sm text-blue-700">Unweighted GPA</div>
+                    </div>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-3xl font-bold text-blue-600">#{currentGPA.classRank}</div>
+                      <div className="text-sm text-blue-700">of {currentGPA.totalStudents}</div>
+                    </div>
                   </div>
-                  <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="text-2xl font-bold text-blue-600">{currentGPA.unweighted}</div>
-                    <div className="text-xs text-blue-700">Unweighted GPA</div>
+                  
+                  <div className="space-y-3 mt-6">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Degree Progress</span>
+                      <span className="text-sm text-muted-foreground">{currentGPA.creditsCompleted}/{currentGPA.totalCredits}</span>
+                    </div>
+                    <Progress value={(currentGPA.creditsCompleted / currentGPA.totalCredits) * 100} className="h-3" />
                   </div>
-                  <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="text-2xl font-bold text-blue-600">#{currentGPA.classRank}</div>
-                    <div className="text-xs text-blue-700">of {currentGPA.totalStudents}</div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Degree Progress</span>
-                    <span className="text-sm text-muted-foreground">{currentGPA.creditsCompleted}/{currentGPA.totalCredits}</span>
-                  </div>
-                  <Progress value={(currentGPA.creditsCompleted / currentGPA.totalCredits) * 100} className="h-2" />
                 </div>
               </CardContent>
             </Card>
 
-            {/* GPA Analysis - Wider card */}
-            <Card className="lg:col-span-2">
+            {/* GPA Analysis - Equal Width */}
+            <Card className="lg:col-span-1">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <BarChart3 className="h-5 w-5" />
-                  GPA Analysis
+                  GPA Analysis & Trends
                 </CardTitle>
               </CardHeader>
               <CardContent>

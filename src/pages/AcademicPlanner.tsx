@@ -144,8 +144,8 @@ const AcademicPlanner = () => {
   // GPA Line Chart Component
   const GPALineChart = () => {
     return (
-      <div className="space-y-4">
-        <div className="h-[320px]">
+      <div className="space-y-2">
+        <div className="h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={gpaTimeData}
@@ -165,8 +165,8 @@ const AcademicPlanner = () => {
                 height={60}
               />
               <YAxis 
-                domain={[3.0, 4.0]}
-                ticks={[3.0, 3.2, 3.4, 3.6, 3.8, 4.0]}
+                domain={[2.8, 4.0]}
+                ticks={[2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0]}
                 tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
                 axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
                 tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
@@ -191,7 +191,7 @@ const AcademicPlanner = () => {
               />
               <Legend 
                 wrapperStyle={{ 
-                  paddingTop: '20px',
+                  paddingTop: '8px',
                   fontSize: '14px',
                   fontWeight: '500'
                 }}
@@ -237,7 +237,7 @@ const AcademicPlanner = () => {
         </div>
         
         {/* Compact summary stats */}
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-8 pt-1">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-blue-700 rounded-full"></div>
             <div className="text-sm">

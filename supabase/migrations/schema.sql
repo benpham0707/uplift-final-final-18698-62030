@@ -52,28 +52,45 @@ CREATE TABLE public.experiences_activities (
 );
 CREATE TABLE public.family_responsibilities (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL,
-  responsibilities jsonb,
-  life_circumstances jsonb,
+  profile_id uuid NOT NULL UNIQUE,
+  responsibilities jsonb NOT NULL DEFAULT '[]'::jsonb,
+  circumstances jsonb NOT NULL DEFAULT '[]'::jsonb,
+  hours_per_week smallint NOT NULL DEFAULT 0 CHECK (hours_per_week >= 0 AND hours_per_week <= 168),
+  other_responsibilities text DEFAULT ''::text,
+  challenging_circumstances boolean NOT NULL DEFAULT false,
+  other_circumstances text DEFAULT ''::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT family_responsibilities_pkey PRIMARY KEY (id),
   CONSTRAINT family_responsibilities_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.goals_aspirations (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL,
+  profile_id uuid NOT NULL UNIQUE,
   intended_major text,
-  career_interests ARRAY,
-  highest_degree text,
-  preferred_environment ARRAY,
+  career_interests ARRAY NOT NULL DEFAULT '{}'::text[],
+  highest_degree text CHECK (highest_degree IS NULL OR (highest_degree = ANY (ARRAY['bachelors'::text, 'masters'::text, 'phd'::text, 'md'::text, 'jd'::text, 'other_professional'::text, 'undecided'::text]))),
+  college_environment ARRAY NOT NULL DEFAULT '{}'::text[],
   college_plans jsonb,
+  applying_to_uc text CHECK (applying_to_uc IS NULL OR (applying_to_uc = ANY (ARRAY['yes'::text, 'no'::text, 'maybe'::text]))),
+  using_common_app text CHECK (using_common_app IS NULL OR (using_common_app = ANY (ARRAY['yes'::text, 'no'::text, 'maybe'::text]))),
+  start_date text CHECK (start_date IS NULL OR (start_date = ANY (ARRAY['fall_2025'::text, 'spring_2026'::text, 'fall_2026'::text, 'gap_year'::text, 'undecided'::text]))),
+  geographic_preferences ARRAY NOT NULL DEFAULT '{}'::text[],
+  need_based_aid text CHECK (need_based_aid IS NULL OR (need_based_aid = ANY (ARRAY['yes'::text, 'no'::text, 'unsure'::text]))),
+  merit_scholarships text CHECK (merit_scholarships IS NULL OR (merit_scholarships = ANY (ARRAY['yes'::text, 'no'::text, 'unsure'::text]))),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT goals_aspirations_pkey PRIMARY KEY (id),
   CONSTRAINT goals_aspirations_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.personal_growth (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL,
-  meaningful_experiences jsonb,
-  additional_context jsonb,
+  profile_id uuid NOT NULL UNIQUE,
+  meaningful_experiences jsonb NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(meaningful_experiences) = 'object'::text),
+  additional_context jsonb NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(additional_context) = 'object'::text),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  search_vector tsvector,
   CONSTRAINT personal_growth_pkey PRIMARY KEY (id),
   CONSTRAINT personal_growth_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
 );
@@ -109,6 +126,18 @@ CREATE TABLE public.personal_information (
   CONSTRAINT personal_information_pkey PRIMARY KEY (id),
   CONSTRAINT personal_information_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
 );
+CREATE TABLE public.portfolio_analytics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL UNIQUE,
+  input_signature text NOT NULL,
+  overall numeric NOT NULL,
+  dimensions jsonb NOT NULL,
+  detailed jsonb NOT NULL,
+  cached_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT portfolio_analytics_pkey PRIMARY KEY (id),
+  CONSTRAINT portfolio_analytics_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+);
 CREATE TABLE public.profiles (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL UNIQUE,
@@ -135,12 +164,18 @@ CREATE TABLE public.profiles (
 );
 CREATE TABLE public.support_network (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL,
-  counselor jsonb,
-  teachers ARRAY,
-  community_support jsonb,
-  portfolio_items jsonb,
-  documents jsonb,
+  profile_id uuid NOT NULL UNIQUE,
+  counselor jsonb NOT NULL DEFAULT '{}'::jsonb,
+  community_support_legacy jsonb,
+  portfolio_items jsonb NOT NULL DEFAULT '[]'::jsonb,
+  documents jsonb NOT NULL DEFAULT '[]'::jsonb,
+  teachers jsonb NOT NULL DEFAULT '[]'::jsonb,
+  has_community_support boolean NOT NULL DEFAULT false,
+  community_organizations jsonb NOT NULL DEFAULT '[]'::jsonb,
+  has_portfolio_items boolean NOT NULL DEFAULT false,
+  wants_to_upload_documents boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT support_network_pkey PRIMARY KEY (id),
   CONSTRAINT support_network_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
 );

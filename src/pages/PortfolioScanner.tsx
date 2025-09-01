@@ -48,6 +48,9 @@ const PortfolioScanner = () => {
   const [overallProgress, setOverallProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('overview');
   const [isPortfolioDropdownOpen, setIsPortfolioDropdownOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiOverall, setAiOverall] = useState<number | null>(null);
 
   // Navigation items for portfolio scanner dropdown
   const portfolioNavigationItems = [
@@ -66,13 +69,13 @@ const PortfolioScanner = () => {
   };
 
   // Mock rubric scores - in real app these would come from API
-  const [rubricScores] = useState({
-    academicExcellence: { score: 7.2, evidence: ['3.5 GPA while working'], feedback: 'Strong performance given constraints' },
-    leadershipPotential: { score: 9.9, evidence: ['Family coordination', 'Work leadership'], feedback: 'Natural leadership in multiple contexts' },
-    personalGrowth: { score: 6.8, evidence: ['Overcame financial challenges'], feedback: 'Resilience and adaptation' },
-    communityImpact: { score: 5.4, evidence: ['Volunteer work'], feedback: 'Room for expansion' },
-    uniqueValue: { score: 8.7, evidence: ['Bilingual', 'Cultural bridge'], feedback: 'Distinctive perspective' },
-    futureReadiness: { score: 1.8, evidence: ['Clear goals', 'Planning ahead'], feedback: 'Good direction, needs detail' }
+  const [rubricScores, setRubricScores] = useState({
+    academicExcellence: { score: null as number | null },
+    leadershipPotential: { score: null as number | null },
+    personalGrowth: { score: null as number | null },
+    communityImpact: { score: null as number | null },
+    uniqueValue: { score: null as number | null },
+    futureReadiness: { score: null as number | null }
   });
 
   const overallScore = Math.round(
@@ -215,6 +218,49 @@ const PortfolioScanner = () => {
 
     loadProfile();
   }, [user, loading, navigate]);
+
+  // Fetch AI-powered portfolio strength
+  useEffect(() => {
+    async function fetchStrength() {
+      try {
+        if (!user || !hasCompletedOnboarding) return;
+        setAiLoading(true);
+        setAiError(null);
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
+        const resp = await fetch('/api/v1/analytics/portfolio-strength', {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          }
+        });
+        if (!resp.ok) {
+          const text = await resp.text();
+          throw new Error(text || `Request failed: ${resp.status}`);
+        }
+        const json = await resp.json();
+        if (typeof json?.overall === 'number') {
+          setAiOverall(Number(json.overall));
+        }
+        const d = json?.dimensions || {};
+        setRubricScores(prev => ({
+          ...prev,
+          academicExcellence: { ...prev.academicExcellence, score: Number(d.academic ?? prev.academicExcellence.score) },
+          leadershipPotential: { ...prev.leadershipPotential, score: Number(d.leadership ?? prev.leadershipPotential.score) },
+          personalGrowth: { ...prev.personalGrowth, score: Number(d.growth ?? prev.personalGrowth.score) },
+          communityImpact: { ...prev.communityImpact, score: Number(d.community ?? prev.communityImpact.score) },
+          uniqueValue: { ...prev.uniqueValue, score: Number(d.uniqueness ?? prev.uniqueValue.score) },
+          futureReadiness: { ...prev.futureReadiness, score: Number(d.readiness ?? prev.futureReadiness.score) },
+        }));
+      } catch (e: any) {
+        // eslint-disable-next-line no-console
+        console.error('AI analytics error', e);
+        setAiError(e?.message || 'Failed to compute portfolio strength');
+      } finally {
+        setAiLoading(false);
+      }
+    }
+    fetchStrength();
+  }, [user, hasCompletedOnboarding]);
 
   const completionLevels = [
     { level: 'Bronze', min: 20, color: 'bg-amber-600', description: 'Foundation Set' },
@@ -386,9 +432,12 @@ const PortfolioScanner = () => {
       <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <div className="mb-6">
-            <div className="text-6xl font-bold mb-2">{overallScore}</div>
+            <div className="text-6xl font-bold mb-2">{aiLoading ? '…' : (aiOverall ?? overallScore)}</div>
             <div className="text-xl opacity-90">Overall Portfolio Strength</div>
             <div className="text-sm opacity-75 mt-2">Out of 10.0 • Based on 6 key dimensions</div>
+            {aiError && (
+              <div className="text-xs opacity-90 mt-2 text-red-100">{aiError}</div>
+            )}
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
@@ -408,7 +457,7 @@ const PortfolioScanner = () => {
                   textShadow: getScoreStyles(rubricScores.academicExcellence.score).textStyle.textShadow
                 }}
               >
-                {rubricScores.academicExcellence.score}
+                {rubricScores.academicExcellence.score == null ? '…' : rubricScores.academicExcellence.score}
               </div>
               <div className="text-xs opacity-75">Academic</div>
             </div>
@@ -428,7 +477,7 @@ const PortfolioScanner = () => {
                   textShadow: getScoreStyles(rubricScores.leadershipPotential.score).textStyle.textShadow
                 }}
               >
-                {rubricScores.leadershipPotential.score}
+                {rubricScores.leadershipPotential.score == null ? '…' : rubricScores.leadershipPotential.score}
               </div>
               <div className="text-xs opacity-75">Leadership</div>
             </div>
@@ -448,7 +497,7 @@ const PortfolioScanner = () => {
                   textShadow: getScoreStyles(rubricScores.personalGrowth.score).textStyle.textShadow
                 }}
               >
-                {rubricScores.personalGrowth.score}
+                {rubricScores.personalGrowth.score == null ? '…' : rubricScores.personalGrowth.score}
               </div>
               <div className="text-xs opacity-75">Growth</div>
             </div>
@@ -468,7 +517,7 @@ const PortfolioScanner = () => {
                   textShadow: getScoreStyles(rubricScores.communityImpact.score).textStyle.textShadow
                 }}
               >
-                {rubricScores.communityImpact.score}
+                {rubricScores.communityImpact.score == null ? '…' : rubricScores.communityImpact.score}
               </div>
               <div className="text-xs opacity-75">Community</div>
             </div>
@@ -488,7 +537,7 @@ const PortfolioScanner = () => {
                   textShadow: getScoreStyles(rubricScores.uniqueValue.score).textStyle.textShadow
                 }}
               >
-                {rubricScores.uniqueValue.score}
+                {rubricScores.uniqueValue.score == null ? '…' : rubricScores.uniqueValue.score}
               </div>
               <div className="text-xs opacity-75">Uniqueness</div>
             </div>
@@ -508,7 +557,7 @@ const PortfolioScanner = () => {
                   textShadow: getScoreStyles(rubricScores.futureReadiness.score).textStyle.textShadow
                 }}
               >
-                {rubricScores.futureReadiness.score}
+                {rubricScores.futureReadiness.score == null ? '…' : rubricScores.futureReadiness.score}
               </div>
               <div className="text-xs opacity-75">Readiness</div>
             </div>

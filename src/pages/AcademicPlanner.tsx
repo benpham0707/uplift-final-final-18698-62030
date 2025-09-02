@@ -869,24 +869,24 @@ const AcademicPlanner = () => {
           </Card>
 
           {/* Academic Task Dashboard */}
-          <Card className="bg-white border-2 border-amber-200 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-amber-100 to-yellow-100 border-b-2 border-amber-200">
+          <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b-2 border-red-200">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3 text-2xl">
                   <div className="relative">
-                    <Zap className="h-8 w-8 text-amber-600" />
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center">
-                      <AlertCircle className="h-2 w-2 text-white" />
+                    <div className="relative flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-lg border-4 border-red-200">
+                      <Zap className="h-5 w-5 text-white" />
+                      <div className="absolute inset-0 rounded-full border-2 border-red-300 opacity-50"></div>
                     </div>
                   </div>
                   Academic Action Dashboard
                 </CardTitle>
-                <Badge className="bg-amber-100 text-amber-800 border-amber-300 font-medium px-3 py-1">
+                <Badge className="bg-red-100 text-red-800 border-red-300 font-medium px-3 py-1">
                   {/* Hard coded data for task count */}
                   8 Priority Tasks
                 </Badge>
               </div>
-              <CardDescription className="text-base text-amber-900 font-medium">
+              <CardDescription className="text-base text-red-900 font-medium">
                 Key requirements and achievements you're working toward
               </CardDescription>
             </CardHeader>
@@ -894,58 +894,55 @@ const AcademicPlanner = () => {
               <div className="space-y-6">
                 {/* High Priority Tasks */}
                 <Collapsible>
-                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-4 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-300 rounded-xl hover:from-amber-200 hover:to-yellow-200 transition-all duration-300 shadow-lg hover:shadow-xl border-dashed">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg border-3 border-white border-dashed">
-                        <AlertCircle className="h-5 w-5 text-white animate-pulse" />
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-300 rounded-full flex items-center justify-center border-2 border-white">
-                          <span className="text-xs font-bold text-amber-800">!</span>
-                        </div>
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-red-100 to-rose-100 border-2 border-red-300 rounded-xl hover:from-red-200 hover:to-rose-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <AlertCircle className="h-7 w-7 text-white group-hover:scale-110 transition-transform animate-pulse" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-bold text-amber-900 text-base flex items-center gap-2">
+                        <h3 className="font-bold text-red-900 text-lg flex items-center gap-2">
                           High Priority Tasks
                         </h3>
-                        <p className="text-xs text-amber-700 font-medium">Critical requirements for success</p>
+                        <p className="text-sm text-red-700 font-medium">Critical requirements for success</p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-amber-700 group-hover:scale-110 transition-transform" />
+                    <ChevronDown className="h-5 w-5 text-red-700 group-hover:scale-110 transition-transform" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-4">
-                    <div className="bg-white rounded-xl border-2 border-amber-200 shadow-inner p-3 border-dashed">
-                      <div className="grid grid-cols-1 gap-3">
-                        <div className="bg-white p-3 rounded-lg border border-amber-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                    <div className="bg-white rounded-xl border-2 border-red-200 shadow-inner p-4">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-gradient-to-r from-red-50 to-rose-50 p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                           <div className="flex items-start gap-3">
-                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
-                              <Clock className="h-3 w-3 text-white" />
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <Clock className="h-4 w-4 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="font-semibold text-amber-900 text-sm">Complete AP Physics C</span>
-                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                <span className="font-semibold text-red-900">Complete AP Physics C</span>
+                                <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
                                   Plan This
                                 </Button>
                               </div>
-                              <p className="text-xs text-amber-800 font-medium mb-1">Missing for engineering program prerequisites</p>
-                              <p className="text-xs text-amber-600">Deadline: Register by February 1st</p>
+                              <p className="text-sm text-red-800 font-medium mb-1">Missing for engineering program prerequisites</p>
+                              <p className="text-xs text-red-600">Deadline: Register by February 1st</p>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="bg-white p-3 rounded-lg border border-amber-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-gradient-to-r from-red-50 to-rose-50 p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                           <div className="flex items-start gap-3">
-                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
-                              <Target className="h-3 w-3 text-white" />
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <Target className="h-4 w-4 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="font-semibold text-amber-900 text-sm">Raise GPA to 3.9+</span>
-                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                <span className="font-semibold text-red-900">Raise GPA to 3.9+</span>
+                                <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
                                   Plan This
                                 </Button>
                               </div>
-                              <p className="text-xs text-amber-800 font-medium mb-1">Currently 0.1 points below target</p>
-                              <p className="text-xs text-amber-600">Impact: Top-tier college admissions</p>
+                              <p className="text-sm text-red-800 font-medium mb-1">Currently 0.1 points below target</p>
+                              <p className="text-xs text-red-600">Impact: Top-tier college admissions</p>
                             </div>
                           </div>
                         </div>
@@ -956,56 +953,53 @@ const AcademicPlanner = () => {
 
                 {/* Medium Priority Tasks */}
                 <Collapsible>
-                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-4 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-300 rounded-xl hover:from-amber-200 hover:to-yellow-200 transition-all duration-300 shadow-lg hover:shadow-xl border-dashed">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg border-3 border-white border-dashed">
-                        <Clock className="h-5 w-5 text-white" />
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-300 rounded-full flex items-center justify-center border-2 border-white">
-                          <span className="text-xs font-bold text-amber-800">~</span>
-                        </div>
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300 rounded-xl hover:from-orange-200 hover:to-amber-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <Clock className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-bold text-amber-900 text-base flex items-center gap-2">
+                        <h3 className="font-bold text-orange-900 text-lg flex items-center gap-2">
                           Medium Priority Tasks
                         </h3>
-                        <p className="text-xs text-amber-700 font-medium">Important for strengthening profile</p>
+                        <p className="text-sm text-orange-700 font-medium">Important for strengthening profile</p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-amber-700 group-hover:scale-110 transition-transform" />
+                    <ChevronDown className="h-5 w-5 text-orange-700 group-hover:scale-110 transition-transform" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-4">
-                    <div className="bg-white rounded-xl border-2 border-amber-200 shadow-inner p-3 border-dashed">
+                    <div className="bg-white rounded-xl border-2 border-orange-200 shadow-inner p-4">
                       <div className="grid grid-cols-1 gap-3">
-                        <div className="bg-white p-3 rounded-lg border border-amber-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                           <div className="flex items-start gap-3">
-                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 shadow-md flex-shrink-0 mt-1 animate-fade-in">
                               <BookOpen className="h-3 w-3 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-1">
-                                <span className="font-semibold text-amber-900 text-sm">Complete AP Statistics</span>
-                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                <span className="font-semibold text-orange-900 text-sm">Complete AP Statistics</span>
+                                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
                                   Plan This
                                 </Button>
                               </div>
-                              <p className="text-xs text-amber-700 mb-1">Supports data science track</p>
+                              <p className="text-xs text-orange-700 mb-1">Supports data science track</p>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="bg-white p-3 rounded-lg border border-amber-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                           <div className="flex items-start gap-3">
-                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 shadow-md flex-shrink-0 mt-1 animate-fade-in">
                               <Users className="h-3 w-3 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-1">
-                                <span className="font-semibold text-amber-900 text-sm">Join Research Program</span>
-                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                <span className="font-semibold text-orange-900 text-sm">Join Research Program</span>
+                                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
                                   Plan This
                                 </Button>
                               </div>
-                              <p className="text-xs text-amber-700 mb-1">Enhance graduate school applications</p>
+                              <p className="text-xs text-orange-700 mb-1">Enhance graduate school applications</p>
                             </div>
                           </div>
                         </div>
@@ -1014,42 +1008,39 @@ const AcademicPlanner = () => {
                   </CollapsibleContent>
                 </Collapsible>
 
-                {/* Low Priority Tasks */}
+                {/* Future Opportunities */}
                 <Collapsible>
-                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-4 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-300 rounded-xl hover:from-amber-200 hover:to-yellow-200 transition-all duration-300 shadow-lg hover:shadow-xl border-dashed">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg border-3 border-white border-dashed">
-                        <Calendar className="h-5 w-5 text-white" />
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-300 rounded-full flex items-center justify-center border-2 border-white">
-                          <span className="text-xs font-bold text-amber-800">+</span>
-                        </div>
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-slate-100 to-gray-100 border-2 border-slate-300 rounded-xl hover:from-slate-200 hover:to-gray-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <Calendar className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-bold text-amber-900 text-base flex items-center gap-2">
+                        <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
                           Future Opportunities
-                          <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
                         </h3>
-                        <p className="text-xs text-amber-700 font-medium">Nice-to-have enhancements</p>
+                        <p className="text-sm text-slate-700 font-medium">Nice-to-have enhancements</p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-amber-700 group-hover:scale-110 transition-transform" />
+                    <ChevronDown className="h-5 w-5 text-slate-700 group-hover:scale-110 transition-transform" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-4">
-                    <div className="bg-white rounded-xl border-2 border-amber-200 shadow-inner p-3 border-dashed">
+                    <div className="bg-white rounded-xl border-2 border-slate-200 shadow-inner p-4">
                       <div className="grid grid-cols-1 gap-3">
-                        <div className="bg-white p-3 rounded-lg border border-amber-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                           <div className="flex items-start gap-3">
-                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
                               <MapPin className="h-3 w-3 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-1">
-                                <span className="font-semibold text-amber-900 text-sm">Study Abroad Program</span>
-                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                <span className="font-semibold text-slate-900 text-sm">Study Abroad Program</span>
+                                <Button size="sm" className="bg-gradient-to-r from-slate-500 to-gray-500 hover:from-slate-600 hover:to-gray-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
                                   Explore
                                 </Button>
                               </div>
-                              <p className="text-xs text-amber-700 mb-1">Cultural enrichment opportunity</p>
+                              <p className="text-xs text-slate-700 mb-1">Cultural enrichment opportunity</p>
                             </div>
                           </div>
                         </div>

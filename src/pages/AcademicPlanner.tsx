@@ -869,12 +869,12 @@ const AcademicPlanner = () => {
           </Card>
 
           {/* Academic Task Dashboard */}
-          <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 shadow-xl">
+          <Card className="bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl">
             <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b-2 border-red-200">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-3 text-2xl">
+                <CardTitle className="flex items-center gap-3 text-xl">
                   <div className="relative">
-                    <div className="relative flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-lg border-4 border-red-200">
+                    <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-lg border-3 border-red-200">
                       <Zap className="h-5 w-5 text-white" />
                       <div className="absolute inset-0 rounded-full border-2 border-red-300 opacity-50"></div>
                     </div>

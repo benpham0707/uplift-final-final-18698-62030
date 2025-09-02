@@ -117,6 +117,11 @@ const AcademicPlanner = () => {
     }
   ]);
   const [userInput, setUserInput] = useState('');
+  
+  // Draggable chatbot state
+  const [chatPosition, setChatPosition] = useState({ x: window.innerWidth - 420, y: 100 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const handleSendMessage = () => {
     if (userInput.trim()) {
@@ -127,6 +132,40 @@ const AcademicPlanner = () => {
       setUserInput('');
     }
   };
+
+  // Dragging functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragOffset({
+      x: e.clientX - chatPosition.x,
+      y: e.clientY - chatPosition.y
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setChatPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
 
   const toggleInsight = (insightId: string) => {
     setExpandedInsights(prev => 
@@ -1064,18 +1103,28 @@ const AcademicPlanner = () => {
         <MessageCircle className="h-6 w-6" />
       </Button>
 
-      {/* Pop-up Chatbot */}
+      {/* Draggable Chatbot */}
       {isChatOpen && (
-        <div className="fixed bottom-24 right-6 w-80 h-96 z-50 animate-in slide-in-from-bottom-4">
+        <div 
+          className="fixed w-96 h-[32rem] z-50 animate-in slide-in-from-bottom-4"
+          style={{ 
+            left: chatPosition.x, 
+            top: chatPosition.y,
+            cursor: isDragging ? 'grabbing' : 'default'
+          }}
+        >
           <Card className="h-full shadow-2xl border-2">
-            <CardHeader className="border-b p-4">
+            <CardHeader 
+              className="border-b p-4 cursor-grab active:cursor-grabbing select-none"
+              onMouseDown={handleMouseDown}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="flex items-center gap-2 text-lg">
+                  <CardTitle className="flex items-center gap-2 text-lg pointer-events-none">
                     <MessageCircle className="h-5 w-5" />
                     Academic Advisor
                   </CardTitle>
-                  <CardDescription className="text-xs">
+                  <CardDescription className="text-xs pointer-events-none">
                     Get personalized guidance on your academic journey
                   </CardDescription>
                 </div>
@@ -1083,7 +1132,7 @@ const AcademicPlanner = () => {
                   variant="ghost" 
                   size="sm"
                   onClick={() => setIsChatOpen(false)}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 pointer-events-auto"
                 >
                   ×
                 </Button>

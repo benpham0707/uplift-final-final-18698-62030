@@ -617,7 +617,7 @@ const AcademicPlanner = () => {
                   </div>
                   Academic Trophy Case
                 </CardTitle>
-                <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white border-amber-400 px-4 py-1 text-base font-semibold shadow-lg animate-fade-in">
+                <Badge variant="outline" className="text-amber-700 border-amber-200 font-medium px-3 py-1">
                   {/* Hard coded data for achievement count */}
                   12 Achievements Unlocked
                 </Badge>
@@ -864,7 +864,7 @@ const AcademicPlanner = () => {
                   </div>
                   Academic Action Dashboard
                 </CardTitle>
-                <Badge className="bg-gradient-to-r from-red-500 to-rose-500 text-white border-red-400 px-4 py-1 text-base font-semibold shadow-lg">
+                <Badge variant="outline" className="text-red-700 border-red-200 font-medium px-3 py-1">
                   {/* Hard coded data for task count */}
                   8 Priority Tasks
                 </Badge>
@@ -888,7 +888,7 @@ const AcademicPlanner = () => {
                       <div className="text-left">
                         <h3 className="font-bold text-red-900 text-lg flex items-center gap-2">
                           High Priority Tasks
-                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                          
                         </h3>
                         <p className="text-sm text-red-700 font-medium">Critical requirements for success</p>
                       </div>
@@ -951,7 +951,6 @@ const AcademicPlanner = () => {
                       <div className="text-left">
                         <h3 className="font-bold text-orange-900 text-lg flex items-center gap-2">
                           Medium Priority Tasks
-                          <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
                         </h3>
                         <p className="text-sm text-orange-700 font-medium">Important for strengthening profile</p>
                       </div>

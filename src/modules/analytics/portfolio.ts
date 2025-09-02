@@ -233,7 +233,7 @@ function signatureFromBundle(bundle: any): string {
 		bundle.profile?.updated_at,
 		bundle.academic?.updated_at,
 		bundle.experiences?.updated_at,
-		bundle.personalInfo?.updated_at,
+		/* exclude personalInfo; logistics shouldn't affect score */
 		bundle.family?.updated_at,
 		bundle.goalsAsp?.updated_at,
 		bundle.personalGrowth?.updated_at,

@@ -260,6 +260,11 @@ const PortfolioScanner = () => {
       }
     }
     fetchStrength();
+
+    // listen for reconcile completion to auto-refresh
+    const onReconciled = () => fetchStrength();
+    window.addEventListener('analytics:reconciled', onReconciled);
+    return () => window.removeEventListener('analytics:reconciled', onReconciled);
   }, [user, hasCompletedOnboarding]);
 
   const completionLevels = [

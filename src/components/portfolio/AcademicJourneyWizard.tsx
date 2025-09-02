@@ -401,6 +401,16 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel, onProgre
 
     const bump = isFinal ? 0.7 : 0.4;
     await supabase.from('profiles').update({ completion_score: bump }).eq('id', profileId);
+
+    // Reconcile analytics automatically
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      if (token) {
+        await fetch('/api/v1/analytics/reconcile', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        window.dispatchEvent(new CustomEvent('analytics:reconciled'));
+      }
+    } catch { /* non-blocking */ }
   };
 
   const handleNext = () => {

@@ -167,6 +167,16 @@ const FamilyResponsibilitiesWizard: React.FC<Props> = ({ onComplete, onCancel, o
         .eq('id', profile.id);
       if (profileErr) throw profileErr;
 
+      // Reconcile analytics automatically
+      try {
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
+        if (token) {
+          await fetch('/api/v1/analytics/reconcile', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+          window.dispatchEvent(new CustomEvent('analytics:reconciled'));
+        }
+      } catch { /* non-blocking */ }
+
       toast({
         title: "Family information saved!",
         description: "Your family responsibilities and circumstances have been recorded.",

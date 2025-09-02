@@ -174,21 +174,21 @@ const PersonalGrowthWizard: React.FC<Props> = ({ onComplete, onCancel, onProgres
 
         setData((prev) => ({
           meaningfulExperiences: {
-            significantChallenge: '',
-            leadershipExample: '',
-            academicExcitement: '',
-            creativity: '',
-            greatestTalent: '',
-            communityImpact: '',
-            uniqueQualities: '',
-            educationalOpportunity: ''
+            significantChallenge: (pg as any)?.meaningful_experiences?.significantChallenge ?? '',
+            leadershipExample: (pg as any)?.meaningful_experiences?.leadershipExample ?? '',
+            academicExcitement: (pg as any)?.meaningful_experiences?.academicExcitement ?? '',
+            creativity: (pg as any)?.meaningful_experiences?.creativity ?? '',
+            greatestTalent: (pg as any)?.meaningful_experiences?.greatestTalent ?? '',
+            communityImpact: (pg as any)?.meaningful_experiences?.communityImpact ?? '',
+            uniqueQualities: (pg as any)?.meaningful_experiences?.uniqueQualities ?? '',
+            educationalOpportunity: (pg as any)?.meaningful_experiences?.educationalOpportunity ?? ''
           },
           additionalContext: {
-            backgroundIdentity: '',
-            academicCircumstances: '',
-            educationalDisruptions: '',
-            schoolCommunityContext: '',
-            additionalInfo: ''
+            backgroundIdentity: (pg as any)?.additional_context?.backgroundIdentity ?? '',
+            academicCircumstances: (pg as any)?.additional_context?.academicCircumstances ?? '',
+            educationalDisruptions: (pg as any)?.additional_context?.educationalDisruptions ?? '',
+            schoolCommunityContext: (pg as any)?.additional_context?.schoolCommunityContext ?? '',
+            additionalInfo: (pg as any)?.additional_context?.additionalInfo ?? ''
           }
         }));
       } catch (_) {
@@ -264,6 +264,19 @@ const PersonalGrowthWizard: React.FC<Props> = ({ onComplete, onCancel, onProgres
         })
         .eq('id', profile.id);
       if (profileErr) throw profileErr;
+
+      // Reconcile analytics so Portfolio Scanner updates automatically
+      try {
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
+        if (token) {
+          await fetch('/api/v1/analytics/reconcile', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          window.dispatchEvent(new CustomEvent('analytics:reconciled'));
+        }
+      } catch (_) { /* non-blocking */ }
 
       toast({
         title: "Personal growth stories saved!",
@@ -503,6 +516,19 @@ const PersonalGrowthWizard: React.FC<Props> = ({ onComplete, onCancel, onProgres
                   .from('profiles')
                   .update({ completion_score: Math.max(Number(profile.completion_score ?? 0), 0.3) })
                   .eq('id', profile.id);
+
+                // Reconcile analytics so Portfolio Scanner updates automatically
+                try {
+                  const session = await supabase.auth.getSession();
+                  const token = session.data.session?.access_token;
+                  if (token) {
+                    await fetch('/api/v1/analytics/reconcile', {
+                      method: 'POST',
+                      headers: { Authorization: `Bearer ${token}` }
+                    });
+                    window.dispatchEvent(new CustomEvent('analytics:reconciled'));
+                  }
+                } catch (_) { /* non-blocking */ }
 
                 toast({ title: 'Progress saved', description: 'You can come back anytime.' });
                 onProgressRefresh?.();

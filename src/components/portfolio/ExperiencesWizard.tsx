@@ -251,6 +251,16 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
 
     const bump = isFinal ? 0.75 : 0.45;
     await supabase.from('profiles').update({ completion_score: bump }).eq('id', profileId);
+
+    // Reconcile analytics automatically
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      if (token) {
+        await fetch('/api/v1/analytics/reconcile', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        window.dispatchEvent(new CustomEvent('analytics:reconciled'));
+      }
+    } catch { /* non-blocking */ }
   };
 
   const saveAllExperiences = async () => {

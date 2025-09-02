@@ -292,16 +292,16 @@ const AcademicPlanner = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
                     <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-3xl font-bold text-blue-600">{currentGPA.weighted}</div>
-                      <div className="text-sm text-blue-700">Weighted GPA</div>
+                      <div className="text-3xl font-bold text-blue-800">{currentGPA.weighted}</div>
+                      <div className="text-sm text-blue-900">Weighted GPA</div>
                     </div>
                     <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-3xl font-bold text-blue-600">{currentGPA.unweighted}</div>
-                      <div className="text-sm text-blue-700">Unweighted GPA</div>
+                      <div className="text-3xl font-bold text-blue-800">{currentGPA.unweighted}</div>
+                      <div className="text-sm text-blue-900">Unweighted GPA</div>
                     </div>
                     <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-3xl font-bold text-blue-600">{Math.round(((currentGPA.totalStudents - currentGPA.classRank + 1) / currentGPA.totalStudents) * 100)}th</div>
-                      <div className="text-sm text-blue-700">Percentile</div>
+                      <div className="text-3xl font-bold text-blue-800">{Math.round(((currentGPA.totalStudents - currentGPA.classRank + 1) / currentGPA.totalStudents) * 100)}th</div>
+                      <div className="text-sm text-blue-900">Percentile</div>
                     </div>
                   </div>
                   
@@ -604,242 +604,453 @@ const AcademicPlanner = () => {
             </CardContent>
           </Card>
 
-          {/* Requirements Achieved Section */}
-          <Card className="mb-6">
-            <CardHeader>
+          {/* Trophy Case Section */}
+          <Card className="mb-6 bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 border-b-2 border-amber-200">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Award className="h-6 w-6" />
-                  Academic Milestones Completed
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <div className="relative">
+                    <Award className="h-8 w-8 text-amber-600 animate-pulse" />
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center animate-ping">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  Academic Trophy Case
                 </CardTitle>
-                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                <Badge className="bg-amber-100 text-amber-800 border-amber-300 font-medium px-3 py-1">
                   {/* Hard coded data for achievement count */}
-                  12 Achievements
+                  12 Achievements Unlocked
                 </Badge>
               </div>
-              <CardDescription>
-                Celebration and validation of completed requirements
+              <CardDescription className="text-base text-amber-900 font-medium">
+                Your hall of academic excellence and achievements
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* A-G Requirements Met */}
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                {/* Gold Tier Trophies */}
                 <Collapsible>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-green-600">
-                        <Check className="h-4 w-4 text-white" />
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-yellow-100 to-amber-100 border-2 border-yellow-300 rounded-xl hover:from-yellow-200 hover:to-amber-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <Award className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-semibold text-green-800">A-G Requirements Met</h3>
-                        <p className="text-sm text-green-600">Core foundation subjects completed</p>
+                        <h3 className="font-bold text-amber-900 text-lg flex items-center gap-2">
+                          Gold Tier Achievements
+                        </h3>
+                        <p className="text-sm text-amber-700 font-medium">Elite academic accomplishments</p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-green-600" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2 p-4 border border-green-200 rounded-lg bg-white">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">4 Years English</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Completed June 2024</span>
-                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200 text-xs">High Impact</Badge>
-                            </div>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-1">Strong writing and communication skills foundation</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: Advanced composition courses, honors programs</p>
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-amber-200 text-amber-900 text-xs font-bold px-2 py-1">
+                        {/* Hard coded data for gold tier count */}
+                        3/5
+                      </Badge>
+                      <div className="w-16 bg-amber-200 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full" style={{width: '60%'}}></div>
                       </div>
-                      
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">3 Years Mathematics (through Algebra II)</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Completed May 2024</span>
-                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200 text-xs">High Impact</Badge>
+                      <ChevronDown className="h-5 w-5 text-amber-700 group-hover:scale-110 transition-transform" />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-4">
+                    <div className="bg-white rounded-xl border-2 border-yellow-200 shadow-inner p-4">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-4 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <Star className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-amber-900">AP Biology - Perfect Score: 5</span>
+                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-sm text-amber-800 font-medium mb-1">College credit + pre-med track eligibility</p>
+                              <p className="text-xs text-amber-600">Unlocks: Advanced biology courses, research opportunities</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">Mathematical reasoning and problem-solving competency</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: STEM major eligibility, engineering programs</p>
-                          <Button size="sm" variant="outline" className="mt-2 h-7 text-xs">
-                            💬 Leverage This
-                          </Button>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-4 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <Target className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-amber-900">Biology Major Prerequisites Complete</span>
+                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-sm text-amber-800 font-medium mb-1">Direct admission eligibility secured</p>
+                              <p className="text-xs text-amber-600">Unlocks: Priority enrollment, scholarship eligibility</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-4 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <CheckCircle className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-amber-900">Credit Requirements Complete</span>
+                                <Button size="sm" className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-sm text-amber-800 font-medium mb-1">Early college enrollment possible</p>
+                              <p className="text-xs text-amber-600">Unlocks: Dual enrollment, accelerated programs</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
 
-                {/* Advanced Coursework Completed */}
+                {/* Silver Tier Trophies */}
                 <Collapsible>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-blue-600">
-                        <Check className="h-4 w-4 text-white" />
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-slate-100 to-gray-100 border-2 border-slate-300 rounded-xl hover:from-slate-200 hover:to-gray-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <Award className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-semibold text-blue-800">Advanced Coursework Completed</h3>
-                        <p className="text-sm text-blue-600">AP scores and honors courses achieved</p>
+                        <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                          Silver Tier Achievements
+                        </h3>
+                        <p className="text-sm text-slate-700 font-medium">Strong foundational accomplishments</p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-blue-600" />
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-slate-200 text-slate-900 text-xs font-bold px-2 py-1">
+                        {/* Hard coded data for silver tier count */}
+                        5/7
+                      </Badge>
+                      <div className="w-16 bg-slate-200 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-slate-400 to-gray-500 h-2 rounded-full" style={{width: '71%'}}></div>
+                      </div>
+                      <ChevronDown className="h-5 w-5 text-slate-700 group-hover:scale-110 transition-transform" />
+                    </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2 p-4 border border-blue-200 rounded-lg bg-white">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">AP Biology</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Score: 5</span>
-                              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs">Exceptional Impact</Badge>
+                  <CollapsibleContent className="mt-4">
+                    <div className="bg-white rounded-xl border-2 border-slate-200 shadow-inner p-4">
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <Calculator className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-slate-900 text-sm">AP Calculus AB - Score: 4</span>
+                                <Button size="sm" className="bg-gradient-to-r from-slate-500 to-gray-500 hover:from-slate-600 hover:to-gray-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-slate-700 mb-1">Advanced math placement secured</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">Demonstrates mastery of college-level biology concepts</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: College credit, advanced biology courses, pre-med track</p>
-                          <Button size="sm" variant="outline" className="mt-2 h-7 text-xs">
-                            💬 Leverage This
-                          </Button>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">AP Calculus AB</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Score: 4</span>
-                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200 text-xs">High Impact</Badge>
+                        
+                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <BookOpen className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-slate-900 text-sm">4 Years English</span>
+                                <Button size="sm" className="bg-gradient-to-r from-slate-500 to-gray-500 hover:from-slate-600 hover:to-gray-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-slate-700 mb-1">Advanced composition eligibility</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">Strong foundation in differential and integral calculus</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: Placement into advanced math, engineering programs</p>
                         </div>
-                      </div>
 
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">Honors Chemistry</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Grade: A</span>
-                              <Badge variant="secondary" className="bg-slate-100 text-slate-800 border-slate-200 text-xs">Moderate Impact</Badge>
+                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <GraduationCap className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-slate-900 text-sm">Honors Diploma Eligibility</span>
+                                <Button size="sm" className="bg-gradient-to-r from-slate-500 to-gray-500 hover:from-slate-600 hover:to-gray-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-slate-700 mb-1">Scholarship opportunities unlocked</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">Advanced understanding of chemical principles and lab techniques</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: AP Chemistry eligibility, science research opportunities</p>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <Users className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-slate-900 text-sm">Research Experience (Summer 2024)</span>
+                                <Button size="sm" className="bg-gradient-to-r from-slate-500 to-gray-500 hover:from-slate-600 hover:to-gray-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-slate-700 mb-1">Graduate school recommendations available</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
 
-                {/* Graduation Requirements Secured */}
+                {/* Bronze Tier Trophies */}
                 <Collapsible>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-purple-600">
-                        <Check className="h-4 w-4 text-white" />
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300 rounded-xl hover:from-orange-200 hover:to-amber-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <Award className="h-7 w-7 text-white group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="text-left">
-                        <h3 className="font-semibold text-purple-800">Graduation Requirements Secured</h3>
-                        <p className="text-sm text-purple-600">Diploma and credential milestones achieved</p>
+                        <h3 className="font-bold text-orange-900 text-lg flex items-center gap-2">
+                          Bronze Tier Achievements
+                        </h3>
+                        <p className="text-sm text-orange-700 font-medium">Important supporting accomplishments</p>
                       </div>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-purple-600" />
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-orange-200 text-orange-900 text-xs font-bold px-2 py-1">
+                        {/* Hard coded data for bronze tier count */}
+                        4/4
+                      </Badge>
+                      <div className="w-16 bg-orange-200 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-orange-400 to-amber-600 h-2 rounded-full" style={{width: '100%'}}></div>
+                      </div>
+                      <ChevronDown className="h-5 w-5 text-orange-700 group-hover:scale-110 transition-transform" />
+                    </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2 p-4 border border-purple-200 rounded-lg bg-white">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">Honors Diploma Eligibility</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Secured</span>
-                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200 text-xs">High Impact</Badge>
+                  <CollapsibleContent className="mt-4">
+                    <div className="bg-white rounded-xl border-2 border-orange-200 shadow-inner p-4">
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 shadow-md flex-shrink-0 mt-1 animate-fade-in">
+                              <CheckCircle className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-orange-900 text-sm">Honors Chemistry - Grade: A</span>
+                                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Leverage This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-orange-700 mb-1">AP Chemistry eligibility secured</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">Enhanced graduation credentials demonstrating academic excellence</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: Honor society membership, scholarship opportunities</p>
-                          <Button size="sm" variant="outline" className="mt-2 h-7 text-xs">
-                            💬 Leverage This
-                          </Button>
                         </div>
                       </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </CardContent>
+          </Card>
 
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">Credit Requirements Complete</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">On Track</span>
-                              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs">Exceptional Impact</Badge>
+          {/* Academic Task Dashboard */}
+          <Card className="mb-6 bg-gradient-to-br from-red-50 to-rose-100 border-2 border-red-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-red-100 to-rose-100 border-b-2 border-red-200">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <div className="relative">
+                    <Target className="h-8 w-8 text-red-600" />
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <AlertCircle className="h-2 w-2 text-white" />
+                    </div>
+                  </div>
+                  Academic Action Dashboard
+                </CardTitle>
+                <Badge className="bg-red-100 text-red-800 border-red-300 font-medium px-3 py-1">
+                  {/* Hard coded data for task count */}
+                  8 Priority Tasks
+                </Badge>
+              </div>
+              <CardDescription className="text-base text-red-900 font-medium">
+                Key requirements and achievements you're working toward
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                {/* High Priority Tasks */}
+                <Collapsible>
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-red-100 to-rose-100 border-2 border-red-300 rounded-xl hover:from-red-200 hover:to-rose-200 transition-all duration-300 shadow-lg hover:shadow-xl border-dashed">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-red-400 to-rose-500 shadow-lg border-4 border-white border-dashed">
+                        <AlertCircle className="h-7 w-7 text-white animate-pulse" />
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-300 rounded-full flex items-center justify-center border-2 border-white">
+                          <span className="text-xs font-bold text-red-800">!</span>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <h3 className="font-bold text-red-900 text-lg flex items-center gap-2">
+                          High Priority Tasks
+                          
+                        </h3>
+                        <p className="text-sm text-red-700 font-medium">Critical requirements for success</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-red-700 group-hover:scale-110 transition-transform" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-4">
+                    <div className="bg-white rounded-xl border-2 border-red-200 shadow-inner p-4 border-dashed">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-gradient-to-r from-red-50 to-rose-50 p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-red-400 to-rose-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                              <Clock className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-red-900">Complete AP Physics C</span>
+                                <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Plan This
+                                </Button>
+                              </div>
+                              <p className="text-sm text-red-800 font-medium mb-1">Missing for engineering program prerequisites</p>
+                              <p className="text-xs text-red-600">Deadline: Register by February 1st</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">All minimum credit requirements secured for graduation</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: Focus on electives, early college enrollment</p>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-red-50 to-rose-50 p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-red-400 to-rose-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                              <Target className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-red-900">Raise GPA to 3.9+</span>
+                                <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-xs px-3 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Plan This
+                                </Button>
+                              </div>
+                              <p className="text-sm text-red-800 font-medium mb-1">Currently 0.1 points below target</p>
+                              <p className="text-xs text-red-600">Impact: Top-tier college admissions</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
 
-                {/* Major Prerequisites Fulfilled */}
+                {/* Medium Priority Tasks */}
                 <Collapsible>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-orange-600">
-                        <Check className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <h3 className="font-semibold text-orange-800">Major Prerequisites Fulfilled</h3>
-                        <p className="text-sm text-orange-600">Target major requirements completed</p>
-                      </div>
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-orange-600" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2 p-4 border border-orange-200 rounded-lg bg-white">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">Biology Major Prerequisites</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Completed</span>
-                              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs">Exceptional Impact</Badge>
-                            </div>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-1">All required coursework for intended biology major completed</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: Direct admission eligibility, advanced standing</p>
-                          <Button size="sm" variant="outline" className="mt-2 h-7 text-xs">
-                            💬 Leverage This
-                          </Button>
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300 rounded-xl hover:from-orange-200 hover:to-yellow-200 transition-all duration-300 shadow-lg hover:shadow-xl border-dashed">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 shadow-lg border-4 border-white border-dashed">
+                        <Clock className="h-7 w-7 text-white" />
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-orange-300 rounded-full flex items-center justify-center border-2 border-white">
+                          <span className="text-xs font-bold text-orange-800">~</span>
                         </div>
                       </div>
-
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">Research Experience Secured</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">Summer 2024</span>
-                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200 text-xs">High Impact</Badge>
+                      <div className="text-left">
+                        <h3 className="font-bold text-orange-900 text-lg flex items-center gap-2">
+                          Medium Priority Tasks
+                        </h3>
+                        <p className="text-sm text-orange-700 font-medium">Important for strengthening profile</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-orange-700 group-hover:scale-110 transition-transform" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-4">
+                    <div className="bg-white rounded-xl border-2 border-orange-200 shadow-inner p-4 border-dashed">
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                              <BookOpen className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-orange-900 text-sm">Complete AP Statistics</span>
+                                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Plan This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-orange-700 mb-1">Supports data science track</p>
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">Hands-on research experience in molecular biology lab</p>
-                          <p className="text-sm text-blue-600 mt-1">Unlocks: Graduate school recommendations, research positions</p>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                              <Users className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-orange-900 text-sm">Join Research Program</span>
+                                <Button size="sm" className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Plan This
+                                </Button>
+                              </div>
+                              <p className="text-xs text-orange-700 mb-1">Enhance graduate school applications</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                {/* Low Priority Tasks */}
+                <Collapsible>
+                  <CollapsibleTrigger className="group flex items-center justify-between w-full p-5 bg-gradient-to-r from-slate-100 to-gray-100 border-2 border-slate-300 rounded-xl hover:from-slate-200 hover:to-gray-200 transition-all duration-300 shadow-lg hover:shadow-xl border-dashed">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-lg border-4 border-white border-dashed">
+                        <Calendar className="h-7 w-7 text-white" />
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-slate-300 rounded-full flex items-center justify-center border-2 border-white">
+                          <span className="text-xs font-bold text-slate-800">+</span>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                          Future Opportunities
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
+                        </h3>
+                        <p className="text-sm text-slate-700 font-medium">Nice-to-have enhancements</p>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-slate-700 group-hover:scale-110 transition-transform" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-4">
+                    <div className="bg-white rounded-xl border-2 border-slate-200 shadow-inner p-4 border-dashed">
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
+                              <MapPin className="h-3 w-3 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-semibold text-slate-900 text-sm">Study Abroad Program</span>
+                                <Button size="sm" className="bg-gradient-to-r from-slate-500 to-gray-500 hover:from-slate-600 hover:to-gray-600 text-white text-xs px-2 py-1 shadow-md hover:shadow-lg transition-all hover:scale-105">
+                                  Explore
+                                </Button>
+                              </div>
+                              <p className="text-xs text-slate-700 mb-1">Cultural enrichment opportunity</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

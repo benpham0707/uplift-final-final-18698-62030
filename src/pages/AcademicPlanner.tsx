@@ -27,7 +27,8 @@ import {
   Star,
   Calculator,
   X,
-  Check
+  Check,
+  Zap
 } from 'lucide-react';
 
 const AcademicPlanner = () => {
@@ -867,12 +868,12 @@ const AcademicPlanner = () => {
           </Card>
 
           {/* Academic Task Dashboard */}
-          <Card className="mb-6 bg-gradient-to-br from-red-50 to-rose-100 border-2 border-red-200 shadow-lg">
+          <Card className="mb-6 bg-white border-2 border-red-200 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-red-100 to-rose-100 border-b-2 border-red-200">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3 text-2xl">
                   <div className="relative">
-                    <Target className="h-8 w-8 text-red-600" />
+                    <Zap className="h-8 w-8 text-red-600" />
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                       <AlertCircle className="h-2 w-2 text-white" />
                     </div>
@@ -913,7 +914,7 @@ const AcademicPlanner = () => {
                   <CollapsibleContent className="mt-4">
                     <div className="bg-white rounded-xl border-2 border-red-200 shadow-inner p-4 border-dashed">
                       <div className="grid grid-cols-1 gap-4">
-                        <div className="bg-gradient-to-r from-red-50 to-rose-50 p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-white p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
                           <div className="flex items-start gap-3">
                             <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-red-400 to-rose-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
                               <Clock className="h-4 w-4 text-white" />
@@ -931,7 +932,7 @@ const AcademicPlanner = () => {
                           </div>
                         </div>
                         
-                        <div className="bg-gradient-to-r from-red-50 to-rose-50 p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-white p-4 rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
                           <div className="flex items-start gap-3">
                             <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-red-400 to-rose-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
                               <Target className="h-4 w-4 text-white" />
@@ -975,7 +976,7 @@ const AcademicPlanner = () => {
                   <CollapsibleContent className="mt-4">
                     <div className="bg-white rounded-xl border-2 border-orange-200 shadow-inner p-4 border-dashed">
                       <div className="grid grid-cols-1 gap-3">
-                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-white p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
                           <div className="flex items-start gap-3">
                             <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
                               <BookOpen className="h-3 w-3 text-white" />
@@ -992,7 +993,7 @@ const AcademicPlanner = () => {
                           </div>
                         </div>
                         
-                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-white p-3 rounded-lg border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
                           <div className="flex items-start gap-3">
                             <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
                               <Users className="h-3 w-3 text-white" />
@@ -1036,7 +1037,7 @@ const AcademicPlanner = () => {
                   <CollapsibleContent className="mt-4">
                     <div className="bg-white rounded-xl border-2 border-slate-200 shadow-inner p-4 border-dashed">
                       <div className="grid grid-cols-1 gap-3">
-                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
+                        <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 border-dashed">
                           <div className="flex items-start gap-3">
                             <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gradient-to-br from-slate-400 to-gray-500 shadow-md flex-shrink-0 mt-1 border-2 border-white border-dashed">
                               <MapPin className="h-3 w-3 text-white" />

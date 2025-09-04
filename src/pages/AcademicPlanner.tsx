@@ -29,7 +29,11 @@ import {
   Calculator,
   X,
   Check,
-  Zap
+  Zap,
+  Brain,
+  Scale,
+  Link,
+  CheckCircle2
 } from 'lucide-react';
 
 const AcademicPlanner = () => {
@@ -545,155 +549,124 @@ const AcademicPlanner = () => {
             </Card>
           </div>
 
-          {/* Academic Insights & Updates - Phone Notification Style */}
-          <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-4">
-            {/* Header with Filter */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200/50">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-600/10 backdrop-blur-sm rounded-xl border border-blue-200/30">
-                  <Target className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Academic Notifications</h3>
-                  <p className="text-sm text-gray-600">Latest insights and updates</p>
-                </div>
-              </div>
-              
-              {/* Filter Controls */}
-              <div className="flex items-center gap-2">
-                <select className="text-xs px-3 py-1.5 bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                  <option value="all">All Notifications</option>
-                  <option value="urgent">Urgent Only</option>
-                  <option value="completed">Completed</option>
-                  <option value="pending">Pending Action</option>
-                </select>
-                <Badge className="bg-blue-100/80 text-blue-800 border-blue-300/50 backdrop-blur-sm">
-                  {insights.length} notifications
-                </Badge>
-              </div>
-            </div>
+          {/* Academic Planning Insights & Recommendations */}
+          <Card className="shadow-medium">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                Academic Planning Insights & Recommendations
+              </CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Showing 3 of 6 insights • Scroll to see more
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div 
+                className="insights-scroll h-[600px] overflow-y-auto space-y-6 pr-2 scroll-smooth"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'hsl(var(--border)) transparent'
+                }}
+              >
+                <style dangerouslySetInnerHTML={{
+                  __html: `
+                    .insights-scroll::-webkit-scrollbar {
+                      width: 6px;
+                    }
+                    .insights-scroll::-webkit-scrollbar-track {
+                      background: transparent;
+                    }
+                    .insights-scroll::-webkit-scrollbar-thumb {
+                      background: hsl(var(--border));
+                      border-radius: 3px;
+                    }
+                    .insights-scroll::-webkit-scrollbar-thumb:hover {
+                      background: hsl(var(--foreground) / 0.3);
+                    }
+                  `
+                }} />
 
-            {/* Scrollable Notification List */}
-            <ScrollArea className="h-80 w-full">
-              <div className="space-y-2 pr-4">
-                {insights.map((insight, index) => {
-                  const isExpanded = expandedInsights.includes(insight.id);
-                  const IconComponent = insight.icon;
-                  
-                  return (
-                    <div key={insight.id} className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl hover:bg-white/80 transition-all duration-200 shadow-sm hover:shadow-md">
-                      <Collapsible open={isExpanded} onOpenChange={() => toggleInsight(insight.id)}>
-                        <CollapsibleTrigger asChild>
-                          <div className="w-full p-4 cursor-pointer">
-                            <div className="flex items-start gap-3">
-                              {/* Notification Indicator */}
-                              <div className="flex flex-col items-center gap-1 mt-1">
-                                <div className={`w-2.5 h-2.5 rounded-full shadow-sm ${
-                                  insight.color === 'green' ? 'bg-green-500' :
-                                  insight.color === 'orange' ? 'bg-orange-500' :
-                                  insight.color === 'blue' ? 'bg-blue-500' :
-                                  'bg-gray-500'
-                                } ${index < 2 ? 'animate-pulse' : ''}`}></div>
-                                <div className="text-xs text-gray-500 font-medium">
-                                  {index < 2 ? 'NEW' : Math.floor(Math.random() * 12) + 1 + 'h'}
-                                </div>
-                              </div>
-                              
-                              {/* Notification Content */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div className={`p-1.5 rounded-lg ${
-                                    insight.color === 'green' ? 'bg-green-100/80 text-green-700' :
-                                    insight.color === 'orange' ? 'bg-orange-100/80 text-orange-700' :
-                                    insight.color === 'blue' ? 'bg-blue-100/80 text-blue-700' :
-                                    'bg-gray-100/80 text-gray-700'
-                                  }`}>
-                                    <IconComponent className="h-3.5 w-3.5" />
-                                  </div>
-                                  <h4 className="font-medium text-gray-900 text-sm">{insight.title}</h4>
-                                  <div className={`ml-auto px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    insight.color === 'green' ? 'bg-green-100/80 text-green-700 border border-green-200/50' :
-                                    insight.color === 'orange' ? 'bg-orange-100/80 text-orange-700 border border-orange-200/50' :
-                                    insight.color === 'blue' ? 'bg-blue-100/80 text-blue-700 border border-blue-200/50' :
-                                    'bg-gray-100/80 text-gray-700 border border-gray-200/50'
-                                  }`}>
-                                    {insight.percentage}%
-                                  </div>
-                                </div>
-                                
-                                <p className="text-sm text-gray-700 mb-2 line-clamp-2">{insight.summary}</p>
-                                
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                                    <span>{index < 2 ? 'Just now' : Math.floor(Math.random() * 12) + 1 + ' hours ago'}</span>
-                                    <span>•</span>
-                                    <span className={`${
-                                      insight.color === 'green' ? 'text-green-600' :
-                                      insight.color === 'orange' ? 'text-orange-600' :
-                                      insight.color === 'blue' ? 'text-blue-600' :
-                                      'text-gray-600'
-                                    } hover:underline cursor-pointer`}>
-                                      {isExpanded ? 'Collapse' : 'View details'}
-                                    </span>
-                                  </div>
-                                  {isExpanded ? (
-                                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 text-gray-400" />
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </CollapsibleTrigger>
-                        
-                        <CollapsibleContent>
-                          <div className="px-4 pb-4 ml-6">
-                            <div className="p-3 bg-gray-50/80 backdrop-blur-sm rounded-lg border border-gray-200/50">
-                              <h5 className="font-medium mb-2 text-gray-900 text-sm">Detailed Analysis</h5>
-                              <p className="text-xs text-gray-700 mb-3 leading-relaxed">{insight.details}</p>
-                              
-                              <h5 className="font-medium mb-2 text-gray-900 text-sm">Recommended Actions</h5>
-                              <ul className="space-y-1">
-                                {insight.recommendations.map((rec, idx) => (
-                                  <li key={idx} className="flex items-start gap-2 text-xs">
-                                    <div className={`w-1 h-1 rounded-full mt-1.5 flex-shrink-0 ${
-                                      insight.color === 'green' ? 'bg-green-500' :
-                                      insight.color === 'orange' ? 'bg-orange-500' :
-                                      insight.color === 'blue' ? 'bg-blue-500' :
-                                      'bg-gray-500'
-                                    }`}></div>
-                                    <span className="text-gray-700">{rec}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                              
-                              {/* Action Buttons */}
-                              <div className="flex gap-2 mt-3">
-                                <button className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200/80 transition-colors">
-                                  Mark as Read
-                                </button>
-                                <button className="px-3 py-1 bg-gray-100/80 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200/80 transition-colors">
-                                  Remind Later
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </div>
-                  );
-                })}
-                
-                {/* Load More Notifications */}
-                <div className="pt-2 pb-1">
-                  <button className="w-full p-3 text-sm text-gray-600 bg-white/40 backdrop-blur-sm border border-gray-200/50 rounded-xl hover:bg-white/60 transition-all duration-200">
-                    Load more notifications...
-                  </button>
-                </div>
+                {/* Academic Excellence Insight */}
+                <AcademicInsightItem
+                  title="GPA Trajectory Optimization Opportunity"
+                  description="Your 3.8 GPA while managing work responsibilities demonstrates strong time management, but targeted improvement in AP Chemistry could boost your STEM profile significantly. Strategic focus on lab reports and practice problems could raise your semester GPA to 3.9+, positioning you for competitive pre-med programs."
+                  time="1 hour ago"
+                  type="improvement"
+                  impact="high"
+                  estimatedGains={{
+                    gpaIncrease: 0.15,
+                    competitiveStanding: 0.23,
+                    stemProfile: 0.31
+                  }}
+                  actionItems={[
+                    { action: "Schedule weekly chemistry tutoring sessions", buttonText: "Book Tutoring" },
+                    { action: "Create structured lab report template", buttonText: "Optimize Study Methods" },
+                    { action: "Form chemistry study group with high performers", buttonText: "Build Study Network" }
+                  ]}
+                  connections="Consistent academic performance + work ethic narrative + strategic improvement = compelling resilience story for competitive programs."
+                />
+
+                {/* Course Planning Insight */}
+                <AcademicInsightItem
+                  title="Advanced Coursework Sequence Optimization"
+                  description="Your current AP course load (4 completed) positions you well, but strategic selection of 2-3 additional APs could significantly strengthen your academic profile. Focus on courses that align with your career interests and demonstrate intellectual curiosity beyond graduation requirements."
+                  time="6 hours ago"
+                  type="opportunity"
+                  impact="high"
+                  estimatedGains={{
+                    courseRigor: 0.28,
+                    collegePrepScore: 0.19,
+                    scholarshipEligibility: 0.22
+                  }}
+                  actionItems={[
+                    { action: "Research AP courses for senior year", buttonText: "Explore Options" },
+                    { action: "Meet with counselor about course planning", buttonText: "Get Guidance" },
+                    { action: "Consider dual enrollment opportunities", buttonText: "Expand Horizons" }
+                  ]}
+                  connections="Strategic course selection + demonstrated academic ability + career alignment = strong foundation for competitive college admissions."
+                />
+
+                {/* Achievement Recognition */}
+                <AcademicInsightItem
+                  title="Academic Consistency Achievement Pattern"
+                  description="Maintaining 3.8+ GPA for three consecutive semesters while working part-time showcases exceptional time management and academic dedication. This consistency pattern, combined with your upward trajectory in challenging courses, creates a powerful narrative of academic resilience and growth mindset."
+                  time="2 days ago"
+                  type="strength"
+                  impact="medium"
+                  estimatedGains={{
+                    narrativeStrength: 0.25,
+                    workEthicProfile: 0.18,
+                    collegeReadiness: 0.15
+                  }}
+                  actionItems={[
+                    { action: "Document study strategies and time management", buttonText: "Capture Success Methods" },
+                    { action: "Prepare academic achievement portfolio", buttonText: "Showcase Growth" },
+                    { action: "Consider academic honors applications", buttonText: "Seek Recognition" }
+                  ]}
+                  connections="Consistent performance + time management skills + work experience = demonstrated college readiness and maturity."
+                />
+
+                {/* Graduation Timeline */}
+                <AcademicInsightItem
+                  title="Graduation Requirements Progress Check"
+                  description="You've completed 85% of graduation requirements with excellent pacing. Current trajectory shows on-time graduation with opportunities to exceed minimum requirements. Consider using remaining elective slots strategically to strengthen areas of interest or career preparation."
+                  time="1 week ago"
+                  type="strength"
+                  impact="low"
+                  estimatedGains={{
+                    graduationReadiness: 0.12,
+                    eleciveFocus: 0.08
+                  }}
+                  actionItems={[
+                    { action: "Review elective options for senior year", buttonText: "Plan Electives" },
+                    { action: "Confirm graduation requirement completion", buttonText: "Verify Progress" }
+                  ]}
+                  connections="On-track graduation + strategic elective use = maximum preparation for post-secondary success."
+                />
+
               </div>
-            </ScrollArea>
-          </div>
+            </CardContent>
+          </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Trophy Case Section */}
@@ -1256,6 +1229,172 @@ const AcademicPlanner = () => {
           </Card>
         </div>
       )}
+    </div>
+  );
+};
+
+// Academic Insight Item Component for Academic Planning specific insights
+interface AcademicInsightItemProps {
+  title: string;
+  description: string;
+  time: string;
+  type: 'strength' | 'opportunity' | 'improvement' | 'warning' | 'concern';
+  impact: 'high' | 'medium' | 'low';
+  estimatedGains: Record<string, number>;
+  actionItems: Array<{
+    action: string;
+    buttonText: string;
+  }>;
+  connections: string;
+}
+
+const AcademicInsightItem = ({ title, description, time, type, impact, estimatedGains, actionItems, connections }: AcademicInsightItemProps) => {
+  const typeColors = {
+    strength: 'text-green-600',
+    opportunity: 'text-blue-600',
+    improvement: 'text-purple-600',
+    warning: 'text-orange-600',
+    concern: 'text-red-600'
+  };
+
+  const getCheckmarkColor = (type: string, impact: string) => {
+    if (type === 'warning' && impact === 'medium') {
+      return 'text-muted-foreground';
+    }
+    if (type === 'concern') {
+      return 'text-red-500';
+    }
+    
+    switch (impact) {
+      case 'high':
+        return 'text-blue-500';
+      case 'medium':
+        return 'text-green-500';
+      case 'low':
+        return 'text-yellow-500';
+      default:
+        return 'text-muted-foreground';
+    }
+  };
+
+  const getBorderClass = (type: string, impact: string) => {
+    if (type === 'warning' && impact === 'medium') {
+      return 'border-2 border-muted-foreground/30';
+    }
+    if (type === 'concern') {
+      return 'border-2 border-red-500';
+    }
+    if (impact === 'high') {
+      return 'border-2 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.8)] hover:shadow-[0_0_35px_rgba(59,130,246,1)]';
+    }
+    if (impact === 'medium') {
+      return 'border-2 border-green-500';
+    }
+    return 'border-2 border-yellow-500';
+  };
+
+  const getImpactBadgeColors = (type: string, impact: string) => {
+    if (type === 'warning' && impact === 'medium') {
+      return 'bg-muted text-muted-foreground border-muted';
+    }
+    if (type === 'concern') {
+      return 'bg-red-100 text-red-700 border-red-300';
+    }
+    
+    switch (impact) {
+      case 'high':
+        return 'bg-blue-100 text-blue-700 border-blue-300';
+      case 'medium':
+        return 'bg-green-100 text-green-700 border-green-300';
+      case 'low':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+      default:
+        return 'bg-muted text-muted-foreground border-muted';
+    }
+  };
+
+  const getImpactText = (type: string, impact: string) => {
+    if (type === 'warning' && impact === 'medium') {
+      return 'missed opportunity';
+    }
+    if (type === 'concern') {
+      return 'negative impact';
+    }
+    return `${impact} impact`;
+  };
+
+  return (
+    <div className={`p-5 rounded-lg shadow-soft hover:shadow-medium transition-all duration-200 ${getBorderClass(type, impact)}`}>
+      <div className="flex items-start gap-3">
+        <CheckCircle2 className={`h-6 w-6 mt-0.5 ${getCheckmarkColor(type, impact)} flex-shrink-0`} />
+        <div className="flex-1 space-y-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-semibold text-foreground text-lg">{title}</h4>
+                <Badge className={`text-xs px-2 py-1 ${getImpactBadgeColors(type, impact)}`}>
+                  {getImpactText(type, impact)}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{description}</p>
+            </div>
+            <div className="text-right ml-4 min-w-[140px]">
+              <div className="text-xs text-muted-foreground mb-2 flex items-center justify-end gap-1 font-medium">
+                <Scale className="h-3 w-3" />
+                Estimated Impact
+              </div>
+              <div className="space-y-1 opacity-50">
+                {Object.entries(estimatedGains).map(([key, value]) => (
+                  <div key={key} className="text-xs font-medium text-muted-foreground">
+                    {value >= 0 ? '+' : ''}
+                    {value.toFixed(2)} {key}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-primary/5 rounded-md p-3 border border-primary/20">
+            <h5 className="font-medium text-foreground text-sm mb-2 flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Academic Focus Areas
+            </h5>
+            <p className="text-xs text-muted-foreground italic">{connections}</p>
+          </div>
+
+          <div className="bg-secondary/10 rounded-md p-3 border border-secondary/30">
+            <h5 className="font-medium text-foreground text-sm mb-2 flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Recommended Actions
+            </h5>
+            <div className="space-y-2">
+              {actionItems.map((item, index) => (
+                <div key={index} className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground flex-1 mr-3">{item.action}</span>
+                  <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+                    {item.buttonText}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between pt-2 border-t border-border/50">
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {time}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                Record in Journal
+              </Button>
+              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                View Full Analysis
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

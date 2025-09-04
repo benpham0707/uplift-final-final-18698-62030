@@ -15,7 +15,9 @@ import {
   Brain,
   Clock,
   Award,
-  TrendingUp
+  TrendingUp,
+  Calendar,
+  RefreshCw
 } from 'lucide-react';
 
 interface TaskPlanningInterfaceProps {
@@ -65,8 +67,8 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
       <DialogContent className="max-w-7xl h-[85vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <Target className="h-6 w-6 text-primary" />
-            {task.title}
+            <Calendar className="h-6 w-6 text-primary" />
+            Next Actions Planning
           </DialogTitle>
         </DialogHeader>
         
@@ -279,7 +281,7 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
             </ScrollArea>
 
             {/* Chat Input */}
-            <div className="p-4 border-t">
+            <div className="p-4 border-t space-y-3">
               <div className="flex gap-2">
                 <Input
                   value={userInput}
@@ -292,6 +294,17 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
+              <Button 
+                variant="outline" 
+                className="w-full flex items-center gap-2 text-sm"
+                onClick={() => {
+                  // Regenerate task logic would go here
+                  console.log('Regenerating task based on chat discussion...');
+                }}
+              >
+                <RefreshCw className="h-4 w-4" />
+                Regenerate Task Plan
+              </Button>
             </div>
           </div>
         </div>

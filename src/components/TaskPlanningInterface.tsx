@@ -251,16 +251,63 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
                     <Award className="h-4 w-4" />
                     Success Metrics & Outcomes
                   </h3>
-                  <div className="space-y-3">
-                    {task.takeaways.map((takeaway, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-muted/20">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="text-sm font-medium">Expected Outcome {index + 1}</span>
-                          <p className="text-xs text-muted-foreground leading-relaxed mt-1">{takeaway}</p>
+                  <div className="space-y-4">
+                    {task.takeaways.map((takeaway, index) => {
+                      // Hard coded data values - Different outcome format types for varied visual appeal and sense of accomplishment
+                      const formatTypes = [
+                        {
+                          // Achievement Format - Celebratory style
+                          bg: "bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200",
+                          icon: <Award className="h-5 w-5 text-emerald-600" />,
+                          title: "🎯 Achievement Milestone",
+                          titleClass: "text-emerald-800 font-semibold"
+                        },
+                        {
+                          // Progress Format - Data-driven style
+                          bg: "bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200",
+                          icon: <TrendingUp className="h-5 w-5 text-blue-600" />,
+                          title: "📊 Progress Indicator",
+                          titleClass: "text-blue-800 font-semibold"
+                        },
+                        {
+                          // Impact Format - Results-focused style
+                          bg: "bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200",
+                          icon: <Target className="h-5 w-5 text-amber-600" />,
+                          title: "⚡ Impact Outcome",
+                          titleClass: "text-amber-800 font-semibold"
+                        },
+                        {
+                          // Milestone Format - Timeline-based style
+                          bg: "bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200",
+                          icon: <CheckCircle2 className="h-5 w-5 text-purple-600" />,
+                          title: "🚀 Success Milestone",
+                          titleClass: "text-purple-800 font-semibold"
+                        },
+                        {
+                          // Growth Format - Development-focused style
+                          bg: "bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200",
+                          icon: <Brain className="h-5 w-5 text-rose-600" />,
+                          title: "🌱 Growth Outcome",
+                          titleClass: "text-rose-800 font-semibold"
+                        }
+                      ];
+                      
+                      const format = formatTypes[index % formatTypes.length];
+                      
+                      return (
+                        <div key={index} className={`flex items-start gap-4 p-4 rounded-xl ${format.bg} hover:shadow-md transition-all duration-300`}>
+                          <div className="flex-shrink-0 mt-0.5">
+                            {format.icon}
+                          </div>
+                          <div className="flex-1">
+                            <span className={`text-sm ${format.titleClass} block mb-2`}>
+                              {format.title}
+                            </span>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{takeaway}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 

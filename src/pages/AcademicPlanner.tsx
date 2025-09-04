@@ -834,9 +834,15 @@ const AcademicPlanner = () => {
             </CardContent>
           </Card>
 
-          {/* Section Header */}
+          {/* Section Separator */}
           <div className="my-12">
-            <h2 className="text-3xl font-bold text-foreground text-center mb-8">Academic Portfolio</h2>
+            <div className="flex items-center justify-center">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+              <div className="mx-6">
+                <h2 className="text-3xl font-bold text-foreground">Academic Portfolio</h2>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+            </div>
           </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">

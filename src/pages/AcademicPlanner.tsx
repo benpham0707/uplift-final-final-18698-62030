@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { 
   GraduationCap, 
@@ -544,96 +545,138 @@ const AcademicPlanner = () => {
             </Card>
           </div>
 
-          {/* Academic Insights - News/Announcements Style */}
-          <Card className="mb-6">
-            <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-blue-600 rounded-lg">
-                  <Target className="h-5 w-5 text-white" />
+          {/* Academic Insights & Updates - Phone Notification Style */}
+          <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-4">
+            {/* Header with Filter */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-600/10 backdrop-blur-sm rounded-xl border border-blue-200/30">
+                  <Target className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Academic Insights & Updates</CardTitle>
-                  <CardDescription>Latest analysis and recommendations for your academic journey</CardDescription>
+                  <h3 className="text-lg font-semibold text-gray-900">Academic Notifications</h3>
+                  <p className="text-sm text-gray-600">Latest insights and updates</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="space-y-1">
+              
+              {/* Filter Controls */}
+              <div className="flex items-center gap-2">
+                <select className="text-xs px-3 py-1.5 bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                  <option value="all">All Notifications</option>
+                  <option value="urgent">Urgent Only</option>
+                  <option value="completed">Completed</option>
+                  <option value="pending">Pending Action</option>
+                </select>
+                <Badge className="bg-blue-100/80 text-blue-800 border-blue-300/50 backdrop-blur-sm">
+                  {insights.length} notifications
+                </Badge>
+              </div>
+            </div>
+
+            {/* Scrollable Notification List */}
+            <ScrollArea className="h-80 w-full">
+              <div className="space-y-2 pr-4">
                 {insights.map((insight, index) => {
                   const isExpanded = expandedInsights.includes(insight.id);
                   const IconComponent = insight.icon;
                   
                   return (
-                    <div key={insight.id} className="border-b last:border-b-0">
+                    <div key={insight.id} className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl hover:bg-white/80 transition-all duration-200 shadow-sm hover:shadow-md">
                       <Collapsible open={isExpanded} onOpenChange={() => toggleInsight(insight.id)}>
                         <CollapsibleTrigger asChild>
-                          <div className="w-full p-4 hover:bg-slate-50 cursor-pointer transition-colors">
-                            <div className="flex items-start gap-4">
-                              {/* News-style timestamp/badge */}
+                          <div className="w-full p-4 cursor-pointer">
+                            <div className="flex items-start gap-3">
+                              {/* Notification Indicator */}
                               <div className="flex flex-col items-center gap-1 mt-1">
-                                <div className={`w-3 h-3 rounded-full ${
+                                <div className={`w-2.5 h-2.5 rounded-full shadow-sm ${
                                   insight.color === 'green' ? 'bg-green-500' :
                                   insight.color === 'orange' ? 'bg-orange-500' :
                                   insight.color === 'blue' ? 'bg-blue-500' :
                                   'bg-gray-500'
-                                }`}></div>
-                                <div className="text-xs text-muted-foreground">NEW</div>
+                                } ${index < 2 ? 'animate-pulse' : ''}`}></div>
+                                <div className="text-xs text-gray-500 font-medium">
+                                  {index < 2 ? 'NEW' : Math.floor(Math.random() * 12) + 1 + 'h'}
+                                </div>
                               </div>
                               
-                              {/* Content */}
+                              {/* Notification Content */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <IconComponent className={`h-4 w-4 ${
-                                    insight.color === 'green' ? 'text-green-600' :
-                                    insight.color === 'orange' ? 'text-orange-600' :
-                                    insight.color === 'blue' ? 'text-blue-600' :
-                                    'text-gray-600'
-                                  }`} />
-                                  <h3 className="font-semibold text-base">{insight.title}</h3>
-                                  <Badge variant="outline" className={`ml-auto ${
-                                    insight.color === 'green' ? 'border-green-300 text-green-700' :
-                                    insight.color === 'orange' ? 'border-orange-300 text-orange-700' :
-                                    insight.color === 'blue' ? 'border-blue-300 text-blue-700' :
-                                    'border-gray-300 text-gray-700'
+                                  <div className={`p-1.5 rounded-lg ${
+                                    insight.color === 'green' ? 'bg-green-100/80 text-green-700' :
+                                    insight.color === 'orange' ? 'bg-orange-100/80 text-orange-700' :
+                                    insight.color === 'blue' ? 'bg-blue-100/80 text-blue-700' :
+                                    'bg-gray-100/80 text-gray-700'
+                                  }`}>
+                                    <IconComponent className="h-3.5 w-3.5" />
+                                  </div>
+                                  <h4 className="font-medium text-gray-900 text-sm">{insight.title}</h4>
+                                  <div className={`ml-auto px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    insight.color === 'green' ? 'bg-green-100/80 text-green-700 border border-green-200/50' :
+                                    insight.color === 'orange' ? 'bg-orange-100/80 text-orange-700 border border-orange-200/50' :
+                                    insight.color === 'blue' ? 'bg-blue-100/80 text-blue-700 border border-blue-200/50' :
+                                    'bg-gray-100/80 text-gray-700 border border-gray-200/50'
                                   }`}>
                                     {insight.percentage}%
-                                  </Badge>
+                                  </div>
                                 </div>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{insight.summary}</p>
-                                <div className="flex items-center gap-2 mt-2">
-                                  <span className="text-xs text-muted-foreground">2 hours ago</span>
-                                  <span className="text-xs text-muted-foreground">•</span>
-                                  <span className="text-xs text-blue-600 hover:text-blue-800">Read more</span>
+                                
+                                <p className="text-sm text-gray-700 mb-2 line-clamp-2">{insight.summary}</p>
+                                
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span>{index < 2 ? 'Just now' : Math.floor(Math.random() * 12) + 1 + ' hours ago'}</span>
+                                    <span>•</span>
+                                    <span className={`${
+                                      insight.color === 'green' ? 'text-green-600' :
+                                      insight.color === 'orange' ? 'text-orange-600' :
+                                      insight.color === 'blue' ? 'text-blue-600' :
+                                      'text-gray-600'
+                                    } hover:underline cursor-pointer`}>
+                                      {isExpanded ? 'Collapse' : 'View details'}
+                                    </span>
+                                  </div>
                                   {isExpanded ? (
-                                    <ChevronDown className="h-3 w-3 ml-auto text-muted-foreground" />
+                                    <ChevronDown className="h-4 w-4 text-gray-400" />
                                   ) : (
-                                    <ChevronRight className="h-3 w-3 ml-auto text-muted-foreground" />
+                                    <ChevronRight className="h-4 w-4 text-gray-400" />
                                   )}
                                 </div>
                               </div>
                             </div>
                           </div>
                         </CollapsibleTrigger>
+                        
                         <CollapsibleContent>
-                          <div className="px-4 pb-4 ml-7">
-                            <div className="p-4 bg-slate-50 rounded-lg border">
-                              <h4 className="font-medium mb-2 text-slate-900">Detailed Analysis</h4>
-                              <p className="text-sm text-slate-700 mb-4 leading-relaxed">{insight.details}</p>
+                          <div className="px-4 pb-4 ml-6">
+                            <div className="p-3 bg-gray-50/80 backdrop-blur-sm rounded-lg border border-gray-200/50">
+                              <h5 className="font-medium mb-2 text-gray-900 text-sm">Detailed Analysis</h5>
+                              <p className="text-xs text-gray-700 mb-3 leading-relaxed">{insight.details}</p>
                               
-                              <h4 className="font-medium mb-2 text-slate-900">Action Items</h4>
-                              <ul className="space-y-2">
+                              <h5 className="font-medium mb-2 text-gray-900 text-sm">Recommended Actions</h5>
+                              <ul className="space-y-1">
                                 {insight.recommendations.map((rec, idx) => (
-                                  <li key={idx} className="flex items-start gap-2 text-sm">
-                                    <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${
+                                  <li key={idx} className="flex items-start gap-2 text-xs">
+                                    <div className={`w-1 h-1 rounded-full mt-1.5 flex-shrink-0 ${
                                       insight.color === 'green' ? 'bg-green-500' :
                                       insight.color === 'orange' ? 'bg-orange-500' :
                                       insight.color === 'blue' ? 'bg-blue-500' :
                                       'bg-gray-500'
                                     }`}></div>
-                                    <span className="text-slate-700">{rec}</span>
+                                    <span className="text-gray-700">{rec}</span>
                                   </li>
                                 ))}
                               </ul>
+                              
+                              {/* Action Buttons */}
+                              <div className="flex gap-2 mt-3">
+                                <button className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200/80 transition-colors">
+                                  Mark as Read
+                                </button>
+                                <button className="px-3 py-1 bg-gray-100/80 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200/80 transition-colors">
+                                  Remind Later
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </CollapsibleContent>
@@ -641,9 +684,16 @@ const AcademicPlanner = () => {
                     </div>
                   );
                 })}
+                
+                {/* Load More Notifications */}
+                <div className="pt-2 pb-1">
+                  <button className="w-full p-3 text-sm text-gray-600 bg-white/40 backdrop-blur-sm border border-gray-200/50 rounded-xl hover:bg-white/60 transition-all duration-200">
+                    Load more notifications...
+                  </button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </ScrollArea>
+          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Trophy Case Section */}

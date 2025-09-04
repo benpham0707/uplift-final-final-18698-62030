@@ -74,7 +74,7 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
           {/* Left Side - Task Information */}
           <div className="flex-1 border-r overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="p-6 pb-8 space-y-6 max-w-none">
+              <div className="p-6 pb-20 space-y-6 max-w-none">
                 {/* Task Header */}
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">

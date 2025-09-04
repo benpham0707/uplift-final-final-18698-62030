@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import TaskPlanningInterface from '@/components/TaskPlanningInterface';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { 
   GraduationCap, 
@@ -128,6 +129,10 @@ const AcademicPlanner = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [quickActionsExpanded, setQuickActionsExpanded] = useState(false);
+  
+  // Task planning interface state
+  const [taskPlanningOpen, setTaskPlanningOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
 
   const handleSendMessage = () => {
     if (userInput.trim()) {
@@ -189,6 +194,163 @@ const AcademicPlanner = () => {
     "Course difficulty analysis",
     "Study abroad planning"
   ];
+
+  // Hard coded data values for task planning - defines available academic planning tasks
+  const taskDatabase = {
+    "Schedule weekly chemistry tutoring sessions": {
+      title: "Schedule Weekly Chemistry Tutoring Sessions",
+      impact: "High",
+      difficulty: "Medium",
+      timeframe: "2-3 weeks",
+      category: "Academic Support",
+      description: "Establish consistent, structured chemistry support through professional tutoring to address specific knowledge gaps and improve laboratory skills. This focused approach will enhance your understanding of complex chemical concepts and boost your semester GPA.",
+      importance: "Chemistry is a foundational subject for pre-med tracks and STEM majors. Consistent tutoring sessions provide structured learning, immediate feedback, and personalized attention that classroom instruction may not offer. Strong chemistry performance demonstrates academic rigor and scientific aptitude to college admissions committees.",
+      takeaways: [
+        "Develop stronger problem-solving skills in chemistry",
+        "Build confidence in laboratory techniques and report writing", 
+        "Create study strategies that can be applied to other STEM courses",
+        "Establish a support system for challenging academic content"
+      ],
+      detailedSteps: [
+        "Research and contact 2-3 qualified chemistry tutors through school resources, online platforms, or peer recommendations",
+        "Schedule initial consultation sessions to assess compatibility and teaching style",
+        "Establish weekly recurring sessions (1-2 hours each) that align with your class schedule",
+        "Prepare specific topics and questions before each session based on current coursework",
+        "Create a shared document to track progress, concepts covered, and areas needing focus",
+        "Schedule sessions strategically before major tests, labs, or assignment due dates",
+        "Evaluate progress monthly and adjust tutoring focus based on grade improvements"
+      ]
+    },
+    "Create structured lab report template": {
+      title: "Create Structured Lab Report Template",
+      impact: "High", 
+      difficulty: "Low",
+      timeframe: "1-2 weeks",
+      category: "Study Optimization",
+      description: "Develop a comprehensive, reusable template for chemistry lab reports that ensures consistent quality, reduces preparation time, and maximizes points on every assignment. This systematic approach will improve your lab report grades and streamline your workflow.",
+      importance: "Lab reports often comprise a significant portion of chemistry grades and demonstrate scientific communication skills. A well-structured template ensures you never miss important sections, maintains professional presentation standards, and allows you to focus on analysis rather than formatting.",
+      takeaways: [
+        "Master scientific writing and communication standards",
+        "Develop systematic approach to laboratory work and documentation",
+        "Improve efficiency in completing assignments", 
+        "Create transferable skills for future science courses"
+      ],
+      detailedSteps: [
+        "Review past lab reports and instructor feedback to identify common formatting requirements",
+        "Research standard scientific lab report formats from chemistry style guides and textbooks",
+        "Create template sections: Title, Objective, Materials, Procedure, Data/Observations, Analysis, Conclusion",
+        "Add specific formatting guidelines, citation styles, and common formulas used in your class",
+        "Include checklists for each section to ensure completeness before submission",
+        "Test template with next lab assignment and refine based on instructor feedback",
+        "Share template with study group members to create consistent standards"
+      ]
+    },
+    "Form chemistry study group with high performers": {
+      title: "Form Chemistry Study Group with High Performers", 
+      impact: "High",
+      difficulty: "Medium",
+      timeframe: "2-4 weeks",
+      category: "Peer Learning",
+      description: "Organize a dedicated chemistry study group with academically strong classmates to facilitate collaborative learning, share diverse problem-solving approaches, and create accountability for consistent study habits.",
+      importance: "Peer learning accelerates understanding through diverse perspectives and teaching others solidifies your own knowledge. Study groups with high-performing students expose you to effective study strategies and maintain motivation through healthy academic competition.",
+      takeaways: [
+        "Learn multiple approaches to solving complex chemistry problems",
+        "Develop communication skills by explaining concepts to others",
+        "Build valuable academic and social connections",
+        "Create accountability system for consistent study habits"
+      ],
+      detailedSteps: [
+        "Identify 3-4 high-performing classmates who demonstrate strong chemistry understanding",
+        "Approach potential members with specific study group proposal including meeting frequency and format",
+        "Establish regular meeting schedule (weekly 2-3 hour sessions) and consistent location", 
+        "Create group guidelines for preparation, participation, and shared resources",
+        "Rotate leadership responsibilities for different topics or chapters",
+        "Develop shared study materials, practice problems, and review sheets",
+        "Schedule additional review sessions before major exams and coordinate study strategies"
+      ]
+    },
+    "Research AP courses for senior year": {
+      title: "Research AP Courses for Senior Year",
+      impact: "Medium",
+      difficulty: "Low",
+      timeframe: "2-3 weeks", 
+      category: "Course Planning",
+      description: "Systematically research and evaluate Advanced Placement course options for senior year to maximize academic rigor, align with college goals, and demonstrate intellectual curiosity beyond standard requirements.",
+      importance: "Strategic AP course selection strengthens college applications by showing academic challenge-seeking and preparation for college-level work. The right combination can also provide college credit, advanced standing, and demonstrate expertise in your intended field of study.",
+      takeaways: [
+        "Understand college credit and placement benefits of different AP courses",
+        "Align course selection with intended college major and career goals",
+        "Evaluate course difficulty and time commitment realistically",
+        "Create strategic academic narrative for college applications"
+      ],
+      detailedSteps: [
+        "Review available AP courses at your school and their prerequisites",
+        "Research AP credit policies at target colleges and universities",
+        "Meet with current AP teachers to understand course expectations and workload",
+        "Assess your strengths and interests to select courses where you can excel",
+        "Consider how AP courses align with your intended major or career path",
+        "Evaluate your overall course load to ensure balance with other commitments",
+        "Create a preliminary schedule and get counselor approval for feasibility"
+      ]
+    },
+    "Meet with counselor about course planning": {
+      title: "Meet with Counselor About Course Planning",
+      impact: "High",
+      difficulty: "Low", 
+      timeframe: "1 week",
+      category: "Academic Guidance",
+      description: "Schedule comprehensive meeting with your academic counselor to review graduation requirements, discuss senior year course options, and ensure your academic plan aligns with college and career goals.",
+      importance: "Professional academic counseling ensures you're meeting all requirements while optimizing your course selection for college admissions. Counselors have insights into course difficulty, teacher quality, and can help prevent scheduling conflicts or academic pitfalls.",
+      takeaways: [
+        "Verify you're on track for graduation and college admission requirements", 
+        "Get professional insight into course difficulty and teacher recommendations",
+        "Understand how your academic plan supports your college and career goals",
+        "Receive guidance on balancing academic rigor with realistic expectations"
+      ],
+      detailedSteps: [
+        "Schedule appointment with your assigned academic counselor",
+        "Prepare list of questions about graduation requirements and course options",
+        "Bring unofficial transcript and tentative senior year course preferences",
+        "Discuss your college goals and how courses align with admission requirements",
+        "Review any concerns about course load, difficulty, or scheduling conflicts",
+        "Get recommendations for teachers, course sequences, or alternative options",
+        "Follow up with written summary of decisions and next steps"
+      ]
+    },
+    "Consider dual enrollment opportunities": {
+      title: "Consider Dual Enrollment Opportunities",
+      impact: "High",
+      difficulty: "Medium",
+      timeframe: "3-4 weeks",
+      category: "Advanced Learning",
+      description: "Explore dual enrollment programs that allow you to take college courses while in high school, earning both high school and college credit simultaneously.",
+      importance: "Dual enrollment demonstrates college readiness, provides authentic college experience, and can significantly reduce college costs and time to degree. It shows admissions officers you can handle college-level academic challenges while still in high school.",
+      takeaways: [
+        "Experience authentic college-level coursework and expectations",
+        "Earn college credit that transfers to most universities", 
+        "Demonstrate advanced academic readiness to college admissions",
+        "Potentially reduce college costs and time to graduation"
+      ],
+      detailedSteps: [
+        "Research dual enrollment partnerships between your school and local colleges",
+        "Review eligibility requirements (GPA, test scores, grade level)",
+        "Identify courses that align with your academic goals and interests",
+        "Understand credit transfer policies at your target colleges",
+        "Meet with both high school counselor and college advisor to plan",
+        "Complete application and registration processes for both institutions",
+        "Prepare for increased academic rigor and college-level expectations"
+      ]
+    }
+  };
+
+  // Function to handle opening task planning interface
+  const handleTaskPlanningOpen = (actionText: string) => {
+    const task = taskDatabase[actionText as keyof typeof taskDatabase];
+    if (task) {
+      setSelectedTask(task);
+      setTaskPlanningOpen(true);
+    }
+  };
 
   // GPA Line Chart Component
   const GPALineChart = () => {
@@ -603,6 +765,7 @@ const AcademicPlanner = () => {
                     { action: "Create structured lab report template", buttonText: "Optimize Study Methods" },
                     { action: "Form chemistry study group with high performers", buttonText: "Build Study Network" }
                   ]}
+                  onActionClick={handleTaskPlanningOpen}
                   connections="Consistent academic performance + work ethic narrative + strategic improvement = compelling resilience story for competitive programs."
                 />
 
@@ -620,9 +783,10 @@ const AcademicPlanner = () => {
                   }}
                   actionItems={[
                     { action: "Research AP courses for senior year", buttonText: "Explore Options" },
-                    { action: "Meet with counselor about course planning", buttonText: "Get Guidance" },
+                    { action: "Meet with counselor about course planning", buttonText: "Get Guidance" }, 
                     { action: "Consider dual enrollment opportunities", buttonText: "Expand Horizons" }
                   ]}
+                  onActionClick={handleTaskPlanningOpen}
                   connections="Strategic course selection + demonstrated academic ability + career alignment = strong foundation for competitive college admissions."
                 />
 
@@ -643,6 +807,7 @@ const AcademicPlanner = () => {
                     { action: "Prepare academic achievement portfolio", buttonText: "Showcase Growth" },
                     { action: "Consider academic honors applications", buttonText: "Seek Recognition" }
                   ]}
+                  onActionClick={handleTaskPlanningOpen}
                   connections="Consistent performance + time management skills + work experience = demonstrated college readiness and maturity."
                 />
 
@@ -661,6 +826,7 @@ const AcademicPlanner = () => {
                     { action: "Review elective options for senior year", buttonText: "Plan Electives" },
                     { action: "Confirm graduation requirement completion", buttonText: "Verify Progress" }
                   ]}
+                  onActionClick={handleTaskPlanningOpen}
                   connections="On-track graduation + strategic elective use = maximum preparation for post-secondary success."
                 />
 
@@ -1229,6 +1395,13 @@ const AcademicPlanner = () => {
           </Card>
         </div>
       )}
+
+      {/* Task Planning Interface */}
+      <TaskPlanningInterface 
+        isOpen={taskPlanningOpen}
+        onClose={() => setTaskPlanningOpen(false)}
+        task={selectedTask}
+      />
     </div>
   );
 };
@@ -1246,9 +1419,10 @@ interface AcademicInsightItemProps {
     buttonText: string;
   }>;
   connections: string;
+  onActionClick?: (action: string) => void;
 }
 
-const AcademicInsightItem = ({ title, description, time, type, impact, estimatedGains, actionItems, connections }: AcademicInsightItemProps) => {
+const AcademicInsightItem = ({ title, description, time, type, impact, estimatedGains, actionItems, connections, onActionClick }: AcademicInsightItemProps) => {
   const typeColors = {
     strength: 'text-green-600',
     opportunity: 'text-blue-600',
@@ -1371,7 +1545,12 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
               {actionItems.map((item, index) => (
                 <div key={index} className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground flex-1 mr-3">{item.action}</span>
-                  <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-6 px-2 text-xs"
+                    onClick={() => onActionClick?.(item.action)}
+                  >
                     {item.buttonText}
                   </Button>
                 </div>

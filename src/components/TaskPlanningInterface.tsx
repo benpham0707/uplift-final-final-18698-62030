@@ -1,0 +1,228 @@
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Target, 
+  Lightbulb, 
+  CheckCircle2, 
+  MessageCircle, 
+  Send, 
+  Brain,
+  Clock,
+  Award,
+  TrendingUp
+} from 'lucide-react';
+
+interface TaskPlanningInterfaceProps {
+  isOpen: boolean;
+  onClose: () => void;
+  task: {
+    title: string;
+    impact: string;
+    difficulty: string;
+    timeframe: string;
+    category: string;
+    description: string;
+    importance: string;
+    takeaways: string[];
+    detailedSteps: string[];
+  } | null;
+}
+
+const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, onClose, task }) => {
+  // Hard coded data values for chat messages between user and task planning chatbot
+  const [chatMessages, setChatMessages] = useState([
+    {
+      role: 'assistant',
+      content: "Hi! I'm your Task Planning Assistant. I'll help you customize this action plan to fit your specific needs and circumstances. What aspects would you like to personalize?"
+    }
+  ]);
+  const [userInput, setUserInput] = useState('');
+
+  const handleSendMessage = () => {
+    if (userInput.trim()) {
+      setChatMessages(prev => [
+        ...prev,
+        { role: 'user', content: userInput },
+        { 
+          role: 'assistant', 
+          content: "Great question! Let me analyze your specific situation and provide personalized recommendations for this task." 
+        }
+      ]);
+      setUserInput('');
+    }
+  };
+
+  if (!task) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl h-[80vh] p-0">
+        <DialogHeader className="px-6 py-4 border-b">
+          <DialogTitle className="flex items-center gap-3 text-xl">
+            <Target className="h-6 w-6 text-primary" />
+            {task.title}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="flex h-full">
+          {/* Left Side - Task Information */}
+          <div className="flex-1 border-r">
+            <ScrollArea className="h-full">
+              <div className="p-6 space-y-6">
+                {/* Task Overview */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Brain className="h-5 w-5" />
+                      Task Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-muted-foreground leading-relaxed">
+                      {task.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-3">
+                      <Badge variant="outline" className="flex items-center gap-2">
+                        <TrendingUp className="h-3 w-3" />
+                        Impact: {task.impact}
+                      </Badge>
+                      <Badge variant="outline" className="flex items-center gap-2">
+                        <Clock className="h-3 w-3" />
+                        {task.timeframe}
+                      </Badge>
+                      <Badge variant="outline">
+                        Difficulty: {task.difficulty}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Why It's Important */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5" />
+                      Why This Matters
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {task.importance}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Key Takeaways */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Award className="h-5 w-5" />
+                      Key Takeaways
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {task.takeaways.map((takeaway, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">{takeaway}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                {/* Detailed Steps */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" />
+                      Step-by-Step Guide
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {task.detailedSteps.map((step, index) => (
+                        <div key={index} className="flex gap-4">
+                          <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 pt-1">
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {step}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </ScrollArea>
+          </div>
+
+          {/* Right Side - Chat Interface */}
+          <div className="w-96 flex flex-col">
+            {/* Chat Header */}
+            <div className="p-4 border-b">
+              <h3 className="font-semibold flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Personalize Your Plan
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Chat with our AI to customize this task to your specific needs
+              </p>
+            </div>
+
+            {/* Chat Messages */}
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {chatMessages.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div 
+                      className={`max-w-[80%] p-3 rounded-lg text-sm ${
+                        message.role === 'user' 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {message.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {/* Chat Input */}
+            <div className="p-4 border-t">
+              <div className="flex gap-2">
+                <Input
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  placeholder="Ask about customizing this task..."
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1"
+                />
+                <Button size="sm" onClick={handleSendMessage}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default TaskPlanningInterface;

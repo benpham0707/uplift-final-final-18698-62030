@@ -499,17 +499,17 @@ const AcademicPlanner = () => {
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-3xl font-bold text-blue-800">{currentGPA.weighted}</div>
-                      <div className="text-sm text-blue-900">Weighted GPA</div>
+                    <div className="text-center p-3 bg-blue-100 rounded-lg border border-blue-300">
+                      <div className="text-3xl font-bold text-blue-900">{currentGPA.weighted}</div>
+                      <div className="text-sm text-blue-950">Weighted GPA</div>
                     </div>
-                    <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-3xl font-bold text-blue-800">{currentGPA.unweighted}</div>
-                      <div className="text-sm text-blue-900">Unweighted GPA</div>
+                    <div className="text-center p-3 bg-blue-100 rounded-lg border border-blue-300">
+                      <div className="text-3xl font-bold text-blue-900">{currentGPA.unweighted}</div>
+                      <div className="text-sm text-blue-950">Unweighted GPA</div>
                     </div>
-                    <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-3xl font-bold text-blue-800">{Math.round(((currentGPA.totalStudents - currentGPA.classRank + 1) / currentGPA.totalStudents) * 100)}th</div>
-                      <div className="text-sm text-blue-900">Percentile</div>
+                    <div className="text-center p-3 bg-blue-100 rounded-lg border border-blue-300">
+                      <div className="text-3xl font-bold text-blue-900">{Math.round(((currentGPA.totalStudents - currentGPA.classRank + 1) / currentGPA.totalStudents) * 100)}th</div>
+                      <div className="text-sm text-blue-950">Percentile</div>
                     </div>
                   </div>
                   

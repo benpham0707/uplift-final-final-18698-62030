@@ -63,18 +63,18 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-7xl h-[85vh] p-0 overflow-hidden">
-        <DialogHeader className="px-6 py-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <DialogHeader className="px-6 py-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Target className="h-6 w-6 text-primary" />
             {task.title}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex h-[calc(100%-80px)]">
+        <div className="flex flex-1 min-h-0">
           {/* Left Side - Task Information */}
           <div className="flex-1 border-r overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="p-6 pb-20 space-y-6 max-w-none">
+              <div className="p-6 pb-32 space-y-6 max-w-none">
                 {/* Task Header */}
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">

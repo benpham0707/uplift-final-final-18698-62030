@@ -834,7 +834,18 @@ const AcademicPlanner = () => {
             </CardContent>
           </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Section Separator */}
+          <div className="my-12">
+            <div className="flex items-center justify-center">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+              <div className="mx-6 px-4 py-2 bg-muted/50 rounded-full border">
+                <span className="text-sm font-medium text-muted-foreground">Academic Portfolio</span>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+            </div>
+          </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
           {/* Trophy Case Section */}
           <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 shadow-xl">
             <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 border-b-2 border-amber-200">

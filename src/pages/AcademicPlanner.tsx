@@ -457,10 +457,10 @@ const AcademicPlanner = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-amber-600 rounded-full"></div>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#84A59D' }}></div>
             <div className="text-sm">
               <span className="font-semibold text-slate-700">Major Average:</span>
-              <span className="ml-1 font-bold text-amber-600">{gpaData.majorRecommended}</span>
+              <span className="ml-1 font-bold" style={{ color: '#84A59D' }}>{gpaData.majorRecommended}</span>
             </div>
           </div>
           <div className="flex items-center gap-3">

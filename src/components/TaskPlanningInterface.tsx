@@ -252,71 +252,32 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
                     Success Metrics & Outcomes
                   </h3>
                   
-                  {/* Strategic Visual Hierarchy for Outcomes */}
-                  <div className="space-y-4">
-                    {task.takeaways.map((takeaway, index) => {
-                      // Hard coded data values - Strategic hierarchy: most impressive first, supporting metrics after
-                      const getOutcomeHierarchy = (index: number) => {
-                        if (index === 0) {
-                          // Hero Outcome - Most impressive and impactful
-                          return {
-                            size: "large",
-                            bg: "bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/30",
-                            icon: <Award className="h-8 w-8 text-primary" />,
-                            title: "Achievement Milestone",
-                            titleClass: "text-xl font-bold text-primary mb-3",
-                            contentClass: "text-base leading-relaxed",
-                            padding: "p-6",
-                            shadow: "shadow-lg hover:shadow-xl"
-                          };
-                        } else if (index === 1) {
-                          // Primary Outcome - Key supporting result
-                          return {
-                            size: "medium", 
-                            bg: "bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/60",
-                            icon: <TrendingUp className="h-6 w-6 text-emerald-600" />,
-                            title: "Progress Indicator",
-                            titleClass: "text-lg font-semibold text-emerald-800 mb-2",
-                            contentClass: "text-sm leading-relaxed text-emerald-700",
-                            padding: "p-5",
-                            shadow: "shadow-md hover:shadow-lg"
-                          };
-                        } else {
-                          // Supporting Outcomes - Trust builders and additional benefits
-                          return {
-                            size: "small",
-                            bg: "bg-muted/40 border border-muted-foreground/20",
-                            icon: <CheckCircle2 className="h-5 w-5 text-muted-foreground" />,
-                            title: "Success Milestone",
-                            titleClass: "text-sm font-medium text-muted-foreground mb-1",
-                            contentClass: "text-xs leading-relaxed text-muted-foreground/80",
-                            padding: "p-4",
-                            shadow: "hover:shadow-sm"
-                          };
-                        }
-                      };
-                      
-                      const hierarchy = getOutcomeHierarchy(index);
-                      
-                      return (
-                        <div key={index} className={`flex items-start gap-4 rounded-xl transition-all duration-300 ${hierarchy.bg} ${hierarchy.padding} ${hierarchy.shadow}`}>
+                  {/* Grid Layout Based on Count */}
+                  <div className={`grid gap-4 ${
+                    task.takeaways.length === 1 ? 'grid-cols-1' :
+                    task.takeaways.length === 2 ? 'grid-cols-2' :
+                    task.takeaways.length === 3 ? 'grid-cols-3' :
+                    task.takeaways.length === 4 ? 'grid-cols-2' :
+                    task.takeaways.length === 5 ? 'grid-cols-3' :
+                    task.takeaways.length === 6 ? 'grid-cols-3' :
+                    task.takeaways.length <= 8 ? 'grid-cols-2' :
+                    'grid-cols-3'
+                  }`}>
+                    {task.takeaways.map((takeaway, index) => (
+                      <div key={index} className="bg-muted/30 border border-muted-foreground/20 rounded-xl p-4 hover:shadow-md transition-all duration-300">
+                        <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 mt-1">
-                            {hierarchy.icon}
+                            <Award className="h-5 w-5 text-primary" />
                           </div>
                           <div className="flex-1">
-                            <div className={hierarchy.titleClass}>
-                              {hierarchy.title}
+                            <div className="text-sm font-medium text-foreground mb-2">
+                              Success Metric {index + 1}
                             </div>
-                            <p className={hierarchy.contentClass}>{takeaway}</p>
-                            {index === 0 && (
-                              <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium">
-                                Primary Goal
-                              </div>
-                            )}
+                            <p className="text-sm text-muted-foreground leading-relaxed">{takeaway}</p>
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 </div>
 

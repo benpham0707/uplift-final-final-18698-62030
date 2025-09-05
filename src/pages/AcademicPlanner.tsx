@@ -437,10 +437,10 @@ const AcademicPlanner = () => {
               <Line 
                 type="monotone" 
                 dataKey="majorAverage" 
-                stroke="#d97706" 
+                stroke="#84A59D" 
                 strokeWidth={4}
-                dot={{ fill: '#d97706', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
-                activeDot={{ r: 8, stroke: '#d97706', strokeWidth: 3, fill: '#ffffff' }}
+                dot={{ fill: '#84A59D', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
+                activeDot={{ r: 8, stroke: '#84A59D', strokeWidth: 3, fill: '#ffffff' }}
                 name="Major Average"
               />
             </LineChart>

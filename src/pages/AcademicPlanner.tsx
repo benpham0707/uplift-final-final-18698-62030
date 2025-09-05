@@ -1470,7 +1470,7 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
       return 'border-2 border-red-500';
     }
     if (impact === 'high') {
-      return 'border border-blue-300 bg-blue-50/30 shadow-[0_0_15px_rgba(132,165,157,0.3),0_0_30px_rgba(132,165,157,0.15)] hover:shadow-[0_0_20px_rgba(132,165,157,0.4),0_0_40px_rgba(132,165,157,0.2)] rounded-xl';
+      return 'shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] border-blue-500/50';
     }
     if (impact === 'medium') {
       return 'border-2 border-green-500';

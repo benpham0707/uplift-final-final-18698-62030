@@ -48,6 +48,7 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
     }
   ]);
   const [userInput, setUserInput] = useState('');
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const handleSendMessage = () => {
     if (userInput.trim()) {
@@ -78,12 +79,17 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-10 w-10 p-0 border border-border/50 hover:border-border">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-10 w-10 p-0 border border-border/50 hover:border-border"
+                      onClick={() => setShowTutorial(true)}
+                    >
                       <Info className="h-5 w-5 text-primary" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="max-w-sm">
-                    <p className="text-sm">Learn how to use the task planning interface. Chat with the AI to personalize your plan, track your progress with success metrics, and finalize your task to add it to your calendar and dashboard.</p>
+                    <p className="text-sm">Click to open the task planning tutorial</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -440,6 +446,146 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
           </div>
         </div>
       </DialogContent>
+      
+      {/* Tutorial Dialog */}
+      <Dialog open={showTutorial} onOpenChange={setShowTutorial}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Info className="h-5 w-5 text-primary" />
+              Task Planning Interface Tutorial
+            </DialogTitle>
+          </DialogHeader>
+          
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-6 py-4">
+              
+              {/* Overview */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-primary">Welcome to Task Planning</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  This interface helps you transform AI-generated task recommendations into personalized, actionable plans. 
+                  Here's how to get the most out of each section:
+                </p>
+              </div>
+
+              <Separator />
+
+              {/* Left Panel Explanation */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Task Overview & Planning (Left Panel)
+                </h3>
+                
+                <div className="space-y-4 pl-6">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">📋 Task Information</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Review the task title, description, and key attributes (impact level, difficulty, timeframe). 
+                      These give you context for planning your approach.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">🎯 Implementation Phases</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      See your task broken down into manageable phases with specific action steps. 
+                      Each phase includes estimated time commitments and detailed sub-tasks.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">💡 Strategic Value</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Understand why this task matters for your goals and what long-term benefits you'll gain.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">📊 Success Metrics</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Track your progress with specific, measurable indicators. Use these to stay motivated and assess your success.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Chat Interface Explanation */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-primary" />
+                  AI Personalization Chat (Right Panel)
+                </h3>
+                
+                <div className="space-y-4 pl-6">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">💬 Smart Customization</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Chat with the AI to customize the task plan for your specific situation. Ask about:
+                    </p>
+                    <ul className="text-xs text-muted-foreground space-y-1 ml-4">
+                      <li>• Adjusting timelines based on your schedule</li>
+                      <li>• Modifying difficulty based on your experience level</li>
+                      <li>• Adding specific resources or tools you have access to</li>
+                      <li>• Accounting for constraints or challenges you face</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">🔄 Regenerate Plan</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Use the regenerate button (↻) to update the entire task plan based on your conversation. 
+                      The AI will incorporate all your feedback and preferences into a new, personalized plan.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Final Steps */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <CalendarPlus className="h-4 w-4 text-primary" />
+                  Finalizing Your Task
+                </h3>
+                
+                <div className="space-y-4 pl-6">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">✅ Ready to Commit?</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Once you're satisfied with your personalized plan, click "Add to Calendar" to:
+                    </p>
+                    <ul className="text-xs text-muted-foreground space-y-1 ml-4">
+                      <li>• Save the task to your personal dashboard</li>
+                      <li>• Add milestones and deadlines to your calendar</li>
+                      <li>• Begin tracking your progress</li>
+                      <li>• Access the plan anytime from your task list</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                    <p className="text-xs text-primary font-medium">
+                      💡 Pro Tip: Don't rush! Take time to chat with the AI and customize the plan. 
+                      The more specific you are about your situation, the better your personalized action plan will be.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </ScrollArea>
+          
+          <div className="flex justify-end pt-4 border-t">
+            <Button onClick={() => setShowTutorial(false)}>
+              Got it, thanks!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };

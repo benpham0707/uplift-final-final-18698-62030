@@ -35,7 +35,11 @@ interface TaskPlanningInterfaceProps {
     description: string;
     importance: string;
     takeaways: string[];
-    detailedSteps: string[];
+    phases: Array<{
+      title: string;
+      description: string;
+      steps: string[];
+    }>;
   } | null;
 }
 
@@ -141,106 +145,38 @@ const TaskPlanningInterface: React.FC<TaskPlanningInterfaceProps> = ({ isOpen, o
                     Implementation Phases
                   </h3>
                   
-                  {/* Hard coded data values for task implementation phases specific to academic tutoring sessions */}
                   <div className="space-y-4">
-                    <div className={`border rounded-lg p-4 space-y-3 ${task.impact === 'High' ? 'shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] border-blue-500/50' : ''}`}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-semibold">1</div>
-                        <h4 className="font-medium">Planning & Setup</h4>
-                        <Badge variant="outline" className="text-xs">Week 1</Badge>
-                      </div>
-                      <div className="pl-8 space-y-2">
-                        <p className="text-sm text-muted-foreground">Research and identify qualified tutors, establish schedule, set learning objectives</p>
-                        <ul className="text-xs space-y-1 text-muted-foreground">
-                          <li>• Find certified chemistry tutors with proven track record</li>
-                          <li>• Schedule initial assessment session</li>
-                          <li>• Define specific areas of focus and improvement goals</li>
-                        </ul>
-                        <div className="mt-3 space-y-2">
-                          <h5 className="text-xs font-medium text-muted-foreground">Detailed Action Steps:</h5>
-                          {task.detailedSteps.slice(0, Math.ceil(task.detailedSteps.length / 3)).map((step, index) => (
-                            <div key={index} className="flex gap-3 p-2 rounded bg-muted/30">
-                              <div className="flex-shrink-0 w-5 h-5 bg-primary/20 text-primary rounded-full flex items-center justify-center text-xs font-semibold">
-                                {index + 1}
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-xs text-muted-foreground leading-relaxed">{step}</p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                                  <Clock className="h-3 w-3" />
-                                  <span>Est. time: 2-3 hours</span>
+                    {task.phases.map((phase, phaseIndex) => (
+                      <div key={phaseIndex} className={`border rounded-lg p-4 space-y-3 ${task.impact === 'High' ? 'shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] border-blue-500/50' : ''}`}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-semibold">{phaseIndex + 1}</div>
+                          <h4 className="font-medium">{phase.title}</h4>
+                          <Badge variant="outline" className="text-xs">
+                            {phaseIndex === 0 ? 'Weeks 1-2' : phaseIndex === 1 ? 'Weeks 2-4' : 'Weeks 4-6'}
+                          </Badge>
+                        </div>
+                        <div className="pl-8 space-y-2">
+                          <p className="text-sm text-muted-foreground">{phase.description}</p>
+                          <div className="mt-3 space-y-2">
+                            <h5 className="text-xs font-medium text-muted-foreground">Action Steps:</h5>
+                            {phase.steps.map((step, stepIndex) => (
+                              <div key={stepIndex} className="flex gap-3 p-2 rounded bg-muted/30">
+                                <div className="flex-shrink-0 w-5 h-5 bg-primary/20 text-primary rounded-full flex items-center justify-center text-xs font-semibold">
+                                  {stepIndex + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-xs text-muted-foreground leading-relaxed">{step}</p>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                    <Clock className="h-3 w-3" />
+                                    <span>Est. time: {phaseIndex === 0 ? '2-3 hours' : phaseIndex === 1 ? '1-2 hours' : '30-60 minutes'}</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    <div className={`border rounded-lg p-4 space-y-3 ${task.impact === 'High' ? 'shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] border-blue-500/50' : ''}`}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-semibold">2</div>
-                        <h4 className="font-medium">Regular Sessions</h4>
-                        <Badge variant="outline" className="text-xs">Weeks 2-12</Badge>
-                      </div>
-                      <div className="pl-8 space-y-2">
-                        <p className="text-sm text-muted-foreground">Consistent weekly sessions focusing on problem-solving and concept reinforcement</p>
-                        <ul className="text-xs space-y-1 text-muted-foreground">
-                          <li>• 90-minute sessions covering current coursework</li>
-                          <li>• Practice problems and lab technique improvement</li>
-                          <li>• Regular progress assessments and adjustments</li>
-                        </ul>
-                        <div className="mt-3 space-y-2">
-                          <h5 className="text-xs font-medium text-muted-foreground">Detailed Action Steps:</h5>
-                          {task.detailedSteps.slice(Math.ceil(task.detailedSteps.length / 3), Math.ceil(task.detailedSteps.length * 2 / 3)).map((step, index) => (
-                            <div key={index} className="flex gap-3 p-2 rounded bg-muted/30">
-                              <div className="flex-shrink-0 w-5 h-5 bg-primary/20 text-primary rounded-full flex items-center justify-center text-xs font-semibold">
-                                {Math.ceil(task.detailedSteps.length / 3) + index + 1}
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-xs text-muted-foreground leading-relaxed">{step}</p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                                  <Clock className="h-3 w-3" />
-                                  <span>Est. time: 1-2 hours</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={`border rounded-lg p-4 space-y-3 ${task.impact === 'High' ? 'shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] border-blue-500/50' : ''}`}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-semibold">3</div>
-                        <h4 className="font-medium">Assessment & Optimization</h4>
-                        <Badge variant="outline" className="text-xs">Ongoing</Badge>
-                      </div>
-                      <div className="pl-8 space-y-2">
-                        <p className="text-sm text-muted-foreground">Monitor progress and adapt tutoring approach based on performance data</p>
-                        <ul className="text-xs space-y-1 text-muted-foreground">
-                          <li>• Monthly progress reviews with grades and comprehension metrics</li>
-                          <li>• Adjust tutoring focus areas based on performance</li>
-                          <li>• Prepare for major exams and lab practicals</li>
-                        </ul>
-                        <div className="mt-3 space-y-2">
-                          <h5 className="text-xs font-medium text-muted-foreground">Detailed Action Steps:</h5>
-                          {task.detailedSteps.slice(Math.ceil(task.detailedSteps.length * 2 / 3)).map((step, index) => (
-                            <div key={index} className="flex gap-3 p-2 rounded bg-muted/30">
-                              <div className="flex-shrink-0 w-5 h-5 bg-primary/20 text-primary rounded-full flex items-center justify-center text-xs font-semibold">
-                                {Math.ceil(task.detailedSteps.length * 2 / 3) + index + 1}
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-xs text-muted-foreground leading-relaxed">{step}</p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                                  <Clock className="h-3 w-3" />
-                                  <span>Est. time: 30-60 minutes</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
 

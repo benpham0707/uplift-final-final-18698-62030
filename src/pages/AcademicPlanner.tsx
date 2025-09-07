@@ -717,7 +717,7 @@ const AcademicPlanner = () => {
             </Card>
           </div>
 
-          {/* Academic Planning Insights & Recommendations */}
+          {/* Academic Planning Insights & Recommendations Dashboard */}
           <Card className="shadow-medium">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -725,7 +725,7 @@ const AcademicPlanner = () => {
                 Academic Planning Insights & Recommendations
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Showing 3 of 6 insights • Scroll to see more
+                Strategic insights to optimize your academic performance
               </p>
               
               {/* Filter bubble */}
@@ -812,26 +812,21 @@ const AcademicPlanner = () => {
               </Popover>
             </CardHeader>
             <CardContent>
-              <div 
-                className="insights-scroll h-[600px] overflow-y-auto space-y-6 pr-2 scroll-smooth"
-                style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'hsl(var(--border)) transparent'
-                }}
-              >
+              {/* 2-column dashboard grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2">
                 <style dangerouslySetInnerHTML={{
                   __html: `
-                    .insights-scroll::-webkit-scrollbar {
+                    .grid::-webkit-scrollbar {
                       width: 6px;
                     }
-                    .insights-scroll::-webkit-scrollbar-track {
+                    .grid::-webkit-scrollbar-track {
                       background: transparent;
                     }
-                    .insights-scroll::-webkit-scrollbar-thumb {
+                    .grid::-webkit-scrollbar-thumb {
                       background: hsl(var(--border));
                       border-radius: 3px;
                     }
-                    .insights-scroll::-webkit-scrollbar-thumb:hover {
+                    .grid::-webkit-scrollbar-thumb:hover {
                       background: hsl(var(--foreground) / 0.3);
                     }
                   `
@@ -839,8 +834,8 @@ const AcademicPlanner = () => {
 
                 {/* Academic Excellence Insight */}
                 <AcademicInsightItem
-                  title="GPA Trajectory Optimization Opportunity"
-                  description="Your 3.8 GPA while managing work responsibilities demonstrates strong time management, but targeted improvement in AP Chemistry could boost your STEM profile significantly. Strategic focus on lab reports and practice problems could raise your semester GPA to 3.9+, positioning you for competitive pre-med programs."
+                  title="GPA Trajectory Optimization"
+                  description="Your 3.8 GPA while managing work demonstrates strong time management. Targeted AP Chemistry improvement could boost your STEM profile significantly."
                   time="1 hour ago"
                   type="improvement"
                   impact="high"
@@ -855,13 +850,13 @@ const AcademicPlanner = () => {
                     { action: "Form chemistry study group with high performers", buttonText: "Build Study Network" }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
-                  connections="Consistent academic performance + work ethic narrative + strategic improvement = compelling resilience story for competitive programs."
+                  connections="Academic performance + work ethic + strategic improvement = compelling story for competitive programs."
                 />
 
                 {/* Course Planning Insight */}
                 <AcademicInsightItem
-                  title="Advanced Coursework Sequence Optimization"
-                  description="Your current AP course load (4 completed) positions you well, but strategic selection of 2-3 additional APs could significantly strengthen your academic profile. Focus on courses that align with your career interests and demonstrate intellectual curiosity beyond graduation requirements."
+                  title="Advanced Coursework Optimization"
+                  description="Your current AP course load (4 completed) positions you well. Strategic selection of 2-3 additional APs could significantly strengthen your profile."
                   time="6 hours ago"
                   type="opportunity"
                   impact="high"
@@ -876,13 +871,13 @@ const AcademicPlanner = () => {
                     { action: "Consider dual enrollment opportunities", buttonText: "Expand Horizons" }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
-                  connections="Strategic course selection + demonstrated academic ability + career alignment = strong foundation for competitive college admissions."
+                  connections="Strategic course selection + demonstrated ability + career alignment = strong college foundation."
                 />
 
                 {/* Achievement Recognition */}
                 <AcademicInsightItem
-                  title="Academic Consistency Achievement Pattern"
-                  description="Maintaining 3.8+ GPA for three consecutive semesters while working part-time showcases exceptional time management and academic dedication. This consistency pattern, combined with your upward trajectory in challenging courses, creates a powerful narrative of academic resilience and growth mindset."
+                  title="Academic Consistency Pattern"
+                  description="Maintaining 3.8+ GPA for three consecutive semesters while working part-time showcases exceptional time management and dedication."
                   time="2 days ago"
                   type="strength"
                   impact="medium"
@@ -897,13 +892,13 @@ const AcademicPlanner = () => {
                     { action: "Consider academic honors applications", buttonText: "Seek Recognition" }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
-                  connections="Consistent performance + time management skills + work experience = demonstrated college readiness and maturity."
+                  connections="Consistent performance + time management + work experience = demonstrated college readiness."
                 />
 
                 {/* Graduation Timeline */}
                 <AcademicInsightItem
-                  title="Graduation Requirements Progress Check"
-                  description="You've completed 85% of graduation requirements with excellent pacing. Current trajectory shows on-time graduation with opportunities to exceed minimum requirements. Consider using remaining elective slots strategically to strengthen areas of interest or career preparation."
+                  title="Graduation Requirements Check"
+                  description="You've completed 85% of graduation requirements with excellent pacing. Consider using remaining elective slots strategically."
                   time="1 week ago"
                   type="strength"
                   impact="low"
@@ -916,7 +911,7 @@ const AcademicPlanner = () => {
                     { action: "Confirm graduation requirement completion", buttonText: "Verify Progress" }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
-                  connections="On-track graduation + strategic elective use = maximum preparation for post-secondary success."
+                  connections="On-track graduation + strategic elective use = maximum post-secondary preparation."
                 />
 
               </div>
@@ -1553,18 +1548,18 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
 
   const getBorderClass = (type: string, impact: string) => {
     if (type === 'warning' && impact === 'medium') {
-      return 'border-2 border-muted-foreground/30';
+      return 'border border-muted-foreground/30';
     }
     if (type === 'concern') {
-      return 'border-2 border-red-500';
+      return 'border border-red-500';
     }
     if (impact === 'high') {
-      return 'border-2 border-blue-500 shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_8px_rgba(59,130,246,0.3)]';
+      return 'border border-blue-500 shadow-md hover:shadow-lg';
     }
     if (impact === 'medium') {
-      return 'border-2 border-green-500';
+      return 'border border-green-500';
     }
-    return 'border-2 border-yellow-500';
+    return 'border border-yellow-500';
   };
 
   const getImpactBadgeColors = (type: string, impact: string) => {
@@ -1598,77 +1593,65 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
   };
 
   return (
-    <div className={`p-5 rounded-lg shadow-soft hover:shadow-medium transition-all duration-200 ${getBorderClass(type, impact)}`}>
-      <div className="flex items-start gap-3">
-        <CheckCircle2 className={`h-6 w-6 mt-0.5 ${getCheckmarkColor(type, impact)} flex-shrink-0`} />
-        <div className="flex-1 space-y-3">
+    <div className={`p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 ${getBorderClass(type, impact)} bg-card`}>
+      <div className="flex items-start gap-2">
+        <CheckCircle2 className={`h-4 w-4 mt-0.5 ${getCheckmarkColor(type, impact)} flex-shrink-0`} />
+        <div className="flex-1 space-y-2">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h4 className="font-semibold text-foreground text-lg">{title}</h4>
-                <Badge className={`text-xs px-2 py-1 ${getImpactBadgeColors(type, impact)}`}>
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-semibold text-foreground text-sm">{title}</h4>
+                <Badge className={`text-xs px-1.5 py-0.5 ${getImpactBadgeColors(type, impact)}`}>
                   {getImpactText(type, impact)}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{description}</p>
-            </div>
-            <div className="text-right ml-4 min-w-[140px]">
-              <div className="text-xs text-muted-foreground mb-2 flex items-center justify-end gap-1 font-medium">
-                <Scale className="h-3 w-3" />
-                Estimated Impact
-              </div>
-              <div className="space-y-1 opacity-50">
-                {Object.entries(estimatedGains).map(([key, value]) => (
-                  <div key={key} className="text-xs font-medium text-muted-foreground">
-                    {value >= 0 ? '+' : ''}
-                    {value.toFixed(2)} {key}
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
             </div>
           </div>
           
-          <div className="bg-primary/5 rounded-md p-3 border border-primary/20">
-            <h5 className="font-medium text-foreground text-sm mb-2 flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Academic Focus Areas
+          <div className="bg-primary/5 rounded-md p-2 border border-primary/20">
+            <h5 className="font-medium text-foreground text-xs mb-1 flex items-center gap-1">
+              <Target className="h-3 w-3" />
+              Focus Areas
             </h5>
             <p className="text-xs text-muted-foreground italic">{connections}</p>
           </div>
 
-          <div className="bg-secondary/10 rounded-md p-3 border border-secondary/30">
-            <h5 className="font-medium text-foreground text-sm mb-2 flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              Recommended Actions
+          <div className="bg-secondary/10 rounded-md p-2 border border-secondary/30">
+            <h5 className="font-medium text-foreground text-xs mb-2 flex items-center gap-1">
+              <Zap className="h-3 w-3" />
+              Actions
             </h5>
-            <div className="space-y-2">
-              {actionItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground flex-1 mr-3">{item.action}</span>
+            <div className="space-y-1.5">
+              {actionItems.slice(0, 2).map((item, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex-1 mr-2 leading-tight">{item.action}</span>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="h-6 px-2 text-xs"
+                    className="h-5 px-2 text-xs"
                     onClick={() => onActionClick?.(item.action)}
                   >
                     {item.buttonText}
                   </Button>
                 </div>
               ))}
+              {actionItems.length > 2 && (
+                <div className="text-xs text-muted-foreground/70">
+                  +{actionItems.length - 2} more actions available
+                </div>
+              )}
             </div>
           </div>
           
-          <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <div className="flex items-center justify-between pt-1 border-t border-border/50">
             <div className="text-xs text-muted-foreground flex items-center gap-1">
               <Clock className="h-3 w-3" />
               {time}
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                Record in Journal
-              </Button>
-              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                View Full Analysis
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" className="h-5 px-2 text-xs">
+                View Details
               </Button>
             </div>
           </div>

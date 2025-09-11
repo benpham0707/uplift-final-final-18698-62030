@@ -1583,7 +1583,7 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
                   {getImpactText(type, impact)}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{description}</p>
+              <p className="text-sm text-foreground/75 mt-2 leading-relaxed">{description}</p>
             </div>
             <div className="text-right ml-4 min-w-[140px]">
               <div className="text-xs text-muted-foreground mb-2 flex items-center justify-end gap-1 font-medium">
@@ -1606,7 +1606,7 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
               <Target className="h-4 w-4" />
               Academic Focus Areas
             </h5>
-            <p className="text-xs text-muted-foreground italic">{connections}</p>
+            <p className="text-xs text-foreground/70 italic">{connections}</p>
           </div>
 
           <div className="bg-secondary/10 rounded-md p-3 border border-secondary/30">
@@ -1618,11 +1618,11 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
               {actionItems.map((item, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex-1 mr-3 font-medium">{item.action}</span>
+                    <span className="text-foreground/70 flex-1 mr-3 font-medium">{item.action}</span>
                     <Button 
-                      variant="default" 
+                      variant="secondary" 
                       size="sm" 
-                      className="h-7 px-3 text-xs font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                      className="h-7 px-3 text-xs font-medium hover:bg-secondary/80 transition-all duration-200"
                       onClick={() => onActionClick?.(item.action)}
                     >
                       {item.buttonText}
@@ -1633,7 +1633,7 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {item.components.map((component, compIndex) => (
                           <div key={compIndex} className="group relative bg-gradient-to-r from-secondary/20 to-secondary/10 border border-secondary/30 rounded-md p-2 hover:from-secondary/30 hover:to-secondary/20 transition-all duration-200 hover:scale-[1.01] hover:shadow-sm">
-                            <span className="text-xs text-foreground/80 leading-snug font-normal group-hover:text-foreground/90 transition-colors block">
+                            <span className="text-xs text-foreground/85 leading-snug font-normal group-hover:text-foreground transition-colors block">
                               {component}
                             </span>
                           </div>

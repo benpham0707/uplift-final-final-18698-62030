@@ -49,6 +49,7 @@ const PortfolioScanner = () => {
   const [overallProgress, setOverallProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('overview');
   const [isPortfolioDropdownOpen, setIsPortfolioDropdownOpen] = useState(false);
+  const [isFeaturesDropdownOpen, setIsFeaturesDropdownOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiOverall, setAiOverall] = useState<number | null>(null);
@@ -329,10 +330,57 @@ const PortfolioScanner = () => {
                 Platform
               </Button>
               
-              {/* Features */}
-              <Button variant="ghost" size="sm">
-                Features
-              </Button>
+              {/* Features Dropdown */}
+              <div className="relative">
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  onMouseEnter={() => setIsFeaturesDropdownOpen(true)}
+                  onMouseLeave={() => setIsFeaturesDropdownOpen(false)}
+                  className="flex items-center space-x-1 hover-glow-blue transition-all duration-300"
+                >
+                  <span>Features</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+                
+                {/* Features Dropdown Menu */}
+                {isFeaturesDropdownOpen && (
+                  <div 
+                    className="absolute top-full left-0 mt-1 w-56 bg-background border border-border rounded-lg shadow-lg z-[60]"
+                    onMouseEnter={() => setIsFeaturesDropdownOpen(true)}
+                    onMouseLeave={() => setIsFeaturesDropdownOpen(false)}
+                  >
+                    <div className="py-2">
+                      <button
+                        onClick={() => {
+                          navigate('/extracurricular-optimizer');
+                          setIsFeaturesDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors flex items-center space-x-2 text-foreground hover-glow-blue"
+                      >
+                        <Users className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium">Next Moves Engine</div>
+                          <div className="text-xs text-muted-foreground">Strategic development planning</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate('/academic-planner');
+                          setIsFeaturesDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors flex items-center space-x-2 text-foreground hover-glow-blue"
+                      >
+                        <BookOpen className="h-4 w-4" />
+                        <div>
+                          <div className="font-medium">Academic Planner</div>
+                          <div className="text-xs text-muted-foreground">Course and grade optimization</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
               
               {/* Portfolio Scanner Dropdown */}
               <div className="relative">
@@ -668,6 +716,9 @@ const PortfolioScanner = () => {
         </div>
 
       </div>
+      
+      {/* Additional spacing below summary cards */}
+      <div className="pb-16"></div>
     </div>
   );
 };

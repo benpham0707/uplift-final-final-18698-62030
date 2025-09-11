@@ -165,6 +165,15 @@ All colors MUST be HSL.
     @apply transition-all duration-300 hover:shadow-medium hover:-translate-y-1;
   }
   
+  .hover-glow-blue {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-glow-blue:hover {
+    box-shadow: 0 0 20px hsl(220 100% 65% / 0.4), 0 0 40px hsl(220 100% 65% / 0.2);
+    text-shadow: 0 0 10px hsl(220 100% 65% / 0.6);
+  }
+  
   .section-transition {
     @apply relative overflow-hidden;
     background: linear-gradient(

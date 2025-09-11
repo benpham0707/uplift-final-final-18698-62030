@@ -800,8 +800,7 @@ const AcademicPlanner = () => {
                         "Weekly lab report review sessions",
                         "Practice problem sets (2 hours/week)",
                         "Chemistry tutor consultation",
-                        "AP Chemistry exam preparation",
-                        "Study group participation"
+                        "AP Chemistry exam preparation"
                       ]
                     }
                   ]}
@@ -829,7 +828,6 @@ const AcademicPlanner = () => {
                         "AP course selection consultation",
                         "Schedule optimization for GPA goals",
                         "College admission course requirements review",
-                        "Dual enrollment opportunity assessment",
                         "Academic workload balance planning"
                       ]
                     }
@@ -858,8 +856,7 @@ const AcademicPlanner = () => {
                         "Study habit optimization assessment",
                         "Time management skill development",
                         "Academic support network building",
-                        "Progress tracking system setup",
-                        "Work-study balance improvement strategies"
+                        "Progress tracking system setup"
                       ]
                     }
                   ]}
@@ -886,7 +883,6 @@ const AcademicPlanner = () => {
                         "Elective course selection strategy",
                         "Graduation timeline verification",
                         "Career-aligned course prioritization",
-                        "College preparation course enrollment",
                         "Academic transcript optimization"
                       ]
                     }

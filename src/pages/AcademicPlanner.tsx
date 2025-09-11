@@ -1624,9 +1624,9 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex-1 mr-3 font-medium">{item.action}</span>
                     <Button 
-                      variant="outline" 
+                      variant="default" 
                       size="sm" 
-                      className="h-6 px-2 text-xs"
+                      className="h-7 px-3 text-xs font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
                       onClick={() => onActionClick?.(item.action)}
                     >
                       {item.buttonText}
@@ -1636,9 +1636,9 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
                     <div className="ml-4 mt-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {item.components.map((component, compIndex) => (
-                          <div key={compIndex} className="group relative bg-gradient-to-r from-secondary/20 to-secondary/10 border border-secondary/30 rounded-md p-2.5 hover:from-secondary/30 hover:to-secondary/20 transition-all duration-200 hover:scale-[1.01] hover:shadow-sm">
-                            <span className="text-xs text-foreground/90 leading-relaxed font-medium group-hover:text-foreground transition-colors block">
-                              You will: {component.toLowerCase().replace(/^[a-z]/, (letter) => letter.toUpperCase())}
+                          <div key={compIndex} className="group relative bg-gradient-to-r from-secondary/20 to-secondary/10 border border-secondary/30 rounded-md p-2 hover:from-secondary/30 hover:to-secondary/20 transition-all duration-200 hover:scale-[1.01] hover:shadow-sm">
+                            <span className="text-xs text-foreground/80 leading-snug font-normal group-hover:text-foreground/90 transition-colors block">
+                              {component}
                             </span>
                           </div>
                         ))}

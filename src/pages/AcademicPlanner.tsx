@@ -793,7 +793,17 @@ const AcademicPlanner = () => {
                     stemProfile: 0.31
                   }}
                   actionItems={[
-                    { action: "Master Chemistry Performance", buttonText: "Comprehensive Chemistry Plan" }
+                    { 
+                      action: "Master Chemistry Performance", 
+                      buttonText: "Comprehensive Chemistry Plan",
+                      components: [
+                        "Weekly lab report review sessions",
+                        "Practice problem sets (2 hours/week)",
+                        "Chemistry tutor consultation",
+                        "AP Chemistry exam preparation",
+                        "Study group participation"
+                      ]
+                    }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
                   connections="Consistent academic performance + work ethic narrative + strategic improvement = compelling resilience story for competitive programs."
@@ -812,7 +822,17 @@ const AcademicPlanner = () => {
                     scholarshipEligibility: 0.22
                   }}
                   actionItems={[
-                    { action: "Optimize Senior Year Academic Planning", buttonText: "Strategic Course Planning" }
+                    { 
+                      action: "Optimize Senior Year Academic Planning", 
+                      buttonText: "Strategic Course Planning",
+                      components: [
+                        "AP course selection consultation",
+                        "Schedule optimization for GPA goals",
+                        "College admission course requirements review",
+                        "Dual enrollment opportunity assessment",
+                        "Academic workload balance planning"
+                      ]
+                    }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
                   connections="Strategic course selection + demonstrated academic ability + career alignment = strong foundation for competitive college admissions."
@@ -831,7 +851,17 @@ const AcademicPlanner = () => {
                     collegeReadiness: 0.15
                   }}
                   actionItems={[
-                    { action: "Strengthen Academic Foundation", buttonText: "Build Strong Foundation" }
+                    { 
+                      action: "Strengthen Academic Foundation", 
+                      buttonText: "Build Strong Foundation",
+                      components: [
+                        "Study habit optimization assessment",
+                        "Time management skill development",
+                        "Academic support network building",
+                        "Progress tracking system setup",
+                        "Work-study balance improvement strategies"
+                      ]
+                    }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
                   connections="Consistent performance + time management skills + work experience = demonstrated college readiness and maturity."
@@ -849,7 +879,17 @@ const AcademicPlanner = () => {
                     eleciveFocus: 0.08
                   }}
                   actionItems={[
-                    { action: "Optimize Senior Year Academic Planning", buttonText: "Plan Final Year" }
+                    { 
+                      action: "Optimize Senior Year Academic Planning", 
+                      buttonText: "Plan Final Year",
+                      components: [
+                        "Elective course selection strategy",
+                        "Graduation timeline verification",
+                        "Career-aligned course prioritization",
+                        "College preparation course enrollment",
+                        "Academic transcript optimization"
+                      ]
+                    }
                   ]}
                   onActionClick={handleTaskPlanningOpen}
                   connections="On-track graduation + strategic elective use = maximum preparation for post-secondary success."
@@ -1453,6 +1493,7 @@ interface AcademicInsightItemProps {
   actionItems: Array<{
     action: string;
     buttonText: string;
+    components?: string[];
   }>;
   connections: string;
   onActionClick?: (action: string) => void;
@@ -1579,16 +1620,28 @@ const AcademicInsightItem = ({ title, description, time, type, impact, estimated
             </h5>
             <div className="space-y-2">
               {actionItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground flex-1 mr-3">{item.action}</span>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-6 px-2 text-xs"
-                    onClick={() => onActionClick?.(item.action)}
-                  >
-                    {item.buttonText}
-                  </Button>
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex-1 mr-3 font-medium">{item.action}</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-6 px-2 text-xs"
+                      onClick={() => onActionClick?.(item.action)}
+                    >
+                      {item.buttonText}
+                    </Button>
+                  </div>
+                  {item.components && (
+                    <div className="ml-4 space-y-1">
+                      {item.components.map((component, compIndex) => (
+                        <div key={compIndex} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                          <span>{component}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

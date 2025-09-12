@@ -51,6 +51,15 @@ All colors MUST be HSL.
     --gradient-section: linear-gradient(135deg, hsl(0 0% 100%), hsl(45 15% 99%));
     --gradient-accent: linear-gradient(135deg, hsl(45 15% 98%), hsl(0 0% 100%));
     
+    /* Game-like Vibrant Gradients */
+    --gradient-vibrant-blue: linear-gradient(135deg, hsl(220 100% 55%), hsl(200 100% 65%));
+    --gradient-vibrant-green: linear-gradient(135deg, hsl(120 100% 45%), hsl(140 100% 55%));
+    --gradient-vibrant-purple: linear-gradient(135deg, hsl(280 100% 55%), hsl(260 100% 65%));
+    --gradient-vibrant-orange: linear-gradient(135deg, hsl(30 100% 55%), hsl(20 100% 65%));
+    --gradient-vibrant-cyan: linear-gradient(135deg, hsl(180 100% 45%), hsl(200 100% 55%));
+    --gradient-vibrant-pink: linear-gradient(135deg, hsl(320 100% 55%), hsl(300 100% 65%));
+    --gradient-dashboard: linear-gradient(135deg, hsl(220 100% 20%), hsl(240 100% 30%), hsl(220 100% 40%));
+    
     --shadow-soft: 0 2px 20px -2px hsl(209 52% 25% / 0.1);
     --shadow-medium: 0 8px 30px -4px hsl(209 52% 25% / 0.15);
     --shadow-strong: 0 20px 40px -8px hsl(209 52% 25% / 0.2);
@@ -160,6 +169,35 @@ All colors MUST be HSL.
   .gradient-accent {
     background: var(--gradient-accent);
   }
+  
+  .gradient-vibrant-blue {
+    background: var(--gradient-vibrant-blue);
+  }
+  
+  .gradient-vibrant-green {
+    background: var(--gradient-vibrant-green);
+  }
+  
+  .gradient-vibrant-purple {
+    background: var(--gradient-vibrant-purple);
+  }
+  
+  .gradient-vibrant-orange {
+    background: var(--gradient-vibrant-orange);
+  }
+  
+  .gradient-vibrant-cyan {
+    background: var(--gradient-vibrant-cyan);
+  }
+  
+  .gradient-vibrant-pink {
+    background: var(--gradient-vibrant-pink);
+  }
+  
+  .gradient-dashboard {
+    background: var(--gradient-dashboard);
+  }
+  
   
   .hover-lift {
     @apply transition-all duration-300 hover:shadow-medium hover:-translate-y-1;

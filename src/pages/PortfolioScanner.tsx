@@ -306,9 +306,9 @@ const PortfolioScanner = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-dashboard">
       {/* Uplift Platform Navigation */}
-      <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+      <nav className="sticky top-0 z-50 w-full bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Uplift Logo */}
@@ -484,137 +484,53 @@ const PortfolioScanner = () => {
       {/* Overview Section */}
       <section id="overview">
       {/* Dramatic Overall Score Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <div className="mb-6">
-            <div className="text-6xl font-bold mb-2">{aiLoading ? '…' : (aiOverall ?? overallScore)}</div>
-            <div className="text-xl opacity-90">Overall Portfolio Strength</div>
-            <div className="text-sm opacity-75 mt-2">Out of 10.0 • Based on 6 key dimensions</div>
+      <div className="gradient-dashboard text-white">
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+          <div className="mb-8">
+            <div className="text-8xl font-bold mb-4 animate-glow-pulse drop-shadow-2xl">{aiLoading ? '…' : (aiOverall ?? overallScore)}</div>
+            <div className="text-2xl font-medium mb-2">Overall Portfolio Strength</div>
+            <div className="text-lg opacity-90 mt-2">Out of 10.0 • Based on 6 key dimensions</div>
             {aiError && (
-              <div className="text-xs opacity-90 mt-2 text-red-100">{aiError}</div>
+              <div className="text-sm opacity-90 mt-2 text-red-200">{aiError}</div>
             )}
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
-            <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
-              style={{
-                ...getScoreStyles(rubricScores.academicExcellence.score).boxStyle,
-                borderColor: getScoreStyles(rubricScores.academicExcellence.score).boxStyle.borderColor,
-                boxShadow: getScoreStyles(rubricScores.academicExcellence.score).boxStyle.boxShadow
-              }}
-            >
-              <div 
-                className="text-lg font-semibold transition-colors duration-300" 
-                style={{
-                  ...getScoreStyles(rubricScores.academicExcellence.score).textStyle,
-                  color: getScoreStyles(rubricScores.academicExcellence.score).textStyle.color,
-                  textShadow: getScoreStyles(rubricScores.academicExcellence.score).textStyle.textShadow
-                }}
-              >
+            <div className="gradient-vibrant-green rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl animate-bounce-subtle border-0">
+              <div className="text-2xl font-bold text-white drop-shadow-lg">
                 {rubricScores.academicExcellence.score == null ? '…' : rubricScores.academicExcellence.score}
               </div>
-              <div className="text-xs opacity-75">Academic</div>
+              <div className="text-sm text-white/90 font-medium">Academic</div>
             </div>
-            <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
-              style={{
-                ...getScoreStyles(rubricScores.leadershipPotential.score).boxStyle,
-                borderColor: getScoreStyles(rubricScores.leadershipPotential.score).boxStyle.borderColor,
-                boxShadow: getScoreStyles(rubricScores.leadershipPotential.score).boxStyle.boxShadow
-              }}
-            >
-              <div 
-                className="text-lg font-semibold transition-colors duration-300" 
-                style={{
-                  ...getScoreStyles(rubricScores.leadershipPotential.score).textStyle,
-                  color: getScoreStyles(rubricScores.leadershipPotential.score).textStyle.color,
-                  textShadow: getScoreStyles(rubricScores.leadershipPotential.score).textStyle.textShadow
-                }}
-              >
+            <div className="gradient-vibrant-blue rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl border-0">
+              <div className="text-2xl font-bold text-white drop-shadow-lg">
                 {rubricScores.leadershipPotential.score == null ? '…' : rubricScores.leadershipPotential.score}
               </div>
-              <div className="text-xs opacity-75">Leadership</div>
+              <div className="text-sm text-white/90 font-medium">Leadership</div>
             </div>
-            <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
-              style={{
-                ...getScoreStyles(rubricScores.personalGrowth.score).boxStyle,
-                borderColor: getScoreStyles(rubricScores.personalGrowth.score).boxStyle.borderColor,
-                boxShadow: getScoreStyles(rubricScores.personalGrowth.score).boxStyle.boxShadow
-              }}
-            >
-              <div 
-                className="text-lg font-semibold transition-colors duration-300" 
-                style={{
-                  ...getScoreStyles(rubricScores.personalGrowth.score).textStyle,
-                  color: getScoreStyles(rubricScores.personalGrowth.score).textStyle.color,
-                  textShadow: getScoreStyles(rubricScores.personalGrowth.score).textStyle.textShadow
-                }}
-              >
+            <div className="gradient-vibrant-orange rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl border-0">
+              <div className="text-2xl font-bold text-white drop-shadow-lg">
                 {rubricScores.personalGrowth.score == null ? '…' : rubricScores.personalGrowth.score}
               </div>
-              <div className="text-xs opacity-75">Growth</div>
+              <div className="text-sm text-white/90 font-medium">Growth</div>
             </div>
-            <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
-              style={{
-                ...getScoreStyles(rubricScores.communityImpact.score).boxStyle,
-                borderColor: getScoreStyles(rubricScores.communityImpact.score).boxStyle.borderColor,
-                boxShadow: getScoreStyles(rubricScores.communityImpact.score).boxStyle.boxShadow
-              }}
-            >
-              <div 
-                className="text-lg font-semibold transition-colors duration-300" 
-                style={{
-                  ...getScoreStyles(rubricScores.communityImpact.score).textStyle,
-                  color: getScoreStyles(rubricScores.communityImpact.score).textStyle.color,
-                  textShadow: getScoreStyles(rubricScores.communityImpact.score).textStyle.textShadow
-                }}
-              >
+            <div className="gradient-vibrant-purple rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl border-0">
+              <div className="text-2xl font-bold text-white drop-shadow-lg">
                 {rubricScores.communityImpact.score == null ? '…' : rubricScores.communityImpact.score}
               </div>
-              <div className="text-xs opacity-75">Community</div>
+              <div className="text-sm text-white/90 font-medium">Community</div>
             </div>
-            <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
-              style={{
-                ...getScoreStyles(rubricScores.uniqueValue.score).boxStyle,
-                borderColor: getScoreStyles(rubricScores.uniqueValue.score).boxStyle.borderColor,
-                boxShadow: getScoreStyles(rubricScores.uniqueValue.score).boxStyle.boxShadow
-              }}
-            >
-              <div 
-                className="text-lg font-semibold transition-colors duration-300" 
-                style={{
-                  ...getScoreStyles(rubricScores.uniqueValue.score).textStyle,
-                  color: getScoreStyles(rubricScores.uniqueValue.score).textStyle.color,
-                  textShadow: getScoreStyles(rubricScores.uniqueValue.score).textStyle.textShadow
-                }}
-              >
+            <div className="gradient-vibrant-cyan rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl animate-bounce-subtle border-0">
+              <div className="text-2xl font-bold text-white drop-shadow-lg">
                 {rubricScores.uniqueValue.score == null ? '…' : rubricScores.uniqueValue.score}
               </div>
-              <div className="text-xs opacity-75">Uniqueness</div>
+              <div className="text-sm text-white/90 font-medium">Uniqueness</div>
             </div>
-            <div 
-              className="bg-background/20 backdrop-blur-sm rounded-lg p-3 transition-all duration-300 border-2"
-              style={{
-                ...getScoreStyles(rubricScores.futureReadiness.score).boxStyle,
-                borderColor: getScoreStyles(rubricScores.futureReadiness.score).boxStyle.borderColor,
-                boxShadow: getScoreStyles(rubricScores.futureReadiness.score).boxStyle.boxShadow
-              }}
-            >
-              <div 
-                className="text-lg font-semibold transition-colors duration-300" 
-                style={{
-                  ...getScoreStyles(rubricScores.futureReadiness.score).textStyle,
-                  color: getScoreStyles(rubricScores.futureReadiness.score).textStyle.color,
-                  textShadow: getScoreStyles(rubricScores.futureReadiness.score).textStyle.textShadow
-                }}
-              >
+            <div className="gradient-vibrant-pink rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl border-0">
+              <div className="text-2xl font-bold text-white drop-shadow-lg">
                 {rubricScores.futureReadiness.score == null ? '…' : rubricScores.futureReadiness.score}
               </div>
-              <div className="text-xs opacity-75">Readiness</div>
+              <div className="text-sm text-white/90 font-medium">Readiness</div>
             </div>
           </div>
         </div>

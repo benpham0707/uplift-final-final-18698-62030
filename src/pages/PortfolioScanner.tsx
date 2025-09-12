@@ -496,14 +496,14 @@ const PortfolioScanner = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
-            <div className="gradient-vibrant-green rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl animate-bounce-subtle border-0">
-              <div className="text-2xl font-bold text-white drop-shadow-lg">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
+              <div className="text-2xl font-bold text-white drop-shadow-md">
                 {rubricScores.academicExcellence.score == null ? '…' : rubricScores.academicExcellence.score}
               </div>
               <div className="text-sm text-white/90 font-medium">Academic</div>
             </div>
-            <div className="gradient-vibrant-blue rounded-xl p-4 transition-all duration-300 hover-lift shadow-xl border-0">
-              <div className="text-2xl font-bold text-white drop-shadow-lg">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
+              <div className="text-2xl font-bold text-white drop-shadow-md">
                 {rubricScores.leadershipPotential.score == null ? '…' : rubricScores.leadershipPotential.score}
               </div>
               <div className="text-sm text-white/90 font-medium">Leadership</div>

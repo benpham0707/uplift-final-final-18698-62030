@@ -489,104 +489,128 @@ const AcademicPlanner = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-dashboard">
       {/* Hero Section with Academic Metrics */}
-      <div className="relative min-h-[500px] bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden border-b">
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
+      <div className="gradient-dashboard text-white">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
               Academic Planner
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
               Track your progress and plan your academic journey strategically
             </p>
           </div>
 
           {/* Academic Metrics Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-card border rounded-xl p-4 transition-all duration-300 hover:shadow-medium shadow-soft">
-              <div className="text-2xl font-bold text-primary mb-1">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
+              <div className="text-2xl font-bold text-white drop-shadow-md">
                 {currentGPA.weighted}
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Weighted GPA</div>
+              <div className="text-sm text-white/90 font-medium">Weighted GPA</div>
             </div>
-            <div className="bg-card border rounded-xl p-4 transition-all duration-300 hover:shadow-medium shadow-soft">
-              <div className="text-2xl font-bold text-primary mb-1">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
+              <div className="text-2xl font-bold text-white drop-shadow-md">
                 {currentGPA.unweighted}
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Unweighted GPA</div>
+              <div className="text-sm text-white/90 font-medium">Unweighted GPA</div>
             </div>
-            <div className="bg-card border rounded-xl p-4 transition-all duration-300 hover:shadow-medium shadow-soft">
-              <div className="text-2xl font-bold text-secondary mb-1">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
+              <div className="text-2xl font-bold text-white drop-shadow-md">
                 {Math.round((1 - currentGPA.classRank / currentGPA.totalStudents) * 100)}%
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Percentile</div>
+              <div className="text-sm text-white/90 font-medium">Percentile</div>
             </div>
-            <div className="bg-card border rounded-xl p-4 transition-all duration-300 hover:shadow-medium shadow-soft">
-              <div className="text-2xl font-bold text-accent mb-1">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
+              <div className="text-2xl font-bold text-white drop-shadow-md">
                 {Math.round((currentGPA.creditsCompleted / currentGPA.totalCredits) * 100)}%
               </div>
-              <div className="text-sm text-muted-foreground font-medium">Progress</div>
+              <div className="text-sm text-white/90 font-medium">Progress</div>
             </div>
           </div>
 
           {/* Progress Bar and Requirements Checklist */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Progress Overview */}
-            <div className="bg-card border rounded-xl p-6 shadow-soft">
-              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <TrendingUp className="h-5 w-5 mr-2 text-primary" />
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-lg">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <TrendingUp className="h-5 w-5 mr-2" />
                 Academic Progress
               </h3>
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                  <div className="flex justify-between text-sm text-white/90 mb-2">
                     <span>Credits Completed</span>
                     <span>{currentGPA.creditsCompleted}/{currentGPA.totalCredits}</span>
                   </div>
-                  <Progress value={(currentGPA.creditsCompleted / currentGPA.totalCredits) * 100} className="h-3" />
+                  <Progress value={(currentGPA.creditsCompleted / currentGPA.totalCredits) * 100} className="h-3 bg-white/20" />
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                  <div className="flex justify-between text-sm text-white/90 mb-2">
                     <span>Class Rank</span>
                     <span>{currentGPA.classRank}/{currentGPA.totalStudents}</span>
                   </div>
-                  <Progress value={(1 - currentGPA.classRank / currentGPA.totalStudents) * 100} className="h-3" />
+                  <Progress value={(1 - currentGPA.classRank / currentGPA.totalStudents) * 100} className="h-3 bg-white/20" />
                 </div>
               </div>
             </div>
 
             {/* Requirements Checklist */}
-            <div className="bg-card border rounded-xl p-6 shadow-soft">
-              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <CheckCircle2 className="h-5 w-5 mr-2 text-primary" />
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-lg">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <CheckCircle2 className="h-5 w-5 mr-2" />
                 Requirements Status
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">Core Requirements</span>
-                  <Badge className="bg-success/10 text-success border-success/20">
+                  <span className="text-white/90">Core Requirements</span>
+                  <Badge className="bg-green-500/20 text-green-200 border-green-400/30">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Complete
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">Major Requirements</span>
-                  <Badge className="bg-warning/10 text-warning border-warning/20">
+                  <span className="text-white/90">Major Requirements</span>
+                  <Badge className="bg-orange-500/20 text-orange-200 border-orange-400/30">
                     <Clock className="h-3 w-3 mr-1" />
                     85% Done
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">Electives</span>
-                  <Badge className="bg-secondary/10 text-secondary border-secondary/20">
+                  <span className="text-white/90">Electives</span>
+                  <Badge className="bg-blue-500/20 text-blue-200 border-blue-400/30">
                     <Target className="h-3 w-3 mr-1" />
                     On Track
                   </Badge>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Header */}
+      <div className="bg-background border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Academic Planner</h1>
+              <p className="text-muted-foreground mt-1">Plan your courses and optimize your academic performance</p>
+            </div>
+            <div className="text-right flex items-center gap-3">
+              <p className="text-sm text-muted-foreground mt-1">Getting Started</p>
+              <p className="text-sm text-muted-foreground mt-1">Begin Your Journey</p>
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+              <span>Overall Progress</span>
+              <span>0% Complete</span>
+            </div>
+            <Progress value={0} className="h-2" />
           </div>
         </div>
       </div>

@@ -1399,6 +1399,18 @@ const AcademicPlanner = () => {
             </CardContent>
           </Card>
 
+          {/* Soft Border Separator */}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <div className="bg-background px-4">
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary/30 to-accent/30"></div>
+              </div>
+            </div>
+          </div>
+
           {/* Academic Task Dashboard */}
           <Card className="bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b-2 border-red-200">

@@ -729,29 +729,29 @@ const AcademicPlanner = () => {
 
           {/* Academic Metrics Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
-              <div className="text-2xl font-bold text-white drop-shadow-md">
+            <div className="bg-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-xl p-4 border border-primary/10 animate-[float_6s_ease-in-out_infinite]">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 {currentGPA.weighted}
               </div>
-              <div className="text-sm text-white/90 font-medium">Weighted GPA</div>
+              <div className="text-sm text-muted-foreground font-medium">Weighted GPA</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
-              <div className="text-2xl font-bold text-white drop-shadow-md">
+            <div className="bg-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-xl p-4 border border-primary/10 animate-[float_6s_ease-in-out_infinite_1s]">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 {currentGPA.unweighted}
               </div>
-              <div className="text-sm text-white/90 font-medium">Unweighted GPA</div>
+              <div className="text-sm text-muted-foreground font-medium">Unweighted GPA</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
-              <div className="text-2xl font-bold text-white drop-shadow-md">
+            <div className="bg-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-xl p-4 border border-primary/10 animate-[float_6s_ease-in-out_infinite_2s]">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 {Math.round((1 - currentGPA.classRank / currentGPA.totalStudents) * 100)}%
               </div>
-              <div className="text-sm text-white/90 font-medium">Percentile</div>
+              <div className="text-sm text-muted-foreground font-medium">Percentile</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-all duration-300 hover-lift shadow-lg border border-white/30">
-              <div className="text-2xl font-bold text-white drop-shadow-md">
+            <div className="bg-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 rounded-xl p-4 border border-primary/10 animate-[float_6s_ease-in-out_infinite_3s]">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 {Math.round((currentGPA.creditsCompleted / currentGPA.totalCredits) * 100)}%
               </div>
-              <div className="text-sm text-white/90 font-medium">Progress</div>
+              <div className="text-sm text-muted-foreground font-medium">Progress</div>
             </div>
           </div>
 

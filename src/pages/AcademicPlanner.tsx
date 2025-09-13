@@ -441,19 +441,19 @@ const AcademicPlanner = () => {
               <Line 
                 type="monotone" 
                 dataKey="yourGPA" 
-                stroke="#1e40af" 
+                stroke="#9333ea" 
                 strokeWidth={4}
-                dot={{ fill: '#1e40af', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
-                activeDot={{ r: 8, stroke: '#1e40af', strokeWidth: 3, fill: '#ffffff' }}
+                dot={{ fill: '#9333ea', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
+                activeDot={{ r: 8, stroke: '#9333ea', strokeWidth: 3, fill: '#ffffff' }}
                 name="Your GPA"
               />
               <Line 
                 type="monotone" 
-                dataKey="majorAverage" 
-                stroke="#84A59D" 
+                dataKey="majorAverage"
+                stroke="#1e3a8a" 
                 strokeWidth={4}
-                dot={{ fill: '#84A59D', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
-                activeDot={{ r: 8, stroke: '#84A59D', strokeWidth: 3, fill: '#ffffff' }}
+                dot={{ fill: '#1e3a8a', strokeWidth: 3, r: 6, stroke: '#ffffff' }}
+                activeDot={{ r: 8, stroke: '#1e3a8a', strokeWidth: 3, fill: '#ffffff' }}
                 name="Major Average"
               />
             </LineChart>
@@ -489,7 +489,7 @@ const AcademicPlanner = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-dashboard">
+    <div className="min-h-screen bg-background">
       {/* Hero Section with Academic Metrics */}
       <div className="gradient-dashboard text-white">
         <div className="max-w-7xl mx-auto px-4 py-12">

@@ -20,6 +20,7 @@ import {
   Calendar, 
   BarChart3,
   AlertCircle,
+  AlertTriangle,
   Filter,
   CheckCircle,
   Award,
@@ -37,7 +38,8 @@ import {
   Brain,
   Scale,
   Link,
-  CheckCircle2
+  CheckCircle2,
+  Lightbulb
 } from 'lucide-react';
 
 const AcademicPlanner = () => {
@@ -848,216 +850,418 @@ const AcademicPlanner = () => {
           <Card className="shadow-medium mb-6">
             <CardHeader className="rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+                <BarChart3 className="h-5 w-5 text-primary" />
                 Subject Performance Analytics
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Detailed analysis of your academic strengths and areas for improvement across subjects
+                Detailed analysis of your academic performance organized by subject and year
               </p>
             </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Strengths Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-green-700 flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5" />
-                    Academic Strengths
-                  </h3>
-                  
-                  {/* Strong Subject Cards */}
-                  <div className="space-y-3">
-                    {/* Hard coded data for strong subjects */}
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="font-semibold text-green-900">Biology</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-green-700">94.2%</div>
-                          <div className="text-xs text-green-600">Average</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-green-200 rounded-full h-2 mb-2">
-                        <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{width: '94%'}}></div>
-                      </div>
-                      <div className="text-xs text-green-800">
-                        Consistent A grades, strong lab performance, excellent understanding of complex concepts
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="font-semibold text-green-900">English Literature</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-green-700">91.8%</div>
-                          <div className="text-xs text-green-600">Average</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-green-200 rounded-full h-2 mb-2">
-                        <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{width: '92%'}}></div>
-                      </div>
-                      <div className="text-xs text-green-800">
-                        Exceptional analytical writing, strong critical thinking, excellent essay structure
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="font-semibold text-green-900">History</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-green-700">89.5%</div>
-                          <div className="text-xs text-green-600">Average</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-green-200 rounded-full h-2 mb-2">
-                        <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{width: '90%'}}></div>
-                      </div>
-                      <div className="text-xs text-green-800">
-                        Strong research skills, excellent source analysis, clear historical arguments
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Areas for Improvement Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-red-700 flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5" />
-                    Areas for Improvement
-                  </h3>
-                  
-                  {/* Struggling Subject Cards */}
-                  <div className="space-y-3">
-                    {/* Hard coded data for struggling subjects */}
-                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                          <span className="font-semibold text-red-900">AP Chemistry</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-red-700">74.3%</div>
-                          <div className="text-xs text-red-600">Average</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-red-200 rounded-full h-2 mb-2">
-                        <div className="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full" style={{width: '74%'}}></div>
-                      </div>
-                      <div className="text-xs text-red-800 mb-2">
-                        Challenges with stoichiometry, lab report quality needs improvement
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="text-xs h-6 px-2 border-red-300 text-red-700 hover:bg-red-50">
-                          Get Tutoring
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-xs h-6 px-2 border-red-300 text-red-700 hover:bg-red-50">
-                          Study Plan
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                          <span className="font-semibold text-orange-900">Calculus BC</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-orange-700">81.2%</div>
-                          <div className="text-xs text-orange-600">Average</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-orange-200 rounded-full h-2 mb-2">
-                        <div className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full" style={{width: '81%'}}></div>
-                      </div>
-                      <div className="text-xs text-orange-800 mb-2">
-                        Integration techniques need practice, series convergence concepts
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="text-xs h-6 px-2 border-orange-300 text-orange-700 hover:bg-orange-50">
-                          Practice Problems
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-xs h-6 px-2 border-orange-300 text-orange-700 hover:bg-orange-50">
-                          Office Hours
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                          <span className="font-semibold text-yellow-900">AP Physics</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-yellow-700">78.9%</div>
-                          <div className="text-xs text-yellow-600">Average</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-yellow-200 rounded-full h-2 mb-2">
-                        <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full" style={{width: '79%'}}></div>
-                      </div>
-                      <div className="text-xs text-yellow-800 mb-2">
-                        Problem-solving approach, unit conversions, graph interpretation
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="text-xs h-6 px-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50">
-                          Study Group
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-xs h-6 px-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50">
-                          Lab Review
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Performance Trends */}
-              <div className="mt-8 pt-6 border-t border-border">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Performance Trends & Recommendations
-                </h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
-                    <div className="text-sm font-semibold text-purple-700 mb-2">Overall Trend</div>
-                    <div className="text-xs text-purple-600 mb-3">
-                      STEM subjects showing more variability than humanities. Consider additional support for quantitative courses.
-                    </div>
-                    <Badge className="bg-purple-100 text-purple-700 border-purple-300 text-xs">
-                      Action Needed
+            <CardContent className="space-y-6">
+              {/* Hard coded data for demonstration - These are placeholder academic performance data organized by year and subject */}
+              
+              {/* 11th Grade Academic Year */}
+              <Card className="w-full border-primary/20">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-lg font-semibold">2023-2024 Academic Year</h4>
+                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                      11th Grade
                     </Badge>
                   </div>
-                  
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
-                    <div className="text-sm font-semibold text-green-700 mb-2">Strength Pattern</div>
-                    <div className="text-xs text-green-600 mb-3">
-                      Excellent in analytical and writing-based subjects. Leverage these skills for college applications.
-                    </div>
-                    <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">
-                      Leverage Strength
-                    </Badge>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Biology */}
+                  <div className="border rounded-lg border-border/50">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-4 h-auto font-medium text-left hover:bg-muted/50"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <span>Biology</span>
+                            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30">
+                              High Relevance to Major
+                            </Badge>
+                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                              Strength
+                            </Badge>
+                          </div>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="px-4 pb-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Current Grade</span>
+                                <span className="text-sm text-primary font-semibold">A- (92%)</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Class Average: B+ (87%)
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Major Relevance</span>
+                                <span className="text-sm text-primary font-semibold">Critical</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Essential for Pre-Med track
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Trend</span>
+                                <span className="text-sm text-primary font-semibold flex items-center">
+                                  <TrendingUp className="h-3 w-3 mr-1" />
+                                  Improving
+                                </span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                +5% from last quarter
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-2 border-t">
+                            <div className="text-sm text-muted-foreground">
+                              <strong>Insights:</strong> Excellent performance in a highly relevant subject. Your grade is above class average, 
+                              demonstrating strong aptitude for life sciences. Continue current study methods.
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
 
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                    <div className="text-sm font-semibold text-blue-700 mb-2">Improvement Strategy</div>
-                    <div className="text-xs text-blue-600 mb-3">
-                      Focus on foundational concepts in STEM. Consider peer tutoring and additional practice time.
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs">
-                      Strategic Focus
-                    </Badge>
+                  {/* AP Chemistry */}
+                  <div className="border rounded-lg border-border/50">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-4 h-auto font-medium text-left hover:bg-muted/50"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <span>AP Chemistry</span>
+                            <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30">
+                              Medium Relevance to Major
+                            </Badge>
+                            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
+                              Needs Attention
+                            </Badge>
+                          </div>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="px-4 pb-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Current Grade</span>
+                                <span className="text-sm text-destructive font-semibold">C+ (78%)</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Class Average: B- (82%)
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Major Relevance</span>
+                                <span className="text-sm font-semibold">Moderate</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Useful for MCAT preparation
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Trend</span>
+                                <span className="text-sm text-destructive font-semibold flex items-center">
+                                  <AlertTriangle className="h-3 w-3 mr-1" />
+                                  Declining
+                                </span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                -3% from last quarter
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-2 border-t">
+                            <div className="text-sm text-muted-foreground mb-3">
+                              <strong>Insights:</strong> Performance below class average in a subject that's relevant to your major. 
+                              Consider additional support to strengthen chemistry fundamentals.
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/5">
+                                Find Chemistry Tutor
+                              </Button>
+                              <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/5">
+                                AP Chem Resources
+                              </Button>
+                              <Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/5">
+                                Study Group
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
-                </div>
-              </div>
+
+                  {/* Calculus BC */}
+                  <div className="border rounded-lg border-border/50">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-4 h-auto font-medium text-left hover:bg-muted/50"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <span>Calculus BC</span>
+                            <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30">
+                              Low Relevance to Major
+                            </Badge>
+                          </div>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="px-4 pb-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Current Grade</span>
+                                <span className="text-sm font-semibold">B- (82%)</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Class Average: B (85%)
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Major Relevance</span>
+                                <span className="text-sm font-semibold">Low</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                General analytical skills
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Trend</span>
+                                <span className="text-sm font-semibold flex items-center">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Stable
+                                </span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Consistent performance
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-2 border-t">
+                            <div className="text-sm text-muted-foreground">
+                              <strong>Insights:</strong> Solid performance in advanced mathematics. While not directly relevant to 
+                              your major, the analytical thinking skills are valuable. Consider maintaining current effort level.
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+
+                  {/* English Literature */}
+                  <div className="border rounded-lg border-border/50">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-4 h-auto font-medium text-left hover:bg-muted/50"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <span>English Literature</span>
+                            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/30">
+                              Medium Relevance to Major
+                            </Badge>
+                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                              Strength
+                            </Badge>
+                          </div>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="px-4 pb-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Current Grade</span>
+                                <span className="text-sm text-primary font-semibold">A (94%)</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Class Average: B+ (88%)
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Major Relevance</span>
+                                <span className="text-sm font-semibold">Moderate</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Critical thinking & communication
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Trend</span>
+                                <span className="text-sm text-primary font-semibold flex items-center">
+                                  <TrendingUp className="h-3 w-3 mr-1" />
+                                  Excellent
+                                </span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Consistent high performance
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-2 border-t">
+                            <div className="text-sm text-muted-foreground">
+                              <strong>Insights:</strong> Outstanding performance well above class average. Your strong writing and 
+                              analytical skills will be valuable for medical school applications and throughout your career.
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+
+                  {/* AP Physics */}
+                  <div className="border rounded-lg border-border/50">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-4 h-auto font-medium text-left hover:bg-muted/50"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <span>AP Physics</span>
+                            <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30">
+                              Low Relevance to Major
+                            </Badge>
+                          </div>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="px-4 pb-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Current Grade</span>
+                                <span className="text-sm font-semibold">B (85%)</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Class Average: B- (83%)
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Major Relevance</span>
+                                <span className="text-sm font-semibold">Low</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                General problem-solving skills
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Trend</span>
+                                <span className="text-sm font-semibold flex items-center">
+                                  <TrendingUp className="h-3 w-3 mr-1" />
+                                  Stable
+                                </span>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Slight improvement trend
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-2 border-t">
+                            <div className="text-sm text-muted-foreground">
+                              <strong>Insights:</strong> Above-average performance in physics. While not directly relevant to your major, 
+                              strong problem-solving skills are valuable. Consider maintaining current effort level.
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Performance Summary & Strategic Recommendations */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Lightbulb className="h-5 w-5 text-primary" />
+                    <span>Strategic Academic Insights</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-foreground flex items-center space-x-2">
+                        <Target className="h-4 w-4 text-primary" />
+                        <span>Key Strengths</span>
+                      </h5>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                          <span>Exceptional performance in life sciences and humanities</span>
+                        </li>
+                        <li className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                          <span>Strong analytical and communication skills</span>
+                        </li>
+                        <li className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                          <span>Consistent upward trends in key subjects</span>
+                        </li>
+                      </ul>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-foreground flex items-center space-x-2">
+                        <Brain className="h-4 w-4 text-primary" />
+                        <span>Growth Opportunities</span>
+                      </h5>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground mt-2 flex-shrink-0"></div>
+                          <span>Focus on chemistry fundamentals for MCAT prep</span>
+                        </li>
+                        <li className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground mt-2 flex-shrink-0"></div>
+                          <span>Leverage writing skills in STEM subjects</span>
+                        </li>
+                        <li className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground mt-2 flex-shrink-0"></div>
+                          <span>Seek additional support in physical sciences</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
 

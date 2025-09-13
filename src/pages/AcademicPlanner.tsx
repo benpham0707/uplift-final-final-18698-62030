@@ -39,7 +39,8 @@ import {
   Scale,
   Link,
   CheckCircle2,
-  Lightbulb
+  Lightbulb,
+  Minus
 } from 'lucide-react';
 
 // SubjectPerformanceAnalytics subcomponent for year-based expandable analytics
@@ -162,7 +163,7 @@ const SubjectPerformanceAnalytics: React.FC = () => {
               <Card className="cursor-pointer hover:bg-accent/50 transition-colors border-l-4 border-l-primary/60">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         {expandedYears.includes(year) ? (
                           <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -170,55 +171,61 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                           <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         )}
                         <h3 className="font-semibold text-base text-foreground">{data.year}</h3>
+                        <Badge variant="secondary" className="text-xs">{data.status}</Badge>
                       </div>
-                      <Badge variant="secondary" className="text-xs">{data.status}</Badge>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-primary">{data.overallGPA}</div>
+                      <div className="ml-6">
+                        <div className="text-xl font-bold text-primary">{data.overallGPA}</div>
                         <div className="text-xs text-muted-foreground">GPA</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-lg font-semibold text-foreground">
-                          {data.detailedMetrics.strongestSubjects.length}
+                    </div>
+                    
+                    <div className="flex items-center gap-6">
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                        <div className="flex items-center gap-1">
+                          {data.detailedMetrics.gpaImprovement.includes('+') ? (
+                            <TrendingUp className="w-3 h-3 text-green-600" />
+                          ) : data.detailedMetrics.gpaImprovement.includes('Maintained') ? (
+                            <Minus className="w-3 h-3 text-blue-600" />
+                          ) : (
+                            <TrendingDown className="w-3 h-3 text-orange-600" />
+                          )}
+                          <span className="text-sm font-semibold text-foreground">
+                            {data.detailedMetrics.gpaImprovement.includes('+') ? 
+                              '+' + (data.detailedMetrics.gpaImprovement.match(/\+([0-9.]+)/)?.[1] || '0.0') : 
+                              data.detailedMetrics.gpaImprovement.includes('Maintained') ? '0.0' : 
+                              '-0.1'
+                            }
+                          </span>
                         </div>
-                        <div className="text-xs text-muted-foreground">Top Subjects</div>
+                        <div className="text-xs text-muted-foreground">GPA Trend</div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 gap-3 mt-3 pt-3 border-t border-border">
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-foreground">
-                        {data.detailedMetrics.gpaImprovement.includes('+') ? 
-                          data.detailedMetrics.gpaImprovement.match(/\+([0-9.]+)/)?.[1] || '0.0' : 
-                          '0.0'
-                        }
+                      
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-gradient-to-br from-amber/10 to-amber/5 border border-amber/20">
+                        <div className="flex items-center gap-1">
+                          <Brain className="w-3 h-3 text-amber-600" />
+                          <span className="text-sm font-semibold text-foreground">
+                            {data.detailedMetrics.courseDifficulty.includes('Standard') ? '2.5' :
+                             data.detailedMetrics.courseDifficulty.includes('15%') ? '3.0' :
+                             data.detailedMetrics.courseDifficulty.includes('25%') ? '4.0' :
+                             data.detailedMetrics.courseDifficulty.includes('35%') ? '4.5' : '2.0'
+                            }/5
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">Difficulty</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">GPA Δ</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-foreground">
-                        {data.detailedMetrics.courseDifficulty.match(/(\d+)%/)?.[1] || '0'}%
+                      
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-gradient-to-br from-blue/10 to-blue/5 border border-blue/20">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-blue-600" />
+                          <span className="text-sm font-semibold text-foreground">
+                            {data.detailedMetrics.notableAchievements.includes('AP') ? 
+                              data.detailedMetrics.notableAchievements.match(/(\d+)\s*AP/)?.[1] || '0' : 
+                              '0'
+                            }
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">AP Courses</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">Difficulty</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-foreground">
-                        {data.detailedMetrics.notableAchievements.includes('AP') ? 
-                          data.detailedMetrics.notableAchievements.match(/(\d+)\s*AP/)?.[1] || '0' : 
-                          '0'
-                        }
-                      </div>
-                      <div className="text-xs text-muted-foreground">AP Courses</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold text-foreground">
-                        {data.detailedMetrics.notableAchievements.includes('honor roll') ? '✓' : 
-                         data.detailedMetrics.notableAchievements.includes('science fair') ? '★' : 
-                         data.detailedMetrics.notableAchievements.includes('government') ? '👑' : '—'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Awards</div>
                     </div>
                   </div>
                 </CardContent>

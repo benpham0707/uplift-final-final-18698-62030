@@ -1079,7 +1079,20 @@ const AcademicPlanner = () => {
                 AI-powered analysis of your academic performance and strategic recommendations
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            
+            {/* Soft Border Separator */}
+            <div className="relative px-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-border/50 to-transparent"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <div className="bg-background px-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary/40 to-accent/40"></div>
+                </div>
+              </div>
+            </div>
+            
+            <CardContent className="pt-4">
               <ScrollArea className="h-96">
                 <div className="space-y-4">
                   {insights.map((insight) => (
@@ -1398,18 +1411,6 @@ const AcademicPlanner = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Soft Border Separator */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <div className="bg-background px-4">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary/30 to-accent/30"></div>
-              </div>
-            </div>
-          </div>
 
           {/* Academic Task Dashboard */}
           <Card className="bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl overflow-hidden">

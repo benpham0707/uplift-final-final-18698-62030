@@ -437,90 +437,104 @@ const ProjectIncubationSystem = () => {
             </h3>
             
             <ScrollArea className="w-full">
-              <div className="flex space-x-6 pb-4">
+              <div className="flex space-x-8 pb-4">
                 {projectPipeline.filter(project => project.status === 'active').map((project) => (
-                  <Card key={project.id} className="min-w-[400px] max-w-[400px] border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge variant="default" className="bg-green-500/10 text-green-700 border-green-500/20">
+                  <Card key={project.id} className="min-w-[500px] max-w-[500px] border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
+                    <CardHeader className="pb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <Badge variant="default" className="bg-green-500/10 text-green-700 border-green-500/20 px-3 py-1">
                           {project.stage}
                         </Badge>
-                        <div className="flex items-center space-x-2">
-                          {project.type === 'technical' && <Code className="h-4 w-4 text-blue-500" />}
-                          {project.type === 'social-impact' && <Heart className="h-4 w-4 text-green-500" />}
-                          {project.type === 'creative' && <Palette className="h-4 w-4 text-purple-500" />}
-                          {project.type === 'entrepreneurial' && <Briefcase className="h-4 w-4 text-orange-500" />}
-                          <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs">
+                        <div className="flex items-center space-x-3">
+                          {project.type === 'technical' && <Code className="h-5 w-5 text-blue-500" />}
+                          {project.type === 'social-impact' && <Heart className="h-5 w-5 text-green-500" />}
+                          {project.type === 'creative' && <Palette className="h-5 w-5 text-purple-500" />}
+                          {project.type === 'entrepreneurial' && <Briefcase className="h-5 w-5 text-orange-500" />}
+                          <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs px-2 py-1">
                             {project.priorityRating}
                           </Badge>
                         </div>
                       </div>
-                      <CardTitle className="text-lg mb-1">{project.project}</CardTitle>
-                      <CardDescription className="text-sm">{project.description}</CardDescription>
+                      <CardTitle className="text-xl mb-3">{project.project}</CardTitle>
+                      <CardDescription className="text-sm leading-relaxed">{project.description}</CardDescription>
                     </CardHeader>
                     
-                    <CardContent className="space-y-4">
-                      {/* Progress & Completion */}
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Completion</span>
-                          <span className="font-medium text-foreground">{project.progress}% • {project.completionPrediction}</span>
+                    <CardContent className="space-y-6">
+                      {/* Progress & Completion Section */}
+                      <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-muted-foreground">Project Completion</span>
+                          <span className="font-semibold text-foreground">{project.progress}%</span>
                         </div>
                         <Progress value={project.progress} className="h-3" />
-                      </div>
-                      
-                      {/* Key Metrics Grid */}
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="space-y-1">
-                          <div className="flex items-center text-muted-foreground">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            Deadline
-                          </div>
-                          <div className="font-medium text-foreground">{new Date(project.deadline).toLocaleDateString()}</div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center text-muted-foreground">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Time Invested
-                          </div>
-                          <div className="font-medium text-foreground">{project.timeInvested}h / {project.totalTimeEstimate}h</div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center text-muted-foreground">
-                            <TrendingUp className="h-3 w-3 mr-1" />
-                            Impact Rating
-                          </div>
-                          <div className="font-medium text-foreground flex items-center">
-                            {project.impactRating}/10
-                            <Star className="h-3 w-3 ml-1 text-yellow-500 fill-current" />
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center text-muted-foreground">
-                            <Eye className="h-3 w-3 mr-1" />
-                            Last Active
-                          </div>
-                          <div className="font-medium text-foreground">{project.recentActivity}</div>
+                        <div className="text-xs text-muted-foreground text-center">
+                          Estimated completion: {project.completionPrediction}
                         </div>
                       </div>
                       
-                      {/* Next Milestone */}
-                      <div className="p-3 bg-muted/30 rounded-lg">
-                        <div className="text-xs text-muted-foreground mb-1 flex items-center">
-                          <Target className="h-3 w-3 mr-1" />
+                      {/* Time & Deadline Section */}
+                      <div className="bg-blue-50/50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200/50 dark:border-blue-800/50">
+                        <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-blue-600" />
+                          Timeline & Schedule
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <div className="text-xs text-muted-foreground">Deadline</div>
+                            <div className="text-sm font-medium text-foreground flex items-center">
+                              <Calendar className="h-3 w-3 mr-1 text-blue-600" />
+                              {new Date(project.deadline).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-xs text-muted-foreground">Time Invested</div>
+                            <div className="text-sm font-medium text-foreground">
+                              {project.timeInvested}h / {project.totalTimeEstimate}h
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Impact & Activity Section */}
+                      <div className="bg-green-50/50 dark:bg-green-950/20 rounded-lg p-4 border border-green-200/50 dark:border-green-800/50">
+                        <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+                          Impact & Activity
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <div className="text-xs text-muted-foreground">Impact Rating</div>
+                            <div className="text-sm font-medium text-foreground flex items-center">
+                              <Star className="h-3 w-3 mr-1 text-yellow-500 fill-current" />
+                              {project.impactRating}/10
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-xs text-muted-foreground">Last Active</div>
+                            <div className="text-sm font-medium text-foreground">
+                              {project.recentActivity}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Next Milestone Section */}
+                      <div className="bg-purple-50/50 dark:bg-purple-950/20 rounded-lg p-4 border border-purple-200/50 dark:border-purple-800/50">
+                        <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center">
+                          <Target className="h-4 w-4 mr-2 text-purple-600" />
                           Next Milestone
-                        </div>
-                        <div className="text-sm font-medium text-foreground">{project.nextMilestone}</div>
+                        </h4>
+                        <div className="text-sm text-muted-foreground">{project.nextMilestone}</div>
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="default" className="flex-1">
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <Button size="sm" className="h-10">
                           <PlayCircle className="h-4 w-4 mr-2" />
                           Continue to Work
                         </Button>
-                        <Button size="sm" variant="secondary" className="flex-1">
-                          <Settings className="h-4 w-4 mr-2" />
+                        <Button size="sm" variant="outline" className="h-10">
+                          <Eye className="h-4 w-4 mr-2" />
                           Update Navigation
                         </Button>
                       </div>
@@ -540,90 +554,104 @@ const ProjectIncubationSystem = () => {
               </h3>
               
               <ScrollArea className="w-full">
-                <div className="flex space-x-6 pb-4">
+                <div className="flex space-x-8 pb-4">
                   {projectPipeline.filter(project => project.status === 'paused').map((project) => (
-                    <Card key={project.id} className="min-w-[400px] max-w-[400px] border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 opacity-75">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                    <Card key={project.id} className="min-w-[500px] max-w-[500px] border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 opacity-75">
+                      <CardHeader className="pb-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20 px-3 py-1">
                             {project.stage} • Paused
                           </Badge>
-                          <div className="flex items-center space-x-2">
-                            {project.type === 'technical' && <Code className="h-4 w-4 text-blue-500" />}
-                            {project.type === 'social-impact' && <Heart className="h-4 w-4 text-green-500" />}
-                            {project.type === 'creative' && <Palette className="h-4 w-4 text-purple-500" />}
-                            {project.type === 'entrepreneurial' && <Briefcase className="h-4 w-4 text-orange-500" />}
-                            <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs">
+                          <div className="flex items-center space-x-3">
+                            {project.type === 'technical' && <Code className="h-5 w-5 text-blue-500" />}
+                            {project.type === 'social-impact' && <Heart className="h-5 w-5 text-green-500" />}
+                            {project.type === 'creative' && <Palette className="h-5 w-5 text-purple-500" />}
+                            {project.type === 'entrepreneurial' && <Briefcase className="h-5 w-5 text-orange-500" />}
+                            <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs px-2 py-1">
                               {project.priorityRating}
                             </Badge>
                           </div>
                         </div>
-                        <CardTitle className="text-lg mb-1">{project.project}</CardTitle>
-                        <CardDescription className="text-sm">{project.description}</CardDescription>
+                        <CardTitle className="text-xl mb-3">{project.project}</CardTitle>
+                        <CardDescription className="text-sm leading-relaxed">{project.description}</CardDescription>
                       </CardHeader>
                       
-                      <CardContent className="space-y-4">
-                        {/* Progress & Completion */}
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Completion</span>
-                            <span className="font-medium text-foreground">{project.progress}% • {project.completionPrediction}</span>
+                      <CardContent className="space-y-6">
+                        {/* Progress & Completion Section */}
+                        <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-muted-foreground">Project Completion</span>
+                            <span className="font-semibold text-foreground">{project.progress}%</span>
                           </div>
                           <Progress value={project.progress} className="h-3" />
-                        </div>
-                        
-                        {/* Key Metrics Grid */}
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div className="space-y-1">
-                            <div className="flex items-center text-muted-foreground">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              Deadline
-                            </div>
-                            <div className="font-medium text-foreground">{new Date(project.deadline).toLocaleDateString()}</div>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="flex items-center text-muted-foreground">
-                              <Clock className="h-3 w-3 mr-1" />
-                              Time Invested
-                            </div>
-                            <div className="font-medium text-foreground">{project.timeInvested}h / {project.totalTimeEstimate}h</div>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="flex items-center text-muted-foreground">
-                              <TrendingUp className="h-3 w-3 mr-1" />
-                              Impact Rating
-                            </div>
-                            <div className="font-medium text-foreground flex items-center">
-                              {project.impactRating}/10
-                              <Star className="h-3 w-3 ml-1 text-yellow-500 fill-current" />
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="flex items-center text-muted-foreground">
-                              <Eye className="h-3 w-3 mr-1" />
-                              Last Active
-                            </div>
-                            <div className="font-medium text-foreground">{project.recentActivity}</div>
+                          <div className="text-xs text-muted-foreground text-center">
+                            Status: {project.completionPrediction}
                           </div>
                         </div>
                         
-                        {/* Next Milestone */}
-                        <div className="p-3 bg-muted/30 rounded-lg">
-                          <div className="text-xs text-muted-foreground mb-1 flex items-center">
-                            <Target className="h-3 w-3 mr-1" />
+                        {/* Time & Deadline Section */}
+                        <div className="bg-blue-50/50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200/50 dark:border-blue-800/50">
+                          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
+                            <Clock className="h-4 w-4 mr-2 text-blue-600" />
+                            Timeline & Schedule
+                          </h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <div className="text-xs text-muted-foreground">Deadline</div>
+                              <div className="text-sm font-medium text-foreground flex items-center">
+                                <Calendar className="h-3 w-3 mr-1 text-blue-600" />
+                                {new Date(project.deadline).toLocaleDateString()}
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-xs text-muted-foreground">Time Invested</div>
+                              <div className="text-sm font-medium text-foreground">
+                                {project.timeInvested}h / {project.totalTimeEstimate}h
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Impact & Activity Section */}
+                        <div className="bg-green-50/50 dark:bg-green-950/20 rounded-lg p-4 border border-green-200/50 dark:border-green-800/50">
+                          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
+                            <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+                            Impact & Activity
+                          </h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <div className="text-xs text-muted-foreground">Impact Rating</div>
+                              <div className="text-sm font-medium text-foreground flex items-center">
+                                <Star className="h-3 w-3 mr-1 text-yellow-500 fill-current" />
+                                {project.impactRating}/10
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="text-xs text-muted-foreground">Last Active</div>
+                              <div className="text-sm font-medium text-foreground">
+                                {project.recentActivity}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Next Milestone Section */}
+                        <div className="bg-purple-50/50 dark:bg-purple-950/20 rounded-lg p-4 border border-purple-200/50 dark:border-purple-800/50">
+                          <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center">
+                            <Target className="h-4 w-4 mr-2 text-purple-600" />
                             Next Milestone
-                          </div>
-                          <div className="text-sm font-medium text-foreground">{project.nextMilestone}</div>
+                          </h4>
+                          <div className="text-sm text-muted-foreground">{project.nextMilestone}</div>
                         </div>
                         
                         {/* Action Buttons */}
-                        <div className="flex space-x-2">
-                          <Button size="sm" variant="outline" className="flex-1">
+                        <div className="grid grid-cols-2 gap-3 pt-2">
+                          <Button size="sm" variant="outline" className="h-10">
                             <PlayCircle className="h-4 w-4 mr-2" />
                             Resume Work
                           </Button>
-                          <Button size="sm" variant="secondary" className="flex-1">
-                            <Settings className="h-4 w-4 mr-2" />
+                          <Button size="sm" variant="secondary" className="h-10">
+                            <Eye className="h-4 w-4 mr-2" />
                             Update Navigation
                           </Button>
                         </div>

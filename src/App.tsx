@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import PortfolioScanner from "./pages/PortfolioScanner";
 import ExtracurricularOptimizer from "./pages/ExtracurricularOptimizer";
 import AcademicPlanner from "./pages/AcademicPlanner";
+import ProjectIncubationSystem from "./pages/ProjectIncubationSystem";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/portfolio-scanner" element={<PortfolioScanner />} />
             <Route path="/extracurricular-optimizer" element={<ExtracurricularOptimizer />} />
             <Route path="/academic-planner" element={<AcademicPlanner />} />
+            <Route path="/project-incubation" element={<ProjectIncubationSystem />} />
             <Route path="/auth" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

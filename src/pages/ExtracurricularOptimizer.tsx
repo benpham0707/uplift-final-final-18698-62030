@@ -374,8 +374,12 @@ const AcademicPlanningIntelligence = () => {
                     key={domain.id} 
                     className={`relative group cursor-pointer transition-all duration-500 hover:scale-105 animate-fade-in`}
                     onClick={() => {
-                      const element = document.getElementById(domain.id);
-                      element?.scrollIntoView({ behavior: 'smooth' });
+                      if (domain.id === 'projects') {
+                        navigate('/project-incubation');
+                      } else {
+                        const element = document.getElementById(domain.id);
+                        element?.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }}
                   >
                     {/* Subtle blue fire effect - only glow at score 10 */}

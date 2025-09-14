@@ -75,7 +75,7 @@ const ProjectIncubationSystem = () => {
     completedProjects: 1
   };
 
-  // Hard coded data for project pipeline with different stages
+  // Hard coded data for project pipeline with comprehensive metrics for dashboard
   const projectPipeline = [
     {
       id: 'idea-exploration',
@@ -84,10 +84,16 @@ const ProjectIncubationSystem = () => {
       progress: 85,
       status: 'active',
       type: 'social-impact',
-      timeInvested: '8 hours',
+      timeInvested: 32,
+      totalTimeEstimate: 120,
+      deadline: '2025-12-15',
+      impactRating: 9.2,
+      priorityRating: 'High',
       nextMilestone: 'Stakeholder interviews complete',
       aiMode: 'socratic',
-      description: 'Mobile app to track and reduce food waste in campus dining'
+      description: 'Mobile app to track and reduce food waste in campus dining',
+      recentActivity: '2 days ago',
+      completionPrediction: '3 weeks'
     },
     {
       id: 'development',
@@ -96,22 +102,70 @@ const ProjectIncubationSystem = () => {
       progress: 60,
       status: 'active', 
       type: 'technical',
-      timeInvested: '24 hours',
+      timeInvested: 45,
+      totalTimeEstimate: 80,
+      deadline: '2025-11-30',
+      impactRating: 7.8,
+      priorityRating: 'Medium',
       nextMilestone: 'MVP testing with beta users',
       aiMode: 'development-partner',
-      description: 'Machine learning algorithm to match students for optimal study groups'
+      description: 'Machine learning algorithm to match students for optimal study groups',
+      recentActivity: '1 day ago',
+      completionPrediction: '5 weeks'
     },
     {
       id: 'launch-prep',
       stage: 'Launch Preparation',
       project: 'Photography Portfolio Site',
       progress: 90,
-      status: 'review',
+      status: 'active',
       type: 'creative',
-      timeInvested: '40 hours',
+      timeInvested: 65,
+      totalTimeEstimate: 70,
+      deadline: '2025-10-20',
+      impactRating: 6.5,
+      priorityRating: 'Low',
       nextMilestone: 'Portfolio submission to contests',
       aiMode: 'development-partner',
-      description: 'Professional photography portfolio with e-commerce integration'
+      description: 'Professional photography portfolio with e-commerce integration',
+      recentActivity: '4 hours ago',
+      completionPrediction: '1 week'
+    },
+    {
+      id: 'mental-health-hub',
+      stage: 'Research',
+      project: 'Mental Health Resource Hub',
+      progress: 25,
+      status: 'paused',
+      type: 'social-impact',
+      timeInvested: 12,
+      totalTimeEstimate: 90,
+      deadline: '2026-03-01',
+      impactRating: 8.9,
+      priorityRating: 'High',
+      nextMilestone: 'Complete user research interviews',
+      aiMode: 'socratic',
+      description: 'Comprehensive platform connecting students with mental health resources',
+      recentActivity: '2 weeks ago',
+      completionPrediction: 'On hold'
+    },
+    {
+      id: 'tutoring-marketplace',
+      stage: 'Ideation',
+      project: 'Campus Tutoring Marketplace',
+      progress: 15,
+      status: 'paused',
+      type: 'entrepreneurial',
+      timeInvested: 8,
+      totalTimeEstimate: 150,
+      deadline: '2026-05-15',
+      impactRating: 7.3,
+      priorityRating: 'Medium',
+      nextMilestone: 'Market validation research',
+      aiMode: 'socratic',
+      description: 'Two-sided marketplace connecting students with peer tutors',
+      recentActivity: '3 weeks ago',
+      completionPrediction: 'On hold'
     }
   ];
 
@@ -356,68 +410,230 @@ const ProjectIncubationSystem = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pb-20">
-        {/* Project Pipeline Section */}
+        {/* Project Dashboard */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
-            <Workflow className="h-6 w-6 mr-2 text-primary" />
-            Your Project Pipeline
-          </h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {projectPipeline.map((project, index) => (
-              <Card key={project.id} className="relative overflow-hidden border-l-4 border-l-primary/60 hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={project.status === 'active' ? 'default' : project.status === 'review' ? 'secondary' : 'outline'} className="text-xs">
-                      {project.stage}
-                    </Badge>
-                    <div className="flex items-center space-x-2">
-                      {project.type === 'technical' && <Code className="h-4 w-4 text-blue-500" />}
-                      {project.type === 'social-impact' && <Heart className="h-4 w-4 text-green-500" />}
-                      {project.type === 'creative' && <Palette className="h-4 w-4 text-purple-500" />}
-                    </div>
-                  </div>
-                  <CardTitle className="text-lg">{project.project}</CardTitle>
-                  <CardDescription className="text-sm">{project.description}</CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Progress</span>
-                      <span className="font-medium text-foreground">{project.progress}%</span>
-                    </div>
-                    <Progress value={project.progress} className="h-2" />
-                  </div>
-                  
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Time Invested:</span>
-                      <span className="font-medium text-foreground">{project.timeInvested}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">AI Mode:</span>
-                      <span className="font-medium text-foreground capitalize">{project.aiMode.replace('-', ' ')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <div className="text-xs text-muted-foreground mb-1">Next Milestone</div>
-                    <div className="text-sm font-medium text-foreground">{project.nextMilestone}</div>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="default" className="flex-1">
-                      Continue Work
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      <MessageCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-foreground flex items-center">
+              <BarChart3 className="h-6 w-6 mr-2 text-primary" />
+              Project Dashboard
+            </h2>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
+              <Button variant="outline" size="sm">
+                <PlusCircle className="h-4 w-4 mr-2" />
+                New Project
+              </Button>
+            </div>
           </div>
+
+          {/* Active Projects */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+              <PlayCircle className="h-5 w-5 mr-2 text-green-500" />
+              Active Projects ({projectPipeline.filter(p => p.status === 'active').length})
+            </h3>
+            
+            <ScrollArea className="w-full">
+              <div className="flex space-x-6 pb-4">
+                {projectPipeline.filter(project => project.status === 'active').map((project) => (
+                  <Card key={project.id} className="min-w-[400px] max-w-[400px] border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge variant="default" className="bg-green-500/10 text-green-700 border-green-500/20">
+                          {project.stage}
+                        </Badge>
+                        <div className="flex items-center space-x-2">
+                          {project.type === 'technical' && <Code className="h-4 w-4 text-blue-500" />}
+                          {project.type === 'social-impact' && <Heart className="h-4 w-4 text-green-500" />}
+                          {project.type === 'creative' && <Palette className="h-4 w-4 text-purple-500" />}
+                          {project.type === 'entrepreneurial' && <Briefcase className="h-4 w-4 text-orange-500" />}
+                          <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs">
+                            {project.priorityRating}
+                          </Badge>
+                        </div>
+                      </div>
+                      <CardTitle className="text-lg mb-1">{project.project}</CardTitle>
+                      <CardDescription className="text-sm">{project.description}</CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-4">
+                      {/* Progress & Completion */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Completion</span>
+                          <span className="font-medium text-foreground">{project.progress}% • {project.completionPrediction}</span>
+                        </div>
+                        <Progress value={project.progress} className="h-3" />
+                      </div>
+                      
+                      {/* Key Metrics Grid */}
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-1">
+                          <div className="flex items-center text-muted-foreground">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            Deadline
+                          </div>
+                          <div className="font-medium text-foreground">{new Date(project.deadline).toLocaleDateString()}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-muted-foreground">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Time Invested
+                          </div>
+                          <div className="font-medium text-foreground">{project.timeInvested}h / {project.totalTimeEstimate}h</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-muted-foreground">
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            Impact Rating
+                          </div>
+                          <div className="font-medium text-foreground flex items-center">
+                            {project.impactRating}/10
+                            <Star className="h-3 w-3 ml-1 text-yellow-500 fill-current" />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-muted-foreground">
+                            <Eye className="h-3 w-3 mr-1" />
+                            Last Active
+                          </div>
+                          <div className="font-medium text-foreground">{project.recentActivity}</div>
+                        </div>
+                      </div>
+                      
+                      {/* Next Milestone */}
+                      <div className="p-3 bg-muted/30 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1 flex items-center">
+                          <Target className="h-3 w-3 mr-1" />
+                          Next Milestone
+                        </div>
+                        <div className="text-sm font-medium text-foreground">{project.nextMilestone}</div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex space-x-2">
+                        <Button size="sm" variant="default" className="flex-1">
+                          <PlayCircle className="h-4 w-4 mr-2" />
+                          Continue to Work
+                        </Button>
+                        <Button size="sm" variant="secondary" className="flex-1">
+                          <Settings className="h-4 w-4 mr-2" />
+                          Update Navigation
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          {/* Paused Projects */}
+          {projectPipeline.filter(p => p.status === 'paused').length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                <Clock className="h-5 w-5 mr-2 text-yellow-500" />
+                Paused Projects ({projectPipeline.filter(p => p.status === 'paused').length})
+              </h3>
+              
+              <ScrollArea className="w-full">
+                <div className="flex space-x-6 pb-4">
+                  {projectPipeline.filter(project => project.status === 'paused').map((project) => (
+                    <Card key={project.id} className="min-w-[400px] max-w-[400px] border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 opacity-75">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                            {project.stage} • Paused
+                          </Badge>
+                          <div className="flex items-center space-x-2">
+                            {project.type === 'technical' && <Code className="h-4 w-4 text-blue-500" />}
+                            {project.type === 'social-impact' && <Heart className="h-4 w-4 text-green-500" />}
+                            {project.type === 'creative' && <Palette className="h-4 w-4 text-purple-500" />}
+                            {project.type === 'entrepreneurial' && <Briefcase className="h-4 w-4 text-orange-500" />}
+                            <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs">
+                              {project.priorityRating}
+                            </Badge>
+                          </div>
+                        </div>
+                        <CardTitle className="text-lg mb-1">{project.project}</CardTitle>
+                        <CardDescription className="text-sm">{project.description}</CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-4">
+                        {/* Progress & Completion */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Completion</span>
+                            <span className="font-medium text-foreground">{project.progress}% • {project.completionPrediction}</span>
+                          </div>
+                          <Progress value={project.progress} className="h-3" />
+                        </div>
+                        
+                        {/* Key Metrics Grid */}
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="space-y-1">
+                            <div className="flex items-center text-muted-foreground">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              Deadline
+                            </div>
+                            <div className="font-medium text-foreground">{new Date(project.deadline).toLocaleDateString()}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex items-center text-muted-foreground">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Time Invested
+                            </div>
+                            <div className="font-medium text-foreground">{project.timeInvested}h / {project.totalTimeEstimate}h</div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex items-center text-muted-foreground">
+                              <TrendingUp className="h-3 w-3 mr-1" />
+                              Impact Rating
+                            </div>
+                            <div className="font-medium text-foreground flex items-center">
+                              {project.impactRating}/10
+                              <Star className="h-3 w-3 ml-1 text-yellow-500 fill-current" />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex items-center text-muted-foreground">
+                              <Eye className="h-3 w-3 mr-1" />
+                              Last Active
+                            </div>
+                            <div className="font-medium text-foreground">{project.recentActivity}</div>
+                          </div>
+                        </div>
+                        
+                        {/* Next Milestone */}
+                        <div className="p-3 bg-muted/30 rounded-lg">
+                          <div className="text-xs text-muted-foreground mb-1 flex items-center">
+                            <Target className="h-3 w-3 mr-1" />
+                            Next Milestone
+                          </div>
+                          <div className="text-sm font-medium text-foreground">{project.nextMilestone}</div>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline" className="flex-1">
+                            <PlayCircle className="h-4 w-4 mr-2" />
+                            Resume Work
+                          </Button>
+                          <Button size="sm" variant="secondary" className="flex-1">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Update Navigation
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          )}
         </div>
 
         {/* Project Types & Strategies */}

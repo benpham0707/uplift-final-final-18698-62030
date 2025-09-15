@@ -438,10 +438,10 @@ const ProjectIncubationSystem = () => {
   }, [isDragging, dragOffset]);
 
   return (
-    <div className="min-h-screen gradient-project-main">
+    <div className="min-h-screen bg-background">
       {/* Header with beautiful gradient */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 gradient-project-header opacity-80"></div>
+        <div className="absolute inset-0 gradient-project-header"></div>
         <div className="relative max-w-7xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <div className="inline-flex items-center space-x-2 bg-white/10 rounded-full px-4 py-2 mb-6 border border-white/20">
@@ -482,27 +482,39 @@ const ProjectIncubationSystem = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-20">
-        {/* Active Projects Dashboard */}
-
-        {/* Project Dashboard */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground flex items-center">
-              <BarChart3 className="h-6 w-6 mr-2 text-primary" />
-              Active Project Dashboard
-            </h2>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button variant="outline" size="sm">
-                <PlusCircle className="h-4 w-4 mr-2" />
-                New Project
-              </Button>
+      <div className="max-w-7xl mx-auto px-4 pb-20 space-y-16">
+        {/* Active & Paused Projects Section */}
+        <section className="relative">
+          {/* Section Header with Visual Separator */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500/10 to-red-500/10 rounded-full px-6 py-3 mb-4 border border-purple-200/50">
+              <BarChart3 className="h-5 w-5 text-purple-600" />
+              <span className="text-lg font-semibold text-foreground">Project Dashboard</span>
             </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Monitor your active projects and manage paused initiatives with AI-powered insights and progress tracking
+            </p>
           </div>
+
+          {/* Section Content Card */}
+          <Card className="gradient-project-card border-purple-200/30 shadow-soft">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-foreground flex items-center">
+                  <BarChart3 className="h-6 w-6 mr-2 text-primary" />
+                  Active Project Dashboard
+                </h2>
+                <div className="flex items-center space-x-3">
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    New Project
+                  </Button>
+                </div>
+              </div>
 
           {/* Active Projects */}
           <div className="mb-8">
@@ -761,18 +773,25 @@ const ProjectIncubationSystem = () => {
               </div>
             </div>
           )}
-        </div>
+            </CardContent>
+          </Card>
+        </section>
 
-        {/* Project Discovery & Planning */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground flex items-center">
-                <LightbulbIcon className="h-6 w-6 mr-2 text-primary" />
-                Project Discovery & Planning
-              </h2>
-              <p className="text-muted-foreground mt-1">Explore curated project ideas and start planning your next breakthrough</p>
+        {/* Project Discovery & Planning Section */}
+        <section className="relative">
+          {/* Section Header with Visual Separator */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500/10 to-red-500/10 rounded-full px-6 py-3 mb-4 border border-purple-200/50">
+              <LightbulbIcon className="h-5 w-5 text-purple-600" />
+              <span className="text-lg font-semibold text-foreground">Project Discovery & Planning</span>
             </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Explore curated project ideas and start planning your next breakthrough with AI-powered recommendations
+            </p>
+          </div>
+
+          {/* Section Actions */}
+          <div className="flex justify-center mb-8">
             <Button variant="outline" size="sm" className="flex items-center gap-2">
               <MapPin className="w-4 h-4" />
               Campus Navigation
@@ -1105,10 +1124,24 @@ const ProjectIncubationSystem = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </section>
 
-        {/* Project Types & Strategies */}
-        <div className="mb-12">
+        {/* Project Types & Strategies Section */}
+        <section className="relative">
+          {/* Section Header with Visual Separator */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500/10 to-red-500/10 rounded-full px-6 py-3 mb-4 border border-purple-200/50">
+              <Code className="h-5 w-5 text-purple-600" />
+              <span className="text-lg font-semibold text-foreground">Project Types & Strategic Focus</span>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Explore different project categories and strategic approaches to build a comprehensive portfolio
+            </p>
+          </div>
+
+          {/* Section Content Card */}
+          <Card className="gradient-project-card border-purple-200/30 shadow-soft">
+            <CardContent className="p-8">
           <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
             <Target className="h-6 w-6 mr-2 text-primary" />
             Project Types & Strategic Focus
@@ -1189,14 +1222,26 @@ const ProjectIncubationSystem = () => {
               </TabsContent>
             ))}
           </Tabs>
-        </div>
+            </CardContent>
+          </Card>
+        </section>
 
-        {/* AI Collaboration Modes */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
-            <Brain className="h-6 w-6 mr-2 text-primary" />
-            AI Collaboration Modes
-          </h2>
+        {/* AI Collaboration Modes Section */}
+        <section className="relative">
+          {/* Section Header with Visual Separator */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500/10 to-red-500/10 rounded-full px-6 py-3 mb-4 border border-purple-200/50">
+              <Brain className="h-5 w-5 text-purple-600" />
+              <span className="text-lg font-semibold text-foreground">AI Collaboration Modes</span>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Choose your AI collaboration style to optimize project development and learning outcomes
+            </p>
+          </div>
+
+          {/* Section Content Card */}
+          <Card className="gradient-project-card border-purple-200/30 shadow-soft">
+            <CardContent className="p-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Object.entries(aiCollaborationModes).map(([mode, data]) => {
@@ -1246,14 +1291,26 @@ const ProjectIncubationSystem = () => {
               );
             })}
           </div>
-        </div>
+            </CardContent>
+          </Card>
+        </section>
 
-        {/* Uniqueness Preservation */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
-            <Star className="h-6 w-6 mr-2 text-primary" />
-            Uniqueness Preservation
-          </h2>
+        {/* Uniqueness Preservation Section */}
+        <section className="relative">
+          {/* Section Header with Visual Separator */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500/10 to-red-500/10 rounded-full px-6 py-3 mb-4 border border-purple-200/50">
+              <Star className="h-5 w-5 text-purple-600" />
+              <span className="text-lg font-semibold text-foreground">Uniqueness Preservation</span>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Advanced metrics and tracking to ensure your projects stand out and maintain competitive advantage
+            </p>
+          </div>
+
+          {/* Section Content Card */}
+          <Card className="gradient-project-card border-purple-200/30 shadow-soft">
+            <CardContent className="p-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -1316,7 +1373,9 @@ const ProjectIncubationSystem = () => {
               </CardContent>
             </Card>
           </div>
-        </div>
+            </CardContent>
+          </Card>
+        </section>
       </div>
 
       {/* Floating AI Chat Assistant */}

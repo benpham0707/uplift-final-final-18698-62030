@@ -437,6 +437,42 @@ const ProjectIncubationSystem = () => {
     }
   }, [isDragging, dragOffset]);
 
+  // Hook: convert vertical wheel to horizontal scroll reliably and block page/back navigation when hovering
+  const useHorizontalWheel = (ref: React.RefObject<HTMLDivElement | null>) => {
+    React.useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
+
+      const onWheel = (e: WheelEvent) => {
+        // Prevent default scrolling and history swipe when over this element
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+
+        const dx = e.deltaX || 0;
+        const dy = e.deltaY || 0;
+
+        // Prefer vertical delta to drive horizontal movement
+        const delta = Math.abs(dy) >= Math.abs(dx) ? dy : dx;
+        if (delta !== 0) {
+          el.scrollLeft += delta;
+        }
+      };
+
+      el.addEventListener('wheel', onWheel as EventListener, { passive: false });
+      return () => {
+        el.removeEventListener('wheel', onWheel as EventListener);
+      };
+    }, [ref]);
+  };
+
+  // Refs for horizontal scrollers
+  const activeProjectsRef = React.useRef<HTMLDivElement>(null);
+  const pausedProjectsRef = React.useRef<HTMLDivElement>(null);
+
+  // Attach wheel handlers
+  useHorizontalWheel(activeProjectsRef);
+  useHorizontalWheel(pausedProjectsRef);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header with beautiful gradient */}
@@ -478,8 +514,11 @@ const ProjectIncubationSystem = () => {
               </div>
             </div>
           </div>
-        </div>
       </div>
+    </div>
+
+      {/* Smooth transition spacer between header and dashboards */}
+      <div aria-hidden="true" className="h-8 md:h-14 bg-gradient-to-b from-transparent to-background/80"></div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pb-20 space-y-16">
@@ -513,26 +552,13 @@ const ProjectIncubationSystem = () => {
               Active Projects ({projectPipeline.filter(p => p.status === 'active').length})
             </h3>
             
-            <div className="w-full overflow-x-auto no-scrollbar" 
+            <div className="w-full overflow-x-auto no-scrollbar"
+                 ref={activeProjectsRef}
                  style={{ 
                    overscrollBehaviorX: 'contain',
+                   overscrollBehaviorY: 'contain',
                    touchAction: 'pan-x',
                    WebkitOverflowScrolling: 'touch'
-                 }}
-                 onWheelCapture={(e) => {
-                   const el = e.currentTarget as HTMLElement;
-                   const { deltaX, deltaY } = e;
-                   
-                   // Always prevent default to stop browser navigation
-                   e.preventDefault();
-                   e.stopPropagation();
-                   
-                   // Convert vertical scroll to horizontal
-                   if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY !== 0) {
-                     el.scrollLeft += deltaY;
-                   } else if (deltaX !== 0) {
-                     el.scrollLeft += deltaX;
-                   }
                  }}>
               <div className="flex space-x-6 pb-4 min-w-max"
                    style={{ touchAction: 'pan-x' }}>
@@ -652,26 +678,13 @@ const ProjectIncubationSystem = () => {
                 Paused Projects ({projectPipeline.filter(p => p.status === 'paused').length})
               </h3>
               
-              <div className="w-full overflow-x-auto no-scrollbar" 
+              <div className="w-full overflow-x-auto no-scrollbar"
+                   ref={pausedProjectsRef}
                    style={{ 
                      overscrollBehaviorX: 'contain',
+                     overscrollBehaviorY: 'contain',
                      touchAction: 'pan-x',
                      WebkitOverflowScrolling: 'touch'
-                   }}
-                   onWheelCapture={(e) => {
-                     const el = e.currentTarget as HTMLElement;
-                     const { deltaX, deltaY } = e;
-                     
-                     // Always prevent default to stop browser navigation
-                     e.preventDefault();
-                     e.stopPropagation();
-                     
-                     // Convert vertical scroll to horizontal
-                     if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY !== 0) {
-                       el.scrollLeft += deltaY;
-                     } else if (deltaX !== 0) {
-                       el.scrollLeft += deltaX;
-                     }
                    }}>
                 <div className="flex space-x-6 pb-4 min-w-max"
                      style={{ touchAction: 'pan-x' }}>

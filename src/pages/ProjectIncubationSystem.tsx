@@ -912,156 +912,187 @@ const ProjectIncubationSystem = () => {
                           <Card className="bg-muted/30">
                             <CardContent className="p-6">
                               <div className="space-y-5">
-                                {/* Top Section: Why Choose This Project - Full Width */}
-                                <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
-                                  <CardContent className="p-5">
-                                    <h5 className="font-semibold text-lg text-foreground mb-3 flex items-center justify-center gap-2">
-                                      <Star className="w-5 h-5 text-primary" />
-                                      Why Choose This Project?
-                                    </h5>
-                                    <p className="text-sm text-muted-foreground text-center leading-relaxed">{project.whyPick}</p>
+                                {/* Top Section: Why Choose This Project (Full Width with Skills on Right) */}
+                                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border-primary/30 shadow-xl hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5"></div>
+                                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full transform translate-x-16 -translate-y-16"></div>
+                                  
+                                  <CardContent className="p-6 relative">
+                                    <div className="flex items-center space-x-3 mb-4">
+                                      <div className="p-2 rounded-lg bg-primary/20">
+                                        <Star className="h-6 w-6 text-primary" />
+                                      </div>
+                                      <h5 className="text-2xl font-bold text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                                        Why Choose This Project
+                                      </h5>
+                                    </div>
+                                    
+                                    <div className="grid md:grid-cols-3 gap-6">
+                                      {/* Left side - Main description (2/3 width) */}
+                                      <div className="md:col-span-2 space-y-4">
+                                        <p className="text-muted-foreground leading-relaxed text-lg">{project.whyPick}</p>
+                                      </div>
+
+                                      {/* Right side - Skills (1/3 width) */}
+                                      <div className="space-y-4">
+                                        <div className="flex items-center space-x-2 mb-3">
+                                          <Brain className="h-5 w-5 text-accent" />
+                                          <h6 className="text-lg font-semibold text-foreground">Skills You'll Develop</h6>
+                                        </div>
+                                        
+                                        <div className="space-y-2">
+                                          <TooltipProvider>
+                                            {project.skills.slice(0, 4).map((skill, idx) => {
+                                              // Hard coded skill definitions for tooltip content
+                                              const skillDefinitions = {
+                                                'Leadership': 'Ability to guide teams, make decisions, and inspire others toward common goals',
+                                                'Project Management': 'Planning, organizing, and managing resources to achieve specific objectives',
+                                                'Community Engagement': 'Building relationships and collaborating with local communities',
+                                                'Research Methods': 'Systematic approaches to gathering, analyzing, and interpreting data',
+                                                'Data Analysis': 'Processing and examining data to discover patterns and insights',
+                                                'Academic Writing': 'Clear, structured communication for scholarly audiences',
+                                                'Business Development': 'Strategies for growing and expanding business opportunities',
+                                                'Financial Planning': 'Managing resources and budgets for sustainable growth',
+                                                'Marketing': 'Promoting products or services to target audiences',
+                                                'Creative Design': 'Visual problem-solving and aesthetic communication',
+                                                'Digital Tools': 'Proficiency with software and technology platforms',
+                                                'Portfolio Curation': 'Selecting and organizing work to showcase abilities',
+                                                'Programming': 'Writing code to create software solutions',
+                                                'Problem Solving': 'Analytical thinking to overcome challenges',
+                                                'Technical Design': 'Creating technical specifications and architectures',
+                                                'Cultural Intelligence': 'Understanding and adapting to diverse cultural contexts',
+                                                'Communication': 'Effective verbal and written expression',
+                                                'Event Planning': 'Organizing and coordinating successful gatherings'
+                                              };
+                                              
+                                              return (
+                                                <Tooltip key={idx}>
+                                                  <TooltipTrigger asChild>
+                                                    <div className="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-primary/20 hover:bg-primary/5 transition-all cursor-help group">
+                                                      <span className="font-medium text-foreground text-sm group-hover:text-primary">{skill}</span>
+                                                      <HelpCircle className="h-3 w-3 text-primary opacity-60 group-hover:opacity-100" />
+                                                    </div>
+                                                  </TooltipTrigger>
+                                                  <TooltipContent side="left" className="max-w-xs">
+                                                    <p className="text-sm">{skillDefinitions[skill] || 'Essential skill for project success'}</p>
+                                                  </TooltipContent>
+                                                </Tooltip>
+                                              );
+                                            })}
+                                          </TooltipProvider>
+                                        </div>
+                                      </div>
+                                    </div>
                                   </CardContent>
                                 </Card>
 
-                                {/* Middle Section: Skills & Outcomes - Gradient Boxes */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                                  <TooltipProvider>
-                                    <div className="relative group">
-                                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-xl blur-sm group-hover:blur-none transition-all duration-300"></div>
-                                      <div className="relative bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200/50 dark:border-blue-800/50 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300">
-                                        <div className="flex items-center gap-2 mb-3">
-                                          <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50">
-                                            <Target className="w-4 h-4 text-blue-600" />
-                                          </div>
-                                          <h6 className="font-semibold text-foreground">Skills You'll Develop</h6>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                          {project.skills.map((skill, idx) => {
-                                            // Hard coded skill definitions for tooltip content
-                                            const skillDefinitions = {
-                                              'Leadership': 'Ability to guide teams, make decisions, and inspire others toward common goals',
-                                              'Project Management': 'Planning, organizing, and managing resources to achieve specific objectives',
-                                              'Community Engagement': 'Building relationships and collaborating with local communities',
-                                              'Research Methods': 'Systematic approaches to gathering, analyzing, and interpreting data',
-                                              'Data Analysis': 'Processing and examining data to discover patterns and insights',
-                                              'Academic Writing': 'Clear, structured communication for scholarly audiences',
-                                              'Business Development': 'Strategies for growing and expanding business opportunities',
-                                              'Financial Planning': 'Managing resources and budgets for sustainable growth',
-                                              'Marketing': 'Promoting products or services to target audiences',
-                                              'Creative Design': 'Visual problem-solving and aesthetic communication',
-                                              'Digital Tools': 'Proficiency with software and technology platforms',
-                                              'Portfolio Curation': 'Selecting and organizing work to showcase abilities',
-                                              'Programming': 'Writing code to create software solutions',
-                                              'Problem Solving': 'Analytical thinking to overcome challenges',
-                                              'Technical Design': 'Creating technical specifications and architectures',
-                                              'Cultural Intelligence': 'Understanding and adapting to diverse cultural contexts',
-                                              'Communication': 'Effective verbal and written expression',
-                                              'Event Planning': 'Organizing and coordinating successful gatherings'
-                                            };
-                                            
-                                            return (
-                                              <Tooltip key={idx}>
-                                                <TooltipTrigger asChild>
-                                                  <Badge 
-                                                    variant="outline" 
-                                                    className="text-xs cursor-help hover:bg-blue-100 hover:border-blue-400 transition-colors duration-200 py-1 px-2 bg-white/60 dark:bg-gray-800/60"
-                                                  >
-                                                    {skill}
-                                                  </Badge>
-                                                </TooltipTrigger>
-                                                <TooltipContent className="max-w-xs">
-                                                  <p className="text-sm">{skillDefinitions[skill] || 'Essential skill for project success'}</p>
-                                                </TooltipContent>
-                                              </Tooltip>
-                                            );
-                                          })}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </TooltipProvider>
+                                {/* Middle Section: Expected Outcomes (Full Width) */}
+                                <Card className="bg-gradient-to-br from-emerald-500/5 via-green-500/5 to-teal-500/5 border-emerald-500/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-500/5"></div>
+                                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-full"></div>
                                   
-                                  <div className="relative group">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-sm group-hover:blur-none transition-all duration-300"></div>
-                                    <div className="relative bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200/50 dark:border-green-800/50 rounded-xl p-4 hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/50">
-                                          <CheckCircle className="w-4 h-4 text-green-600" />
-                                        </div>
-                                        <h6 className="font-semibold text-foreground">Expected Outcomes</h6>
+                                  <CardContent className="p-5 relative">
+                                    <div className="flex items-center space-x-3 mb-4">
+                                      <div className="p-2 rounded-lg bg-emerald-500/20">
+                                        <TrendingUp className="h-6 w-6 text-emerald-600" />
                                       </div>
-                                      <div className="space-y-2">
-                                        {project.outcomes.map((outcome, idx) => (
-                                          <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-800/60 transition-colors">
-                                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                            <div className="flex-1">
-                                              <div className="text-sm font-medium text-foreground capitalize">{outcome}</div>
-                                              <div className="text-xs text-muted-foreground">
-                                                {idx === 0 ? 'Tangible achievement you can showcase' : 
-                                                 idx === 1 ? 'Valuable connections and relationships' : 
-                                                 'Meaningful personal development'}
-                                              </div>
+                                      <h6 className="text-xl font-bold text-foreground bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                                        Expected Outcomes & Impact
+                                      </h6>
+                                    </div>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                      {project.outcomes.map((outcome, idx) => (
+                                        <div key={idx} className="flex items-start space-x-3 p-4 rounded-lg bg-gradient-to-r from-emerald-500/10 to-transparent border-l-4 border-emerald-500 hover:shadow-md transition-all">
+                                          <div className="p-2 rounded-full bg-emerald-500/20 mt-1">
+                                            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                          </div>
+                                          <div>
+                                            <div className="font-semibold text-foreground capitalize">{outcome}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                              {idx === 0 ? 'Tangible achievement you can showcase to admissions committees' : 
+                                               idx === 1 ? 'Valuable connections and professional relationships' : 
+                                               'Meaningful personal development and growth opportunities'}
                                             </div>
                                           </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+
+                                {/* Third Section: Key Findings & Profile Connections (Side by Side) */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                                  <Card className="bg-gradient-to-br from-amber-500/5 via-yellow-500/5 to-orange-500/5 border-amber-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.1),transparent_50%)]"></div>
+                                    
+                                    <CardContent className="p-4 relative">
+                                      <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 rounded-lg bg-amber-500/20 group-hover:bg-amber-500/30 transition-colors">
+                                          <Brain className="w-5 h-5 text-amber-600" />
+                                        </div>
+                                        <h6 className="text-lg font-bold text-foreground group-hover:text-amber-700 transition-colors">
+                                          Key Research Findings
+                                        </h6>
+                                      </div>
+                                      
+                                      <div className="space-y-3 max-h-40 overflow-y-auto">
+                                        {project.findings?.map((finding: string, index: number) => (
+                                          <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-background/40 border border-amber-500/20 hover:border-amber-500/40 transition-all">
+                                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 flex-shrink-0"></div>
+                                            <span className="text-sm text-muted-foreground leading-relaxed">{finding}</span>
+                                          </div>
                                         ))}
                                       </div>
-                                    </div>
-                                  </div>
+                                    </CardContent>
+                                  </Card>
+                                  
+                                  <Card className="bg-gradient-to-br from-indigo-500/5 via-blue-500/5 to-purple-500/5 border-indigo-500/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.1),transparent_50%)]"></div>
+                                    
+                                    <CardContent className="p-4 relative">
+                                      <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 rounded-lg bg-indigo-500/20 group-hover:bg-indigo-500/30 transition-colors">
+                                          <Link className="w-5 h-5 text-indigo-600" />
+                                        </div>
+                                        <h6 className="text-lg font-bold text-foreground group-hover:text-indigo-700 transition-colors">
+                                          Profile Alignment
+                                        </h6>
+                                      </div>
+                                      
+                                      <div className="space-y-3 max-h-40 overflow-y-auto">
+                                        {project.connections?.map((connection: string, index: number) => (
+                                          <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-background/40 border border-indigo-500/20 hover:border-indigo-500/40 transition-all">
+                                            <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2 flex-shrink-0"></div>
+                                            <span className="text-sm text-muted-foreground leading-relaxed">{connection}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </CardContent>
+                                  </Card>
                                 </div>
 
-                                {/* Bottom Section: Analysis Cards - Three Equal Boxes */}
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                  <Card className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 border-purple-200/50 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg transition-all duration-300 group">
-                                    <CardContent className="p-4">
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/50 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
-                                          <Brain className="w-4 h-4 text-purple-600" />
-                                        </div>
-                                        <h6 className="font-semibold text-foreground">Key Findings</h6>
-                                      </div>
-                                      <div className="space-y-2 max-h-32 overflow-y-auto">
-                                        {project.findings?.map((finding: string, index: number) => (
-                                          <div key={index} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0"></div>
-                                            <span>{finding}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </CardContent>
-                                  </Card>
+                                {/* Bottom Section: Impact Assessment (Full Width) */}
+                                <Card className="bg-gradient-to-br from-rose-500/5 via-pink-500/5 to-purple-500/5 border-rose-500/20 shadow-xl hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 via-transparent to-purple-500/5"></div>
+                                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-rose-500/20 to-transparent rounded-full transform -translate-x-16 -translate-y-16"></div>
+                                  <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-purple-500/20 to-transparent rounded-full transform translate-x-12 translate-y-12"></div>
                                   
-                                  <Card className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all duration-300 group">
-                                    <CardContent className="p-4">
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
-                                          <Link className="w-4 h-4 text-blue-600" />
-                                        </div>
-                                        <h6 className="font-semibold text-foreground">Profile Connections</h6>
+                                  <CardContent className="p-5 relative">
+                                    <div className="flex items-center gap-3 mb-4">
+                                      <div className="p-3 rounded-lg bg-rose-500/20">
+                                        <Scale className="h-6 w-6 text-rose-600" />
                                       </div>
-                                      <div className="space-y-2 max-h-32 overflow-y-auto">
-                                        {project.connections?.map((connection: string, index: number) => (
-                                          <div key={index} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></div>
-                                            <span>{connection}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </CardContent>
-                                  </Card>
-                                  
-                                  <Card className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 border-orange-200/50 dark:border-orange-800/50 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-lg transition-all duration-300 group">
-                                    <CardContent className="p-4">
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <div className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/50 group-hover:bg-orange-200 dark:group-hover:bg-orange-800/50 transition-colors">
-                                          <Scale className="w-4 h-4 text-orange-600" />
-                                        </div>
-                                        <h6 className="font-semibold text-foreground">Impact Assessment</h6>
-                                      </div>
-                                      <div className="text-xs text-muted-foreground leading-relaxed max-h-32 overflow-y-auto">
-                                        {project.impact}
-                                      </div>
-                                    </CardContent>
-                                  </Card>
-                                </div>
+                                      <h6 className="text-xl font-bold text-foreground bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                                        Comprehensive Impact Assessment
+                                      </h6>
+                                    </div>
+                                    
+                                    <div className="text-muted-foreground leading-relaxed text-lg">
+                                      {project.impact}
+                                    </div>
+                                  </CardContent>
+                                </Card>
 
                                 {/* Action Button */}
                                 <div className="flex justify-center pt-4 border-t border-border/30">

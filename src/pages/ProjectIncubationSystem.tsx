@@ -485,16 +485,6 @@ const ProjectIncubationSystem = () => {
       <div className="max-w-7xl mx-auto px-4 pb-20 space-y-16">
         {/* Active & Paused Projects Section */}
         <section className="relative">
-          {/* Section Header with Visual Separator */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500/10 to-red-500/10 rounded-full px-6 py-3 mb-4 border border-purple-200/50">
-              <BarChart3 className="h-5 w-5 text-purple-600" />
-              <span className="text-lg font-semibold text-foreground">Project Dashboard</span>
-            </div>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Monitor your active projects and manage paused initiatives with AI-powered insights and progress tracking
-            </p>
-          </div>
 
           {/* Section Content Card */}
           <Card className="gradient-project-card border-purple-200/30 shadow-soft">
@@ -530,8 +520,18 @@ const ProjectIncubationSystem = () => {
                    WebkitOverflowScrolling: 'touch'
                  }}
                  onWheelCapture={(e) => {
-                   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                     e.stopPropagation();
+                   const el = e.currentTarget as HTMLElement;
+                   const { deltaX, deltaY } = e;
+                   
+                   // Always prevent default to stop browser navigation
+                   e.preventDefault();
+                   e.stopPropagation();
+                   
+                   // Convert vertical scroll to horizontal
+                   if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY !== 0) {
+                     el.scrollLeft += deltaY;
+                   } else if (deltaX !== 0) {
+                     el.scrollLeft += deltaX;
                    }
                  }}>
               <div className="flex space-x-6 pb-4 min-w-max"
@@ -659,8 +659,18 @@ const ProjectIncubationSystem = () => {
                      WebkitOverflowScrolling: 'touch'
                    }}
                    onWheelCapture={(e) => {
-                     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                       e.stopPropagation();
+                     const el = e.currentTarget as HTMLElement;
+                     const { deltaX, deltaY } = e;
+                     
+                     // Always prevent default to stop browser navigation
+                     e.preventDefault();
+                     e.stopPropagation();
+                     
+                     // Convert vertical scroll to horizontal
+                     if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY !== 0) {
+                       el.scrollLeft += deltaY;
+                     } else if (deltaX !== 0) {
+                       el.scrollLeft += deltaX;
                      }
                    }}>
                 <div className="flex space-x-6 pb-4 min-w-max"

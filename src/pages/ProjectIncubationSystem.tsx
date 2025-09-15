@@ -481,161 +481,7 @@ const ProjectIncubationSystem = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pb-20">
-        {/* Project Discovery & Planning Dashboard */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground flex items-center">
-              <LightbulbIcon className="h-6 w-6 mr-2 text-primary" />
-              Project Discovery & Planning
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            {/* Left Side - Suggested Projects */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-                <Search className="h-5 w-5 mr-2 text-blue-500" />
-                Suggested Project Directions
-              </h3>
-              
-              <div className="space-y-3">
-                {suggestedProjects.map((project) => (
-                  <Card 
-                    key={project.id} 
-                    className={`cursor-pointer transition-all duration-300 border-2 ${
-                      selectedProject === project.id 
-                        ? 'border-primary shadow-lg scale-[1.02] bg-primary/5' 
-                        : 'border-border hover:border-primary/50 hover:shadow-md'
-                    }`}
-                    onClick={() => setSelectedProject(project.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
-                          <project.icon className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-foreground truncate">{project.title}</h4>
-                            <Badge variant="outline" className="text-xs ml-2">
-                              {project.category}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                            {project.description}
-                          </p>
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center space-x-4">
-                              <span className="flex items-center">
-                                <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
-                                {project.estimatedTime}
-                              </span>
-                              <span className="flex items-center">
-                                <Star className="h-3 w-3 mr-1 text-yellow-500" />
-                                {project.impactScore}
-                              </span>
-                            </div>
-                            <Badge 
-                              variant={project.uniquenessRating === 'Very High' ? 'default' : 
-                                     project.uniquenessRating === 'High' ? 'secondary' : 'outline'}
-                              className="text-xs"
-                            >
-                              {project.uniquenessRating}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Side - Chat Interface */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-                <MessageCircle className="h-5 w-5 mr-2 text-green-500" />
-                Personalize Your Project Plan
-              </h3>
-              
-              <Card className={`h-[600px] transition-all duration-300 ${
-                selectedProject 
-                  ? 'border-green-500/30 shadow-lg' 
-                  : 'border-muted bg-muted/20 opacity-60'
-              }`}>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className={`w-3 h-3 rounded-full ${
-                        selectedProject ? 'bg-green-500' : 'bg-muted-foreground'
-                      }`}></div>
-                      <span className={`text-sm font-medium ${
-                        selectedProject ? 'text-foreground' : 'text-muted-foreground'
-                      }`}>
-                        Chat with our AI to customize this project
-                      </span>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="flex flex-col h-[480px]">
-                  {/* Chat Messages Area */}
-                  <div className={`flex-1 overflow-y-auto space-y-4 mb-4 ${
-                    !selectedProject ? 'pointer-events-none' : ''
-                  }`}>
-                    {selectedProject ? (
-                      <>
-                        <div className="bg-muted/30 rounded-lg p-4">
-                          <div className="flex items-start space-x-3">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <Brain className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-foreground">
-                                Hi! I'm your Project Planning Assistant. I'll help you customize this project to fit your specific needs and circumstances.
-                              </p>
-                              <p className="text-sm text-muted-foreground mt-2">
-                                Let's start with <strong>{suggestedProjects.find(p => p.id === selectedProject)?.title}</strong>. What aspects would you like to personalize?
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-center">
-                        <div className="text-muted-foreground">
-                          <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p className="text-sm">Select a project from the left to start planning</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Chat Input */}
-                  <div className={`border-t pt-4 ${!selectedProject ? 'opacity-50 pointer-events-none' : ''}`}>
-                    <div className="flex space-x-2">
-                      <Input
-                        placeholder="Ask about customizing this project..."
-                        value={userInput}
-                        onChange={(e) => setUserInput(e.target.value)}
-                        className="flex-1"
-                        disabled={!selectedProject}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      />
-                      <Button 
-                        onClick={handleSendMessage}
-                        disabled={!selectedProject || !userInput.trim()}
-                        className="px-3"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
+        {/* Active Projects Dashboard */}
 
         {/* Project Dashboard */}
         <div className="mb-12">
@@ -891,6 +737,210 @@ const ProjectIncubationSystem = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Project Discovery & Planning */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground flex items-center">
+                <LightbulbIcon className="h-6 w-6 mr-2 text-primary" />
+                Project Discovery & Planning
+              </h2>
+              <p className="text-muted-foreground mt-1">Explore curated project ideas and start planning your next breakthrough</p>
+            </div>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Campus Navigation
+            </Button>
+          </div>
+
+          <Card className="bg-gradient-to-br from-background to-muted/30 border-primary/20">
+            <CardContent className="p-6">
+              <div className="h-[500px]">
+                <ScrollArea className="h-full">
+                  <div className="space-y-4 pr-4">
+                    {[
+                      {
+                        id: 'social-impact',
+                        title: 'Social Impact Initiative',
+                        category: 'Community Service',
+                        description: 'Create meaningful change in your local community through organized service projects',
+                        match: '92%',
+                        timeCommitment: '3-6 months',
+                        difficulty: 'Medium',
+                        whyPick: 'Builds leadership skills, creates lasting community connections, and demonstrates commitment to social responsibility',
+                        skills: ['Leadership', 'Project Management', 'Community Engagement'],
+                        outcomes: ['Local impact', 'Network building', 'Personal fulfillment']
+                      },
+                      {
+                        id: 'research-project',
+                        title: 'Independent Research',
+                        category: 'Academic',
+                        description: 'Conduct original research in your field of interest with faculty mentorship',
+                        match: '87%',
+                        timeCommitment: '6-12 months',
+                        difficulty: 'High',
+                        whyPick: 'Develops critical thinking, research methodology skills, and positions you for graduate school or academic careers',
+                        skills: ['Research Methods', 'Data Analysis', 'Academic Writing'],
+                        outcomes: ['Publications', 'Conference presentations', 'Graduate school preparation']
+                      },
+                      {
+                        id: 'startup-venture',
+                        title: 'Entrepreneurial Venture',
+                        category: 'Business',
+                        description: 'Launch a student-focused startup or business with real market potential',
+                        match: '81%',
+                        timeCommitment: '12+ months',
+                        difficulty: 'High',
+                        whyPick: 'Teaches business fundamentals, risk management, and innovation while building valuable professional networks',
+                        skills: ['Business Development', 'Financial Planning', 'Marketing'],
+                        outcomes: ['Business experience', 'Revenue generation', 'Professional network']
+                      },
+                      {
+                        id: 'creative-portfolio',
+                        title: 'Creative Portfolio Project',
+                        category: 'Arts & Media',
+                        description: 'Build a standout creative portfolio showcasing your artistic talents and vision',
+                        match: '89%',
+                        timeCommitment: '2-4 months',
+                        difficulty: 'Medium',
+                        whyPick: 'Showcases creativity, builds a professional portfolio, and opens doors to creative industry opportunities',
+                        skills: ['Creative Design', 'Digital Tools', 'Portfolio Curation'],
+                        outcomes: ['Professional portfolio', 'Industry connections', 'Creative recognition']
+                      },
+                      {
+                        id: 'tech-innovation',
+                        title: 'Technology Innovation Lab',
+                        category: 'STEM',
+                        description: 'Develop innovative technology solutions to real-world problems',
+                        match: '85%',
+                        timeCommitment: '4-8 months',
+                        difficulty: 'High',
+                        whyPick: 'Builds technical expertise, problem-solving skills, and positions you at the forefront of innovation',
+                        skills: ['Programming', 'Problem Solving', 'Technical Design'],
+                        outcomes: ['Technical skills', 'Innovation experience', 'Industry relevance']
+                      },
+                      {
+                        id: 'cultural-exchange',
+                        title: 'Cultural Exchange Initiative',
+                        category: 'Global Engagement',
+                        description: 'Bridge cultural gaps through organized exchange programs and events',
+                        match: '78%',
+                        timeCommitment: '3-5 months',
+                        difficulty: 'Medium',
+                        whyPick: 'Develops cultural competency, language skills, and global perspective valuable in today\'s interconnected world',
+                        skills: ['Cultural Intelligence', 'Communication', 'Event Planning'],
+                        outcomes: ['Global perspective', 'Language skills', 'Cultural network']
+                      }
+                    ].map((project) => (
+                      <Collapsible key={project.id} open={expandedProjects.includes(project.id)} onOpenChange={() => toggleProject(project.id)}>
+                        <CollapsibleTrigger asChild>
+                          <Card className="cursor-pointer hover:bg-accent/50 transition-colors border-l-4 border-l-primary/60">
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2">
+                                    {expandedProjects.includes(project.id) ? (
+                                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                    ) : (
+                                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                    )}
+                                    <h4 className="font-semibold text-base text-foreground">{project.title}</h4>
+                                    <Badge variant="secondary" className="text-xs">{project.category}</Badge>
+                                  </div>
+                                  <div className="ml-6">
+                                    <p className="text-sm text-muted-foreground mb-2">{project.description}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-4">
+                                  <div className="flex flex-col items-center p-2 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                                    <div className="text-lg font-bold text-primary">{project.match}</div>
+                                    <div className="text-xs text-muted-foreground">Match</div>
+                                  </div>
+                                  
+                                  <div className="flex flex-col items-center p-2 rounded-lg bg-gradient-to-br from-amber/10 to-amber/5 border border-amber/20">
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="w-3 h-3 text-amber-600" />
+                                      <span className="text-xs font-semibold text-foreground">{project.timeCommitment}</span>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">Duration</div>
+                                  </div>
+                                  
+                                  <div className="flex flex-col items-center p-2 rounded-lg bg-gradient-to-br from-blue/10 to-blue/5 border border-blue/20">
+                                    <div className="flex items-center gap-1">
+                                      <BarChart3 className="w-3 h-3 text-blue-600" />
+                                      <span className="text-xs font-semibold text-foreground">{project.difficulty}</span>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">Difficulty</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-4">
+                          <Card className="bg-muted/30">
+                            <CardContent className="p-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Why Pick This Project */}
+                                <div>
+                                  <h5 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                                    <Star className="w-4 h-4 text-primary" />
+                                    Why Choose This Project?
+                                  </h5>
+                                  <p className="text-sm text-muted-foreground mb-4">{project.whyPick}</p>
+                                  
+                                  <h6 className="font-medium text-foreground mb-2">Skills You'll Develop:</h6>
+                                  <div className="flex flex-wrap gap-2 mb-4">
+                                    {project.skills.map((skill, idx) => (
+                                      <Badge key={idx} variant="outline" className="text-xs">{skill}</Badge>
+                                    ))}
+                                  </div>
+                                  
+                                  <h6 className="font-medium text-foreground mb-2">Expected Outcomes:</h6>
+                                  <div className="space-y-1">
+                                    {project.outcomes.map((outcome, idx) => (
+                                      <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <CheckCircle className="w-3 h-3 text-green-600" />
+                                        {outcome}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                {/* Project Customization Interface */}
+                                <div className="bg-background border rounded-lg p-4">
+                                  <h5 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                                    <MessageCircle className="w-4 h-4 text-primary" />
+                                    Project Planning Assistant
+                                  </h5>
+                                  <div className="space-y-3 mb-4 max-h-48 overflow-y-auto">
+                                    <div className="bg-muted/50 p-3 rounded-lg">
+                                      <p className="text-sm text-foreground">
+                                        Great choice! I'll help you customize this {project.title.toLowerCase()} project. What specific goals do you want to achieve?
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Input placeholder="Type your goals and preferences..." className="flex-1 text-sm" />
+                                    <Button size="sm">
+                                      <Send className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Project Types & Strategies */}

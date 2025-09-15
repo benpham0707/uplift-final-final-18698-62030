@@ -288,4 +288,14 @@ All colors MUST be HSL.
       transform: translateY(0px) scale(1);
     }
   }
+
+  /* Hide scrollbars for horizontal scroll areas */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

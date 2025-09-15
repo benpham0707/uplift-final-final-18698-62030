@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -511,13 +511,18 @@ const ProjectIncubationSystem = () => {
               Active Projects ({projectPipeline.filter(p => p.status === 'active').length})
             </h3>
             
-            <ScrollArea className="w-full" style={{ touchAction: 'pan-x' }}>
-              <div className="flex space-x-6 pb-4 min-w-max pr-4"
-                   onWheel={(e) => {
-                     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                       e.stopPropagation();
-                     }
-                   }}
+            <div className="w-full overflow-x-auto no-scrollbar" 
+                 style={{ 
+                   overscrollBehaviorX: 'contain',
+                   touchAction: 'pan-x',
+                   WebkitOverflowScrolling: 'touch'
+                 }}
+                 onWheelCapture={(e) => {
+                   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                     e.stopPropagation();
+                   }
+                 }}>
+              <div className="flex space-x-6 pb-4 min-w-max"
                    style={{ touchAction: 'pan-x' }}>
                 {projectPipeline.filter(project => project.status === 'active').map((project) => (
                   <Card key={project.id} className="min-w-[700px] max-w-[700px] border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
@@ -624,7 +629,7 @@ const ProjectIncubationSystem = () => {
                   </Card>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           </div>
 
           {/* Paused Projects */}
@@ -635,13 +640,18 @@ const ProjectIncubationSystem = () => {
                 Paused Projects ({projectPipeline.filter(p => p.status === 'paused').length})
               </h3>
               
-              <ScrollArea className="w-full" style={{ touchAction: 'pan-x' }}>
-                <div className="flex space-x-6 pb-4 min-w-max pr-4"
-                     onWheel={(e) => {
-                       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                         e.stopPropagation();
-                       }
-                     }}
+              <div className="w-full overflow-x-auto no-scrollbar" 
+                   style={{ 
+                     overscrollBehaviorX: 'contain',
+                     touchAction: 'pan-x',
+                     WebkitOverflowScrolling: 'touch'
+                   }}
+                   onWheelCapture={(e) => {
+                     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                       e.stopPropagation();
+                     }
+                   }}>
+                <div className="flex space-x-6 pb-4 min-w-max"
                      style={{ touchAction: 'pan-x' }}>
                   {projectPipeline.filter(project => project.status === 'paused').map((project) => (
                     <Card key={project.id} className="min-w-[700px] max-w-[700px] border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 opacity-75">
@@ -748,7 +758,7 @@ const ProjectIncubationSystem = () => {
                     </Card>
                   ))}
                 </div>
-              </ScrollArea>
+              </div>
             </div>
           )}
         </div>
@@ -772,7 +782,7 @@ const ProjectIncubationSystem = () => {
           <Card className="bg-gradient-to-br from-background to-muted/30 border-primary/20">
             <CardContent className="p-6">
               <div className="h-[500px]">
-                <ScrollArea className="h-full">
+                <div className="h-full overflow-y-auto">
                   <div className="space-y-4 pr-4">
                     {[
                       {
@@ -1091,7 +1101,7 @@ const ProjectIncubationSystem = () => {
                       </Collapsible>
                     ))}
                   </div>
-                </ScrollArea>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1334,7 +1344,7 @@ const ProjectIncubationSystem = () => {
           </div>
           
           {/* Chat Messages */}
-          <ScrollArea className="h-80 p-3">
+          <div className="h-80 p-3 overflow-y-auto">
             <div className="space-y-3">
               {chatMessages.map((message, index) => (
                 <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -1348,7 +1358,7 @@ const ProjectIncubationSystem = () => {
                 </div>
               ))}
             </div>
-          </ScrollArea>
+          </div>
           
           {/* Chat Input */}
           <div className="p-3 border-t border-border">

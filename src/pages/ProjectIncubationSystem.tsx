@@ -438,43 +438,43 @@ const ProjectIncubationSystem = () => {
   }, [isDragging, dragOffset]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
+    <div className="min-h-screen gradient-project-main">
       {/* Header with beautiful gradient */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-primary/10"></div>
+        <div className="absolute inset-0 gradient-project-header opacity-80"></div>
         <div className="relative max-w-7xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-primary/10 rounded-full px-4 py-2 mb-6">
-              <Lightbulb className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Project Incubation System</span>
+            <div className="inline-flex items-center space-x-2 bg-white/10 rounded-full px-4 py-2 mb-6 border border-white/20">
+              <Lightbulb className="h-4 w-4 text-white" />
+              <span className="text-sm font-medium text-white">Project Incubation System</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Build Projects That Actually Matter
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
               AI-collaborative project development that ensures uniqueness and impact. 
               From idea discovery to launch, we'll help you build something meaningful.
             </p>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
-                <div className="text-2xl font-bold text-foreground">{projectDiscoveryData.totalProjects}</div>
-                <div className="text-sm text-muted-foreground">Active Projects</div>
+              <div className="text-center p-4 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm">
+                <div className="text-2xl font-bold text-white">{projectDiscoveryData.totalProjects}</div>
+                <div className="text-sm text-white/70">Active Projects</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20">
-                <div className="text-2xl font-bold text-foreground">{projectDiscoveryData.completion}%</div>
-                <div className="text-sm text-muted-foreground">Discovery Complete</div>
+              <div className="text-center p-4 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm">
+                <div className="text-2xl font-bold text-white">{projectDiscoveryData.completion}%</div>
+                <div className="text-sm text-white/70">Discovery Complete</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20">
-                <div className="text-2xl font-bold text-foreground">High</div>
-                <div className="text-sm text-muted-foreground">Uniqueness Score</div>
+              <div className="text-center p-4 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm">
+                <div className="text-2xl font-bold text-white">High</div>
+                <div className="text-sm text-white/70">Uniqueness Score</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20">
-                <div className="text-2xl font-bold text-foreground">89%</div>
-                <div className="text-sm text-muted-foreground">AI Effectiveness</div>
+              <div className="text-center p-4 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm">
+                <div className="text-2xl font-bold text-white">89%</div>
+                <div className="text-sm text-white/70">AI Effectiveness</div>
               </div>
             </div>
           </div>
@@ -507,7 +507,7 @@ const ProjectIncubationSystem = () => {
           {/* Active Projects */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-              <PlayCircle className="h-5 w-5 mr-2 text-green-500" />
+              <PlayCircle className="h-5 w-5 mr-2" style={{ color: 'hsl(280 70% 60%)' }} />
               Active Projects ({projectPipeline.filter(p => p.status === 'active').length})
             </h3>
             
@@ -525,17 +525,17 @@ const ProjectIncubationSystem = () => {
               <div className="flex space-x-6 pb-4 min-w-max"
                    style={{ touchAction: 'pan-x' }}>
                 {projectPipeline.filter(project => project.status === 'active').map((project) => (
-                  <Card key={project.id} className="min-w-[700px] max-w-[700px] border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
+                  <Card key={project.id} className="min-w-[700px] max-w-[700px] gradient-project-card border border-purple-200/50 shadow-project hover:shadow-strong transition-all duration-300">
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between mb-3">
-                        <Badge variant="default" className="bg-green-500/10 text-green-700 border-green-500/20 px-3 py-1">
+                        <Badge variant="default" style={{ backgroundColor: 'hsl(280 70% 60% / 0.1)', color: 'hsl(280 70% 40%)', border: '1px solid hsl(280 70% 60% / 0.2)' }} className="px-3 py-1">
                           {project.stage}
                         </Badge>
                         <div className="flex items-center space-x-3">
-                          {project.type === 'technical' && <Code className="h-5 w-5 text-blue-500" />}
-                          {project.type === 'social-impact' && <Heart className="h-5 w-5 text-green-500" />}
-                          {project.type === 'creative' && <Palette className="h-5 w-5 text-purple-500" />}
-                          {project.type === 'entrepreneurial' && <Briefcase className="h-5 w-5 text-orange-500" />}
+                          {project.type === 'technical' && <Code className="h-5 w-5" style={{ color: 'hsl(280 70% 60%)' }} />}
+                          {project.type === 'social-impact' && <Heart className="h-5 w-5" style={{ color: 'hsl(0 75% 60%)' }} />}
+                          {project.type === 'creative' && <Palette className="h-5 w-5" style={{ color: 'hsl(280 70% 60%)' }} />}
+                          {project.type === 'entrepreneurial' && <Briefcase className="h-5 w-5" style={{ color: 'hsl(0 75% 60%)' }} />}
                           <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs px-2 py-1">
                             {project.priorityRating}
                           </Badge>
@@ -547,7 +547,7 @@ const ProjectIncubationSystem = () => {
                     
                     <CardContent className="space-y-4">
                       {/* Progress & Completion Section */}
-                      <div className="bg-muted/30 rounded-lg p-4">
+                      <div className="bg-white/40 rounded-lg p-4 border border-purple-200/30">
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-sm font-semibold text-foreground">Project Completion</span>
                           <span className="font-bold text-foreground">{project.progress}%</span>
@@ -561,8 +561,8 @@ const ProjectIncubationSystem = () => {
                       {/* Key Metrics Grid - Horizontal Layout */}
                       <div className="grid grid-cols-4 gap-6">
                         {/* Deadline */}
-                        <div className="text-center p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
-                          <div className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                        <div className="text-center p-3 bg-white/50 rounded-lg border border-purple-200/40">
+                          <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(280 70% 50%)' }}>
                             <Calendar className="h-3 w-3 mr-1" />
                             Deadline
                           </div>
@@ -572,8 +572,8 @@ const ProjectIncubationSystem = () => {
                         </div>
                         
                         {/* Time Invested */}
-                        <div className="text-center p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
-                          <div className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                        <div className="text-center p-3 bg-white/50 rounded-lg border border-purple-200/40">
+                          <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(280 70% 50%)' }}>
                             <Clock className="h-3 w-3 mr-1" />
                             Time Invested
                           </div>
@@ -583,8 +583,8 @@ const ProjectIncubationSystem = () => {
                         </div>
                         
                         {/* Impact Rating */}
-                        <div className="text-center p-3 bg-green-50/50 dark:bg-green-950/20 rounded-lg border border-green-200/50 dark:border-green-800/50">
-                          <div className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                        <div className="text-center p-3 bg-white/50 rounded-lg border border-red-200/40">
+                          <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(0 75% 50%)' }}>
                             <Star className="h-3 w-3 mr-1" />
                             Impact Rating
                           </div>
@@ -594,8 +594,8 @@ const ProjectIncubationSystem = () => {
                         </div>
                         
                         {/* Last Active */}
-                        <div className="text-center p-3 bg-green-50/50 dark:bg-green-950/20 rounded-lg border border-green-200/50 dark:border-green-800/50">
-                          <div className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                        <div className="text-center p-3 bg-white/50 rounded-lg border border-red-200/40">
+                          <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(0 75% 50%)' }}>
                             <Eye className="h-3 w-3 mr-1" />
                             Last Active
                           </div>
@@ -606,8 +606,8 @@ const ProjectIncubationSystem = () => {
                       </div>
                       
                       {/* Next Milestone Section */}
-                      <div className="bg-purple-50/50 dark:bg-purple-950/20 rounded-lg p-4 border border-purple-200/50 dark:border-purple-800/50">
-                        <div className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2 flex items-center">
+                      <div className="bg-white/50 rounded-lg p-4 border border-purple-200/40">
+                        <div className="text-xs font-bold uppercase tracking-wide mb-2 flex items-center" style={{ color: 'hsl(280 70% 50%)' }}>
                           <Target className="h-3 w-3 mr-1" />
                           Next Milestone
                         </div>
@@ -616,11 +616,11 @@ const ProjectIncubationSystem = () => {
                       
                       {/* Action Buttons */}
                       <div className="grid grid-cols-2 gap-3">
-                        <Button size="sm" className="h-9">
+                        <Button size="sm" className="h-9 gradient-project-accent text-white border-0 hover:opacity-90">
                           <PlayCircle className="h-4 w-4 mr-2" />
                           Continue to Work
                         </Button>
-                        <Button size="sm" variant="outline" className="h-9">
+                        <Button size="sm" variant="outline" className="h-9 border-purple-300/50 hover:bg-purple-50">
                           <Eye className="h-4 w-4 mr-2" />
                           Update Navigation
                         </Button>
@@ -636,7 +636,7 @@ const ProjectIncubationSystem = () => {
           {projectPipeline.filter(p => p.status === 'paused').length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-                <Clock className="h-5 w-5 mr-2 text-yellow-500" />
+                <Clock className="h-5 w-5 mr-2" style={{ color: 'hsl(0 75% 60%)' }} />
                 Paused Projects ({projectPipeline.filter(p => p.status === 'paused').length})
               </h3>
               
@@ -654,17 +654,17 @@ const ProjectIncubationSystem = () => {
                 <div className="flex space-x-6 pb-4 min-w-max"
                      style={{ touchAction: 'pan-x' }}>
                   {projectPipeline.filter(project => project.status === 'paused').map((project) => (
-                    <Card key={project.id} className="min-w-[700px] max-w-[700px] border-l-4 border-l-yellow-500 hover:shadow-lg transition-all duration-300 opacity-75">
+                    <Card key={project.id} className="min-w-[700px] max-w-[700px] gradient-project-paused border border-red-200/30 hover:shadow-medium transition-all duration-300 opacity-80">
                       <CardHeader className="pb-4">
                         <div className="flex items-center justify-between mb-3">
-                          <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20 px-3 py-1">
+                          <Badge variant="secondary" style={{ backgroundColor: 'hsl(0 75% 60% / 0.1)', color: 'hsl(0 75% 40%)', border: '1px solid hsl(0 75% 60% / 0.2)' }} className="px-3 py-1">
                             {project.stage} • Paused
                           </Badge>
                           <div className="flex items-center space-x-3">
-                            {project.type === 'technical' && <Code className="h-5 w-5 text-blue-500" />}
-                            {project.type === 'social-impact' && <Heart className="h-5 w-5 text-green-500" />}
-                            {project.type === 'creative' && <Palette className="h-5 w-5 text-purple-500" />}
-                            {project.type === 'entrepreneurial' && <Briefcase className="h-5 w-5 text-orange-500" />}
+                            {project.type === 'technical' && <Code className="h-5 w-5" style={{ color: 'hsl(280 50% 50%)' }} />}
+                            {project.type === 'social-impact' && <Heart className="h-5 w-5" style={{ color: 'hsl(0 50% 50%)' }} />}
+                            {project.type === 'creative' && <Palette className="h-5 w-5" style={{ color: 'hsl(280 50% 50%)' }} />}
+                            {project.type === 'entrepreneurial' && <Briefcase className="h-5 w-5" style={{ color: 'hsl(0 50% 50%)' }} />}
                             <Badge variant={project.priorityRating === 'High' ? 'destructive' : project.priorityRating === 'Medium' ? 'secondary' : 'outline'} className="text-xs px-2 py-1">
                               {project.priorityRating}
                             </Badge>
@@ -676,7 +676,7 @@ const ProjectIncubationSystem = () => {
                       
                       <CardContent className="space-y-4">
                         {/* Progress & Completion Section */}
-                        <div className="bg-muted/30 rounded-lg p-4">
+                        <div className="bg-white/60 rounded-lg p-4 border border-red-200/30">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-sm font-semibold text-foreground">Project Completion</span>
                             <span className="font-bold text-foreground">{project.progress}%</span>
@@ -690,8 +690,8 @@ const ProjectIncubationSystem = () => {
                         {/* Key Metrics Grid - Horizontal Layout */}
                         <div className="grid grid-cols-4 gap-6">
                           {/* Deadline */}
-                          <div className="text-center p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
-                            <div className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                          <div className="text-center p-3 bg-white/70 rounded-lg border border-purple-200/30">
+                            <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(280 50% 50%)' }}>
                               <Calendar className="h-3 w-3 mr-1" />
                               Deadline
                             </div>
@@ -701,8 +701,8 @@ const ProjectIncubationSystem = () => {
                           </div>
                           
                           {/* Time Invested */}
-                          <div className="text-center p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
-                            <div className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                          <div className="text-center p-3 bg-white/70 rounded-lg border border-purple-200/30">
+                            <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(280 50% 50%)' }}>
                               <Clock className="h-3 w-3 mr-1" />
                               Time Invested
                             </div>
@@ -712,8 +712,8 @@ const ProjectIncubationSystem = () => {
                           </div>
                           
                           {/* Impact Rating */}
-                          <div className="text-center p-3 bg-green-50/50 dark:bg-green-950/20 rounded-lg border border-green-200/50 dark:border-green-800/50">
-                            <div className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                          <div className="text-center p-3 bg-white/70 rounded-lg border border-red-200/30">
+                            <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(0 50% 50%)' }}>
                               <Star className="h-3 w-3 mr-1" />
                               Impact Rating
                             </div>
@@ -723,8 +723,8 @@ const ProjectIncubationSystem = () => {
                           </div>
                           
                           {/* Last Active */}
-                          <div className="text-center p-3 bg-green-50/50 dark:bg-green-950/20 rounded-lg border border-green-200/50 dark:border-green-800/50">
-                            <div className="text-xs font-bold text-green-600 uppercase tracking-wide mb-1 flex items-center justify-center">
+                          <div className="text-center p-3 bg-white/70 rounded-lg border border-red-200/30">
+                            <div className="text-xs font-bold uppercase tracking-wide mb-1 flex items-center justify-center" style={{ color: 'hsl(0 50% 50%)' }}>
                               <Eye className="h-3 w-3 mr-1" />
                               Last Active
                             </div>
@@ -735,8 +735,8 @@ const ProjectIncubationSystem = () => {
                         </div>
                         
                         {/* Next Milestone Section */}
-                        <div className="bg-purple-50/50 dark:bg-purple-950/20 rounded-lg p-4 border border-purple-200/50 dark:border-purple-800/50">
-                          <div className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2 flex items-center">
+                        <div className="bg-white/70 rounded-lg p-4 border border-purple-200/30">
+                          <div className="text-xs font-bold uppercase tracking-wide mb-2 flex items-center" style={{ color: 'hsl(280 50% 50%)' }}>
                             <Target className="h-3 w-3 mr-1" />
                             Next Milestone
                           </div>
@@ -745,11 +745,11 @@ const ProjectIncubationSystem = () => {
                         
                         {/* Action Buttons */}
                         <div className="grid grid-cols-2 gap-3">
-                          <Button size="sm" variant="outline" className="h-9">
+                          <Button size="sm" variant="outline" className="h-9 border-purple-300/50 hover:bg-purple-50">
                             <PlayCircle className="h-4 w-4 mr-2" />
                             Resume Work
                           </Button>
-                          <Button size="sm" variant="secondary" className="h-9">
+                          <Button size="sm" variant="secondary" className="h-9 bg-red-100/50 hover:bg-red-100">
                             <Eye className="h-4 w-4 mr-2" />
                             Update Navigation
                           </Button>

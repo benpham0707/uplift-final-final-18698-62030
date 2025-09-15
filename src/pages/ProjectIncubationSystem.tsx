@@ -911,11 +911,11 @@ const ProjectIncubationSystem = () => {
                         <CollapsibleContent className="mt-4">
                           <Card className="bg-muted/30">
                             <CardContent className="p-6">
-                              <div className="space-y-6">
+                              <div className="space-y-5">
                                 {/* Top Section: Why Choose This Project - Full Width */}
                                 <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
-                                  <CardContent className="p-6">
-                                    <h5 className="font-semibold text-lg text-foreground mb-4 flex items-center justify-center gap-2">
+                                  <CardContent className="p-5">
+                                    <h5 className="font-semibold text-lg text-foreground mb-3 flex items-center justify-center gap-2">
                                       <Star className="w-5 h-5 text-primary" />
                                       Why Choose This Project?
                                     </h5>
@@ -923,16 +923,19 @@ const ProjectIncubationSystem = () => {
                                   </CardContent>
                                 </Card>
 
-                                {/* Second Row: Skills & Outcomes - Side by Side */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Middle Section: Skills & Outcomes - Gradient Boxes */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                                   <TooltipProvider>
-                                    <Card className="bg-muted/20 hover:bg-muted/30 transition-all duration-300 hover:shadow-md border-l-4 border-l-blue-500/50 hover:border-l-blue-500">
-                                      <CardContent className="p-5">
-                                        <h6 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                                          <Target className="w-4 h-4 text-blue-500" />
-                                          Skills You'll Develop
-                                        </h6>
-                                        <div className="flex flex-wrap gap-3">
+                                    <div className="relative group">
+                                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-xl blur-sm group-hover:blur-none transition-all duration-300"></div>
+                                      <div className="relative bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200/50 dark:border-blue-800/50 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300">
+                                        <div className="flex items-center gap-2 mb-3">
+                                          <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50">
+                                            <Target className="w-4 h-4 text-blue-600" />
+                                          </div>
+                                          <h6 className="font-semibold text-foreground">Skills You'll Develop</h6>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
                                           {project.skills.map((skill, idx) => {
                                             // Hard coded skill definitions for tooltip content
                                             const skillDefinitions = {
@@ -961,7 +964,7 @@ const ProjectIncubationSystem = () => {
                                                 <TooltipTrigger asChild>
                                                   <Badge 
                                                     variant="outline" 
-                                                    className="text-xs cursor-help hover:bg-blue-50 hover:border-blue-300 transition-colors duration-200 py-1 px-3"
+                                                    className="text-xs cursor-help hover:bg-blue-100 hover:border-blue-400 transition-colors duration-200 py-1 px-2 bg-white/60 dark:bg-gray-800/60"
                                                   >
                                                     {skill}
                                                   </Badge>
@@ -973,25 +976,26 @@ const ProjectIncubationSystem = () => {
                                             );
                                           })}
                                         </div>
-                                      </CardContent>
-                                    </Card>
+                                      </div>
+                                    </div>
                                   </TooltipProvider>
                                   
-                                  <Card className="bg-muted/20 hover:bg-muted/30 transition-all duration-300 hover:shadow-md border-l-4 border-l-green-500/50 hover:border-l-green-500">
-                                    <CardContent className="p-5">
-                                      <h6 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                                        <CheckCircle className="w-4 h-4 text-green-500" />
-                                        Expected Outcomes
-                                      </h6>
-                                      <div className="space-y-3">
+                                  <div className="relative group">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-sm group-hover:blur-none transition-all duration-300"></div>
+                                    <div className="relative bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200/50 dark:border-green-800/50 rounded-xl p-4 hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/50">
+                                          <CheckCircle className="w-4 h-4 text-green-600" />
+                                        </div>
+                                        <h6 className="font-semibold text-foreground">Expected Outcomes</h6>
+                                      </div>
+                                      <div className="space-y-2">
                                         {project.outcomes.map((outcome, idx) => (
-                                          <div key={idx} className="group flex items-start gap-3 p-3 rounded-lg bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200">
-                                            <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/50 group-hover:bg-green-200 dark:group-hover:bg-green-800/50 transition-colors">
-                                              <CheckCircle className="w-3 h-3 text-green-600" />
-                                            </div>
+                                          <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-800/60 transition-colors">
+                                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
                                             <div className="flex-1">
                                               <div className="text-sm font-medium text-foreground capitalize">{outcome}</div>
-                                              <div className="text-xs text-muted-foreground mt-1">
+                                              <div className="text-xs text-muted-foreground">
                                                 {idx === 0 ? 'Tangible achievement you can showcase' : 
                                                  idx === 1 ? 'Valuable connections and relationships' : 
                                                  'Meaningful personal development'}
@@ -1000,67 +1004,67 @@ const ProjectIncubationSystem = () => {
                                           </div>
                                         ))}
                                       </div>
-                                    </CardContent>
-                                  </Card>
+                                    </div>
+                                  </div>
                                 </div>
 
-                                {/* Third Row: Analysis Sections - Three Equal Boxes */}
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                  <Card className="bg-muted/20 hover:bg-muted/30 transition-all duration-300 hover:shadow-md border-l-4 border-l-purple-500/50 hover:border-l-purple-500 group">
-                                    <CardContent className="p-5">
-                                      <h6 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                                        <Brain className="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform" />
-                                        Key Findings
-                                      </h6>
-                                      <ul className="space-y-3">
+                                {/* Bottom Section: Analysis Cards - Three Equal Boxes */}
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                  <Card className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 border-purple-200/50 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg transition-all duration-300 group">
+                                    <CardContent className="p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/50 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
+                                          <Brain className="w-4 h-4 text-purple-600" />
+                                        </div>
+                                        <h6 className="font-semibold text-foreground">Key Findings</h6>
+                                      </div>
+                                      <div className="space-y-2 max-h-32 overflow-y-auto">
                                         {project.findings?.map((finding: string, index: number) => (
-                                          <li key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-purple-50/50 dark:hover:bg-purple-950/20 transition-colors">
-                                            <div className="p-1 rounded-full bg-purple-100 dark:bg-purple-900/50">
-                                              <CheckCircle2 className="w-3 h-3 text-purple-600" />
-                                            </div>
-                                            <span className="text-sm text-muted-foreground leading-relaxed">{finding}</span>
-                                          </li>
+                                          <div key={index} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0"></div>
+                                            <span>{finding}</span>
+                                          </div>
                                         ))}
-                                      </ul>
+                                      </div>
                                     </CardContent>
                                   </Card>
                                   
-                                  <Card className="bg-muted/20 hover:bg-muted/30 transition-all duration-300 hover:shadow-md border-l-4 border-l-blue-500/50 hover:border-l-blue-500 group">
-                                    <CardContent className="p-5">
-                                      <h6 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                                        <Link className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
-                                        Connections to Your Profile
-                                      </h6>
-                                      <ul className="space-y-3">
+                                  <Card className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all duration-300 group">
+                                    <CardContent className="p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                                          <Link className="w-4 h-4 text-blue-600" />
+                                        </div>
+                                        <h6 className="font-semibold text-foreground">Profile Connections</h6>
+                                      </div>
+                                      <div className="space-y-2 max-h-32 overflow-y-auto">
                                         {project.connections?.map((connection: string, index: number) => (
-                                          <li key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-colors">
-                                            <div className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/50">
-                                              <ArrowRight className="w-3 h-3 text-blue-600" />
-                                            </div>
-                                            <span className="text-sm text-muted-foreground leading-relaxed">{connection}</span>
-                                          </li>
+                                          <div key={index} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></div>
+                                            <span>{connection}</span>
+                                          </div>
                                         ))}
-                                      </ul>
+                                      </div>
                                     </CardContent>
                                   </Card>
                                   
-                                  <Card className="bg-muted/20 hover:bg-muted/30 transition-all duration-300 hover:shadow-md border-l-4 border-l-orange-500/50 hover:border-l-orange-500 group">
-                                    <CardContent className="p-5">
-                                      <h6 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                                        <Scale className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
-                                        Impact Assessment
-                                      </h6>
-                                      <div className="p-4 rounded-lg bg-orange-50/50 dark:bg-orange-950/20 border border-orange-200/50 dark:border-orange-800/50">
-                                        <p className="text-sm text-muted-foreground leading-relaxed">
-                                          {project.impact}
-                                        </p>
+                                  <Card className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 border-orange-200/50 dark:border-orange-800/50 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-lg transition-all duration-300 group">
+                                    <CardContent className="p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/50 group-hover:bg-orange-200 dark:group-hover:bg-orange-800/50 transition-colors">
+                                          <Scale className="w-4 h-4 text-orange-600" />
+                                        </div>
+                                        <h6 className="font-semibold text-foreground">Impact Assessment</h6>
+                                      </div>
+                                      <div className="text-xs text-muted-foreground leading-relaxed max-h-32 overflow-y-auto">
+                                        {project.impact}
                                       </div>
                                     </CardContent>
                                   </Card>
                                 </div>
 
                                 {/* Action Button */}
-                                <div className="flex justify-center pt-6 border-t border-border/50">
+                                <div className="flex justify-center pt-4 border-t border-border/30">
                                   <Button size="lg" className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                                     <Calendar className="w-4 h-4 mr-2" />
                                     Start Planning & Customize Project

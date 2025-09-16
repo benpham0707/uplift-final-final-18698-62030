@@ -46,7 +46,12 @@ import {
   Palette,
   Music,
   Camera,
-  Mountain
+  Mountain,
+  ArrowLeft,
+  ExternalLink,
+  Activity,
+  Layers,
+  Filter
 } from "lucide-react";
 import { 
   LineChart, 
@@ -529,1020 +534,794 @@ const portfolioData = [
   }
 ];
 
-export const PortfolioMetricsDashboard = () => {
-  const ProjectCard = ({ project }: { project: typeof portfolioData[0] }) => {
-    const [activeTab, setActiveTab] = useState("overview");
+// Component for detailed project analysis - This represents the comprehensive AI-generated insights view
+const ProjectCard = ({ project }: { project: typeof portfolioData[0] }) => {
+  return (
+    <Card className="gradient-project-card border-white/20 shadow-project">
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 bg-white/10 border-white/20">
+          <TabsTrigger value="overview" className="text-foreground data-[state=active]:bg-gradient-project-active data-[state=active]:text-white">
+            Impact Story Canvas
+          </TabsTrigger>
+          <TabsTrigger value="skills" className="text-foreground data-[state=active]:bg-gradient-project-active data-[state=active]:text-white">
+            Deep Skills Analytics
+          </TabsTrigger>
+          <TabsTrigger value="narrative" className="text-foreground data-[state=active]:bg-gradient-project-active data-[state=active]:text-white">
+            Story Intelligence
+          </TabsTrigger>
+          <TabsTrigger value="insights" className="text-foreground data-[state=active]:bg-gradient-project-active data-[state=active]:text-white">
+            AI Predictions
+          </TabsTrigger>
+        </TabsList>
 
-    return (
-      <Card className="w-full hover:shadow-strong transition-all duration-500 border-0 gradient-card-primary text-white overflow-hidden">
-        <CardHeader className="pb-4 relative">
-          <div className="absolute top-0 right-0 w-32 h-32 gradient-project-accent opacity-20 rounded-full blur-2xl"></div>
-          <div className="flex items-center justify-between relative z-10">
-            <div className="space-y-2">
-              <CardTitle className="text-2xl font-bold text-white">{project.title}</CardTitle>
-              <CardDescription className="flex items-center gap-3 text-white/80">
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-                  {project.type}
-                </Badge>
-                <Badge variant="outline" className="border-white/30 text-white/90">
-                  {project.category}
-                </Badge>
-                <span className="text-sm">{project.projectPhase}</span>
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={project.verified ? "default" : "secondary"} 
-                     className={project.verified ? "bg-success text-success-foreground" : "bg-warning text-warning-foreground"}>
-                {project.verified ? <CheckCircle className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
-                {project.verified ? "Verified" : "Pending"}
-              </Badge>
-            </div>
+        <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Project Evolution Timeline */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Project Evolution Timeline */}
+            <Card className="gradient-project-card border-white/20">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Project Evolution Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {project.overview.impactStory.evolution.map((phase, idx) => (
+                  <div key={idx} className="border-l-2 border-primary/30 pl-4 pb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="border-primary/30 text-foreground">
+                        {phase.phase}
+                      </Badge>
+                    </div>
+                    <h4 className="font-semibold text-foreground mb-1">{phase.milestone}</h4>
+                    <p className="text-sm text-muted-foreground">{phase.impact}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Metrics Evolution Chart */}
+            <Card className="gradient-project-card border-white/20">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Growth Metrics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={project.overview.metricsEvolution[Object.keys(project.overview.metricsEvolution)[0] as keyof typeof project.overview.metricsEvolution]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                      <XAxis dataKey="month" stroke="#666" />
+                      <YAxis stroke="#666" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(0,0,0,0.8)', 
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '8px',
+                          color: 'white'
+                        }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey={Object.keys(project.overview.metricsEvolution)[0] === 'userGrowth' ? 'users' : 'participants'} 
+                        stroke="hsl(280 70% 60%)" 
+                        strokeWidth={3}
+                        dot={{ fill: 'hsl(280 70% 60%)', strokeWidth: 2, r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardHeader>
 
-        <CardContent className="text-white">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6 bg-white/10 backdrop-blur-sm">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
-                <Eye className="h-4 w-4 mr-2" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="skills" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
-                <Brain className="h-4 w-4 mr-2" />
-                Skills
-              </TabsTrigger>
-              <TabsTrigger value="narrative" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Narrative
-              </TabsTrigger>
-              <TabsTrigger value="insights" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
-                <Sparkles className="h-4 w-4 mr-2" />
-                Insights
-              </TabsTrigger>
-            </TabsList>
-
-            {/* ENHANCED OVERVIEW TAB */}
-            <TabsContent value="overview" className="space-y-6">
-              <div className="space-y-6">
-                <p className="text-white/90 text-lg leading-relaxed">{project.overview.description}</p>
-                
-                {/* Project Impact Story Canvas */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Compass className="h-5 w-5" />
-                      Impact Story Canvas
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="mb-4">
-                      <p className="text-white/80 font-medium mb-2">Genesis Moment</p>
-                      <p className="text-white/90 italic">&ldquo;{project.overview.impactStory.genesis}&rdquo;</p>
+          {/* Stakeholder Ecosystem */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Network className="h-5 w-5" />
+                Stakeholder Ecosystem Map
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {project.overview.stakeholderEcosystem.map((stakeholder, idx) => (
+                  <div key={idx} className="gradient-project-accent p-4 rounded-lg border border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-foreground">{stakeholder.role}</h4>
+                      <Badge 
+                        variant="outline" 
+                        className={`border-white/30 ${
+                          stakeholder.influence === 'High' ? 'text-success' : 
+                          stakeholder.influence === 'Medium' ? 'text-warning' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {stakeholder.influence}
+                      </Badge>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <p className="text-white/80 font-medium">Evolution Timeline</p>
-                      <div className="relative">
-                        {project.overview.impactStory.evolution.map((phase, i) => (
-                          <div key={i} className="flex items-start gap-4 mb-6 relative">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full gradient-secondary flex items-center justify-center text-white font-bold text-sm">
-                              {i + 1}
-                            </div>
-                            <div className="flex-1 space-y-1.5">
-                              <div className="flex items-center gap-3">
-                                <Badge variant="outline" className="border-white/30 text-white/90">{phase.phase}</Badge>
-                                <span className="text-white/80 text-sm font-medium">{phase.milestone}</span>
-                              </div>
-                              <p className="text-white/90 text-sm">{phase.impact}</p>
-                            </div>
-                            {i < project.overview.impactStory.evolution.length - 1 && (
-                              <div className="absolute left-4 top-8 w-0.5 h-6 bg-white/20"></div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                    <p className="text-sm text-muted-foreground mb-1">{stakeholder.relationship}</p>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">{stakeholder.count}</span>
                     </div>
-
-                    <div className="mt-6 p-4 rounded-lg bg-accent/20 border border-accent/30">
-                      <p className="text-white/80 font-medium mb-2 flex items-center gap-2">
-                        <Lightbulb className="h-4 w-4" />
-                        Key Breakthrough
-                      </p>
-                      <p className="text-white/90 italic">&ldquo;{project.overview.impactStory.breakthrough}&rdquo;</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Stakeholder Ecosystem Map */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Network className="h-5 w-5" />
-                      Stakeholder Ecosystem
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {project.overview.stakeholderEcosystem.map((stakeholder, i) => (
-                        <div key={i} className="p-4 rounded-lg bg-white/5 border border-white/10">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-white font-medium">{stakeholder.role}</h4>
-                            <Badge variant="outline" className={`border-white/30 text-xs ${
-                              stakeholder.influence === 'High' ? 'text-success bg-success/20' :
-                              stakeholder.influence === 'Medium' ? 'text-warning bg-warning/20' :
-                              'text-white/70 bg-white/10'
-                            }`}>
-                              {stakeholder.influence}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-white/80">{stakeholder.relationship}</span>
-                            <span className="text-white font-medium">{stakeholder.count}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Metrics Evolution */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      Impact Metrics Evolution
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={project.overview.metricsEvolution.userGrowth || project.overview.metricsEvolution.programGrowth}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                        <XAxis dataKey="month" stroke="rgba(255,255,255,0.8)" />
-                        <YAxis stroke="rgba(255,255,255,0.8)" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'rgba(255,255,255,0.1)', 
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            borderRadius: '8px',
-                            color: 'white'
-                          }} 
-                        />
-                        <Legend />
-                        <Line type="monotone" dataKey="users" stroke="hsl(var(--secondary))" strokeWidth={3} dot={{ fill: "hsl(var(--secondary))" }} />
-                        <Line type="monotone" dataKey="participants" stroke="hsl(var(--secondary))" strokeWidth={3} dot={{ fill: "hsl(var(--secondary))" }} />
-                        <Line type="monotone" dataKey="retention" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ fill: "hsl(var(--accent))" }} />
-                        <Line type="monotone" dataKey="engagement" stroke="hsl(var(--success))" strokeWidth={2} dot={{ fill: "hsl(var(--success))" }} />
-                        <Line type="monotone" dataKey="wellbeingScore" stroke="hsl(var(--success))" strokeWidth={2} dot={{ fill: "hsl(var(--success))" }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-
-                {/* Verification & Evidence Hub */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Shield className="h-5 w-5" />
-                      Verification & Evidence Hub
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                          <Globe className="h-4 w-4" />
-                          Media Features
-                        </h4>
-                        <div className="space-y-2">
-                          {project.overview.verification.mediaFeatures.map((feature, i) => (
-                            <div key={i} className="flex items-center gap-2 text-white/90 text-sm">
-                              <CheckCircle className="h-3 w-3 text-success" />
-                              {feature}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                          <Trophy className="h-4 w-4" />
-                          Certificates & Awards
-                        </h4>
-                        <div className="space-y-2">
-                          {project.overview.verification.certificates.map((cert, i) => (
-                            <div key={i} className="flex items-center gap-2 text-white/90 text-sm">
-                              <Award className="h-3 w-3 text-warning" />
-                              {cert}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-6">
-                      <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                        <MessageCircle className="h-4 w-4" />
-                        Testimonials
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {project.overview.verification.testimonials.map((testimonial, i) => (
-                          <div key={i} className="p-4 rounded-lg bg-white/5 border border-white/10">
-                            <p className="text-white/90 italic text-sm mb-2">&ldquo;{testimonial.quote}&rdquo;</p>
-                            <div className="text-white/70 text-xs">
-                              <span className="font-medium">{testimonial.name}</span> - {testimonial.role}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* College Application Readiness */}
-                <Card className="bg-gradient-score-excellent backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <GraduationCap className="h-5 w-5" />
-                      College Application Readiness Score
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-white mb-1">
-                          {project.overview.applicationReadiness.essayPotential}%
-                        </div>
-                        <div className="text-white/80 text-sm">Essay Potential</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-white mb-1">
-                          {project.overview.applicationReadiness.interviewStories}
-                        </div>
-                        <div className="text-white/80 text-sm">Interview Stories</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-white mb-1">
-                          {project.overview.applicationReadiness.uniquenessScore}%
-                        </div>
-                        <div className="text-white/80 text-sm">Uniqueness Score</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                ))}
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
 
-            {/* ENHANCED SKILLS TAB */}
-            <TabsContent value="skills" className="space-y-6">
-              {/* Skill Development Journeys */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Rocket className="h-5 w-5" />
-                    Skill Development Journeys
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {project.skills.developmentJourney.map((skill, i) => (
-                    <div key={i} className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-white font-semibold text-lg">{skill.skill}</h4>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="border-secondary/50 text-secondary">
-                            {skill.marketValue} Market Value
-                          </Badge>
+          {/* Verification & Evidence */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Verification & Evidence Hub
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">Media Features</h4>
+                  <div className="space-y-2">
+                    {project.overview.verification.mediaFeatures.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-sm text-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">Certificates & Awards</h4>
+                  <div className="space-y-2">
+                    {project.overview.verification.certificates.map((cert, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <Trophy className="h-3 w-3 text-warning" />
+                        <span className="text-sm text-foreground">{cert}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <h4 className="font-semibold text-foreground mb-3">Testimonials</h4>
+                <div className="space-y-3">
+                  {project.overview.verification.testimonials.map((testimonial, idx) => (
+                    <div key={idx} className="gradient-project-accent p-4 rounded-lg border border-white/10">
+                      <p className="text-foreground italic mb-2">"{testimonial.quote}"</p>
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm">
+                          <div className="font-semibold text-foreground">{testimonial.name}</div>
+                          <div className="text-muted-foreground">{testimonial.role}</div>
                         </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {skill.phases.map((phase, j) => (
-                          <div key={j} className="relative flex items-start gap-4">
-                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                              <div className="w-2 h-2 rounded-full bg-secondary"></div>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <Badge variant="secondary" className="bg-accent/20 text-accent-foreground">
-                                  {phase.phase}
-                                </Badge>
-                                <span className="text-white/70 text-sm">{phase.duration}</span>
-                                <div className="ml-auto text-white font-semibold">
-                                  {phase.proficiency}%
-                                </div>
-                              </div>
-                              <p className="text-white/90 text-sm">{phase.evidence}</p>
-                              <Progress value={phase.proficiency} className="mt-2 h-1" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-4 p-3 rounded-lg bg-white/5">
-                        <p className="text-white/80 text-sm mb-1">Unique Application:</p>
-                        <p className="text-white/90 text-sm italic">{skill.uniqueApplication}</p>
                       </div>
                     </div>
                   ))}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-              {/* Competency Network */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Network className="h-5 w-5" />
-                    Skill Interconnection Network
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <RadarChart data={project.skills.competencyNetwork}>
-                          <PolarGrid stroke="rgba(255,255,255,0.2)" />
-                          <PolarAngleAxis dataKey="skill" tick={{ fill: 'white', fontSize: 11 }} />
-                          <PolarRadiusAxis 
-                            angle={90} 
-                            domain={[0, 100]} 
-                            tick={{ fill: 'white', fontSize: 10 }}
-                          />
-                          <Radar 
-                            name="Proficiency" 
-                            dataKey="level" 
-                            stroke="hsl(var(--secondary))" 
-                            fill="hsl(var(--secondary))" 
-                            fillOpacity={0.3}
-                            strokeWidth={2}
-                          />
-                        </RadarChart>
-                      </ResponsiveContainer>
+        <TabsContent value="skills" className="space-y-6 mt-6">
+          {/* Skills Development Journey */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Skill Development Journey
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {project.skills.developmentJourney?.map((journey, idx) => (
+                  <div key={idx} className="gradient-project-accent p-6 rounded-lg border border-white/10">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-lg font-semibold text-foreground">{journey.skill}</h4>
+                      <Badge className="bg-primary/20 text-primary border-primary/30">
+                        {journey.marketValue} Market Value
+                      </Badge>
                     </div>
                     
-                    <div className="space-y-3">
-                      {project.skills.competencyNetwork.map((skill, i) => (
-                        <div key={i} className="p-3 rounded-lg bg-white/5">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-white font-medium">{skill.skill}</span>
-                            <span className="text-secondary font-bold">{skill.level}%</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      {journey.phases.map((phase, phaseIdx) => (
+                        <div key={phaseIdx} className="text-center">
+                          <div className="gradient-project-active p-3 rounded-lg mb-2">
+                            <div className="font-semibold text-white">{phase.phase}</div>
+                            <div className="text-sm text-white/80">{phase.duration}</div>
                           </div>
-                          <div className="flex flex-wrap gap-1">
-                            {skill.connections.map((connection, j) => (
-                              <Badge key={j} variant="outline" className="text-xs border-white/20 text-white/70">
-                                {connection}
-                              </Badge>
-                            ))}
-                          </div>
+                          <div className="text-sm text-muted-foreground mb-2">{phase.evidence}</div>
+                          <Progress value={phase.proficiency} className="h-2" />
+                          <div className="text-xs text-foreground mt-1">{phase.proficiency}%</div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Learning Style Analysis */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Brain className="h-5 w-5" />
-                    Learning Style Intelligence
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-white font-medium mb-3">Primary Learning Style</h4>
-                      <div className="p-4 rounded-lg gradient-secondary">
-                        <div className="text-xl font-bold text-white mb-2">
-                          {project.skills.learningStyle.primary}
-                        </div>
-                        <div className="space-y-2">
-                          {project.skills.learningStyle.indicators.map((indicator, i) => (
-                            <div key={i} className="flex items-start gap-2 text-white/90 text-sm">
-                              <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                              {indicator}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
                     
-                    <div>
-                      <h4 className="text-white font-medium mb-3">Development Recommendations</h4>
-                      <div className="space-y-2">
-                        {project.skills.learningStyle.recommendations.map((rec, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-white/5 flex items-start gap-2">
-                            <Lightbulb className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
-                            <span className="text-white/90 text-sm">{rec}</span>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="mt-4 p-3 bg-white/5 rounded-lg">
+                      <h5 className="font-semibold text-foreground mb-2">Unique Application:</h5>
+                      <p className="text-sm text-muted-foreground">{journey.uniqueApplication}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-              {/* Soft Skills Evidence */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Heart className="h-5 w-5" />
-                    Soft Skills Evidence
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-white font-medium mb-4 flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        Leadership Moments
-                      </h4>
-                      <div className="space-y-3">
-                        {project.skills.softSkillsEvidence.leadership.map((moment, i) => (
-                          <div key={i} className="p-4 rounded-lg bg-white/5">
-                            <div className="flex items-start justify-between mb-2">
-                              <p className="text-white/90 text-sm flex-1">{moment.moment}</p>
-                              <Badge variant="outline" className="border-accent/50 text-accent ml-2">
-                                {moment.skill}
-                              </Badge>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+          {/* Competency Network */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Layers className="h-5 w-5" />
+                Skill Interconnection Network
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={project.skills.competencyNetwork}>
+                    <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                    <PolarAngleAxis dataKey="skill" tick={{ fontSize: 12, fill: '#888' }} />
+                    <PolarRadiusAxis 
+                      angle={90} 
+                      domain={[0, 100]} 
+                      tick={{ fontSize: 10, fill: '#888' }} 
+                    />
+                    <Radar 
+                      name="Proficiency" 
+                      dataKey="level" 
+                      stroke="hsl(280 70% 60%)" 
+                      fill="hsl(280 70% 60%)" 
+                      fillOpacity={0.3}
+                      strokeWidth={2}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+              
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {project.skills.competencyNetwork.map((skill, idx) => (
+                  <div key={idx} className="gradient-project-accent p-3 rounded-lg border border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-foreground">{skill.skill}</h4>
+                      <Badge variant="outline" className="border-primary/30 text-foreground">
+                        {skill.level}%
+                      </Badge>
                     </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-4 flex items-center gap-2">
-                        <MessageCircle className="h-4 w-4" />
-                        Communication Excellence
-                      </h4>
-                      <div className="space-y-3">
-                        {project.skills.softSkillsEvidence.communication.map((comm, i) => (
-                          <div key={i} className="p-4 rounded-lg bg-white/5">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-white font-medium">{comm.context}</span>
-                              <Badge variant="secondary" className="bg-secondary/20 text-secondary-foreground">
-                                {comm.skill}
-                              </Badge>
-                            </div>
-                            <p className="text-white/90 text-sm">{comm.outcome}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* ENHANCED NARRATIVE TAB */}
-            <TabsContent value="narrative" className="space-y-6">
-              {/* Personal Brand Architecture */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Star className="h-5 w-5" />
-                    Personal Brand Architecture
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-white/80 text-sm font-medium mb-2">Core Identity</h4>
-                        <div className="text-2xl font-bold text-white gradient-secondary p-4 rounded-lg text-center">
-                          {project.narrative.personalBrandArchitecture.coreIdentity}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-white/80 text-sm font-medium mb-3">Brand Consistency Score</h4>
-                        <div className="flex items-center gap-3">
-                          <Progress value={project.narrative.personalBrandArchitecture.brandConsistency} className="flex-1" />
-                          <span className="text-white font-bold">
-                            {project.narrative.personalBrandArchitecture.brandConsistency}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white/80 text-sm font-medium mb-3">Value Proposition</h4>
-                      <div className="p-4 rounded-lg bg-accent/20 border border-accent/30">
-                        <p className="text-white/90 italic text-center">
-                          &ldquo;{project.narrative.personalBrandArchitecture.valueProposition}&rdquo;
-                        </p>
-                      </div>
-                      
-                      <h4 className="text-white/80 text-sm font-medium mb-3 mt-4">Key Differentiators</h4>
-                      <div className="space-y-2">
-                        {project.narrative.personalBrandArchitecture.differentiators.map((diff, i) => (
-                          <div key={i} className="p-2 rounded bg-white/5 text-white/90 text-sm">
-                            {diff}
-                          </div>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-1">
+                      {skill.connections.map((connection, connIdx) => (
+                        <Badge key={connIdx} variant="outline" className="text-xs border-white/20 text-muted-foreground">
+                          {connection}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-              {/* Story Arc Analysis */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
-                    Personal Growth Story Arc
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-white/80">Story Coherence</span>
-                        <span className="text-white font-bold">
-                          {project.narrative.storyArcAnalysis.thematicConsistency}%
-                        </span>
-                      </div>
-                      <Progress value={project.narrative.storyArcAnalysis.thematicConsistency} />
+          {/* Learning Style Analysis */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                Learning Style & Recommendations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="gradient-project-accent p-4 rounded-lg border border-white/10 mb-4">
+                <h4 className="text-lg font-semibold text-foreground mb-3">
+                  Primary Learning Style: {project.skills.learningStyle.primary}
+                </h4>
+                <div className="space-y-2">
+                  {project.skills.learningStyle.indicators.map((indicator, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-foreground">{indicator}</span>
                     </div>
-
-                    <ScrollArea className="h-80">
-                      <div className="space-y-4 pr-4">
-                        {project.narrative.storyArcAnalysis.characterDevelopment.map((stage, i) => (
-                          <div key={i} className="relative">
-                            <div className="flex items-start gap-4">
-                              <div className="flex-shrink-0 w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-white font-bold text-sm">
-                                {i + 1}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="text-white font-medium mb-2">{stage.stage}</h4>
-                                <p className="text-white/90 text-sm">{stage.story}</p>
-                              </div>
-                            </div>
-                            {i < project.narrative.storyArcAnalysis.characterDevelopment.length - 1 && (
-                              <div className="absolute left-4 top-8 w-0.5 h-8 bg-white/20"></div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-
-                    <div className="mt-4 p-4 rounded-lg bg-success/20 border border-success/30">
-                      <p className="text-white/80 text-sm font-medium mb-1">Growth Evidence</p>
-                      <p className="text-white/90 text-sm italic">{project.narrative.storyArcAnalysis.growthEvidence}</p>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h5 className="font-semibold text-foreground mb-3">Development Recommendations:</h5>
+                <div className="space-y-2">
+                  {project.skills.learningStyle.recommendations.map((rec, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <ArrowUp className="h-3 w-3 text-primary" />
+                      <span className="text-sm text-foreground">{rec}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="narrative" className="space-y-6 mt-6">
+          {/* Personal Brand Architecture */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Compass className="h-5 w-5" />
+                Personal Brand Architecture
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="gradient-project-accent p-6 rounded-lg border border-white/10 mb-6">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    {project.narrative.personalBrandArchitecture.coreIdentity}
+                  </h3>
+                  <p className="text-lg text-muted-foreground">
+                    {project.narrative.personalBrandArchitecture.valueProposition}
+                  </p>
+                  <div className="mt-4">
+                    <Badge className="bg-success/20 text-success border-success/30">
+                      {project.narrative.personalBrandArchitecture.brandConsistency}% Brand Consistency
+                    </Badge>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Authenticity Indicators */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    Authenticity Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <div className="text-center mb-4">
-                        <div className="text-4xl font-bold text-success mb-2">
-                          {project.narrative.authenticityIndicators.passionConsistency}%
-                        </div>
-                        <div className="text-white/80">Passion Consistency</div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {project.narrative.authenticityIndicators.valueAlignment.map((alignment, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-white/5">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-white font-medium text-sm">Stated:</span>
-                              <span className="text-white/90 text-sm">{alignment.stated}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-success font-medium text-sm">Demonstrated:</span>
-                              <span className="text-success text-sm">{alignment.demonstrated}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-3">Authenticity Verification</h4>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-success/20">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span className="text-white">No authenticity concerns detected</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-success/20">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span className="text-white">Values align with demonstrated actions</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-success/20">
-                          <CheckCircle className="h-5 w-5 text-success" />
-                          <span className="text-white">Consistent passion narrative across timeline</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* College Essay Goldmine */}
-              <Card className="bg-gradient-score-excellent backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    College Essay Goldmine
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Powerful Story Moments</h4>
-                      <div className="space-y-4">
-                        {project.narrative.collegeEssayGoldmine.powerfulMoments.map((moment, i) => (
-                          <div key={i} className="p-4 rounded-lg bg-white/10">
-                            <div className="flex items-start justify-between mb-2">
-                              <p className="text-white/90 text-sm flex-1 italic">
-                                &ldquo;{moment.moment}&rdquo;
-                              </p>
-                              <Badge variant="outline" className="border-warning/50 text-warning ml-2">
-                                {moment.essayPotential}
-                              </Badge>
-                            </div>
-                            <div className="text-white/70 text-xs">
-                              {moment.emotionalResonance && `Emotional Resonance: ${moment.emotionalResonance}`}
-                              {moment.lessonLearned && `Lesson: ${moment.lessonLearned}`}
-                              {moment.uniqueness && `Uniqueness: ${moment.uniqueness}`}
-                              {moment.leadership && `Leadership: ${moment.leadership}`}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Ready-to-Use Quotes</h4>
-                      <div className="space-y-3">
-                        {project.narrative.collegeEssayGoldmine.readyQuotes.map((quote, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-white/5 border-l-4 border-accent">
-                            <p className="text-white/90 italic">&ldquo;{quote}&rdquo;</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Interview Story Bank */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <MessageCircle className="h-5 w-5" />
-                    Interview Story Bank (STAR Method)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {project.narrative.interviewStoryBank.map((story, i) => (
-                      <div key={i} className="p-4 rounded-lg bg-white/5 border border-white/10">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                          <div>
-                            <span className="text-warning font-semibold text-sm">Situation: </span>
-                            <span className="text-white/90 text-sm">{story.situation}</span>
-                          </div>
-                          <div>
-                            <span className="text-secondary font-semibold text-sm">Task: </span>
-                            <span className="text-white/90 text-sm">{story.task}</span>
-                          </div>
-                          <div>
-                            <span className="text-accent font-semibold text-sm">Action: </span>
-                            <span className="text-white/90 text-sm">{story.action}</span>
-                          </div>
-                          <div>
-                            <span className="text-success font-semibold text-sm">Result: </span>
-                            <span className="text-white/90 text-sm">{story.result}</span>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {story.interviewFit.map((fit, j) => (
-                            <Badge key={j} variant="secondary" className="bg-primary/20 text-primary-foreground text-xs">
-                              {fit}
-                            </Badge>
-                          ))}
-                        </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">Key Differentiators:</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {project.narrative.personalBrandArchitecture.differentiators.map((diff, idx) => (
+                      <div key={idx} className="gradient-project-active p-3 rounded-lg text-center">
+                        <span className="text-white font-medium">{diff}</span>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* ENHANCED INSIGHTS TAB */}
-            <TabsContent value="insights" className="space-y-6">
-              {/* Predictive Career Analytics */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Rocket className="h-5 w-5" />
-                    Predictive Career Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Career Trajectory Predictions</h4>
-                      <div className="space-y-3">
-                        {project.insights.predictiveAnalytics.careerTrajectory.map((path, i) => (
-                          <div key={i} className="p-4 rounded-lg bg-white/5">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-white font-medium">{path.path}</span>
-                              <div className="flex items-center gap-2">
-                                <Progress value={path.probability} className="w-24 h-2" />
-                                <span className="text-white font-bold text-sm">{path.probability}%</span>
-                              </div>
-                            </div>
-                            <p className="text-white/80 text-sm">{path.reasoning}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Skill Development Predictions</h4>
-                      <div className="space-y-3">
-                        {project.insights.predictiveAnalytics.skillDevelopmentPredictions.map((skill, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-white/5">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-white font-medium">{skill.skill}</span>
-                              <Badge variant="outline" className="border-secondary/50 text-secondary">
-                                {skill.timeline}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Progress value={skill.growth} className="flex-1 h-1" />
-                              <span className="text-white text-sm">{skill.growth}% growth</span>
-                            </div>
-                            <p className="text-white/70 text-xs">{skill.trigger}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Admissions Competitive Advantage */}
-              <Card className="bg-gradient-score-excellent backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Trophy className="h-5 w-5" />
-                    Admissions Competitive Advantage
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <div className="text-lg text-white/80 mb-2">Competitive Positioning</div>
-                      <div className="text-2xl font-bold text-white">
-                        {project.insights.admissionsAdvantage.competitivePositioning}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-4">School Fit Analysis</h4>
-                      <div className="space-y-3">
-                        {project.insights.admissionsAdvantage.schoolFitAnalysis.map((school, i) => (
-                          <div key={i} className="p-4 rounded-lg bg-white/10">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-white font-semibold">{school.school}</span>
-                              <div className="flex items-center gap-2">
-                                <div className="text-white font-bold">{school.fit}%</div>
-                                <div className={`w-3 h-3 rounded-full ${
-                                  school.fit >= 90 ? 'bg-success' : 
-                                  school.fit >= 80 ? 'bg-warning' : 'bg-destructive'
-                                }`}></div>
-                              </div>
-                            </div>
-                            <p className="text-white/80 text-sm">{school.reasoning}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-3">Key Differentiation Factors</h4>
-                      <div className="space-y-2">
-                        {project.insights.admissionsAdvantage.differentiationFactors.map((factor, i) => (
-                          <div key={i} className="flex items-start gap-2 p-3 rounded-lg bg-white/5">
-                            <Star className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
-                            <span className="text-white/90 text-sm">{factor}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Innovation Quotient */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Zap className="h-5 w-5" />
-                    Innovation Quotient Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="text-center">
-                      <div className="text-5xl font-bold text-white mb-2 gradient-primary p-6 rounded-full w-32 h-32 flex items-center justify-center mx-auto">
-                        {project.insights.innovationQuotient.score}
-                      </div>
-                      <div className="text-white/80 text-lg">Innovation Score</div>
-                      <div className="text-white/70 text-sm mt-2">
-                        {project.insights.innovationQuotient.nextLevelPotential}
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-white font-medium mb-3">Innovation Evidence</h4>
-                        <div className="space-y-2">
-                          {project.insights.innovationQuotient.evidence.map((evidence, i) => (
-                            <div key={i} className="flex items-start gap-2 text-white/90 text-sm">
-                              <Lightbulb className="h-3 w-3 text-warning mt-1 flex-shrink-0" />
-                              {evidence}
-                            </div>
-                          ))}
+          {/* Story Arc Analysis */}
+          {project.narrative.storyArcAnalysis && (
+            <Card className="gradient-project-card border-white/20">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Character Development Journey
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {project.narrative.storyArcAnalysis.characterDevelopment.map((stage, idx) => (
+                    <div key={idx} className="gradient-project-accent p-4 rounded-lg border border-white/10">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold">
+                          {idx + 1}
                         </div>
+                        <h4 className="font-semibold text-foreground">{stage.stage}</h4>
                       </div>
-
-                      <div>
-                        <h4 className="text-white font-medium mb-3">Innovation Patterns</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.insights.innovationQuotient.patterns.map((pattern, i) => (
-                            <Badge key={i} variant="secondary" className="bg-accent/20 text-accent-foreground">
-                              {pattern}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
+                      <p className="text-muted-foreground ml-11">{stage.story}</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Risk Assessment */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5" />
-                    Portfolio Risk Assessment
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Areas for Attention</h4>
-                      <div className="space-y-3">
-                        {project.insights.riskAssessment.potentialConcerns.map((concern, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-white/5">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-white font-medium">{concern.concern}</span>
-                              <Badge variant={
-                                concern.severity === 'High' ? 'destructive' :
-                                concern.severity === 'Medium' ? 'secondary' : 'outline'
-                              } className="text-xs">
-                                {concern.severity}
-                              </Badge>
-                            </div>
-                            <p className="text-white/80 text-sm">{concern.mitigation}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-white font-medium mb-4">Portfolio Strengths</h4>
-                      <div className="space-y-2">
-                        {project.insights.riskAssessment.strengthAreas.map((strength, i) => (
-                          <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-success/20">
-                            <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
-                            <span className="text-white/90 text-sm">{strength}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Development Recommendations */}
-              <Card className="bg-gradient-primary backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Strategic Development Recommendations
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  ))}
+                </div>
+                
+                <div className="mt-6 p-4 bg-white/5 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.insights.developmentRecommendations.map((rec, i) => (
-                      <div key={i} className="p-4 rounded-lg bg-white/10">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge variant="outline" className="border-white/30 text-white">
-                            {rec.category}
-                          </Badge>
-                          <Badge variant={rec.priority === 'High' ? 'destructive' : 'secondary'} className="text-xs">
-                            {rec.priority} Priority
-                          </Badge>
-                        </div>
-                        <h4 className="text-white font-medium mb-2">{rec.action}</h4>
-                        <p className="text-white/80 text-sm">{rec.reasoning}</p>
+                    <div>
+                      <h5 className="font-semibold text-foreground">Thematic Consistency</h5>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Progress value={project.narrative.storyArcAnalysis.thematicConsistency} className="flex-1 h-2" />
+                        <span className="text-foreground font-medium">{project.narrative.storyArcAnalysis.thematicConsistency}%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-foreground">Growth Evidence</h5>
+                      <p className="text-sm text-muted-foreground mt-1">{project.narrative.storyArcAnalysis.growthEvidence}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* College Essay Goldmine */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                College Essay Goldmine
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {project.narrative.collegeEssayGoldmine.powerfulMoments.map((moment, idx) => (
+                  <div key={idx} className="gradient-project-accent p-4 rounded-lg border border-white/10">
+                    <div className="flex items-start justify-between mb-3">
+                      <Badge className="bg-primary/20 text-primary border-primary/30">
+                        {moment.essayPotential}
+                      </Badge>
+                      {moment.emotionalResonance && (
+                        <Badge variant="outline" className="border-white/30 text-foreground">
+                          {moment.emotionalResonance} Impact
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-foreground italic mb-2">"{moment.moment}"</p>
+                    {moment.lessonLearned && (
+                      <div className="mt-2 p-2 bg-white/5 rounded">
+                        <span className="text-xs font-semibold text-muted-foreground">Lesson Learned: </span>
+                        <span className="text-sm text-foreground">{moment.lessonLearned}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {project.narrative.collegeEssayGoldmine.readyQuotes && (
+                <div className="mt-6">
+                  <h4 className="font-semibold text-foreground mb-3">Ready-to-Use Quotes:</h4>
+                  <div className="space-y-2">
+                    {project.narrative.collegeEssayGoldmine.readyQuotes.map((quote, idx) => (
+                      <div key={idx} className="gradient-project-active p-3 rounded-lg">
+                        <p className="text-white italic">"{quote}"</p>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    );
-  };
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-  // Calculate overall portfolio summary statistics
+        <TabsContent value="insights" className="space-y-6 mt-6">
+          {/* Predictive Career Analytics */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Rocket className="h-5 w-5" />
+                Career Trajectory Predictions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {project.insights.predictiveAnalytics?.careerTrajectory.map((path, idx) => (
+                  <div key={idx} className="gradient-project-accent p-4 rounded-lg border border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-foreground">{path.path}</h4>
+                      <Badge 
+                        className={`${
+                          path.probability >= 80 ? 'bg-success/20 text-success border-success/30' :
+                          path.probability >= 70 ? 'bg-warning/20 text-warning border-warning/30' :
+                          'bg-muted/20 text-muted-foreground border-muted/30'
+                        }`}
+                      >
+                        {path.probability}% Match
+                      </Badge>
+                    </div>
+                    <Progress value={path.probability} className="mb-2 h-2" />
+                    <p className="text-sm text-muted-foreground">{path.reasoning}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Admissions Competitive Advantage */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <GraduationCap className="h-5 w-5" />
+                College Admissions Advantage
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="gradient-project-accent p-4 rounded-lg border border-white/10 mb-6">
+                <h3 className="text-lg font-bold text-foreground mb-2">Competitive Positioning</h3>
+                <p className="text-muted-foreground">{project.insights.admissionsAdvantage.competitivePositioning}</p>
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="font-semibold text-foreground">School Fit Analysis:</h4>
+                {project.insights.admissionsAdvantage.schoolFitAnalysis.map((school, idx) => (
+                  <div key={idx} className="gradient-project-accent p-4 rounded-lg border border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-semibold text-foreground">{school.school}</h5>
+                      <Badge 
+                        className={`${
+                          school.fit >= 90 ? 'bg-success/20 text-success border-success/30' :
+                          school.fit >= 85 ? 'bg-warning/20 text-warning border-warning/30' :
+                          'bg-muted/20 text-muted-foreground border-muted/30'
+                        }`}
+                      >
+                        {school.fit}% Fit
+                      </Badge>
+                    </div>
+                    <Progress value={school.fit} className="mb-2 h-2" />
+                    <p className="text-sm text-muted-foreground">{school.reasoning}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Innovation Quotient */}
+          <Card className="gradient-project-card border-white/20">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                Innovation Quotient Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center mb-6">
+                <div className="text-4xl font-bold text-foreground mb-2">
+                  {project.insights.innovationQuotient.score}/100
+                </div>
+                <p className="text-muted-foreground">Innovation Score</p>
+                <Progress value={project.insights.innovationQuotient.score} className="mt-3 h-3" />
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-foreground mb-3">Innovation Evidence:</h4>
+                <div className="space-y-2">
+                  {project.insights.innovationQuotient.evidence.map((evidence, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-foreground">{evidence}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </Card>
+  );
+};
+
+const PortfolioMetricsDashboard = () => {
+  const [selectedProject, setSelectedProject] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<'dashboard' | 'project'>('dashboard');
+
+  // Calculate portfolio summary metrics - This represents aggregated data from all student projects
   const portfolioSummary = {
     totalProjects: portfolioData.length,
-    averageImpactScore: Math.round(
-      portfolioData.reduce((sum, project) => 
-        sum + (project.overview.applicationReadiness.essayPotential || 0), 0
-      ) / portfolioData.length
-    ),
+    averageImpactScore: Math.round(portfolioData.reduce((acc, p) => acc + p.overview.applicationReadiness.essayPotential, 0) / portfolioData.length),
     totalVerified: portfolioData.filter(p => p.verified).length,
-    uniquenessScore: Math.round(
-      portfolioData.reduce((sum, project) => 
-        sum + (project.overview.applicationReadiness.uniquenessScore || 0), 0
-      ) / portfolioData.length
-    )
+    uniquenessScore: Math.round(portfolioData.reduce((acc, p) => acc + p.overview.applicationReadiness.uniquenessScore, 0) / portfolioData.length),
+    totalSkills: portfolioData.reduce((acc, p) => acc + p.skills.competencyNetwork.length, 0),
+    avgReadinessScore: Math.round(portfolioData.reduce((acc, p) => acc + p.overview.applicationReadiness.essayPotential, 0) / portfolioData.length)
   };
 
+  const handleProjectSelect = (projectId: number) => {
+    setSelectedProject(projectId);
+    setViewMode('project');
+  };
+
+  const handleBackToDashboard = () => {
+    setSelectedProject(null);
+    setViewMode('dashboard');
+  };
+
+  const getProjectTypeIcon = (type: string) => {
+    switch (type) {
+      case 'Technical Leadership': return <Code className="h-5 w-5" />;
+      case 'Social Leadership': return <Heart className="h-5 w-5" />;
+      case 'Academic Research': return <BookOpen className="h-5 w-5" />;
+      case 'Creative Innovation': return <Palette className="h-5 w-5" />;
+      default: return <Rocket className="h-5 w-5" />;
+    }
+  };
+
+  const getImpactScoreColor = (score: number) => {
+    if (score >= 90) return 'text-success';
+    if (score >= 80) return 'text-warning'; 
+    if (score >= 70) return 'text-secondary';
+    return 'text-destructive';
+  };
+
+  if (viewMode === 'project' && selectedProject) {
+    const project = portfolioData.find(p => p.id === selectedProject);
+    if (!project) return null;
+
+    return (
+      <div className="min-h-screen gradient-project-main text-white">
+        <div className="container mx-auto px-4 py-8">
+          {/* Back Navigation */}
+          <Button 
+            onClick={handleBackToDashboard}
+            variant="outline" 
+            className="mb-6 border-white/30 text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Portfolio Dashboard
+          </Button>
+
+          {/* Project Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              {getProjectTypeIcon(project.type)}
+              <h1 className="text-4xl font-bold text-white">
+                {project.title}
+              </h1>
+              {project.verified && (
+                <Badge className="bg-success/20 text-success border-success/30">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Verified
+                </Badge>
+              )}
+            </div>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-6">
+              Deep AI-powered analysis and insights from your project narrative
+            </p>
+          </div>
+
+          <ProjectCard key={project.id} project={project} />
+        </div>
+      </div>
+    );
+  }
+
+  // Dashboard View
   return (
-    <div className="min-h-screen gradient-dashboard text-white">
+    <div className="min-h-screen gradient-project-main text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Enhanced Header with Portfolio Overview */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white via-secondary to-accent bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-4 text-white">
             Portfolio Intelligence Dashboard
           </h1>
-          <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
             Deep insights and analytics from your project narratives, optimized for college applications and personal growth
           </p>
           
           {/* Portfolio Summary Metrics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
+            <Card className="gradient-project-card border-white/20 shadow-project">
               <CardContent className="p-4 text-center">
-                <div className="text-3xl font-bold text-white mb-1">{portfolioSummary.totalProjects}</div>
-                <div className="text-white/70 text-sm">Projects Analyzed</div>
+                <div className="text-2xl font-bold text-foreground mb-1">{portfolioSummary.totalProjects}</div>
+                <div className="text-muted-foreground text-sm">Projects</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+            <Card className="gradient-project-card border-white/20 shadow-project">
               <CardContent className="p-4 text-center">
-                <div className="text-3xl font-bold text-success mb-1">{portfolioSummary.averageImpactScore}%</div>
-                <div className="text-white/70 text-sm">Avg Impact Score</div>
+                <div className="text-2xl font-bold text-foreground mb-1">{portfolioSummary.averageImpactScore}%</div>
+                <div className="text-muted-foreground text-sm">Avg Impact</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+            <Card className="gradient-project-card border-white/20 shadow-project">
               <CardContent className="p-4 text-center">
-                <div className="text-3xl font-bold text-secondary mb-1">{portfolioSummary.totalVerified}</div>
-                <div className="text-white/70 text-sm">Verified Projects</div>
+                <div className="text-2xl font-bold text-foreground mb-1">{portfolioSummary.totalVerified}</div>
+                <div className="text-muted-foreground text-sm">Verified</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+            <Card className="gradient-project-card border-white/20 shadow-project">
               <CardContent className="p-4 text-center">
-                <div className="text-3xl font-bold text-accent mb-1">{portfolioSummary.uniquenessScore}%</div>
-                <div className="text-white/70 text-sm">Uniqueness Score</div>
+                <div className="text-2xl font-bold text-foreground mb-1">{portfolioSummary.uniquenessScore}%</div>
+                <div className="text-muted-foreground text-sm">Uniqueness</div>
+              </CardContent>
+            </Card>
+            <Card className="gradient-project-card border-white/20 shadow-project">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-foreground mb-1">{portfolioSummary.totalSkills}</div>
+                <div className="text-muted-foreground text-sm">Total Skills</div>
+              </CardContent>
+            </Card>
+            <Card className="gradient-project-card border-white/20 shadow-project">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-foreground mb-1">{portfolioSummary.avgReadinessScore}%</div>
+                <div className="text-muted-foreground text-sm">App Ready</div>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        {/* Enhanced Project Cards */}
-        <div className="space-y-8">
+        {/* Project Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
           {portfolioData.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+            <Card 
+              key={project.id} 
+              className="gradient-project-card border-white/20 shadow-project hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105"
+              onClick={() => handleProjectSelect(project.id)}
+            >
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    {getProjectTypeIcon(project.type)}
+                    <Badge variant="outline" className="border-white/30 text-foreground">
+                      {project.type}
+                    </Badge>
+                  </div>
+                  {project.verified && (
+                    <Badge className="bg-success/20 text-success border-success/30">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+                <CardTitle className="text-xl text-foreground line-clamp-2">
+                  {project.title}
+                </CardTitle>
+                <CardDescription className="text-muted-foreground line-clamp-3">
+                  {project.overview.description}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                {/* Key Metrics */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center">
+                    <div className={`text-lg font-bold ${getImpactScoreColor(project.overview.applicationReadiness.essayPotential)}`}>
+                      {project.overview.applicationReadiness.essayPotential}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">Impact Score</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">
+                      {project.skills.competencyNetwork.length}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Skills</div>
+                  </div>
+                </div>
+
+                {/* Progress Indicators */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Portfolio Strength</span>
+                    <span className="text-foreground font-medium">{project.overview.applicationReadiness.essayPotential}%</span>
+                  </div>
+                  <Progress value={project.overview.applicationReadiness.essayPotential} className="h-2" />
+                </div>
+
+                {/* Timeline & Status */}
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    <span>{new Date(project.completedDate).toLocaleDateString()}</span>
+                  </div>
+                  <Badge variant="outline" className="border-white/30 text-foreground text-xs">
+                    {project.projectPhase}
+                  </Badge>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10">
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-foreground">
+                      {project.overview.applicationReadiness.interviewStories}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Stories</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-foreground">
+                      {project.overview.stakeholderEcosystem.length}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Partners</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-foreground">
+                      {project.overview.applicationReadiness.uniquenessScore}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">Unique</div>
+                  </div>
+                </div>
+
+                {/* View Details Button */}
+                <Button 
+                  className="w-full gradient-project-accent text-white border-0 hover:opacity-90"
+                  size="sm"
+                >
+                  View Detailed Analysis
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        {/* Export and Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mt-12">
-          <Button size="lg" className="gradient-secondary">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap justify-center gap-4">
+          <Button size="lg" className="gradient-project-header text-white border-0">
             <Download className="h-5 w-5 mr-2" />
             Export Portfolio Summary
           </Button>
@@ -1559,3 +1338,5 @@ export const PortfolioMetricsDashboard = () => {
     </div>
   );
 };
+
+export default PortfolioMetricsDashboard;

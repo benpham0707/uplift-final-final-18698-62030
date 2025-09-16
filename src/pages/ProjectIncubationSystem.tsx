@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { PortfolioMetricsDashboard } from '@/components/PortfolioMetricsDashboard';
+import PortfolioMetricsDashboard from '@/components/PortfolioMetricsDashboard';
 import { 
   Lightbulb, 
   TrendingUp, 

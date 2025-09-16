@@ -1100,10 +1100,10 @@ const ProjectIncubationSystem = () => {
                                   </CardContent>
                                 </Card>
 
-                                {/* Third Section: Key Findings & Profile Connections (Full Width Side by Side) */}
-                                <Card className="bg-gradient-to-r from-amber-500/8 to-indigo-500/8 border-amber-500/20 shadow-md hover:shadow-lg transition-all duration-300">
-                                  <CardContent className="p-6">
-                                    <div className="grid grid-cols-2 gap-8">
+                {/* Third Section: Key Findings & Profile Connections (Full Width Side by Side) */}
+                <Card className="bg-gradient-to-r from-amber-500/8 to-indigo-500/8 border-amber-500/20 shadow-md hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-2 gap-4">
                                       {/* Key Findings - Left Half */}
                                       <div className="space-y-4">
                                         <div className="flex items-center gap-2 mb-4">

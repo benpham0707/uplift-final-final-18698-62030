@@ -6,6 +6,12 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { InsightCard as BeautifulInsightCard } from "@/components/dashboard/InsightCard";
+import { MetricCard as BeautifulMetricCard } from "@/components/dashboard/MetricCard";
+import { QuoteCard } from "@/components/dashboard/QuoteCard";
+import { ExpertAnalysisCard } from "@/components/dashboard/ExpertAnalysisCard";
+import { ExpandableSection } from "@/components/dashboard/ExpandableSection";
+import { TimelineCard } from "@/components/dashboard/TimelineCard";
 import { 
   TrendingUp, 
   Award, 
@@ -609,377 +615,218 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
 
           {/* Enhanced Impact Analysis Tab with Multiple Chart Types */}
           <TabsContent value="impact" className="space-y-8">
-            {/* Chart Selection and Interactive Visualization */}
-            <Card className="glass-card shadow-large overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 border-b border-gradient">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-xl bg-gradient-primary text-white shadow-soft">
-                      <TrendingUp className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">Project Impact Growth Analysis</CardTitle>
-                      <CardDescription>Dynamic visualization of measurable outcomes over time</CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {chartOptions.impact.map((chartType) => (
-                      <Button
-                        key={chartType}
-                        variant={activeChartTypes.impact === chartType ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setActiveChartTypes({...activeChartTypes, impact: chartType})}
-                        className={`capitalize ${activeChartTypes.impact === chartType ? 'bg-gradient-primary text-white' : 'hover-lift'}`}
-                      >
-                        {chartType}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-8">
-                <div className="h-96">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={project.chartData.monthlyImpact}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '12px'
-                        }} 
-                      />
-                      <Legend />
-                      {Object.keys(project.chartData.monthlyImpact[0]).filter(key => key !== 'month').map((key, index) => (
-                        <Line 
-                          key={key}
-                          type="monotone" 
-                          dataKey={key} 
-                          stroke={index === 0 ? "hsl(var(--primary))" : index === 1 ? "hsl(var(--success))" : "hsl(var(--accent))"} 
-                          strokeWidth={3}
-                        />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Enhanced Hero Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <BeautifulMetricCard
+                title="Active Users"
+                value="500+"
+                subtitle="Community Members"
+                trend="up"
+                trendValue="+234% growth"
+                variant="primary"
+              />
+              <BeautifulMetricCard
+                title="Gardens Connected"
+                value="42"
+                subtitle="Neighborhood Networks"
+                trend="up"
+                trendValue="+300% expansion"
+                variant="secondary"
+              />
+              <BeautifulMetricCard
+                title="User Satisfaction"
+                value="96%"
+                subtitle="Community Approval"
+                trend="up"
+                trendValue="+24 points"
+                variant="success"
+              />
+              <BeautifulMetricCard
+                title="Impact Score"
+                value={project.quickMetrics.impactScore}
+                subtitle="Overall Rating"
+                trend="up"
+                trendValue="Excellent"
+                variant="warning"
+              />
+            </div>
 
-            {/* Multi-Level Impact Insights Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-              {/* Impact Genesis with Enhanced Design */}
-              <Card className="glass-card hover-lift group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
-                <CardHeader className="relative z-10">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
-                      <Sparkles className="h-5 w-5" />
-                    </div>
-                    Impact Genesis & Evolution
-                  </CardTitle>
-                  <CardDescription className="text-base font-medium">
-                    {project.impactAnalysis.summary}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 relative z-10">
-                  {/* Surface Level */}
-                  <div className="p-5 rounded-xl bg-gradient-to-r from-primary/15 to-accent/15 border border-primary/30 shadow-soft">
-                    <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <Flame className="h-4 w-4 text-primary" />
-                      The Catalyst Moment
-                    </h4>
-                    <p className="text-foreground/85 italic leading-relaxed">"{project.impactAnalysis.deepDive.genesis.trigger}"</p>
+            {/* Project Genesis Story */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <BeautifulInsightCard
+                title="The Spark: Food Insecurity Crisis"
+                icon={Heart}
+                variant="primary"
+                content={
+                  <div className="space-y-4">
+                    <p>During pandemic lockdowns, I witnessed food insecurity firsthand in historically underserved neighborhoods. Families struggled not just with access to fresh produce, but with the knowledge and community connections needed for sustainable food security.</p>
+                    <p>The trigger moment came when I realized that individual solutions couldn't address systemic community disconnection. This project emerged from understanding that food security is fundamentally about community resilience, not individual resources.</p>
+                  </div>
+                }
+              />
+
+              <QuoteCard
+                quote={project.impactAnalysis.deepDive.genesis.personalConnection}
+                author="Personal Reflection"
+                context="Project Genesis"
+                variant="secondary"
+              />
+            </div>
+
+            {/* Breakthrough Moment */}
+            <div className="mb-8">
+              <TimelineCard
+                variant="primary"
+                events={[
+                  {
+                    title: "Initial Community Research",
+                    description: "Conducted interviews with 40+ families to understand barriers to food security. Discovered that isolation, not resources, was the primary challenge.",
+                    date: "January 2024",
+                    location: "East Oakland",
+                    participants: "40+ families",
+                    impact: "Identified root cause: social disconnection, not resource scarcity"
+                  },
+                  {
+                    title: "The Grandmother's Kitchen Moment",
+                    description: project.impactAnalysis.deepDive.breakthroughMoments[0].moment,
+                    date: "March 2024", 
+                    location: "Mrs. Rodriguez's Home",
+                    impact: project.impactAnalysis.deepDive.breakthroughMoments[0].significance
+                  },
+                  {
+                    title: "Community Ownership Transfer",
+                    description: "Transitioned platform governance to community leaders, ensuring sustainable local ownership and continued growth without external dependency.",
+                    date: "June 2024",
+                    participants: "Community Leadership Council",
+                    impact: "100% community-owned platform with 96% user satisfaction"
+                  }
+                ]}
+              />
+            </div>
+
+            {/* Character Development Insight */}
+            <ExpandableSection
+              title="Personal Transformation: From Disruption to Amplification"
+              preview={project.impactAnalysis.deepDive.breakthroughMoments[0].essayGold}
+              variant="primary"
+              fullContent={
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <BeautifulInsightCard
+                      title="Before: Tech-Centered Mindset"
+                      icon={Code}
+                      content={
+                        <div className="space-y-3">
+                          <p>Initially approached community challenges with a "technology will solve everything" mentality. Believed efficient algorithms and sleek interfaces could replace inefficient human systems.</p>
+                          <p>My first three community outreach attempts failed because I led with technology features instead of relationship building. I was trying to impose solutions rather than understand existing community wisdom.</p>
+                        </div>
+                      }
+                    />
+                    <BeautifulInsightCard
+                      title="After: Community-Centered Leadership"
+                      icon={Users}
+                      variant="success"
+                      content={
+                        <div className="space-y-3">
+                          <p>Learned to ask "How can technology amplify what already works?" instead of "How can technology replace what's inefficient?" This shift transformed both my code and my character.</p>
+                          <p>Now design solutions that honor existing community knowledge while expanding possibilities. Technology becomes a bridge between generations, not a replacement for human wisdom.</p>
+                        </div>
+                      }
+                    />
                   </div>
                   
-                  <div className="p-5 rounded-xl bg-card/60 border border-border/50 shadow-soft">
-                    <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-accent" />
-                      Deep Personal Connection
-                    </h4>
-                    <p className="text-foreground/80 leading-relaxed">{project.impactAnalysis.deepDive.genesis.personalConnection}</p>
-                  </div>
+                  <QuoteCard
+                    quote="The day I learned that my code could grow tomatoes was the day I understood that technology isn't about the future—it's about remembering who we've always been."
+                    author="Personal Essay Draft"
+                    context="Application Portfolio"
+                    variant="primary"
+                  />
+                </div>
+              }
+            />
 
-                  <div className="p-5 rounded-xl bg-destructive/10 border border-destructive/30 shadow-soft">
-                    <h4 className="font-semibold text-destructive mb-3 flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4" />
-                      Learning Through Failure
-                    </h4>
-                    <p className="text-foreground/80 leading-relaxed">{project.impactAnalysis.deepDive.genesis.initialFailures}</p>
-                    <div className="mt-4 p-3 rounded-lg bg-card/80 border border-border/30">
-                      <p className="text-sm text-foreground/70 font-medium">
-                        Key Learning: Initial setbacks provided crucial insights that shaped the project's eventual success. This demonstrates resilience and adaptability - core traits admissions committees value highly.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="p-5 rounded-xl bg-gradient-to-r from-success/15 to-accent/15 border border-success/30 shadow-soft">
-                      <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4" />
-                        Implementation Journey Highlights
-                      </h4>
-                      <div className="space-y-3">
-                        <p className="text-foreground/85 leading-relaxed">
-                          The development process involved three critical phases: initial community research and needs assessment, 
-                          iterative prototype development with continuous user feedback, and finally the scaled implementation 
-                          with measurable impact tracking.
-                        </p>
-                        <p className="text-foreground/85 leading-relaxed">
-                          What started as a simple gardening app evolved into a comprehensive community network platform 
-                          when user feedback revealed the deeper need for social connection and knowledge sharing among gardeners.
-                        </p>
+            {/* Expert Analysis Section */}
+            {insightDepth === 'expert' && (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <ExpertAnalysisCard
+                    title="Deep Psychology Analysis"
+                    category="Behavioral Insights"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your behavioral psychology understanding reveals sophisticated grasp of intrinsic vs. extrinsic motivation. By gamifying community connection rather than individual achievement, you tapped into powerful social cohesion drives that sustain long-term engagement.</p>
+                        <p>The decision to prioritize elder community members as "wisdom keepers" demonstrates advanced emotional intelligence - recognizing that technology adoption requires honoring existing social structures rather than disrupting them.</p>
+                        <p>The 94% user satisfaction score indicates mastery of user psychology principles: progressive disclosure of complexity, social validation loops, and authentic relationship building through digital interfaces.</p>
                       </div>
-                    </div>
+                    }
+                  />
 
-                    <div className="p-5 rounded-xl bg-primary/10 border border-primary/30 shadow-soft">
-                      <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
-                        <Target className="h-4 w-4" />
-                        Measurable Impact Achievements
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="text-center p-3 rounded-lg bg-card/60 border border-border/30">
-                          <div className="text-2xl font-bold text-primary">500+</div>
-                          <div className="text-sm text-foreground/70">Active Users</div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg bg-card/60 border border-border/30">
-                          <div className="text-2xl font-bold text-success">42</div>
-                          <div className="text-sm text-foreground/70">Community Gardens</div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg bg-card/60 border border-border/30">
-                          <div className="text-2xl font-bold text-accent">96%</div>
-                          <div className="text-sm text-foreground/70">User Satisfaction</div>
-                        </div>
+                  <ExpertAnalysisCard
+                    title="Advanced Stakeholder Mapping"
+                    category="Political Strategy"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your stakeholder ecosystem reveals sophisticated political awareness. Successfully navigating relationships between community elders, tech-skeptical residents, local government officials, and enthusiastic early adopters required advanced diplomacy skills.</p>
+                        <p>Securing support from both the neighborhood association president (traditional power structure) and the community college urban planning department (academic legitimacy) shows strategic relationship building across generational and institutional lines.</p>
+                        <p>Your approach to power dynamics - positioning yourself as facilitator rather than leader - demonstrates understanding that sustainable community change requires distributed ownership rather than centralized control.</p>
                       </div>
-                      <p className="text-foreground/85 leading-relaxed">
-                        Beyond metrics, the project facilitated intergenerational knowledge transfer between experienced gardeners 
-                        and newcomers, created job opportunities for community members through the garden network, 
-                        and improved food security in historically underserved neighborhoods.
-                      </p>
+                    }
+                  />
+                </div>
+
+                <ExpertAnalysisCard
+                  title="Systems Thinking Deep Dive"
+                  category="Advanced Analysis"
+                  content={
+                    <div className="space-y-4">
+                      <p>Your root cause analysis went beyond surface-level food access issues to identify underlying social isolation as the core problem. This systems thinking approach - recognizing that food insecurity is often a symptom of community disconnection - shows sophisticated analytical capabilities.</p>
+                      <p>The feedback loops you created are particularly elegant: successful gardens → increased social connection → more community knowledge sharing → better gardens → stronger relationships. This positive reinforcement cycle demonstrates understanding of sustainable system design.</p>
+                      <p>Your anticipation of unintended consequences was remarkable - proactively addressing potential gentrification effects by ensuring community ownership of the platform and data, showing awareness of how tech can inadvertently displace communities it aims to help.</p>
+                      <p>Most sophisticated was your optimization of information flow patterns: creating multi-directional knowledge exchange rather than top-down expert guidance, allowing community wisdom to emerge organically while maintaining quality standards.</p>
                     </div>
+                  }
+                />
 
-                    <div className="p-5 rounded-xl bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/30 shadow-soft">
-                      <h4 className="font-semibold text-accent mb-3 flex items-center gap-2">
-                        <Sparkles className="h-4 w-4" />
-                        Personal Growth & Character Development
-                      </h4>
-                      <p className="text-foreground/85 leading-relaxed mb-3">
-                        This project transformed my understanding of technology's role in community building. 
-                        I evolved from viewing code as an end in itself to seeing it as a tool for amplifying human connection and wisdom.
-                      </p>
-                      <p className="text-foreground/85 leading-relaxed mb-3">
-                        The experience taught me that true innovation honors existing community knowledge while expanding possibilities. 
-                        I learned to lead with humility, asking "How can I serve?" rather than "How can I disrupt?"
-                      </p>
-                      <p className="text-foreground/85 leading-relaxed">
-                        Most significantly, I discovered that sustainable impact requires building with communities, not for them. 
-                        This shift in perspective now guides all my technical and leadership decisions.
-                      </p>
-                    </div>
-
-                    {insightDepth === 'expert' && (
-                      <>
-                        <div className="p-6 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border-l-4 border-primary mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Crown className="h-5 w-5 text-primary" />
-                            <h4 className="font-semibold text-primary">Expert Deep Dive: Systemic Impact Analysis</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                            This project demonstrates sophisticated systems thinking by creating sustainable behavior change across multiple community layers. The 300% growth in active gardens indicates not just user adoption, but fundamental shifts in how communities approach food security and social connection.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            Most impressive is the ripple effect: participating families report 67% increase in neighborhood social connections, suggesting the app catalyzed broader community cohesion beyond its direct functionality.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Microscope className="h-5 w-5 text-purple-600" />
-                            <h4 className="font-semibold text-purple-600">Deep Psychology Analysis</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The behavioral psychology underlying this project's success reveals sophisticated understanding of intrinsic vs. extrinsic motivation. By gamifying community connection rather than individual achievement, you tapped into powerful social cohesion drives that sustain long-term engagement.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your decision to prioritize elder community members as "wisdom keepers" in the app hierarchy demonstrates advanced emotional intelligence - recognizing that technology adoption requires honoring existing social structures rather than disrupting them.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The 94% user satisfaction score indicates mastery of user psychology principles: progressive disclosure of complexity, social validation loops, and authentic relationship building through digital interfaces.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            Most remarkably, your pivot from "disruption" to "amplification" mindset shows sophisticated identity formation - evolving from tech-centric to human-centric worldview while maintaining technical excellence.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Network className="h-5 w-5 text-green-600" />
-                            <h4 className="font-semibold text-green-600">Advanced Stakeholder Mapping</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your stakeholder ecosystem reveals sophisticated political awareness: Successfully navigating relationships between community elders, tech-skeptical residents, local government officials, and enthusiastic early adopters required advanced diplomacy skills.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The fact that you secured support from both the neighborhood association president (traditional power structure) and the community college urban planning department (academic legitimacy) shows strategic relationship building across generational and institutional lines.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your approach to power dynamics - positioning yourself as facilitator rather than leader - demonstrates understanding that sustainable community change requires distributed ownership rather than centralized control.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            The coalition you built now functions independently, indicating mastery of leadership development: creating systems where your presence becomes less necessary over time, not more.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Target className="h-5 w-5 text-orange-600" />
-                            <h4 className="font-semibold text-orange-600">Systems Thinking Deep Dive</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your root cause analysis went beyond surface-level food access issues to identify underlying social isolation as the core problem. This systems thinking approach - recognizing that food insecurity is often a symptom of community disconnection - shows sophisticated analytical capabilities.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The feedback loops you created are particularly elegant: successful gardens → increased social connection → more community knowledge sharing → better gardens → stronger relationships. This positive reinforcement cycle demonstrates understanding of sustainable system design.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your anticipation of unintended consequences was remarkable - proactively addressing potential gentrification effects by ensuring community ownership of the platform and data, showing awareness of how tech can inadvertently displace communities it aims to help.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            Most sophisticated was your optimization of information flow patterns: creating multi-directional knowledge exchange rather than top-down expert guidance, allowing community wisdom to emerge organically while maintaining quality standards.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <AlertCircle className="h-5 w-5 text-indigo-600" />
-                            <h4 className="font-semibold text-indigo-600">Failure Analysis & Recovery</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your initial failures were actually sophisticated experiments in disguise. The three failed community outreach attempts weren't random setbacks - they systematically tested different approaches to technology adoption, yielding valuable data about community priorities and trust-building processes.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The pivot from "tech-first" to "relationship-first" approach demonstrates advanced learning agility. Most developers would have doubled down on technical features; instead, you recognized that adoption barriers were social, not technological.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your recovery strategy showed remarkable emotional intelligence - instead of defending your original design, you used each failure as community engagement opportunity, turning setbacks into relationship-building moments that ultimately strengthened community buy-in.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            This pattern of "failing forward" - where each iteration brought you closer to community needs rather than further from technical vision - demonstrates anti-fragility: becoming stronger through adversity rather than just resilient to it.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Trophy className="h-5 w-5 text-pink-600" />
-                            <h4 className="font-semibold text-pink-600">Competitive Landscape Analysis</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Unlike existing gardening apps focused on individual plant tracking, your community-centered approach addresses the gap between individual knowledge and collective wisdom. This positioning differentiates you from both commercial gardening platforms and traditional community organizing tools.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your unique value proposition combines technical sophistication with cultural humility - rare in the "tech for social good" space, where products typically prioritize scalability over community ownership.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The defensibility of your approach lies not in proprietary technology but in community relationships and trust - creating network effects that competitors cannot easily replicate without years of authentic community engagement.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            Your model's sustainability advantage: as community ownership increases, your platform becomes more valuable to users while becoming less dependent on your technical maintenance - the opposite of typical tech platforms.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg mb-6">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Rocket className="h-5 w-5 text-cyan-600" />
-                            <h4 className="font-semibold text-cyan-600">Scaling Strategy & Sustainability</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your scaling strategy demonstrates sophisticated understanding of organic growth vs. forced expansion. Rather than pursuing rapid user acquisition, you prioritized deep community integration that creates authentic demand for expansion to neighboring areas.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The sustainability model is particularly elegant: each community becomes a training ground for the next, with established users becoming ambassadors and mentors, creating self-perpetuating growth cycles without requiring centralized resources.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your resource optimization shows systems thinking - leveraging existing community assets (elder knowledge, unused land, social networks) rather than requiring external inputs, making the model sustainable even without continued technical development.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            The transition strategy toward community ownership demonstrates long-term vision: building systems designed to eventually function independently, showing understanding that true impact comes from empowering communities to solve their own problems.
-                          </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg">
-                          <div className="flex items-center gap-2 mb-4">
-                            <Globe className="h-5 w-5 text-emerald-600" />
-                            <h4 className="font-semibold text-emerald-600">Cultural Impact Assessment</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your project catalyzed measurable behavioral change in community interaction patterns. Post-implementation surveys show 73% increase in cross-generational conversations and 45% increase in neighbor-to-neighbor resource sharing - indicating cultural shift beyond app usage.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            The preservation vs. innovation balance you achieved is particularly sophisticated - using digital tools to amplify traditional knowledge rather than replace it, creating cultural continuity while enabling adaptation to modern challenges.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            Your approach to intergenerational knowledge transfer - positioning elders as experts and young people as facilitators - reversed typical tech adoption patterns and strengthened rather than disrupted existing cultural hierarchies.
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            The lasting cultural change: community members now default to collaborative problem-solving approaches even for issues unrelated to gardening, suggesting your platform shifted fundamental social interaction patterns toward collective rather than individual solutions.
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Breakthrough Moments with Rich Content */}
-              <Card className="glass-card hover-lift group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
-                <CardHeader className="relative z-10">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-gradient-to-r from-success to-success/80 text-white shadow-soft">
-                      <Crown className="h-5 w-5" />
-                    </div>
-                    Breakthrough Moments Analysis
-                  </CardTitle>
-                  <CardDescription>Critical turning points that defined success trajectory</CardDescription>
-                </CardHeader>
-                <CardContent className="relative z-10">
-                  {project.impactAnalysis.deepDive.breakthroughMoments?.map((moment: any, i: number) => (
-                    <div key={i} className="space-y-5">
-                      <div className="p-5 rounded-xl bg-gradient-to-r from-success/10 to-primary/10 border border-success/30 shadow-soft">
-                        <h5 className="font-semibold text-success mb-3">The Pivotal Moment</h5>
-                        <p className="text-foreground/90 leading-relaxed mb-4">{moment.moment}</p>
-                        
-                        <p className="text-foreground/90 mb-3">
-                          <strong className="text-accent">Strategic Significance:</strong> {moment.significance}
-                        </p>
-                        <p className="text-foreground/90 mb-4">
-                          <strong className="text-primary">Character Evolution:</strong> {moment.characterGrowth}
-                        </p>
-
-                        <div className="p-4 rounded-lg bg-primary/15 border border-primary/30">
-                          <h6 className="font-medium text-primary text-sm mb-2 flex items-center gap-2">
-                            <Gem className="h-3 w-3" />
-                            ESSAY GOLD MINE
-                          </h6>
-                          <p className="italic text-foreground/95 text-sm leading-relaxed">"{moment.essayGold}"</p>
-                        </div>
-
-                        {insightDepth === 'expert' && (
-                          <div className="mt-4 p-4 rounded-lg bg-accent/10 border border-accent/30">
-                            <h6 className="font-medium text-accent text-sm mb-2">Admissions Strategy Note</h6>
-                            <p className="text-foreground/80 text-xs">
-                              This breakthrough demonstrates intellectual maturity and adaptability - key traits admissions officers value. 
-                              Frame this as evidence of your growth mindset and ability to learn from experience.
-                            </p>
-                          </div>
-                        )}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <ExpertAnalysisCard
+                    title="Failure Analysis & Recovery"
+                    category="Learning Agility"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your initial failures were sophisticated experiments in disguise. The three failed community outreach attempts systematically tested different approaches to technology adoption, yielding valuable data about community priorities and trust-building processes.</p>
+                        <p>The pivot from "tech-first" to "relationship-first" approach demonstrates advanced learning agility. Most developers would have doubled down on technical features; instead, you recognized that adoption barriers were social, not technological.</p>
+                        <p>This pattern of "failing forward" demonstrates anti-fragility: becoming stronger through adversity rather than just resilient to it.</p>
                       </div>
+                    }
+                  />
+
+                  <ExpertAnalysisCard
+                    title="Competitive Landscape Analysis"
+                    category="Strategic Positioning"
+                    content={
+                      <div className="space-y-4">
+                        <p>Unlike existing gardening apps focused on individual plant tracking, your community-centered approach addresses the gap between individual knowledge and collective wisdom. This positioning differentiates you from both commercial gardening platforms and traditional community organizing tools.</p>
+                        <p>Your unique value proposition combines technical sophistication with cultural humility - rare in the "tech for social good" space, where products typically prioritize scalability over community ownership.</p>
+                        <p>The defensibility of your approach lies not in proprietary technology but in community relationships and trust - creating network effects that competitors cannot easily replicate without years of authentic community engagement.</p>
+                      </div>
+                    }
+                  />
+                </div>
+
+                <ExpertAnalysisCard
+                  title="Cultural Impact Assessment"
+                  category="Anthropological Analysis"
+                  content={
+                    <div className="space-y-4">
+                      <p>Your project achieved remarkable cultural preservation while enabling innovation. By positioning technology as amplification rather than replacement, you created space for traditional knowledge to flourish alongside modern tools.</p>
+                      <p>The intergenerational knowledge transfer your platform facilitated represents a sophisticated solution to cultural continuity challenges facing many communities. Elder gardeners report feeling valued and heard, while younger participants gain access to traditional wisdom they might otherwise never encounter.</p>
+                      <p>The behavioral changes in your community extend beyond gardening: participating families report 67% increase in neighborhood social connections, suggesting your app catalyzed broader community cohesion beyond its direct functionality.</p>
+                      <p>Most significantly, you've demonstrated that technology can be a tool for cultural healing rather than disruption - a model that could transform how we approach community-centered innovation across diverse cultural contexts.</p>
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
+                  }
+                />
+              </div>
+            )}
           </TabsContent>
 
           {/* Enhanced Skills Deep Dive Tab */}

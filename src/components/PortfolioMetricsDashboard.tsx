@@ -64,7 +64,9 @@ import {
   Gem,
   Microscope,
   Crown,
-  Map
+  Map,
+  Play,
+  User
 } from "lucide-react";
 import { 
   LineChart, 
@@ -468,7 +470,7 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
     essays: 'scatter',
     future: 'bar'
   });
-  const [insightDepth, setInsightDepth] = useState('surface'); // surface, analysis, deep, expert
+  const [insightDepth, setInsightDepth] = useState('surface'); // surface, expert
 
   const chartOptions = {
     impact: ['line', 'area', 'radar'],
@@ -567,7 +569,7 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                   <p className="text-sm text-muted-foreground">Choose how deep you want to dive into the insights</p>
                 </div>
                 <div className="flex gap-2">
-                  {['surface', 'analysis', 'deep', 'expert'].map((level) => (
+                  {['surface', 'expert'].map((level) => (
                     <Button
                       key={level}
                       variant={insightDepth === level ? 'default' : 'outline'}
@@ -691,32 +693,105 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                     <p className="text-foreground/85 italic leading-relaxed">"{project.impactAnalysis.deepDive.genesis.trigger}"</p>
                   </div>
                   
-                  {(insightDepth === 'analysis' || insightDepth === 'deep' || insightDepth === 'expert') && (
-                    <div className="p-5 rounded-xl bg-card/60 border border-border/50 shadow-soft">
-                      <h4 className="font-semibold text-foreground mb-2">Personal Connection Depth</h4>
-                      <p className="text-foreground/80">{project.impactAnalysis.deepDive.genesis.personalConnection}</p>
-                    </div>
-                  )}
+                  <div className="p-5 rounded-xl bg-card/60 border border-border/50 shadow-soft">
+                    <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                      <Heart className="h-4 w-4 text-accent" />
+                      Deep Personal Connection
+                    </h4>
+                    <p className="text-foreground/80 leading-relaxed">{project.impactAnalysis.deepDive.genesis.personalConnection}</p>
+                  </div>
 
-                  {(insightDepth === 'deep' || insightDepth === 'expert') && (
-                    <div className="p-5 rounded-xl bg-destructive/10 border border-destructive/30 shadow-soft">
-                      <h4 className="font-semibold text-destructive mb-2">Learning Through Failure</h4>
-                      <p className="text-foreground/80">{project.impactAnalysis.deepDive.genesis.initialFailures}</p>
-                    </div>
-                  )}
-
-                  {insightDepth === 'expert' && (
-                    <div className="p-5 rounded-xl bg-gradient-to-r from-success/10 to-accent/10 border border-success/30 shadow-soft">
-                      <h4 className="font-semibold text-success mb-2 flex items-center gap-2">
-                        <Crown className="h-4 w-4" />
-                        Expert Analysis: Pattern Recognition
-                      </h4>
-                      <p className="text-foreground/80 text-sm">
-                        This project demonstrates the "Personal Pain Point → Community Solution" pattern that's highly valued by admissions committees. 
-                        The authentic progression from personal experience to systematic change shows mature problem-solving and leadership potential.
+                  <div className="p-5 rounded-xl bg-destructive/10 border border-destructive/30 shadow-soft">
+                    <h4 className="font-semibold text-destructive mb-3 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      Learning Through Failure
+                    </h4>
+                    <p className="text-foreground/80 leading-relaxed">{project.impactAnalysis.deepDive.genesis.initialFailures}</p>
+                    <div className="mt-4 p-3 rounded-lg bg-card/80 border border-border/30">
+                      <p className="text-sm text-foreground/70 font-medium">
+                        Key Learning: Initial setbacks provided crucial insights that shaped the project's eventual success. This demonstrates resilience and adaptability - core traits admissions committees value highly.
                       </p>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="p-5 rounded-xl bg-gradient-to-r from-success/15 to-accent/15 border border-success/30 shadow-soft">
+                      <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4" />
+                        Implementation Journey Highlights
+                      </h4>
+                      <div className="space-y-3">
+                        <p className="text-foreground/85 leading-relaxed">
+                          The development process involved three critical phases: initial community research and needs assessment, 
+                          iterative prototype development with continuous user feedback, and finally the scaled implementation 
+                          with measurable impact tracking.
+                        </p>
+                        <p className="text-foreground/85 leading-relaxed">
+                          What started as a simple gardening app evolved into a comprehensive community network platform 
+                          when user feedback revealed the deeper need for social connection and knowledge sharing among gardeners.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-primary/10 border border-primary/30 shadow-soft">
+                      <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                        <Target className="h-4 w-4" />
+                        Measurable Impact Achievements
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="text-center p-3 rounded-lg bg-card/60 border border-border/30">
+                          <div className="text-2xl font-bold text-primary">500+</div>
+                          <div className="text-sm text-foreground/70">Active Users</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-card/60 border border-border/30">
+                          <div className="text-2xl font-bold text-success">42</div>
+                          <div className="text-sm text-foreground/70">Community Gardens</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-card/60 border border-border/30">
+                          <div className="text-2xl font-bold text-accent">96%</div>
+                          <div className="text-sm text-foreground/70">User Satisfaction</div>
+                        </div>
+                      </div>
+                      <p className="text-foreground/85 leading-relaxed">
+                        Beyond metrics, the project facilitated intergenerational knowledge transfer between experienced gardeners 
+                        and newcomers, created job opportunities for community members through the garden network, 
+                        and improved food security in historically underserved neighborhoods.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/30 shadow-soft">
+                      <h4 className="font-semibold text-accent mb-3 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        Personal Growth & Character Development
+                      </h4>
+                      <p className="text-foreground/85 leading-relaxed mb-3">
+                        This project transformed my understanding of technology's role in community building. 
+                        I evolved from viewing code as an end in itself to seeing it as a tool for amplifying human connection and wisdom.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed mb-3">
+                        The experience taught me that true innovation honors existing community knowledge while expanding possibilities. 
+                        I learned to lead with humility, asking "How can I serve?" rather than "How can I disrupt?"
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        Most significantly, I discovered that sustainable impact requires building with communities, not for them. 
+                        This shift in perspective now guides all my technical and leadership decisions.
+                      </p>
+                    </div>
+
+                    {insightDepth === 'expert' && (
+                      <div className="p-5 rounded-xl bg-gradient-to-r from-success/10 to-accent/10 border border-success/30 shadow-soft">
+                        <h4 className="font-semibold text-success mb-2 flex items-center gap-2">
+                          <Crown className="h-4 w-4" />
+                          Expert Analysis: Admissions Strategy
+                        </h4>
+                        <p className="text-foreground/80 text-sm leading-relaxed">
+                          This project demonstrates the rare "Personal Pain Point → Community Solution" pattern that admissions committees highly value. 
+                          The authentic progression from personal experience to systematic change shows intellectual maturity, cultural competence, 
+                          and leadership potential that distinguishes you from typical "tech for good" applications.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -739,16 +814,12 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                         <h5 className="font-semibold text-success mb-3">The Pivotal Moment</h5>
                         <p className="text-foreground/90 leading-relaxed mb-4">{moment.moment}</p>
                         
-                        {(insightDepth === 'analysis' || insightDepth === 'deep' || insightDepth === 'expert') && (
-                          <>
-                            <p className="text-foreground/90 mb-3">
-                              <strong className="text-accent">Strategic Significance:</strong> {moment.significance}
-                            </p>
-                            <p className="text-foreground/90 mb-4">
-                              <strong className="text-primary">Character Evolution:</strong> {moment.characterGrowth}
-                            </p>
-                          </>
-                        )}
+                        <p className="text-foreground/90 mb-3">
+                          <strong className="text-accent">Strategic Significance:</strong> {moment.significance}
+                        </p>
+                        <p className="text-foreground/90 mb-4">
+                          <strong className="text-primary">Character Evolution:</strong> {moment.characterGrowth}
+                        </p>
 
                         <div className="p-4 rounded-lg bg-primary/15 border border-primary/30">
                           <h6 className="font-medium text-primary text-sm mb-2 flex items-center gap-2">
@@ -775,23 +846,851 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
             </div>
           </TabsContent>
 
-          {/* Continue with other tabs... */}
+          {/* Enhanced Skills Deep Dive Tab */}
           <TabsContent value="skills" className="space-y-8">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Skills Deep Dive content will be enhanced with dynamic charts and multi-level insights...</p>
+            {/* Skills Chart Visualization */}
+            <Card className="glass-card shadow-large overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 border-b border-gradient">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <Brain className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Skills Development Analysis</CardTitle>
+                      <CardDescription>Comprehensive breakdown of technical and soft skills progression</CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {chartOptions.skills.map((chartType) => (
+                      <Button
+                        key={chartType}
+                        variant={activeChartTypes.skills === chartType ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setActiveChartTypes({...activeChartTypes, skills: chartType})}
+                        className={`capitalize ${activeChartTypes.skills === chartType ? 'bg-gradient-primary text-white' : 'hover-lift'}`}
+                      >
+                        {chartType}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={project.chartData.skillProgression}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="skill" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '12px'
+                        }} 
+                      />
+                      <Legend />
+                      <Bar dataKey="month1" fill="hsl(var(--muted))" name="Month 1" />
+                      <Bar dataKey="month3" fill="hsl(var(--primary))" name="Month 3" />
+                      <Bar dataKey="month6" fill="hsl(var(--success))" name="Month 6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Core Competencies Analysis */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <Card className="glass-card hover-lift group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <Code className="h-5 w-5" />
+                    </div>
+                    Core Technical Competencies
+                  </CardTitle>
+                  <CardDescription>Primary skills developed with concrete evidence and real-world application</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 relative z-10">
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-primary/15 to-accent/15 border border-primary/30 shadow-soft">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      Full-Stack Development Mastery
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Achieved proficiency in React, Node.js, and database architecture through hands-on community project development. 
+                      Built a real-time collaborative platform handling 500+ concurrent users with 99.8% uptime over 6 months.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Key breakthrough: Implemented offline-first architecture for low-connectivity areas, demonstrating advanced 
+                      understanding of user experience design and technical constraints. Code architecture was reviewed and praised 
+                      by senior developers at local tech companies.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-success/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      System Architecture & Scalability
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Designed and implemented scalable infrastructure that grew from supporting 45 users to 500+ without performance degradation. 
+                      Learned database optimization, load balancing, and real-time data synchronization under production pressure.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      This experience provided deep understanding of how technical decisions impact real users and communities, 
+                      teaching me to balance feature development with system reliability and user experience.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-accent/10 border border-accent/30 shadow-soft">
+                    <h4 className="font-semibold text-accent mb-3 flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      User Experience Design
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Evolved from tech-first to user-centered design thinking. Completely rebuilt the interface three times based 
+                      on community feedback, achieving 95% user satisfaction versus 40% for the original design. 
+                      This iterative process taught me the critical importance of validating assumptions with real users before building solutions.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card hover-lift group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-to-r from-success to-success/80 text-white shadow-soft">
+                      <Heart className="h-5 w-5" />
+                    </div>
+                    Leadership & Soft Skills Development
+                  </CardTitle>
+                  <CardDescription>Character development and interpersonal skills gained through project leadership</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 relative z-10">
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-success/15 to-accent/15 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Compass className="h-4 w-4" />
+                      Adaptive Leadership Excellence
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Demonstrated exceptional adaptability when initial project approach failed to meet community needs. 
+                      Instead of persisting with the original vision, I led a complete strategic pivot based on user feedback, 
+                      resulting in dramatically improved outcomes.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      This experience taught me that effective leadership requires intellectual humility and the courage to admit 
+                      when assumptions are wrong. I learned to validate ideas before implementing them, saving time and resources 
+                      while building stronger community relationships.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-primary/10 border border-primary/30 shadow-soft">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4" />
+                      Cultural Intelligence & Communication
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Developed advanced cross-cultural communication skills while working with diverse community members across 
+                      generational, linguistic, and socioeconomic lines. Learned to translate technical concepts into accessible language 
+                      and to bridge different perspectives on technology adoption.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Key learning: Technology solutions must respect and amplify existing community wisdom rather than replacing it. 
+                      This insight now guides my approach to all technical and social challenges.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-accent/10 border border-accent/30 shadow-soft">
+                    <h4 className="font-semibold text-accent mb-3 flex items-center gap-2">
+                      <Trophy className="h-4 w-4" />
+                      Strategic Problem-Solving
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Evolved from viewing problems as isolated technical challenges to understanding them as interconnected 
+                      social and technical systems. This systems thinking approach enabled me to identify root causes rather than 
+                      just symptoms, leading to more sustainable and impactful solutions.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Skill Transfer & Market Relevance */}
+            <Card className="glass-card shadow-large">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                    <Briefcase className="h-5 w-5" />
+                  </div>
+                  Market Relevance & Career Application
+                </CardTitle>
+                <CardDescription>How these skills translate to academic and professional opportunities</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30 shadow-soft">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4" />
+                      Academic Program Alignment
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Perfect preparation for computer science programs emphasizing practical impact and social responsibility. 
+                      The combination of technical depth and community engagement demonstrates readiness for programs like 
+                      Stanford's CS+Social Good track or MIT's public service initiatives.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Experience with real-world constraints, user feedback, and production systems provides substantial 
+                      advantage over students with only academic or personal project experience.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-success/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Rocket className="h-4 w-4" />
+                      Professional Readiness
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Developed high-demand skill set with proven ability to scale applications under pressure. 
+                      Experience managing real users and stakeholder expectations provides significant advantage 
+                      for internship and entry-level positions.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Unique context: Most developers learn on toy projects, but I learned on infrastructure serving 
+                      real communities with genuine consequences for failure - this experience is highly valued by employers.
+                    </p>
+                  </div>
+                </div>
+
+                {insightDepth === 'expert' && (
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-success/10 to-accent/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Crown className="h-4 w-4" />
+                      Expert Career Strategy
+                    </h4>
+                    <p className="text-foreground/80 text-sm leading-relaxed">
+                      This skill combination positions you for high-impact roles in social enterprise technology, 
+                      B-Corps, or mission-driven startups. Consider highlighting the rare combination of technical excellence 
+                      with cultural competence and community organizing experience - this profile is exceptionally valuable 
+                      in today's market where companies increasingly focus on social impact and inclusive design.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
+          {/* Enhanced Essay Goldmine Tab */}
           <TabsContent value="essays" className="space-y-8">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Essay Goldmine content will be enhanced with story analysis charts and themes...</p>
+            {/* Story Themes Chart */}
+            <Card className="glass-card shadow-large overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 border-b border-gradient">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <Gem className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Essay Theme Analysis</CardTitle>
+                      <CardDescription>Comprehensive breakdown of narrative themes and essay potential</CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {chartOptions.essays.map((chartType) => (
+                      <Button
+                        key={chartType}
+                        variant={activeChartTypes.essays === chartType ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setActiveChartTypes({...activeChartTypes, essays: chartType})}
+                        className={`capitalize ${activeChartTypes.essays === chartType ? 'bg-gradient-primary text-white' : 'hover-lift'}`}
+                      >
+                        {chartType}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ScatterChart data={project.chartData.storyThemes}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="essays" name="Available Essays" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis dataKey="score" name="Theme Strength" stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '12px'
+                        }} 
+                        formatter={(value, name) => [value, name === 'score' ? 'Theme Strength' : 'Essay Count']}
+                        labelFormatter={(label) => `Theme: ${label}`}
+                      />
+                      <Scatter dataKey="score" fill="hsl(var(--primary))" />
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Ready-to-Use Story Fragments */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <Card className="glass-card hover-lift group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    Powerful Opening Hooks
+                  </CardTitle>
+                  <CardDescription>Compelling narrative beginnings ready for essay applications</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 relative z-10">
+                  {project.essayGoldmine.powerfulOpeningHooks.map((hook: any, index: number) => (
+                    <div key={index} className="p-5 rounded-xl bg-gradient-to-r from-accent/15 to-primary/15 border border-accent/30 shadow-soft">
+                      <div className="mb-4 p-4 rounded-lg bg-card/80 border border-border/30">
+                        <p className="text-foreground/95 italic font-medium leading-relaxed">"{hook.hook}"</p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-gradient-primary text-white border-0">
+                            {hook.essayPrompt}
+                          </Badge>
+                          <Badge variant="outline" className="border-success/50 text-success">
+                            Uniqueness: {hook.uniquenessScore}%
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-foreground/70">{hook.developmentPath}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="p-5 rounded-xl bg-success/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Quote className="h-4 w-4" />
+                      Additional Hook Variations
+                    </h4>
+                    <div className="space-y-3">
+                      <p className="text-foreground/85 italic leading-relaxed">
+                        "The notification at 2 AM changed everything: 'Mrs. Rodriguez's tomatoes are ready for harvest, 
+                        and she's teaching traditional canning tomorrow.' In that moment, I realized my app had become 
+                        something I never intended - a bridge between generations."
+                      </p>
+                      <p className="text-foreground/85 italic leading-relaxed">
+                        "Three failed prototypes taught me more about community than four years of computer science theory. 
+                        The fourth version succeeded because I finally learned to code with my heart, not just my head."
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card hover-lift group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-to-r from-success to-success/80 text-white shadow-soft">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                    Character Development Arcs
+                  </CardTitle>
+                  <CardDescription>Personal growth narratives with supporting evidence</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 relative z-10">
+                  {project.essayGoldmine.characterDevelopmentArcs.map((arc: any, index: number) => (
+                    <div key={index} className="space-y-4">
+                      <div className="p-5 rounded-xl bg-gradient-to-r from-success/15 to-accent/15 border border-success/30 shadow-soft">
+                        <h4 className="font-semibold text-success mb-3">{arc.theme}</h4>
+                        <div className="space-y-2">
+                          {arc.progression.map((step: string, stepIndex: number) => (
+                            <div key={stepIndex} className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
+                                {stepIndex + 1}
+                              </div>
+                              <p className="text-foreground/80 leading-relaxed">{step}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
+                          <h5 className="font-medium text-primary mb-2">Essay Applications</h5>
+                          <div className="flex flex-wrap gap-1">
+                            {arc.essayApplications.map((app: string, appIndex: number) => (
+                              <Badge key={appIndex} variant="outline" className="border-primary/50 text-primary text-xs">
+                                {app}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-4 rounded-xl bg-success/10 border border-success/30">
+                          <h5 className="font-medium text-success mb-2">Character Strengths</h5>
+                          <div className="flex flex-wrap gap-1">
+                            {arc.characterStrengths.map((strength: string, strengthIndex: number) => (
+                              <Badge key={strengthIndex} variant="outline" className="border-success/50 text-success text-xs">
+                                {strength}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Specific Story Moments */}
+            <Card className="glass-card shadow-large">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                    <Camera className="h-5 w-5" />
+                  </div>
+                  Narrative Gold Mine - Specific Moments
+                </CardTitle>
+                <CardDescription>Concrete story moments ready for essay development</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {project.essayGoldmine.specificStoryMoments.map((story: any, index: number) => (
+                  <div key={index} className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border border-accent/30 shadow-soft">
+                    <h4 className="font-bold text-accent mb-4 text-lg">{story.storyTitle}</h4>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                            <Play className="h-4 w-4" />
+                            The Setup
+                          </h5>
+                          <p className="text-foreground/80 leading-relaxed">{story.setup}</p>
+                        </div>
+                        
+                        <div>
+                          <h5 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4 text-destructive" />
+                            The Challenge
+                          </h5>
+                          <p className="text-foreground/80 leading-relaxed">{story.conflict}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                            <User className="h-4 w-4 text-primary" />
+                            My Role
+                          </h5>
+                          <p className="text-foreground/80 leading-relaxed">{story.myRole}</p>
+                        </div>
+                        
+                        <div>
+                          <h5 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-success" />
+                            The Resolution
+                          </h5>
+                          <p className="text-foreground/80 leading-relaxed">{story.resolution}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-lg bg-gradient-to-r from-primary/15 to-accent/15 border border-primary/30">
+                        <h5 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                          <Lightbulb className="h-4 w-4" />
+                          Deeper Meaning
+                        </h5>
+                        <p className="text-foreground/85 leading-relaxed italic">"{story.deeperMeaning}"</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-lg bg-success/10 border border-success/30">
+                          <h6 className="font-medium text-success mb-2">Essay Potential</h6>
+                          <p className="text-sm text-foreground/80">{story.essayPotential}</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-accent/10 border border-accent/30">
+                          <h6 className="font-medium text-accent mb-2">Character Qualities Demonstrated</h6>
+                          <div className="flex flex-wrap gap-1">
+                            {story.characterQualities.map((quality: string, qualityIndex: number) => (
+                              <Badge key={qualityIndex} variant="outline" className="border-accent/50 text-accent text-xs">
+                                {quality}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {insightDepth === 'expert' && (
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-success/10 to-accent/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Crown className="h-4 w-4" />
+                      Expert Essay Strategy
+                    </h4>
+                    <p className="text-foreground/80 text-sm leading-relaxed">
+                      These stories showcase the rare combination of technical skill, cultural intelligence, and community impact that 
+                      sets you apart from typical applicants. Focus on the moments where technology met human connection - 
+                      these demonstrate both innovation and empathy, highly valued by competitive programs.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Ready-to-Use insights */}
+            <Card className="glass-card shadow-large">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  Ready-to-Use Insights & Themes
+                </CardTitle>
+                <CardDescription>Polished insights ready for direct essay integration</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {project.essayGoldmine.readyToUseInsights.map((insight: any, index: number) => (
+                  <div key={index} className="p-5 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30 shadow-soft">
+                    <div className="mb-4 p-4 rounded-lg bg-card/80 border border-border/30">
+                      <p className="text-foreground/95 font-medium leading-relaxed">"{insight.insight}"</p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h5 className="font-semibold text-primary text-sm mb-1">Application Context</h5>
+                        <p className="text-foreground/80 text-sm">{insight.applicationContext}</p>
+                      </div>
+                      
+                      <div>
+                        <h5 className="font-semibold text-success text-sm mb-1">Supporting Evidence</h5>
+                        <p className="text-foreground/80 text-sm">{insight.supportingEvidence}</p>
+                      </div>
+                      
+                      <div>
+                        <h5 className="font-semibold text-accent text-sm mb-1">Essay Integration Strategy</h5>
+                        <p className="text-foreground/80 text-sm">{insight.essayIntegration}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </TabsContent>
 
+          {/* Enhanced Future Trajectory Tab */}
           <TabsContent value="future" className="space-y-8">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Future Trajectory content will be enhanced with career path visualizations...</p>
+            {/* Career Alignment Chart */}
+            <Card className="glass-card shadow-large overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 border-b border-gradient">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <Compass className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Career Path Analysis</CardTitle>
+                      <CardDescription>Data-driven insights into future opportunities and growth potential</CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {chartOptions.future.map((chartType) => (
+                      <Button
+                        key={chartType}
+                        variant={activeChartTypes.future === chartType ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setActiveChartTypes({...activeChartTypes, future: chartType})}
+                        className={`capitalize ${activeChartTypes.future === chartType ? 'bg-gradient-primary text-white' : 'hover-lift'}`}
+                      >
+                        {chartType}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={project.chartData.careerAlignment}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="career" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '12px'
+                        }} 
+                      />
+                      <Legend />
+                      <Bar dataKey="probability" fill="hsl(var(--primary))" name="Career Probability %" />
+                      <Bar dataKey="growth" fill="hsl(var(--success))" name="Growth Potential %" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Career Path Analysis */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <Card className="glass-card hover-lift group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <Rocket className="h-5 w-5" />
+                    </div>
+                    Strategic Career Pathways
+                  </CardTitle>
+                  <CardDescription>Logical next steps based on project experience and demonstrated capabilities</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 relative z-10">
+                  {project.futureAnalysis.careerTrajectoryPredictions.map((prediction: any, index: number) => (
+                    <div key={index} className="p-5 rounded-xl bg-gradient-to-r from-success/15 to-accent/15 border border-success/30 shadow-soft">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-success">{prediction.path}</h4>
+                        <Badge className="bg-gradient-primary text-white border-0">
+                          {prediction.probability}% Match
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <h5 className="font-medium text-foreground text-sm mb-2">Evidence Supporting This Path</h5>
+                          <ul className="space-y-1">
+                            {prediction.evidence.map((item: string, itemIndex: number) => (
+                              <li key={itemIndex} className="text-foreground/80 text-sm flex items-start gap-2">
+                                <CheckCircle className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h5 className="font-medium text-primary text-sm mb-2">Recommended Next Steps</h5>
+                          <ul className="space-y-1">
+                            {prediction.recommendedSteps.map((step: string, stepIndex: number) => (
+                              <li key={stepIndex} className="text-foreground/80 text-sm flex items-start gap-2">
+                                <ChevronRight className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                                {step}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="p-5 rounded-xl bg-primary/10 border border-primary/30 shadow-soft">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      Alternative High-Impact Pathways
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Technology Policy & Ethics:</strong> Your experience bridging technology and community makes you ideal 
+                        for roles in tech policy, digital equity, or ethical AI development. Consider programs that combine 
+                        computer science with public policy or philosophy.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Social Innovation Leadership:</strong> The rare combination of technical skills and community organizing 
+                        experience positions you for leadership roles in social innovation labs, impact investing, or B-Corp development.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Academic Research:</strong> Your project demonstrates skills in human-computer interaction, 
+                        community-centered design, and social computing - growing research fields with significant impact potential.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card hover-lift group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-to-r from-success to-success/80 text-white shadow-soft">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                    Skill Transfer Opportunities
+                  </CardTitle>
+                  <CardDescription>How current project experience applies to future endeavors</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 relative z-10">
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-success/15 to-accent/15 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Code className="h-4 w-4" />
+                      Technical Skills Amplification
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Your full-stack development experience with real users provides a strong foundation for advanced technical roles. 
+                      The production-level experience with scaling, reliability, and user feedback loops gives you significant 
+                      advantages over peers with only academic experience.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      Consider extending these skills into emerging areas like AI/ML applications for social good, 
+                      blockchain for community organizing, or AR/VR for education and training.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-accent/10 border border-accent/30 shadow-soft">
+                    <h4 className="font-semibold text-accent mb-3 flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Leadership & Community Building
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Your experience leading cross-cultural, intergenerational community initiatives translates directly to 
+                      organizational leadership roles. The skills of building consensus, managing diverse stakeholders, 
+                      and creating sustainable systems are highly valued in any sector.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      These skills position you for early leadership opportunities in college and accelerated career advancement 
+                      in any field you choose to pursue.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-primary/10 border border-primary/30 shadow-soft">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" />
+                      Innovation & Problem-Solving
+                    </h4>
+                    <p className="text-foreground/85 leading-relaxed mb-3">
+                      Your approach to problem-solving - starting with community needs, iterating based on feedback, 
+                      and building sustainable systems - is applicable across all fields and industries.
+                    </p>
+                    <p className="text-foreground/85 leading-relaxed">
+                      This methodology positions you for success in research, product development, consulting, 
+                      or any role requiring innovative solutions to complex problems.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Project Evolution & Strategic Integration */}
+            <Card className="glass-card shadow-large">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                    <Network className="h-5 w-5" />
+                  </div>
+                  Project Evolution & Strategic Integration
+                </CardTitle>
+                <CardDescription>Ways to expand current project and integrate with broader goals</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30 shadow-soft">
+                    <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                      <Expand className="h-4 w-4" />
+                      Project Expansion Pathways
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Geographic Scaling:</strong> Expand the platform to serve additional neighborhoods and cities, 
+                        developing replicable implementation frameworks that honor local community characteristics while 
+                        maintaining core functionality.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Feature Evolution:</strong> Add educational components, mentorship matching, micro-lending for garden 
+                        supplies, or integration with local farmers' markets to create a comprehensive community resilience platform.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Research Integration:</strong> Partner with university researchers to study community-centered technology 
+                        adoption, urban agriculture impact, or intergenerational knowledge transfer in digital spaces.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-success/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Link className="h-4 w-4" />
+                      Strategic Academic Integration
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Computer Science Programs:</strong> This project provides excellent foundation for courses in 
+                        human-computer interaction, software engineering, database systems, and user experience design. 
+                        The real-world experience gives you concrete examples for theoretical concepts.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Interdisciplinary Studies:</strong> Perfect bridge project for programs combining technology with 
+                        sociology, urban planning, environmental science, or public policy. Demonstrates ability to apply 
+                        technical skills across disciplines.
+                      </p>
+                      <p className="text-foreground/85 leading-relaxed">
+                        <strong>Leadership Development:</strong> Strong foundation for pursuing leadership roles in student organizations, 
+                        particularly those focused on social impact, technology ethics, or community engagement.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Admissions Positioning Strategy */}
+                <div className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border border-accent/30 shadow-soft">
+                  <h4 className="font-semibold text-accent mb-4 flex items-center gap-2">
+                    <Trophy className="h-5 w-5" />
+                    Strategic Admissions Positioning
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <h5 className="font-medium text-success mb-3">Competitive Advantages</h5>
+                      <div className="space-y-2">
+                        {project.futureAnalysis.admissionsPositioning.competitiveAdvantages.map((advantage: any, index: number) => (
+                          <div key={index} className="p-3 rounded-lg bg-success/10 border border-success/30">
+                            <h6 className="font-medium text-success text-sm mb-1">{advantage.advantage}</h6>
+                            <p className="text-foreground/80 text-xs mb-2">{advantage.strength}</p>
+                            <div className="flex flex-wrap gap-1">
+                              {advantage.schoolFit.map((school: string, schoolIndex: number) => (
+                                <Badge key={schoolIndex} variant="outline" className="border-success/50 text-success text-xs">
+                                  {school}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h5 className="font-medium text-destructive mb-3">Strategic Considerations</h5>
+                      <div className="space-y-2">
+                        {project.futureAnalysis.admissionsPositioning.potentialConcerns.map((concern: any, index: number) => (
+                          <div key={index} className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                            <h6 className="font-medium text-destructive text-sm mb-1">{concern.concern}</h6>
+                            <p className="text-foreground/80 text-xs mb-2">{concern.mitigation}</p>
+                            <p className="text-accent text-xs font-medium">{concern.recommendation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {insightDepth === 'expert' && (
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-success/10 to-accent/10 border border-success/30 shadow-soft">
+                    <h4 className="font-semibold text-success mb-3 flex items-center gap-2">
+                      <Crown className="h-4 w-4" />
+                      Expert Strategic Guidance
+                    </h4>
+                    <p className="text-foreground/80 text-sm leading-relaxed">
+                      Your project portfolio demonstrates exceptional combination of technical excellence, cultural intelligence, 
+                      and community impact that positions you uniquely for top-tier programs. Focus on schools that value 
+                      both innovation and social responsibility. Consider reaching out to faculty in human-computer interaction, 
+                      social computing, or technology policy programs who would appreciate your community-centered approach to technology development.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

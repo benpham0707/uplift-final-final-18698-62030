@@ -28,6 +28,12 @@ import NarrativeArchitectureBuilder from "@/components/dashboard/NarrativeArchit
 import StrategicWritingEnhancement from "@/components/dashboard/StrategicWritingEnhancement";
 import PortfolioCoherenceStrategist from "@/components/dashboard/PortfolioCoherenceStrategist";
 import ExpertApplicationIntelligence from "@/components/dashboard/ExpertApplicationIntelligence";
+import CareerPathStrategyDashboard from "@/components/dashboard/CareerPathStrategyDashboard";
+import AcademicJourneyPlanner from "@/components/dashboard/AcademicJourneyPlanner";
+import ProjectEvolutionWorkshop from "@/components/dashboard/ProjectEvolutionWorkshop";
+import StrategicSkillDevelopmentRoadmap from "@/components/dashboard/StrategicSkillDevelopmentRoadmap";
+import NetworkRelationshipCapitalBuilder from "@/components/dashboard/NetworkRelationshipCapitalBuilder";
+import StrategicFutureIntelligence from "@/components/dashboard/StrategicFutureIntelligence";
 import { 
   TrendingUp, 
   Award, 

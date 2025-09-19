@@ -19,6 +19,7 @@ import {
 
 interface NarrativeArchitectureBuilderProps {
   projectData?: any;
+  enabledTabs?: string[];
 }
 
 // Hard-coded mock data - represents narrative thread mapping and story architecture
@@ -120,7 +121,10 @@ const mockNarrativeData = {
   }
 };
 
-const NarrativeArchitectureBuilder: React.FC<NarrativeArchitectureBuilderProps> = ({ projectData }) => {
+const NarrativeArchitectureBuilder: React.FC<NarrativeArchitectureBuilderProps> = ({ 
+  projectData, 
+  enabledTabs = ['threads', 'development', 'integration', 'coherence'] 
+}) => {
   const [selectedThread, setSelectedThread] = useState(0);
   const [selectedEssay, setSelectedEssay] = useState(0);
 
@@ -133,27 +137,31 @@ const NarrativeArchitectureBuilder: React.FC<NarrativeArchitectureBuilderProps> 
     return colors[color as keyof typeof colors] || colors.primary;
   };
 
+  const tabs = [
+    { value: 'threads', label: 'Story Threads', icon: GitBranch },
+    { value: 'development', label: 'Character Arc', icon: TrendingUp },
+    { value: 'integration', label: 'Essay Integration', icon: BookOpen },
+    { value: 'coherence', label: 'Coherence Analysis', icon: Target }
+  ].filter(tab => enabledTabs.includes(tab.value));
+
+  const defaultTab = tabs[0]?.value || 'threads';
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="threads" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="threads" className="flex items-center gap-2">
-            <GitBranch className="h-4 w-4" />
-            Story Threads
-          </TabsTrigger>
-          <TabsTrigger value="development" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Character Arc
-          </TabsTrigger>
-          <TabsTrigger value="integration" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Essay Integration
-          </TabsTrigger>
-          <TabsTrigger value="coherence" className="flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Coherence Analysis
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue={defaultTab} className="w-full">
+        {tabs.length > 1 && (
+          <TabsList className={`grid w-full grid-cols-${tabs.length}`}>
+            {tabs.map(tab => {
+              const IconComponent = tab.icon;
+              return (
+                <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
+                  <IconComponent className="h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        )}
 
         <TabsContent value="threads" className="space-y-4">
           <Card className="glass-card">

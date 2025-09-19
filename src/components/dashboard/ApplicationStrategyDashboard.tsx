@@ -19,6 +19,7 @@ import {
 
 interface ApplicationStrategyDashboardProps {
   projectData?: any;
+  enabledTabs?: string[];
 }
 
 // Hard-coded mock data - represents project analysis data for application strategy
@@ -91,31 +92,38 @@ const mockStrategyData = {
   ]
 };
 
-const ApplicationStrategyDashboard: React.FC<ApplicationStrategyDashboardProps> = ({ projectData }) => {
+const ApplicationStrategyDashboard: React.FC<ApplicationStrategyDashboardProps> = ({ 
+  projectData, 
+  enabledTabs = ['mapping', 'coherence', 'positioning', 'schools'] 
+}) => {
   const [selectedMapping, setSelectedMapping] = useState(0);
   const [selectedSchool, setSelectedSchool] = useState(0);
 
+  const tabs = [
+    { value: 'mapping', label: 'Project Mapping', icon: Target },
+    { value: 'coherence', label: 'Portfolio Coherence', icon: CheckCircle },
+    { value: 'positioning', label: 'Competitive Edge', icon: TrendingUp },
+    { value: 'schools', label: 'School Alignment', icon: School }
+  ].filter(tab => enabledTabs.includes(tab.value));
+
+  const defaultTab = tabs[0]?.value || 'mapping';
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="mapping" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="mapping" className="flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Project Mapping
-          </TabsTrigger>
-          <TabsTrigger value="coherence" className="flex items-center gap-2">  
-            <CheckCircle className="h-4 w-4" />
-            Portfolio Coherence
-          </TabsTrigger>
-          <TabsTrigger value="positioning" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />  
-            Competitive Edge
-          </TabsTrigger>
-          <TabsTrigger value="schools" className="flex items-center gap-2">
-            <School className="h-4 w-4" />
-            School Alignment
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue={defaultTab} className="w-full">
+        {tabs.length > 1 && (
+          <TabsList className={`grid w-full grid-cols-${tabs.length}`}>
+            {tabs.map(tab => {
+              const IconComponent = tab.icon;
+              return (
+                <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
+                  <IconComponent className="h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        )}
 
         <TabsContent value="mapping" className="space-y-4">
           <Card className="glass-card">

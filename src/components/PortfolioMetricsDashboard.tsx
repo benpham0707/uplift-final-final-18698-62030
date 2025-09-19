@@ -48,11 +48,14 @@ import {
   PieChart,
   Calendar,
   Star,
+  PenTool,
+  FileText,
+  Zap,
+  Layers,
   CheckCircle,
   ArrowUp,
   Download,
   Eye,
-  Zap,
   Briefcase,
   Heart,
   MessageCircle,
@@ -63,7 +66,6 @@ import {
   Rocket,
   Network,
   GraduationCap,
-  FileText,
   ChevronRight,
   MapPin,
   Globe,
@@ -80,7 +82,6 @@ import {
   ArrowLeft,
   ExternalLink,
   Activity,
-  Layers,
   Filter,
   ChevronDown,
   ChevronUp,
@@ -95,8 +96,7 @@ import {
   Crown,
   Map,
   Play,
-  User,
-  PenTool
+  User
 } from "lucide-react";
 import { 
   LineChart, 
@@ -1198,59 +1198,91 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
             )}
           </TabsContent>
 
-          {/* Enhanced Essay Goldmine Tab */}
-          <TabsContent value="essays" className="space-y-8">
-            {/* FOUNDATION CONTENT - Original rich Essay Goldmine UI/UX restored */}
-            <div className="space-y-8">
-              <div className="mb-8">
-                <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
-                    <Layers className="h-5 w-5" />
+            <TabsContent value="essays" className="space-y-6">
+              <div className="text-center space-y-4 mb-8">
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <PenTool className="h-8 w-8 text-primary" />
+                    <div>
+                      <h2 className="text-2xl font-bold text-primary">Essay Goldmine</h2>
+                      <p className="text-sm text-muted-foreground">Transform projects into compelling application narratives</p>
+                    </div>
                   </div>
-                  Multi-Platform Coordination
-                </h3>
-                <p className="text-muted-foreground mb-6">Strategic use of project elements across different application components</p>
-                <PortfolioCoherenceStrategist enabledTabs={['coordination']} />
-              </div>
-              
-              <div className="mb-8">
-                <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
-                    <PenTool className="h-5 w-5" />
-                  </div>
-                  Essay Analysis
-                </h3>
-                <p className="text-muted-foreground mb-6">Detailed assessment and improvement roadmap for existing essays</p>
-                <StrategicWritingEnhancement enabledTabs={['analysis']} />
-              </div>
-            </div>
-            
-            {/* Expert-only essay components */}
-            {insightDepth === 'expert' ? (
-              <div className="space-y-8">
-                <ApplicationStrategyDashboard />
-                <ApplicationDescriptionWorkshop />
-                <NarrativeArchitectureBuilder />
-                <StrategicWritingEnhancement />
-                <PortfolioCoherenceStrategist />
-                <ExpertApplicationIntelligence />
-              </div>
-            ) : (
-              <ComingSoonOverlay
-                title="Advanced Essay Workshop"
-                description="Unlock application strategy dashboards, narrative architecture builders, strategic writing enhancement, and expert application intelligence in Expert Mode."
-              >
-                <div className="space-y-8">
-                  <ApplicationStrategyDashboard />
-                  <ApplicationDescriptionWorkshop />
-                  <NarrativeArchitectureBuilder />
-                  <StrategicWritingEnhancement />
-                  <PortfolioCoherenceStrategist />
-                  <ExpertApplicationIntelligence />
                 </div>
-              </ComingSoonOverlay>
-            )}
-          </TabsContent>
+              </div>
+
+              <div className="space-y-8">
+                {/* Foundation Mode Components - Available Now */}
+                <div className="space-y-6">
+                  <ApplicationStrategyDashboard 
+                    projectData={portfolioData[0]} 
+                    enabledTabs={['mapping', 'coherence', 'positioning']}
+                  />
+                  
+                  <NarrativeArchitectureBuilder 
+                    projectData={portfolioData[0]} 
+                    enabledTabs={['threads', 'development', 'integration', 'coherence']}
+                  />
+                  
+                  <StrategicWritingEnhancement 
+                    projectData={portfolioData[0]} 
+                    enabledTabs={['analysis', 'evidence', 'advantage', 'techniques']}
+                  />
+                  
+                  <PortfolioCoherenceStrategist 
+                    projectData={portfolioData[0]} 
+                    enabledTabs={['coordination']}
+                  />
+                </div>
+
+                {/* Expert Mode - Coming Soon */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <ComingSoonOverlay
+                    title="Application Workshop"
+                    description="Interactive essay development and optimization tools"
+                  >
+                    <Card className="glass-card h-48">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          Interactive Essay Builder
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <Progress value={78} className="h-2" />
+                          <div className="text-sm text-muted-foreground">
+                            Real-time feedback and suggestions
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </ComingSoonOverlay>
+
+                  <ComingSoonOverlay
+                    title="Expert Intelligence"
+                    description="Advanced AI analysis and strategic recommendations"
+                  >
+                    <Card className="glass-card h-48">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Zap className="h-5 w-5" />
+                          AI Essay Intelligence
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <Progress value={92} className="h-2" />
+                          <div className="text-sm text-muted-foreground">
+                            Deep learning essay optimization
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </ComingSoonOverlay>
+                </div>
+              </div>
+            </TabsContent>
 
           {/* Enhanced Future Trajectory Tab */}
           <TabsContent value="future" className="space-y-8">

@@ -18,37 +18,40 @@ export const ComingSoonOverlay: React.FC<ComingSoonOverlayProps> = ({
 }) => {
   return (
     <div className={`relative ${className}`}>
-      {/* Blur the background content */}
-      <div className="blur-sm opacity-30 pointer-events-none">
-        {children}
-      </div>
+      {children}
       
-      {/* Overlay */}
-      <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-        <Card className="max-w-md mx-auto shadow-large border-2 border-primary/20">
-          <CardContent className="p-8 text-center space-y-4">
-            <div className="flex justify-center items-center gap-2 mb-4">
-              <div className="p-3 rounded-full bg-gradient-primary text-white shadow-soft">
-                <Crown className="h-6 w-6" />
+      {/* Compact Coming Soon Block */}
+      <div className="absolute top-4 right-4 z-10">
+        <Card className="max-w-xs shadow-large border-2 bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-md border-transparent" 
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1))',
+                borderImage: 'linear-gradient(135deg, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.6)) 1'
+              }}>
+          <CardContent className="p-4 text-center space-y-3">
+            <div className="flex justify-center items-center gap-2">
+              <div className="p-2 rounded-full bg-gradient-primary text-white shadow-soft">
+                <Crown className="h-4 w-4" />
               </div>
-              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30">
-                <Lock className="h-3 w-3 mr-1" />
+              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30 text-xs">
+                <Lock className="h-2.5 w-2.5 mr-1" />
                 Expert Mode
               </Badge>
             </div>
             
-            <h3 className="text-xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              {title}
-            </h3>
+            <div>
+              <h4 className="text-sm font-bold text-foreground mb-1 flex items-center justify-center gap-1">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                {title}
+              </h4>
+              
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                {description}
+              </p>
+            </div>
             
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {description}
-            </p>
-            
-            <div className="pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground">
-                Unlock advanced analysis, personalized insights, and comprehensive tools in Expert Mode
+            <div className="pt-2 border-t border-border/30">
+              <p className="text-[10px] text-muted-foreground">
+                More features in Expert Mode
               </p>
             </div>
           </CardContent>

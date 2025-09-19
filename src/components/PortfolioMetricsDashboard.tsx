@@ -1129,35 +1129,127 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
 
           {/* Enhanced Skills Deep Dive Tab */}
           <TabsContent value="skills" className="space-y-8">
+            {/* FOUNDATION CONTENT - Always visible */}
             <SkillsDashboard />
             
-            {/* Skills Distribution Chart & Skills Progression Chart - FOUNDATION CONTENT */}
-            <div className="space-y-8">
-              {/* Detailed Skills Analysis - FOUNDATION CONTENT */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                <TechnicalSkillsShowcase />
-                {/* LeadershipSkillsJourney MOVED TO FOUNDATION TAB */}
-              </div>
-              
-              <SoftSkillsEvidence />
-            </div>
-            
-            {/* Expert-only content */}
+            {/* EXPERT CONTENT - Behind ComingSoonOverlay in Foundation mode */}
             {insightDepth === 'expert' ? (
-              <SkillsExpertAnalysis />
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  <TechnicalSkillsShowcase />
+                  <SoftSkillsEvidence />
+                </div>
+                <SkillsExpertAnalysis />
+              </div>
             ) : (
               <ComingSoonOverlay
-                title="Advanced Skills Intelligence"
-                description="Unlock expert skills analysis, competency mapping, and advanced skill development strategies in Expert Mode."
+                title="Advanced Skills Analysis"
+                description="Unlock technical skills showcase, soft skills evidence, expert skills analysis, and competency mapping in Expert Mode."
               >
-                <SkillsExpertAnalysis />
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <TechnicalSkillsShowcase />
+                    <SoftSkillsEvidence />
+                  </div>
+                  <SkillsExpertAnalysis />
+                </div>
               </ComingSoonOverlay>
             )}
           </TabsContent>
 
           {/* Enhanced Essay Goldmine Tab */}
           <TabsContent value="essays" className="space-y-8">
-            {/* Basic Essay Components - FOUNDATION CONTENT (kept as is) */}
+            {/* FOUNDATION CONTENT - Basic Essay Components */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <Card className="glass-card shadow-large">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-primary text-white shadow-soft">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    Project Mapping
+                  </CardTitle>
+                  <CardDescription>Connect your experiences to essay themes</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
+                      <div className="text-sm font-medium text-primary mb-2">Community Impact</div>
+                      <div className="text-xs text-muted-foreground">8 potential essays</div>
+                    </div>
+                    <div className="p-4 rounded-xl bg-success/10 border border-success/30">
+                      <div className="text-sm font-medium text-success mb-2">Leadership Growth</div>
+                      <div className="text-xs text-muted-foreground">6 potential essays</div>
+                    </div>
+                    <div className="p-4 rounded-xl bg-accent/10 border border-accent/30">
+                      <div className="text-sm font-medium text-accent mb-2">Technical Innovation</div>
+                      <div className="text-xs text-muted-foreground">9 potential essays</div>
+                    </div>
+                    <div className="p-4 rounded-xl bg-warning/10 border border-warning/30">
+                      <div className="text-sm font-medium text-warning mb-2">Problem Solving</div>
+                      <div className="text-xs text-muted-foreground">7 potential essays</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card shadow-large">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-secondary text-white shadow-soft">
+                      <Gem className="h-5 w-5" />
+                    </div>
+                    Portfolio Coherence
+                  </CardTitle>
+                  <CardDescription>How your experiences create a unified narrative</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Narrative Consistency</span>
+                      <Badge variant="secondary">94%</Badge>
+                    </div>
+                    <Progress value={94} className="h-2" />
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Theme Diversity</span>
+                      <Badge variant="secondary">87%</Badge>
+                    </div>
+                    <Progress value={87} className="h-2" />
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Evidence Strength</span>
+                      <Badge variant="secondary">96%</Badge>
+                    </div>
+                    <Progress value={96} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <Card className="glass-card">
+                <CardContent className="p-6 text-center">
+                  <Sparkles className="h-8 w-8 mx-auto text-primary mb-2" />
+                  <div className="text-2xl font-bold">15</div>
+                  <div className="text-xs text-muted-foreground">Story Threads</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card">
+                <CardContent className="p-6 text-center">
+                  <Quote className="h-8 w-8 mx-auto text-success mb-2" />
+                  <div className="text-2xl font-bold">8</div>
+                  <div className="text-xs text-muted-foreground">Character Arcs</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="glass-card">
+                <CardContent className="p-6 text-center">
+                  <Award className="h-8 w-8 mx-auto text-warning mb-2" />
+                  <div className="text-2xl font-bold">12</div>
+                  <div className="text-xs text-muted-foreground">Evidence Points</div>
+                </CardContent>
+              </Card>
+            </div>
             
             {/* Expert-only essay components */}
             {insightDepth === 'expert' ? (

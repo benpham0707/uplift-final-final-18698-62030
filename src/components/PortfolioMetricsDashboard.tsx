@@ -727,288 +727,328 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
               />
             </div>
 
-            {/* Personal Transformation Journey */}
-            <TransformationCard
-              title="Personal Transformation: From Disruption to Amplification"
-              progression={[
-                {
-                  title: "Tech-First Mindset",
-                  description: "Initially believed technology could replace inefficient human systems. Led with features instead of relationships.",
-                  keyLearning: "Technology without community trust creates barriers, not solutions.",
-                  milestone: "3 failed outreach attempts"
-                },
-                {
-                  title: "Community Listening Phase",
-                  description: "Realized existing systems contained wisdom I didn't understand. Started attending community meetings as learner, not teacher.",
-                  keyLearning: "Every 'inefficiency' serves a purpose - I needed to understand before optimizing.",
-                  milestone: "First meaningful conversations"
-                },
-                {
-                  title: "Collaborative Design Approach",
-                  description: "Shifted from 'How can tech solve this?' to 'How can tech amplify what already works?' Co-created solutions with community members.",
-                  keyLearning: "The best technology makes people more human, not less.",
-                  milestone: "Community co-design sessions"
-                },
-                {
-                  title: "Amplification Leadership",
-                  description: "Now design solutions that honor existing community knowledge while expanding possibilities. Technology bridges generations instead of replacing wisdom.",
-                  keyLearning: "True innovation happens when technology serves community needs, not when community adapts to technology.",
-                  milestone: "Community ownership transfer"
-                }
-              ]}
-              characterStrengths={["Humility", "Systems Thinking", "Cultural Sensitivity", "Adaptive Leadership"]}
-            />
+            {/* Leadership Evolution Journey - MOVED FROM SKILLS TAB */}
+            <LeadershipSkillsJourney />
 
-            {/* Stakeholder Ecosystem Analysis */}
-            <StakeholderCard
-              stakeholderGroups={[
-                {
-                  type: 'beneficiaries',
-                  title: 'Community Gardeners',
-                  members: ['Mrs. Rodriguez (seed collection keeper)', 'Young families', 'Elder wisdom keepers', 'New residents'],
-                  relationship: 'Primary users who shaped every feature through feedback and testing',
-                  impact: '500+ active users with 96% satisfaction and sustained engagement',
-                  keyInsight: 'Success depends on making everyone feel like an expert contributor, not just a user'
-                },
-                {
-                  type: 'mentors',
-                  title: 'Community Leaders & Advisors',
-                  members: ['Neighborhood Association President', 'Community College Urban Planning Dept', 'Local Tech Mentors', 'Elder Council'],
-                  relationship: 'Provided guidance on community dynamics and technical architecture',
-                  impact: 'Secured institutional support and legitimacy for long-term sustainability',
-                  keyInsight: 'Bridging traditional power structures with innovation requires patience and respect'
-                },
-                {
-                  type: 'partners',
-                  title: 'Implementation Partners',
-                  members: ['Local Government Officials', 'School Districts', 'Community Organizations', 'Environmental Groups'],
-                  relationship: 'Formal partnerships that enabled resource sharing and program expansion',
-                  impact: 'Scaled model to 4 additional neighborhoods with sustained funding',
-                  keyInsight: 'Sustainable community tech requires institutional backing, not just grassroots enthusiasm'
-                },
-                {
-                  type: 'challengers',
-                  title: 'Skeptics & Critical Voices',
-                  members: ['Tech-wary residents', 'Traditional gardening purists', 'Privacy advocates', 'Resource competition concerns'],
-                  relationship: 'Initially resistant but became valuable critics who improved the solution',
-                  impact: 'Their challenges led to better privacy protections and more inclusive design',
-                  keyInsight: 'Skeptics often identify real problems that enthusiasts overlook'
-                }
-              ]}
-              conflictResolution={{
-                situation: 'Heated debate between older gardeners preferring heirloom varieties and younger ones wanting higher-yield hybrids',
-                approach: 'Used app data to show both approaches worked in different soil conditions, created neighborhood seed swap feature',
+            {/* Expert-only components in Foundation mode */}
+            {insightDepth === 'expert' ? (
+              <div className="space-y-8">
+                {/* Personal Transformation Journey */}
+                <TransformationCard
+                  title="Personal Transformation: From Disruption to Amplification"
+                  progression={[
+                    {
+                      title: "Tech-First Mindset",
+                      description: "Initially believed technology could replace inefficient human systems. Led with features instead of relationships.",
+                      keyLearning: "Technology without community trust creates barriers, not solutions.",
+                      milestone: "3 failed outreach attempts"
+                    },
+                    {
+                      title: "Community Listening Phase",
+                      description: "Realized existing systems contained wisdom I didn't understand. Started attending community meetings as learner, not teacher.",
+                      keyLearning: "Every 'inefficiency' serves a purpose - I needed to understand before optimizing.",
+                      milestone: "First meaningful conversations"
+                    },
+                    {
+                      title: "Collaborative Design Approach",
+                      description: "Shifted from 'How can tech solve this?' to 'How can tech amplify what already works?' Co-created solutions with community members.",
+                      keyLearning: "The best technology makes people more human, not less.",
+                      milestone: "Community co-design sessions"
+                    },
+                    {
+                      title: "Amplification Leadership",
+                      description: "Now design solutions that honor existing community knowledge while expanding possibilities. Technology bridges generations instead of replacing wisdom.",
+                      keyLearning: "True innovation happens when technology serves community needs, not when community adapts to technology.",
+                      milestone: "Community ownership transfer"
+                    }
+                  ]}
+                  characterStrengths={["Humility", "Systems Thinking", "Cultural Sensitivity", "Adaptive Leadership"]}
+                />
+
+                {/* Stakeholder Ecosystem Analysis */}
+                <StakeholderCard
+                  stakeholderGroups={[
+                    {
+                      type: 'beneficiaries',
+                      title: 'Community Gardeners',
+                      members: ['Mrs. Rodriguez (seed collection keeper)', 'Young families', 'Elder wisdom keepers', 'New residents'],
+                      relationship: 'Primary users who shaped every feature through feedback and testing',
+                      impact: '500+ active users with 96% satisfaction and sustained engagement',
+                      keyInsight: 'Success depends on making everyone feel like an expert contributor, not just a user'
+                    },
+                    {
+                      type: 'mentors',
+                      title: 'Community Leaders & Advisors',
+                      members: ['Neighborhood Association President', 'Community College Urban Planning Dept', 'Local Tech Mentors', 'Elder Council'],
+                      relationship: 'Provided guidance on community dynamics and technical architecture',
+                      impact: 'Secured institutional support and legitimacy for long-term sustainability',
+                      keyInsight: 'Bridging traditional power structures with innovation requires patience and respect'
+                    },
+                    {
+                      type: 'partners',
+                      title: 'Implementation Partners',
+                      members: ['Local Government Officials', 'School Districts', 'Community Organizations', 'Environmental Groups'],
+                      relationship: 'Formal partnerships that enabled resource sharing and program expansion',
+                      impact: 'Scaled model to 4 additional neighborhoods with sustained funding',
+                      keyInsight: 'Sustainable community tech requires institutional backing, not just grassroots enthusiasm'
+                    },
+                    {
+                      type: 'challengers',
+                      title: 'Skeptics & Critical Voices',
+                      members: ['Tech-wary residents', 'Traditional gardening purists', 'Privacy advocates', 'Resource competition concerns'],
+                      relationship: 'Initially resistant but became valuable critics who improved the solution',
+                      impact: 'Their challenges led to better privacy protections and more inclusive design',
+                      keyInsight: 'Skeptics often identify real problems that enthusiasts overlook'
+                    }
+                  ]}
+                  conflictResolution={{
+                    situation: 'Heated debate between older gardeners preferring heirloom varieties and younger ones wanting higher-yield hybrids',
+                    approach: 'Used app data to show both approaches worked in different soil conditions, created neighborhood seed swap feature',
                 outcome: 'Technology became neutral ground for bridging generational differences, both groups now share knowledge actively'
               }}
             />
 
-            {/* Systems Thinking Deep Dive */}
-            <SystemsThinkingCard
-              problemStatement="Community food insecurity appeared to be resource scarcity but root cause analysis revealed social isolation as core issue"
-              rootCauses={[
-                'Social isolation preventing knowledge sharing between experienced and new gardeners',
-                'Language barriers limiting access to gardening resources and community connections',
-                'Generational divides between traditional methods and modern approaches',
-                'Lack of coordination leading to resource waste and duplicated efforts',
-                'Absence of year-round engagement causing seasonal knowledge loss'
-              ]}
-              systemsMap={[
-                {
-                  id: 'root-1',
-                  label: 'Social Isolation',
-                  type: 'root-cause',
-                  description: 'Neighbors with gardening knowledge not connected to those who need help'
-                },
-                {
-                  id: 'symptom-1',
-                  label: 'Failed Gardens',
-                  type: 'symptom',
-                  description: 'High failure rate among new gardeners due to lack of guidance'
-                },
-                {
-                  id: 'intervention-1',
-                  label: 'Community Platform',
-                  type: 'intervention',
-                  description: 'Digital space for knowledge sharing and relationship building'
-                },
-                {
-                  id: 'outcome-1',
-                  label: 'Sustainable Food Network',
-                  type: 'outcome',
-                  description: '96% user satisfaction with sustained community ownership'
-                }
-              ]}
-              feedbackLoops={[
-                {
-                  title: 'Knowledge Sharing Reinforcement',
-                  description: 'Successful gardens → increased social connection → more knowledge sharing → better gardens → stronger relationships',
-                  type: 'reinforcing',
-                  impact: 'positive'
-                },
-                {
-                  title: 'Trust Building Cycle',
-                  description: 'Platform use → successful interactions → increased trust → more platform engagement → deeper community bonds',
-                  type: 'reinforcing',
-                  impact: 'positive'
-                },
-                {
-                  title: 'Gentrification Mitigation',
-                  description: 'Community ownership → local control → resistance to displacement → sustained neighborhood character',
-                  type: 'balancing',
-                  impact: 'positive'
-                }
-              ]}
-              beforeAfter={{
-                before: 'Fragmented community with individuals struggling in isolation, high garden failure rates, knowledge hoarding by experienced gardeners',
-                after: 'Connected network where success is collective, knowledge flows freely between generations, 67% increase in neighborhood social connections',
-                keyChanges: ['Centralized knowledge sharing', 'Intergenerational connection', 'Community ownership model', 'Sustainable engagement patterns']
-              }}
-            />
+                {/* Systems Thinking Deep Dive */}
+                <SystemsThinkingCard
+                  problemStatement="Community food insecurity appeared to be resource scarcity but root cause analysis revealed social isolation as core issue"
+                  rootCauses={[
+                    'Social isolation preventing knowledge sharing between experienced and new gardeners',
+                    'Language barriers limiting access to gardening resources and community connections',
+                    'Generational divides between traditional methods and modern approaches',
+                    'Lack of coordination leading to resource waste and duplicated efforts',
+                    'Absence of year-round engagement causing seasonal knowledge loss'
+                  ]}
+                  systemsMap={[
+                    {
+                      id: 'root-1',
+                      label: 'Social Isolation',
+                      type: 'root-cause',
+                      description: 'Neighbors with gardening knowledge not connected to those who need help'
+                    },
+                    {
+                      id: 'symptom-1',
+                      label: 'Failed Gardens',
+                      type: 'symptom',
+                      description: 'High failure rate among new gardeners due to lack of guidance'
+                    },
+                    {
+                      id: 'intervention-1',
+                      label: 'Community Platform',
+                      type: 'intervention',
+                      description: 'Digital space for knowledge sharing and relationship building'
+                    },
+                    {
+                      id: 'outcome-1',
+                      label: 'Sustainable Food Network',
+                      type: 'outcome',
+                      description: '96% user satisfaction with sustained community ownership'
+                    }
+                  ]}
+                  feedbackLoops={[
+                    {
+                      title: 'Knowledge Sharing Reinforcement',
+                      description: 'Successful gardens → increased social connection → more knowledge sharing → better gardens → stronger relationships',
+                      type: 'reinforcing',
+                      impact: 'positive'
+                    },
+                    {
+                      title: 'Trust Building Cycle',
+                      description: 'Platform use → successful interactions → increased trust → more platform engagement → deeper community bonds',
+                      type: 'reinforcing',
+                      impact: 'positive'
+                    },
+                    {
+                      title: 'Gentrification Mitigation',
+                      description: 'Community ownership → local control → resistance to displacement → sustained neighborhood character',
+                      type: 'balancing',
+                      impact: 'positive'
+                    }
+                  ]}
+                  beforeAfter={{
+                    before: 'Fragmented community with individuals struggling in isolation, high garden failure rates, knowledge hoarding by experienced gardeners',
+                    after: 'Connected network where success is collective, knowledge flows freely between generations, 67% increase in neighborhood social connections',
+                    keyChanges: ['Centralized knowledge sharing', 'Intergenerational connection', 'Community ownership model', 'Sustainable engagement patterns']
+                  }}
+                />
 
-            {/* Technical Skills Mastery */}
-            <TechnicalSkillsCard
-              skillProgression={[
-                {
-                  skill: 'Full-Stack Development',
-                  category: 'programming',
-                  before: 35,
-                  current: 92,
-                  evidence: ['React/Node.js architecture', '500+ concurrent users', '99.8% uptime', 'Senior developer code review praise'],
-                  keyProject: 'Community gardening platform with real-time collaboration features'
-                },
-                {
-                  skill: 'Database Architecture',
-                  category: 'systems',
-                  before: 20,
-                  current: 85,
-                  evidence: ['Offline-first design', 'Real-time sync', 'Data conflict resolution', 'Performance optimization'],
-                  keyProject: 'Scalable community data management system'
-                },
-                {
-                  skill: 'User Experience Design',
-                  category: 'tools',
-                  before: 25,
-                  current: 95,
-                  evidence: ['3 complete UI rebuilds', '95% user satisfaction', 'Community-driven design process', 'Accessibility compliance'],
-                  keyProject: 'Community-centered interface design with elder-friendly features'
-                },
-                {
-                  skill: 'System Administration',
-                  category: 'systems',
-                  before: 15,
-                  current: 78,
-                  evidence: ['AWS deployment', 'Load balancing', 'Monitoring setup', 'Security implementation'],
-                  keyProject: 'Production infrastructure serving 500+ users reliably'
-                }
-              ]}
-              majorAchievements={[
-                {
-                  title: 'Offline-First Community Platform',
-                  description: 'Built resilient platform working without internet connectivity, crucial for low-resource areas',
-                  technicalComplexity: 5,
-                  innovation: 'Implemented conflict-free data synchronization for community knowledge sharing',
-                  metrics: [
-                    { label: 'Uptime', value: '99.8%' },
-                    { label: 'Users', value: '500+' },
-                    { label: 'Satisfaction', value: '96%' },
-                    { label: 'Response Time', value: '<200ms' }
-                  ]
-                },
-                {
-                  title: 'Community Ownership Transfer System',
-                  description: 'Created sustainable model for community-controlled technology with knowledge transfer protocols',
-                  technicalComplexity: 4,
-                  innovation: 'Developed training systems enabling non-technical community ownership',
-                  metrics: [
-                    { label: 'Communities', value: '4' },
-                    { label: 'Retention', value: '94%' },
-                    { label: 'Local Control', value: '100%' },
-                    { label: 'Sustainability', value: '2+ years' }
-                  ]
-                }
-              ]}
-              technologyStack={{
-                languages: ['JavaScript', 'TypeScript', 'Python', 'SQL'],
-                frameworks: ['React', 'Node.js', 'Express', 'PostgreSQL'],
-                tools: ['Git', 'Docker', 'AWS', 'Figma'],
-                systems: ['Linux', 'nginx', 'Redis', 'CI/CD']
-              }}
-            />
+                {/* Technical Skills Mastery */}
+                <TechnicalSkillsCard
+                  skillProgression={[
+                    {
+                      skill: 'Full-Stack Development',
+                      category: 'programming',
+                      before: 35,
+                      current: 92,
+                      evidence: ['React/Node.js architecture', '500+ concurrent users', '99.8% uptime', 'Senior developer code review praise'],
+                      keyProject: 'Community gardening platform with real-time collaboration features'
+                    },
+                    {
+                      skill: 'Database Architecture',
+                      category: 'systems',
+                      before: 20,
+                      current: 85,
+                      evidence: ['Offline-first design', 'Real-time sync', 'Data conflict resolution', 'Performance optimization'],
+                      keyProject: 'Scalable community data management system'
+                    },
+                    {
+                      skill: 'User Experience Design',
+                      category: 'tools',
+                      before: 25,
+                      current: 95,
+                      evidence: ['3 complete UI rebuilds', '95% user satisfaction', 'Community-driven design process', 'Accessibility compliance'],
+                      keyProject: 'Community-centered interface design with elder-friendly features'
+                    },
+                    {
+                      skill: 'System Administration',
+                      category: 'systems',
+                      before: 15,
+                      current: 78,
+                      evidence: ['AWS deployment', 'Load balancing', 'Monitoring setup', 'Security implementation'],
+                      keyProject: 'Production infrastructure serving 500+ users reliably'
+                    }
+                  ]}
+                  majorAchievements={[
+                    {
+                      title: 'Offline-First Community Platform',
+                      description: 'Built resilient platform working without internet connectivity, crucial for low-resource areas',
+                      technicalComplexity: 5,
+                      innovation: 'Implemented conflict-free data synchronization for community knowledge sharing',
+                      metrics: [
+                        { label: 'Uptime', value: '99.8%' },
+                        { label: 'Users', value: '500+' },
+                        { label: 'Satisfaction', value: '96%' },
+                        { label: 'Response Time', value: '<200ms' }
+                      ]
+                    },
+                    {
+                      title: 'Community Ownership Transfer System',
+                      description: 'Created sustainable model for community-controlled technology with knowledge transfer protocols',
+                      technicalComplexity: 4,
+                      innovation: 'Developed training systems enabling non-technical community ownership',
+                      metrics: [
+                        { label: 'Communities', value: '4' },
+                        { label: 'Retention', value: '94%' },
+                        { label: 'Local Control', value: '100%' },
+                        { label: 'Sustainability', value: '2+ years' }
+                      ]
+                    }
+                  ]}
+                  technologyStack={{
+                    languages: ['JavaScript', 'TypeScript', 'Python', 'SQL'],
+                    frameworks: ['React', 'Node.js', 'Express', 'PostgreSQL'],
+                    tools: ['Git', 'Docker', 'AWS', 'Figma'],
+                    systems: ['Linux', 'nginx', 'Redis', 'CI/CD']
+                  }}
+                />
 
-            {/* Leadership Evolution Journey */}
-            <LeadershipCard
-              evolution={[
-                {
-                  phase: 'Individual Contributor',
-                  timeframe: 'Months 1-2',
-                  leadershipStyle: 'Technical expert trying to lead through expertise',
-                  situationHandled: 'First community meetings where I presented technical solutions',
-                  keyDecision: 'Realized I needed to listen more than I spoke',
-                  outcome: 'Failed to gain community buy-in but learned valuable lessons about communication',
-                  skillsDeveloped: ['Active listening', 'Cultural humility', 'Assumption questioning']
-                },
-                {
-                  phase: 'Collaborative Facilitator',
-                  timeframe: 'Months 3-4',
-                  leadershipStyle: 'Servant leadership focused on enabling others',
-                  situationHandled: 'Mediating conflicts between different gardening approaches',
-                  keyDecision: 'Positioned technology as neutral ground for bridging differences',
-                  outcome: 'Successfully unified competing factions around shared goals',
-                  skillsDeveloped: ['Conflict mediation', 'Stakeholder management', 'Diplomatic communication']
-                },
-                {
-                  phase: 'Community Organizer',
-                  timeframe: 'Months 5-8',
-                  leadershipStyle: 'Distributed leadership empowering community ownership',
-                  situationHandled: 'Scaling platform to multiple neighborhoods while maintaining local control',
-                  keyDecision: 'Created training systems for community leaders rather than centralizing control',
-                  outcome: '4 communities successfully running independent programs with 94% retention',
-                  skillsDeveloped: ['Systems thinking', 'Sustainable scaling', 'Knowledge transfer']
-                },
-                {
-                  phase: 'Strategic Advisor',
-                  timeframe: 'Months 9-12',
-                  leadershipStyle: 'Behind-the-scenes guidance supporting community-led initiatives',
-                  situationHandled: 'Transitioning from active leadership to supportive advisory role',
-                  keyDecision: 'Stepped back to let community leaders take ownership while remaining available for support',
-                  outcome: 'Communities continue thriving with 96% satisfaction and expanding to new areas',
-                  skillsDeveloped: ['Leadership transition', 'Legacy building', 'Sustainable impact creation']
-                }
-              ]}
-              teamFormation={{
-                challenge: 'Building diverse coalition including tech-skeptical elders, enthusiastic young families, and institutional partners',
-                teamBuilding: 'Created structured dialogue sessions where every voice was heard and valued, established rotating leadership roles',
-                conflictResolution: 'Developed framework for addressing disagreements through data-driven discussion and consensus building',
-                results: '15-member community leadership council with 94% retention rate and expanding influence',
-                teamGrowth: ['Increased technical literacy', 'Enhanced communication skills', 'Stronger neighborhood bonds', 'Leadership capacity building']
-              }}
-              decisionFramework={[
-                {
-                  principle: 'Community Ownership First',
-                  application: 'All major decisions must enhance community control rather than centralize power',
-                  example: 'Chose open-source technology and trained local leaders rather than maintaining proprietary control'
-                },
-                {
-                  principle: 'Wisdom Before Innovation',
-                  application: 'Understand existing community knowledge before introducing new solutions',
-                  example: 'Spent 3 months learning traditional gardening methods before suggesting any technological improvements'
-                },
-                {
-                  principle: 'Amplification Over Replacement',
-                  application: 'Technology should enhance human connections, not substitute for them',
-                  example: 'Platform encourages face-to-face meetings and in-person skill sharing rather than purely digital interaction'
-                }
-              ]}
-              impactMetrics={{
-                teamsLed: 4,
-                peopleInfluenced: 500,
-                initiativesLaunched: 12,
-                conflictsResolved: 8
-              }}
-            />
-
-            {/* Leadership Evolution Journey - MOVED FROM SKILLS TAB */}
-            <LeadershipSkillsJourney />
+                {/* Leadership Evolution Journey */}
+                <LeadershipCard
+                  evolution={[
+                    {
+                      phase: 'Individual Contributor',
+                      timeframe: 'Months 1-2',
+                      leadershipStyle: 'Technical expert trying to lead through expertise',
+                      situationHandled: 'First community meetings where I presented technical solutions',
+                      keyDecision: 'Realized I needed to listen more than I spoke',
+                      outcome: 'Failed to gain community buy-in but learned valuable lessons about communication',
+                      skillsDeveloped: ['Active listening', 'Cultural humility', 'Assumption questioning']
+                    },
+                    {
+                      phase: 'Collaborative Facilitator',
+                      timeframe: 'Months 3-4',
+                      leadershipStyle: 'Servant leadership focused on enabling others',
+                      situationHandled: 'Mediating conflicts between different gardening approaches',
+                      keyDecision: 'Positioned technology as neutral ground for bridging differences',
+                      outcome: 'Successfully unified competing factions around shared goals',
+                      skillsDeveloped: ['Conflict mediation', 'Stakeholder management', 'Diplomatic communication']
+                    },
+                    {
+                      phase: 'Community Organizer',
+                      timeframe: 'Months 5-8',
+                      leadershipStyle: 'Distributed leadership empowering community ownership',
+                      situationHandled: 'Scaling platform to multiple neighborhoods while maintaining local control',
+                      keyDecision: 'Created training systems for community leaders rather than centralizing control',
+                      outcome: '4 communities successfully running independent programs with 94% retention',
+                      skillsDeveloped: ['Systems thinking', 'Sustainable scaling', 'Knowledge transfer']
+                    },
+                    {
+                      phase: 'Strategic Advisor',
+                      timeframe: 'Months 9-12',
+                      leadershipStyle: 'Behind-the-scenes guidance supporting community-led initiatives',
+                      situationHandled: 'Transitioning from active leadership to supportive advisory role',
+                      keyDecision: 'Stepped back to let community leaders take ownership while remaining available for support',
+                      outcome: 'Communities continue thriving with 96% satisfaction and expanding to new areas',
+                      skillsDeveloped: ['Leadership transition', 'Legacy building', 'Sustainable impact creation']
+                    }
+                  ]}
+                  teamFormation={{
+                    challenge: 'Building diverse coalition including tech-skeptical elders, enthusiastic young families, and institutional partners',
+                    teamBuilding: 'Created structured dialogue sessions where every voice was heard and valued, established rotating leadership roles',
+                    conflictResolution: 'Developed framework for addressing disagreements through data-driven discussion and consensus building',
+                    results: '15-member community leadership council with 94% retention rate and expanding influence',
+                    teamGrowth: ['Increased technical literacy', 'Enhanced communication skills', 'Stronger neighborhood bonds', 'Leadership capacity building']
+                  }}
+                  decisionFramework={[
+                    {
+                      principle: 'Community Ownership First',
+                      application: 'All major decisions must enhance community control rather than centralize power',
+                      example: 'Chose open-source technology and trained local leaders rather than maintaining proprietary control'
+                    },
+                    {
+                      principle: 'Wisdom Before Innovation',
+                      application: 'Understand existing community knowledge before introducing new solutions',
+                      example: 'Spent 3 months learning traditional gardening methods before suggesting any technological improvements'
+                    },
+                    {
+                      principle: 'Amplification Over Replacement',
+                      application: 'Technology should enhance human connections, not substitute for them',
+                      example: 'Platform encourages face-to-face meetings and in-person skill sharing rather than purely digital interaction'
+                    }
+                  ]}
+                  impactMetrics={{
+                    teamsLed: 4,
+                    peopleInfluenced: 500,
+                    initiativesLaunched: 12,
+                    conflictsResolved: 8
+                  }}
+                />
+              </div>
+            ) : (
+              <ComingSoonOverlay
+                title="Advanced Impact Analysis"
+                description="Unlock personal transformation journeys, stakeholder ecosystem analysis, systems thinking deep dives, technical skills mastery, and leadership evolution tracking in Expert Mode."
+              >
+                <div className="space-y-8">
+                  <TransformationCard
+                    title="Personal Transformation: From Disruption to Amplification"
+                    progression={[]}
+                    characterStrengths={["Humility", "Systems Thinking", "Cultural Sensitivity", "Adaptive Leadership"]}
+                  />
+                  <StakeholderCard
+                    stakeholderGroups={[]}
+                    conflictResolution={{ situation: '', approach: '', outcome: '' }}
+                  />
+                  <SystemsThinkingCard
+                    problemStatement=""
+                    rootCauses={[]}
+                    systemsMap={[]}
+                    feedbackLoops={[]}
+                    beforeAfter={{ before: '', after: '', keyChanges: [] }}
+                  />
+                  <TechnicalSkillsCard
+                    skillProgression={[]}
+                    majorAchievements={[]}
+                    technologyStack={{ languages: [], frameworks: [], tools: [], systems: [] }}
+                  />
+                  <LeadershipCard
+                    evolution={[]}
+                    teamFormation={{ challenge: '', teamBuilding: '', conflictResolution: '', results: '', teamGrowth: [] }}
+                    decisionFramework={[]}
+                    impactMetrics={{ teamsLed: 0, peopleInfluenced: 0, initiativesLaunched: 0, conflictsResolved: 0 }}
+                  />
+                </div>
+              </ComingSoonOverlay>
+            )}
 
             {/* Expert Analysis Section */}
             {insightDepth === 'expert' ? (
@@ -1280,56 +1320,6 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
 
           {/* Enhanced Future Trajectory Tab */}
           <TabsContent value="future" className="space-y-8">
-            {/* Career Alignment Chart */}
-            <Card className="glass-card shadow-large overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 border-b border-gradient">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-xl bg-gradient-primary text-white shadow-soft">
-                      <Compass className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">Career Path Analysis</CardTitle>
-                      <CardDescription>Data-driven insights into future opportunities and growth potential</CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {chartOptions.future.map((chartType) => (
-                      <Button
-                        key={chartType}
-                        variant={activeChartTypes.future === chartType ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setActiveChartTypes({...activeChartTypes, future: chartType})}
-                        className={`capitalize ${activeChartTypes.future === chartType ? 'bg-gradient-primary text-white' : 'hover-lift'}`}
-                      >
-                        {chartType}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-8">
-                <div className="h-96">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={project.chartData.careerAlignment}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="career" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '12px'
-                        }} 
-                      />
-                      <Legend />
-                      <Bar dataKey="probability" fill="hsl(var(--primary))" name="Career Probability %" />
-                      <Bar dataKey="growth" fill="hsl(var(--success))" name="Growth Potential %" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Interactive Future Trajectory Components */}
             <div className="space-y-6">

@@ -869,42 +869,40 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
             </div>
 
             {/* Expert Content with Coming Soon Overlay - Always show in Foundation mode */}
-            <ComingSoonOverlay
-              <ComingSoonOverlay 
-                title="Advanced Impact Analysis"
-                description="Deep-dive analytics, expert insights, and advanced visualizations"
-                className="mt-8"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[400px]">
-                  <Card className="glass-card">
-                    <CardHeader>
-                      <CardTitle>Advanced Stakeholder Analysis</CardTitle>
-                      <CardDescription>Comprehensive relationship mapping and influence analysis</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="h-8 bg-muted rounded animate-pulse"></div>
-                        <div className="h-8 bg-muted rounded animate-pulse"></div>
-                        <div className="h-32 bg-muted rounded animate-pulse"></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="glass-card">
-                    <CardHeader>
-                      <CardTitle>Impact Prediction Models</CardTitle>
-                      <CardDescription>AI-powered forecasting and scenario analysis</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="h-8 bg-muted rounded animate-pulse"></div>
-                        <div className="h-8 bg-muted rounded animate-pulse"></div>
-                        <div className="h-32 bg-muted rounded animate-pulse"></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </ComingSoonOverlay>
-            )}
+            <ComingSoonOverlay 
+              title="Advanced Impact Analysis"
+              description="Deep-dive analytics, expert insights, and advanced visualizations"
+              className="mt-8"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[400px]">
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle>Advanced Stakeholder Analysis</CardTitle>
+                    <CardDescription>Comprehensive relationship mapping and influence analysis</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="h-8 bg-muted rounded animate-pulse"></div>
+                      <div className="h-8 bg-muted rounded animate-pulse"></div>
+                      <div className="h-32 bg-muted rounded animate-pulse"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle>Impact Prediction Models</CardTitle>
+                    <CardDescription>AI-powered forecasting and scenario analysis</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="h-8 bg-muted rounded animate-pulse"></div>
+                      <div className="h-8 bg-muted rounded animate-pulse"></div>
+                      <div className="h-32 bg-muted rounded animate-pulse"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </ComingSoonOverlay>
           </TabsContent>
 
           {/* Skills Deep Dive Tab - Foundation Content Only */}
@@ -919,7 +917,6 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
             <SoftSkillsEvidence />
             
             {/* Expert Content with Coming Soon Overlay */}
-            <ComingSoonOverlay
             <ComingSoonOverlay 
               title="Advanced Skills Analysis"
               description="Expert-level skill assessment, gap analysis, and strategic development recommendations"
@@ -962,10 +959,9 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
 
           {/* Essay Goldmine Tab - Foundation + Expert Content */}
           <TabsContent value="essays" className="space-y-8">
-            {analysisMode === 'foundation' ? (
             <div className="space-y-8">
               {/* Foundation Content: Core Essay Components */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Project Mapping - Foundation */}
                   <Card className="glass-card shadow-large">
                     <CardHeader>
@@ -1020,11 +1016,11 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                   </Card>
                 </div>
 
-                {/* Expert Content with Coming Soon Overlay */}
-                <ComingSoonOverlay 
-                  title="Advanced Essay Intelligence"
-                  description="AI-powered essay optimization, narrative architecture, and strategic writing enhancement"
-                >
+              {/* Expert Content with Coming Soon Overlay */}
+              <ComingSoonOverlay 
+                title="Advanced Essay Intelligence"
+                description="AI-powered essay optimization, narrative architecture, and strategic writing enhancement"
+              >
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-[500px]">
                     <Card className="glass-card">
                       <CardHeader>
@@ -1063,8 +1059,7 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                       </CardContent>
                     </Card>
                   </div>
-                </ComingSoonOverlay>
-              </div>
+              </ComingSoonOverlay>
             </div>
           </TabsContent>
 
@@ -1077,11 +1072,10 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
             <ProjectEvolutionWorkshop />
             
             {/* Expert Content with Coming Soon Overlay */}
-            {analysisMode === 'foundation' ? (
-              <ComingSoonOverlay 
-                title="Advanced Future Intelligence"
-                description="AI-powered career forecasting, strategic planning, and personalized growth pathways"
-              >
+            <ComingSoonOverlay 
+              title="Advanced Future Intelligence"
+              description="AI-powered career forecasting, strategic planning, and personalized growth pathways"
+            >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
                   <Card className="glass-card">
                     <CardHeader>
@@ -1118,14 +1112,6 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                   </Card>
                 </div>
               </ComingSoonOverlay>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <AcademicJourneyPlanner />
-                <StrategicSkillDevelopmentRoadmap />
-                <NetworkRelationshipCapitalBuilder />
-                <StrategicFutureIntelligence />
-              </div>
-            )}
           </TabsContent>
         </Tabs>
       </div>

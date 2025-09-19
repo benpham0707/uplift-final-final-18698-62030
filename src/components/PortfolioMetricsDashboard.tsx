@@ -1133,24 +1133,24 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                 />
               </div>
             ) : (
-              <ComingSoonOverlay
-                title="Advanced Impact Intelligence"
-                description="Unlock deep psychological analysis, advanced stakeholder mapping, systems thinking insights, and cultural impact assessment in Expert Mode."
-              >
-                <div className="space-y-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <ExpertAnalysisCard
-                      title="Deep Psychology Analysis"
-                      category="Behavioral Insights"
-                      content={
-                        <div className="space-y-4">
-                          <p>Your behavioral psychology understanding reveals sophisticated grasp of intrinsic vs. extrinsic motivation. By gamifying community connection rather than individual achievement, you tapped into powerful social cohesion drives that sustain long-term engagement.</p>
-                          <p>The decision to prioritize elder community members as "wisdom keepers" demonstrates advanced emotional intelligence - recognizing that technology adoption requires honoring existing social structures rather than disrupting them.</p>
-                          <p>The 94% user satisfaction score indicates mastery of user psychology principles: progressive disclosure of complexity, social validation loops, and authentic relationship building through digital interfaces.</p>
-                        </div>
-                      }
-                    />
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <ExpertAnalysisCard
+                    title="Deep Psychology Analysis"
+                    category="Behavioral Insights"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your behavioral psychology understanding reveals sophisticated grasp of intrinsic vs. extrinsic motivation. By gamifying community connection rather than individual achievement, you tapped into powerful social cohesion drives that sustain long-term engagement.</p>
+                        <p>The decision to prioritize elder community members as "wisdom keepers" demonstrates advanced emotional intelligence - recognizing that technology adoption requires honoring existing social structures rather than disrupting them.</p>
+                        <p>The 94% user satisfaction score indicates mastery of user psychology principles: progressive disclosure of complexity, social validation loops, and authentic relationship building through digital interfaces.</p>
+                      </div>
+                    }
+                  />
 
+                  <ComingSoonOverlay
+                    title="Advanced Impact Intelligence"
+                    description="Unlock stakeholder mapping, systems thinking insights, and cultural impact assessment in Expert Mode."
+                  >
                     <ExpertAnalysisCard
                       title="Advanced Stakeholder Mapping"
                       category="Political Strategy"
@@ -1162,9 +1162,84 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                         </div>
                       }
                     />
-                  </div>
+                  </ComingSoonOverlay>
                 </div>
-              </ComingSoonOverlay>
+              </div>
+            )}
+            {insightDepth === 'expert' ? (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <ExpertAnalysisCard
+                    title="Deep Psychology Analysis"
+                    category="Behavioral Insights"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your behavioral psychology understanding reveals sophisticated grasp of intrinsic vs. extrinsic motivation. By gamifying community connection rather than individual achievement, you tapped into powerful social cohesion drives that sustain long-term engagement.</p>
+                        <p>The decision to prioritize elder community members as "wisdom keepers" demonstrates advanced emotional intelligence - recognizing that technology adoption requires honoring existing social structures rather than disrupting them.</p>
+                        <p>The 94% user satisfaction score indicates mastery of user psychology principles: progressive disclosure of complexity, social validation loops, and authentic relationship building through digital interfaces.</p>
+                      </div>
+                    }
+                  />
+
+                  <ExpertAnalysisCard
+                    title="Advanced Stakeholder Mapping"
+                    category="Political Strategy"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your stakeholder ecosystem reveals sophisticated political awareness. Successfully navigating relationships between community elders, tech-skeptical residents, local government officials, and enthusiastic early adopters required advanced diplomacy skills.</p>
+                        <p>Securing support from both the neighborhood association president (traditional power structure) and the community college urban planning department (academic legitimacy) shows strategic relationship building across generational and institutional lines.</p>
+                        <p>Your approach to power dynamics - positioning yourself as facilitator rather than leader - demonstrates understanding that sustainable community change requires distributed ownership rather than centralized control.</p>
+                      </div>
+                    }
+                  />
+                </div>
+
+                <ExpertAnalysisCard
+                  title="Cultural Impact Assessment"
+                  category="Anthropological Analysis"
+                  content={
+                    <div className="space-y-4">
+                      <p>Your project achieved remarkable cultural preservation while enabling innovation. By positioning technology as amplification rather than replacement, you created space for traditional knowledge to flourish alongside modern tools.</p>
+                      <p>The intergenerational knowledge transfer your platform facilitated represents a sophisticated solution to cultural continuity challenges facing many communities. Elder gardeners report feeling valued and heard, while younger participants gain access to traditional wisdom they might otherwise never encounter.</p>
+                      <p>The behavioral changes in your community extend beyond gardening: participating families report 67% increase in neighborhood social connections, suggesting your app catalyzed broader community cohesion beyond its direct functionality.</p>
+                      <p>Most significantly, you've demonstrated that technology can be a tool for cultural healing rather than disruption - a model that could transform how we approach community-centered innovation across diverse cultural contexts.</p>
+                    </div>
+                  }
+                />
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <ExpertAnalysisCard
+                    title="Deep Psychology Analysis"
+                    category="Behavioral Insights"
+                    content={
+                      <div className="space-y-4">
+                        <p>Your behavioral psychology understanding reveals sophisticated grasp of intrinsic vs. extrinsic motivation. By gamifying community connection rather than individual achievement, you tapped into powerful social cohesion drives that sustain long-term engagement.</p>
+                        <p>The decision to prioritize elder community members as "wisdom keepers" demonstrates advanced emotional intelligence - recognizing that technology adoption requires honoring existing social structures rather than disrupting them.</p>
+                        <p>The 94% user satisfaction score indicates mastery of user psychology principles: progressive disclosure of complexity, social validation loops, and authentic relationship building through digital interfaces.</p>
+                      </div>
+                    }
+                  />
+
+                  <ComingSoonOverlay
+                    title="Advanced Impact Intelligence"
+                    description="Unlock stakeholder mapping, systems thinking insights, and cultural impact assessment in Expert Mode."
+                  >
+                    <ExpertAnalysisCard
+                      title="Advanced Stakeholder Mapping"
+                      category="Political Strategy"
+                      content={
+                        <div className="space-y-4">
+                          <p>Your stakeholder ecosystem reveals sophisticated political awareness. Successfully navigating relationships between community elders, tech-skeptical residents, local government officials, and enthusiastic early adopters required advanced diplomacy skills.</p>
+                          <p>Securing support from both the neighborhood association president (traditional power structure) and the community college urban planning department (academic legitimacy) shows strategic relationship building across generational and institutional lines.</p>
+                          <p>Your approach to power dynamics - positioning yourself as facilitator rather than leader - demonstrates understanding that sustainable community change requires distributed ownership rather than centralized control.</p>
+                        </div>
+                      }
+                    />
+                  </ComingSoonOverlay>
+                </div>
+              </div>
             )}
           </TabsContent>
 
@@ -1219,67 +1294,27 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                     enabledTabs={['mapping', 'coherence', 'positioning']}
                   />
                   
-                  <NarrativeArchitectureBuilder 
-                    projectData={portfolioData[0]} 
-                    enabledTabs={['threads', 'development', 'integration', 'coherence']}
-                  />
-                  
-                  <StrategicWritingEnhancement 
-                    projectData={portfolioData[0]} 
-                    enabledTabs={['analysis', 'evidence', 'advantage', 'techniques']}
-                  />
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <NarrativeArchitectureBuilder 
+                      projectData={portfolioData[0]} 
+                      enabledTabs={['threads', 'development', 'integration', 'coherence']}
+                    />
+                    
+                    <ComingSoonOverlay
+                      title="Advanced Essay Workshop"
+                      description="Unlock interactive essay builders and AI intelligence in Expert Mode."
+                    >
+                      <StrategicWritingEnhancement 
+                        projectData={portfolioData[0]} 
+                        enabledTabs={['analysis', 'evidence', 'advantage', 'techniques']}
+                      />
+                    </ComingSoonOverlay>
+                  </div>
                   
                   <PortfolioCoherenceStrategist 
                     projectData={portfolioData[0]} 
                     enabledTabs={['coordination']}
                   />
-                </div>
-
-                {/* Expert Mode - Coming Soon */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <ComingSoonOverlay
-                    title="Application Workshop"
-                    description="Interactive essay development and optimization tools"
-                  >
-                    <Card className="glass-card h-48">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <FileText className="h-5 w-5" />
-                          Interactive Essay Builder
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <Progress value={78} className="h-2" />
-                          <div className="text-sm text-muted-foreground">
-                            Real-time feedback and suggestions
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </ComingSoonOverlay>
-
-                  <ComingSoonOverlay
-                    title="Expert Intelligence"
-                    description="Advanced AI analysis and strategic recommendations"
-                  >
-                    <Card className="glass-card h-48">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Zap className="h-5 w-5" />
-                          AI Essay Intelligence
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <Progress value={92} className="h-2" />
-                          <div className="text-sm text-muted-foreground">
-                            Deep learning essay optimization
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </ComingSoonOverlay>
                 </div>
               </div>
             </TabsContent>
@@ -1302,17 +1337,16 @@ const ProjectCard: React.FC<{ project: any; onBack: () => void }> = ({ project, 
                   <StrategicFutureIntelligence />
                 </div>
               ) : (
-                <ComingSoonOverlay
-                  title="Advanced Future Planning"
-                  description="Unlock academic journey planning, strategic skill development roadmaps, network relationship capital building, and strategic future intelligence in Expert Mode."
-                >
-                  <div className="space-y-6">
-                    <AcademicJourneyPlanner />
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  <AcademicJourneyPlanner />
+                  
+                  <ComingSoonOverlay
+                    title="Advanced Future Planning"
+                    description="Unlock strategic skill development and network building in Expert Mode."
+                  >
                     <StrategicSkillDevelopmentRoadmap />
-                    <NetworkRelationshipCapitalBuilder />
-                    <StrategicFutureIntelligence />
-                  </div>
-                </ComingSoonOverlay>
+                  </ComingSoonOverlay>
+                </div>
               )}
             </div>
           </TabsContent>

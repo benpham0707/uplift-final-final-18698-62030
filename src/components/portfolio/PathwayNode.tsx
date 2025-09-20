@@ -68,7 +68,7 @@ const PathwayNode = ({ section, onClick }: PathwayNodeProps) => {
   return (
     <div 
       className={cn(
-        "relative w-96 p-8 rounded-2xl border-2 transition-all duration-300 cursor-pointer",
+        "relative w-[28rem] p-10 rounded-2xl border-2 transition-all duration-300 cursor-pointer",
         config.borderColor,
         config.bgColor,
         config.clickable && "hover:shadow-lg hover:scale-[1.02]",
@@ -123,11 +123,11 @@ const PathwayNode = ({ section, onClick }: PathwayNodeProps) => {
 
       {/* Content */}
       <div className="pt-10 text-center">
-        <h3 className={cn("font-bold text-lg mb-2", config.textColor)}>
+        <h3 className={cn("font-bold text-xl mb-3", config.textColor)}>
           {title}
         </h3>
         
-        <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+        <p className="text-muted-foreground text-base mb-5 leading-relaxed">
           {description}
         </p>
 

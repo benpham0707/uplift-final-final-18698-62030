@@ -292,25 +292,17 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
           </div>
         </div>
 
-        {/* Zigzag Pathway */}
+        {/* Centered Pathway */}
         <div className="relative flex flex-col items-center space-y-20">
           {pathwaySections.map((section, index) => (
-            <div key={section.id} className="relative w-full flex justify-center">
-              {/* Connection Line */}
+            <div key={section.id} className="relative">
+              {/* Simple Connection Line */}
               {index < pathwaySections.length - 1 && (
-                <div 
-                  className={cn(
-                    "absolute top-full w-0.5 h-20 bg-gradient-to-b from-border to-transparent z-0",
-                    index % 2 === 0 ? "left-1/2 transform -translate-x-1/2" : "right-1/2 transform translate-x-1/2"
-                  )} 
-                />
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0.5 h-20 bg-gradient-to-b from-border to-transparent z-0" />
               )}
               
-              {/* Pathway Node with Zigzag Position */}
-              <div className={cn(
-                "relative z-10 transition-all duration-300",
-                index % 2 === 0 ? "mr-24" : "ml-24"
-              )}>
+              {/* Pathway Node */}
+              <div className="relative z-10">
                 <PathwayNode
                   section={section}
                   onClick={() => handleSectionClick(section.id, section.status)}

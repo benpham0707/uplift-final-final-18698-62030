@@ -36,7 +36,7 @@ import {
   Plus
 } from 'lucide-react';
 import OnboardingFlow from '@/components/portfolio/OnboardingFlow';
-import AssessmentDashboard from '@/components/portfolio/AssessmentDashboard';
+import PortfolioPathway from '@/components/portfolio/PortfolioPathway';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -566,10 +566,10 @@ const PortfolioScanner = () => {
       </div>
       </section>
 
-      {/* Assessment Section - Full Width */}
+      {/* Portfolio Pathway Section - Full Width */}
       <section id="assessment" className="w-full bg-background">
         <div className="w-full px-4 lg:px-6 xl:px-8 py-8">
-          <AssessmentDashboard
+          <PortfolioPathway
             onProgressUpdate={setOverallProgress}
             currentProgress={overallProgress}
           />
@@ -578,59 +578,8 @@ const PortfolioScanner = () => {
 
       {/* Main Dashboard - Constrained Width */}
       <div className="max-w-7xl mx-auto px-4 space-y-8">
-
-        {/* Enhanced Progress Cards */}
-        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <EnhancedProgressCard
-            icon={User}
-            title="Profile Strength"
-            subtitle="Overall readiness analysis"
-            mainProgress={Math.round((rubricScores.academicExcellence.score + rubricScores.leadershipPotential.score) / 2 * 10)}
-            subMetrics={[
-              { label: 'Academic', value: Math.round(rubricScores.academicExcellence.score * 10), color: 'bg-blue-500' },
-              { label: 'Leadership', value: Math.round(rubricScores.leadershipPotential.score * 10), color: 'bg-green-500' },
-              { label: 'Evidence', value: 78, color: 'bg-purple-500' }
-            ]}
-            action="View Full Analysis"
-          />
-          <EnhancedProgressCard
-            icon={Brain}
-            title="Skills Discovery"
-            subtitle="Hidden strengths revealed"
-            mainProgress={Math.round((rubricScores.uniqueValue.score + rubricScores.personalGrowth.score) / 2 * 10)}
-            subMetrics={[
-              { label: 'Identified', value: Math.round(rubricScores.uniqueValue.score * 10), color: 'bg-orange-500' },
-              { label: 'Documented', value: Math.round(rubricScores.personalGrowth.score * 10), color: 'bg-teal-500' },
-              { label: 'Validated', value: 65, color: 'bg-pink-500' }
-            ]}
-            action="Discover More"
-          />
-          <EnhancedProgressCard
-            icon={Target}
-            title="Goal Alignment"
-            subtitle="Opportunities matched"
-            mainProgress={Math.round((rubricScores.futureReadiness.score + rubricScores.communityImpact.score) / 2 * 10)}
-            subMetrics={[
-              { label: 'Readiness', value: Math.round(rubricScores.futureReadiness.score * 10), color: 'bg-indigo-500' },
-              { label: 'Impact', value: Math.round(rubricScores.communityImpact.score * 10), color: 'bg-red-500' },
-              { label: 'Matches', value: 42, color: 'bg-yellow-500' }
-            ]}
-            action="Find Opportunities"
-          />
-          <EnhancedProgressCard
-            icon={TrendingUp}
-            title="Enhancement Plan"
-            subtitle="Strategic improvements"
-            mainProgress={Math.round(((10 - rubricScores.communityImpact.score) * 10))}
-            subMetrics={[
-              { label: 'Priority', value: 85, color: 'bg-red-500' },
-              { label: 'Feasibility', value: 92, color: 'bg-green-500' },
-              { label: 'Impact', value: 78, color: 'bg-blue-500' }
-            ]}
-            action="View Plan"
-          />
-        </div>
-
+        {/* Additional spacing below pathway */}
+        <div className="pb-8"></div>
       </div>
       
       {/* Additional spacing below summary cards */}

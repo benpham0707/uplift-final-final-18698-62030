@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { User, GraduationCap, Briefcase, Heart, Target, Users2, BookOpen, Lock, Check, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import PathwayNode from './PathwayNode';
 import PathwayConnection from './PathwayConnection';
 import BasicInformationWizard from './BasicInformationWizard';
@@ -256,7 +257,7 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background"></div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-12">
         {/* Pathway Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl mb-4">
@@ -291,17 +292,25 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
           </div>
         </div>
 
-        {/* Simple Vertical Pathway */}
-        <div className="relative flex flex-col items-center space-y-12">
+        {/* Zigzag Pathway */}
+        <div className="relative flex flex-col items-center space-y-20">
           {pathwaySections.map((section, index) => (
-            <div key={section.id} className="relative">
-              {/* Simple Connection Line */}
+            <div key={section.id} className="relative w-full flex justify-center">
+              {/* Connection Line */}
               {index < pathwaySections.length - 1 && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0.5 h-12 bg-gradient-to-b from-border to-transparent z-0" />
+                <div 
+                  className={cn(
+                    "absolute top-full w-0.5 h-20 bg-gradient-to-b from-border to-transparent z-0",
+                    index % 2 === 0 ? "left-1/2 transform -translate-x-1/2" : "right-1/2 transform translate-x-1/2"
+                  )} 
+                />
               )}
               
-              {/* Pathway Node */}
-              <div className="relative z-10">
+              {/* Pathway Node with Zigzag Position */}
+              <div className={cn(
+                "relative z-10 transition-all duration-300",
+                index % 2 === 0 ? "mr-24" : "ml-24"
+              )}>
                 <PathwayNode
                   section={section}
                   onClick={() => handleSectionClick(section.id, section.status)}

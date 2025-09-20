@@ -68,7 +68,7 @@ const PathwayNode = ({ section, onClick }: PathwayNodeProps) => {
   return (
     <div 
       className={cn(
-        "relative w-80 p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer",
+        "relative w-96 p-8 rounded-2xl border-2 transition-all duration-300 cursor-pointer",
         config.borderColor,
         config.bgColor,
         config.clickable && "hover:shadow-lg hover:scale-[1.02]",

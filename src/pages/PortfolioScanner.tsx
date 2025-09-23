@@ -468,7 +468,7 @@ const PortfolioScanner = () => {
           </div>
 
           {/* Metric Boxes */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
             {[
               { key: 'academicExcellence', label: 'Academic Excellence', icon: GraduationCap },
               { key: 'leadershipPotential', label: 'Leadership Potential', icon: Users },
@@ -480,8 +480,8 @@ const PortfolioScanner = () => {
                const score = rubricScores[key as keyof typeof rubricScores]?.score || 0;
               
               return (
-                <Card key={key} className="bg-background border border-border hover-lift transition-all duration-300 w-auto min-w-[150px]">
-                  <CardContent className="p-3 text-center">
+                <Card key={key} className="bg-background border border-border hover-lift transition-all duration-300 w-auto min-w-[140px]">
+                  <CardContent className="p-2.5 text-center">
                     <Icon className="h-6 w-6 mx-auto mb-1 text-primary" />
                     <div className="text-xl md:text-2xl font-bold mb-1 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                       {score.toFixed(1)}

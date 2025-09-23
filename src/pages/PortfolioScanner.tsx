@@ -480,13 +480,13 @@ const PortfolioScanner = () => {
                const score = rubricScores[key as keyof typeof rubricScores]?.score || 0;
               
               return (
-                <Card key={key} className="bg-background border border-border hover-lift transition-all duration-300 w-auto min-w-[140px]">
-                  <CardContent className="p-3 text-center">
-                    <Icon className="h-4 w-4 mx-auto mb-1 text-primary" />
-                    <div className="text-sm font-semibold mb-1 text-foreground">
+                <Card key={key} className="bg-background border border-border hover-lift transition-all duration-300 w-auto min-w-[160px]">
+                  <CardContent className="p-4 text-center">
+                    <Icon className="h-8 w-8 mx-auto mb-2 text-primary" />
+                    <div className="text-2xl md:text-3xl font-bold mb-1 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                       {score.toFixed(1)}
                     </div>
-                    <div className="text-xs text-muted-foreground font-medium">
+                    <div className="text-sm text-muted-foreground font-medium">
                       {label}
                     </div>
                   </CardContent>

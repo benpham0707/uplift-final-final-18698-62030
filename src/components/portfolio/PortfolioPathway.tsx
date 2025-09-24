@@ -340,7 +340,7 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
       </Dialog>
 
       <Dialog open={openSection === 'academic-journey'} onOpenChange={() => setOpenSection(null)}>
-        <DialogContent className="w-[92vw] md:w-[94vw] lg:w-[92vw] max-w-[1400px] xl:max-w-[1600px] h-auto max-h-[92vh] overflow-visible">
+        <DialogContent className="w-[98vw] lg:w-[98vw] max-w-[1800px] 2xl:max-w-[1920px] h-auto max-h-[92vh] overflow-visible">
           <AcademicJourneyWizard 
             onComplete={handleProgressRefresh}
             onCancel={() => setOpenSection(null)}

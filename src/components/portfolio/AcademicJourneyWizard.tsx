@@ -140,10 +140,8 @@ const STEPS = [
   { id: 3, title: 'Other Schools Attended', description: 'Previous schools and study abroad experience' },
   { id: 4, title: 'Course History', description: 'Current and completed coursework by subject' },
   { id: 5, title: 'College Coursework', description: 'College courses taken during high school' },
-  { id: 6, title: 'Standardized Testing', description: 'SAT, ACT, and other test scores' },
-  { id: 7, title: 'AP Exams', description: 'Advanced Placement exam scores' },
-  { id: 8, title: 'IB Programme', description: 'International Baccalaureate coursework and scores' },
-  { id: 9, title: 'English Proficiency', description: 'English proficiency test scores (if applicable)' }
+  { id: 6, title: 'Testing & Exams', description: 'Standardized tests, AP exams, and IB programme' },
+  { id: 7, title: 'English Proficiency', description: 'English proficiency test scores (if applicable)' }
 ];
 
 const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel, onProgressRefresh }) => {
@@ -222,10 +220,12 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel, onProgre
     const step3 = [data.otherSchoolsAttended === 0 || data.previousSchools.length > 0 || data.studiedAbroad || data.beenHomeschooled];
     const step4 = [(data.academicYears || []).length > 0];
     const step5 = [data.collegeCoursesTaken === 0 || (data.collegeCoursework || []).length > 0];
-    const step6 = [!data.reportTestScores || isFilled(data.sat.total) || isFilled(data.act.composite)];
-    const step7 = [!data.takingAPExams || (data.apExams || []).length > 0];
-    const step8 = [!data.inIBProgramme || (data.ibExams || []).length > 0];
-    const step9 = [!data.needEnglishProficiency || isFilled(data.englishProficiency?.testType)];
+    const step6 = [
+      !data.reportTestScores || isFilled(data.sat.total) || isFilled(data.act.composite),
+      !data.takingAPExams || (data.apExams || []).length > 0,
+      !data.inIBProgramme || (data.ibExams || []).length > 0
+    ];
+    const step7 = [!data.needEnglishProficiency || isFilled(data.englishProficiency?.testType)];
 
     const required = [...step1, ...step2, ...step6, ...step9];
     const completed = required.filter(isFilled).length;
@@ -240,8 +240,7 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel, onProgre
       step_5: step5.every(Boolean),
       step_6: step6.every(Boolean),
       step_7: step7.every(Boolean),
-      step_8: step8.every(Boolean),
-      step_9: step9.every(Boolean),
+      step_7: step7.every(Boolean),
     } as const;
 
     return { percent, sectionComplete } as any;
@@ -498,12 +497,8 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel, onProgre
       case 5:
         return <CollegeCourseworkStep data={data} setData={setData} />;
       case 6:
-        return <StandardizedTestingStep data={data} setData={setData} />;
+        return <TestingAndExamsStep data={data} setData={setData} />;
       case 7:
-        return <APExamsStep data={data} setData={setData} />;
-      case 8:
-        return <IBProgrammeStep data={data} setData={setData} />;
-      case 9:
         return <EnglishProficiencyStep data={data} setData={setData} />;
       default:
         return null;
@@ -2373,8 +2368,10 @@ const CollegeCourseworkStep: React.FC<{ data: AcademicJourneyData; setData: (dat
   );
 };
 
-const StandardizedTestingStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
-  <div className="space-y-6">
+const TestingAndExamsStep: React.FC<{ data: AcademicJourneyData; setData: (data: AcademicJourneyData) => void }> = ({ data, setData }) => (
+  <div className="space-y-10">
+    {/* Standardized Testing */}
+    <div className="space-y-6">
     <div className="flex items-center space-x-2">
       <Checkbox 
         id="report-test-scores"
@@ -2473,6 +2470,17 @@ const StandardizedTestingStep: React.FC<{ data: AcademicJourneyData; setData: (d
         </div>
       </div>
     )}
+    </div>
+
+    <Separator />
+
+    {/* AP Exams */}
+    <APExamsStep data={data} setData={setData} />
+
+    <Separator />
+
+    {/* IB Programme */}
+    <IBProgrammeStep data={data} setData={setData} />
   </div>
 );
 

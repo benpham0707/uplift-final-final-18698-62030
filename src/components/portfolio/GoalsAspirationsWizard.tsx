@@ -231,38 +231,21 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel, onProgr
 
   return (
     <div className="h-screen max-h-screen flex flex-col">
-      {/* Header with stepper and progress consistent with other wizards */}
-      <div className="flex items-center justify-between p-3 border-b flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">Goals & Aspirations</h2>
-        </div>
-        
-        {/* Progress Steps */}
-        <div className="flex items-center space-x-2">
-          {STEPS.map((step, index) => (
-            <React.Fragment key={step.id}>
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                currentStep === step.id ? 'bg-primary text-primary-foreground' :
-                ((step.id === 1 && progress.sectionComplete.academic) || (step.id === 2 && progress.sectionComplete.plans)) ? 'bg-green-600 text-white' : 'bg-muted text-muted-foreground'
-              }`}>
-                {step.id}
-              </div>
-              {index < STEPS.length - 1 && (
-                <div className={`w-4 h-0.5 ${
-                  ((step.id === 1 && progress.sectionComplete.academic) || (step.id === 2 && progress.sectionComplete.plans)) ? 'bg-green-600' : 'bg-muted'
-                }`} />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-      
-      {/* Overall Progress bar */}
-      <div className="px-3 py-2 border-b bg-background/50">
-        <div className="flex items-center gap-3 max-w-md">
-          <Progress value={progress.percent} className="h-2 flex-1" />
-          <span className="text-sm text-muted-foreground w-10 text-right">{progress.percent}%</span>
+      {/* Compact Header (match other sections) */}
+      <div className="flex-shrink-0 border-b bg-background px-6 py-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Goals & Aspirations</h1>
+            <p className="text-sm text-muted-foreground">Define your interests and application plans</p>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">{progress.percent}% complete</span>
+            </div>
+            <div className="mt-1">
+              <Progress value={progress.percent} className="h-2 w-48 ml-auto" />
+            </div>
+          </div>
         </div>
       </div>
 

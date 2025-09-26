@@ -340,7 +340,6 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
     const [localStartDate, setLocalStartDate] = useState(experience.startDate);
     const [localEndDate, setLocalEndDate] = useState(experience.endDate);
     const [localTotalHours, setLocalTotalHours] = useState(experience.totalHours);
-    const [localSupervisor, setLocalSupervisor] = useState(experience.supervisorName);
     const [localVerification, setLocalVerification] = useState(experience.verificationUrl);
     const [localDescription, setLocalDescription] = useState(experience.description);
 
@@ -350,7 +349,6 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
       setLocalStartDate(experience.startDate);
       setLocalEndDate(experience.endDate);
       setLocalTotalHours(experience.totalHours);
-      setLocalSupervisor(experience.supervisorName);
       setLocalVerification(experience.verificationUrl);
       // Only set description from drafts on mount, not on every draft change
       const initialDesc = descriptionDrafts[experience.id] ?? experience.description;
@@ -456,7 +454,6 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                       updateExperience(index, 'endDate', localEndDate);
                       updateExperience(index, 'totalHours', localTotalHours);
                       updateExperience(index, 'description', currentDesc);
-                      updateExperience(index, 'supervisorName', localSupervisor);
                       updateExperience(index, 'verificationUrl', localVerification);
                       setExpandedIndex(null);
                     }}
@@ -566,27 +563,9 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                       <Label htmlFor={`ongoing-${index}`} className="text-sm">Currently ongoing</Label>
                     </div>
 
-                    {/* Time Commitment */}
-                    <div>
-                      <Label className="text-sm font-medium">Time Commitment</Label>
-                      <Select 
-                        value={experience.timeCommitment} 
-                        onValueChange={(v) => updateExperience(index, 'timeCommitment', v)}
-                      >
-                        <SelectTrigger className="mt-2">
-                          <SelectValue placeholder="Select commitment level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {TIME_COMMITMENT.map((t) => (
-                            <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
                     {/* Total Hours */}
                     <div>
-                      <Label className="text-sm font-medium" htmlFor={`hours-${experience.id}`}>Total Hours (approximate)</Label>
+                      <Label className="text-sm font-medium" htmlFor={`hours-${experience.id}`}>Hours per week (approximate)</Label>
                       <Input 
                         type="number"
                         id={`hours-${experience.id}`}
@@ -594,7 +573,7 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                         value={localTotalHours}
                         onChange={(e) => setLocalTotalHours(e.target.value)}
                         onBlur={() => updateExperience(index, 'totalHours', localTotalHours)}
-                        placeholder="e.g., 100"
+                        placeholder="e.g., 5"
                         className="mt-2"
                       />
                     </div>
@@ -649,34 +628,6 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                       </div>
                     </div>
 
-                    {/* Achievements */}
-                    <div>
-                      <Label className="text-sm font-medium">Achievements</Label>
-                      <Input 
-                        placeholder="Add achievement and press Enter"
-                        className="mt-2"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addChip(index, 'achievements', e.currentTarget.value);
-                            e.currentTarget.value = '';
-                          }
-                        }}
-                      />
-                      <div className="flex flex-wrap gap-2 mt-3 max-h-24 overflow-y-auto">
-                        {experience.achievements.map((achievement, achIndex) => (
-                          <Badge 
-                            key={achIndex} 
-                            variant="outline" 
-                            className="cursor-pointer text-xs hover:bg-destructive/10"
-                            onClick={() => removeChip(index, 'achievements', achievement)}
-                          >
-                            {achievement} ×
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Skills Developed */}
                     <div>
                       <Label className="text-sm font-medium">Skills Developed</Label>
@@ -705,19 +656,7 @@ export default function ExperiencesWizard({ onAdded, onClose }: Props) {
                       </div>
                     </div>
 
-                    {/* Contact Information */}
-                    <div>
-                      <Label className="text-sm font-medium" htmlFor={`supervisor-${experience.id}`}>Supervisor/Contact</Label>
-                      <Input 
-                        id={`supervisor-${experience.id}`}
-                        name={`supervisor-${experience.id}`}
-                        value={localSupervisor}
-                        onChange={(e) => setLocalSupervisor(e.target.value)}
-                        onBlur={() => updateExperience(index, 'supervisorName', localSupervisor)}
-                        placeholder="Name (optional)"
-                        className="mt-2"
-                      />
-                    </div>
+                    
 
                     <div>
                       <Label className="text-sm font-medium" htmlFor={`verify-${experience.id}`}>Verification Link</Label>

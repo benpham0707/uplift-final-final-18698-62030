@@ -231,7 +231,7 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel, onProgr
 
   return (
     <div className="h-screen max-h-screen flex flex-col">
-      {/* Minimal Header */}
+      {/* Header with stepper and progress consistent with other wizards */}
       <div className="flex items-center justify-between p-3 border-b flex-shrink-0">
         <div className="flex items-center gap-2">
           <Target className="h-5 w-5 text-primary" />
@@ -257,10 +257,13 @@ const GoalsAspirationsWizard: React.FC<Props> = ({ onComplete, onCancel, onProgr
           ))}
         </div>
       </div>
-
+      
       {/* Overall Progress bar */}
-      <div className="px-3 py-2">
-        <Progress value={progress.percent} className="h-2 max-w-md" />
+      <div className="px-3 py-2 border-b bg-background/50">
+        <div className="flex items-center gap-3 max-w-md">
+          <Progress value={progress.percent} className="h-2 flex-1" />
+          <span className="text-sm text-muted-foreground w-10 text-right">{progress.percent}%</span>
+        </div>
       </div>
 
       {/* Main Content Area - Full height scrollable */}

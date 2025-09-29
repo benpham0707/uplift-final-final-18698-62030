@@ -878,180 +878,190 @@ const AcademicPlanner = () => {
                     <Progress value={(currentGPA.creditsCompleted / currentGPA.totalCredits) * 100} className="h-3" />
                   </div>
                   
-                  {/* Academic Requirements Checklist */}
+                  {/* Academic Requirements Checklist - Collapsible */}
                   <div className="mt-8">
-                    <h3 className="text-sm font-semibold text-foreground mb-4">Academic Course Requirements Checklist</h3>
-                    
-                    {/* A-G Subject Requirements - Smaller emphasis */}
-                    <div className="mb-4">
-                      <button 
-                        onClick={() => setExpandedAG(!expandedAG)}
-                        className="flex items-center gap-2 text-xs w-full hover:bg-muted p-2 rounded-md transition-colors"
-                      >
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600">
-                          <Check className="h-2 w-2 text-white" />
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <button className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors w-full">
+                          <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]:rotate-90" />
+                          Academic Course Requirements Checklist
+                          <Badge variant="secondary" className="ml-auto">15 of 18 met ✓</Badge>
+                        </button>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent className="mt-4">
+                        {/* A-G Subject Requirements - Smaller emphasis */}
+                        <div className="mb-4">
+                          <button 
+                            onClick={() => setExpandedAG(!expandedAG)}
+                            className="flex items-center gap-2 text-xs w-full hover:bg-muted p-2 rounded-md transition-colors"
+                          >
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">A-G Subject Requirements (UC/CSU Foundation)</span>
+                            <ChevronDown className={`h-3 w-3 transition-transform ${expandedAG ? 'rotate-180' : ''}`} />
+                          </button>
+                            
+                          {expandedAG && (
+                            <div className="mt-2 p-2 bg-muted rounded-md text-xs">
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400">
+                                  <X className="h-2 w-2 text-white" />
+                                </div>
+                                <span>Missing: 4th year of math and advanced science courses</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <span className="font-medium">A-G Subject Requirements (UC/CSU Foundation)</span>
-                        <ChevronDown className={`h-3 w-3 transition-transform ${expandedAG ? 'rotate-180' : ''}`} />
-                      </button>
                         
-                      {expandedAG && (
-                        <div className="mt-2 p-2 bg-muted rounded-md text-xs">
+                        {/* Academic Achievement Requirements in 2 columns */}
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                          {/* AP & Course Rigor */}
                           <div className="flex items-center gap-2">
-                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">4+ AP Courses Completed</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
                               <X className="h-2 w-2 text-white" />
                             </div>
-                            <span>Missing: 4th year of math and advanced science courses</span>
+                            <span className="font-medium">8+ AP Courses Planned</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
+                              <X className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">AP Capstone Program</span>
+                          </div>
+                          
+                          {/* Graduation Requirements */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">On Track for Graduation</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
+                              <X className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Early Graduation Possible</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Honors Diploma Track</span>
+                          </div>
+                          
+                          {/* Schedule Rigor */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Most Rigorous Available</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">No Study Halls/Fillers</span>
+                          </div>
+                          
+                          {/* Senior Year Requirements */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
+                              <X className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">4+ Academic Cores Senior Year</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
+                              <X className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Capstone/Research Course</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">College Credit Courses</span>
+                          </div>
+                          
+                          {/* Course Planning */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">All Prerequisites Met</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Grade Trend Management</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Course Load Balance</span>
+                          </div>
+                          
+                          {/* Major-Specific Requirements */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
+                              <X className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Intended Major Prerequisites</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">2+ Specialized Coursework</span>
+                          </div>
+                          
+                          {/* College Application Standards */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
+                              <X className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Reach School Standards</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Safety School Assured</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
+                              <Check className="h-2 w-2 text-white" />
+                            </div>
+                            <span className="font-medium">Scholarship Positioning</span>
                           </div>
                         </div>
-                      )}
-                    </div>
-                    
-                    {/* Academic Achievement Requirements in 2 columns */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                      {/* AP & Course Rigor */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">4+ AP Courses Completed</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">8+ AP Courses Planned</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">AP Capstone Program</span>
-                      </div>
-                      
-                      {/* Graduation Requirements */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">On Track for Graduation</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Early Graduation Possible</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Honors Diploma Track</span>
-                      </div>
-                      
-                      {/* Schedule Rigor */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Most Rigorous Available</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">No Study Halls/Fillers</span>
-                      </div>
-                      
-                      {/* Senior Year Requirements */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">4+ Academic Cores Senior Year</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Capstone/Research Course</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">College Credit Courses</span>
-                      </div>
-                      
-                      {/* Course Planning */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">All Prerequisites Met</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Grade Trend Management</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Course Load Balance</span>
-                      </div>
-                      
-                      {/* Major-Specific Requirements */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Intended Major Prerequisites</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">2+ Specialized Coursework</span>
-                      </div>
-                      
-                      {/* College Application Standards */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400 flex-shrink-0">
-                          <X className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Reach School Standards</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Safety School Assured</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">
-                          <Check className="h-2 w-2 text-white" />
-                        </div>
-                        <span className="font-medium">Scholarship Positioning</span>
-                      </div>
-                      </div>
-                    </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
-                </CardContent>
+                </div>
+              </CardContent>
               </Card>
 
             {/* GPA Analysis - Equal Width */}
@@ -1068,7 +1078,7 @@ const AcademicPlanner = () => {
             </Card>
           </div>
 
-          {/* Recent Insights Section */}
+          {/* Recent Insights Section - 2 Column Layout */}
           <Card className="bg-gradient-to-br from-background via-background to-accent/10 border-accent/20 mb-8">
             <CardHeader className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-foreground">
@@ -1080,36 +1090,30 @@ const AcademicPlanner = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-60">
-                {/* Soft Border at Scroll Cutoff */}
-                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/60 mb-3">
-                  <div className="h-2 bg-gradient-to-b from-border/30 to-transparent"></div>
-                </div>
-                <div className="space-y-2">
-                  {insights.map((insight) => (
-                    <AcademicInsightItem
-                      key={insight.id}
-                      title={insight.title}
-                      description={insight.details}
-                      time="Just now"
-                      type={insight.status === 'complete' ? 'strength' : 
-                            insight.status === 'excellent' ? 'opportunity' : 
-                            insight.status === 'warning' ? 'warning' : 'improvement'}
-                      impact={insight.percentage > 90 ? 'high' : 
-                             insight.percentage > 70 ? 'medium' : 'low'}
-                      pendingGains={{ overall: 0.2, GPA: 0.2 }}
-                      relatedFeatures={['Academic Planner','GPA Analysis']}
-                      actionItems={insight.recommendations.map(rec => ({
-                        action: rec,
-                        link: '#',
-                        buttonText: 'Start Planning'
-                      }))}
-                      connections={`Based on ${insight.title.toLowerCase()} patterns`}
-                      onActionClick={handleTaskPlanningOpen}
-                    />
-                  ))}
-                </div>
-              </ScrollArea>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {insights.map((insight) => (
+                  <AcademicInsightItem
+                    key={insight.id}
+                    title={insight.title}
+                    description={insight.details}
+                    time="Just now"
+                    type={insight.status === 'complete' ? 'strength' : 
+                          insight.status === 'excellent' ? 'opportunity' : 
+                          insight.status === 'warning' ? 'warning' : 'improvement'}
+                    impact={insight.percentage > 90 ? 'high' : 
+                           insight.percentage > 70 ? 'medium' : 'low'}
+                    pendingGains={{ overall: 0.2, GPA: 0.2 }}
+                    relatedFeatures={['Academic Planner','GPA Analysis']}
+                    actionItems={insight.recommendations.map(rec => ({
+                      action: rec,
+                      link: '#',
+                      buttonText: 'Start Planning'
+                    }))}
+                    connections={`Based on ${insight.title.toLowerCase()} patterns`}
+                    onActionClick={handleTaskPlanningOpen}
+                  />
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -1734,8 +1738,6 @@ interface AcademicInsightItemProps {
 }
 
 const AcademicInsightItem = ({ title, description, time, type, impact, pendingGains, relatedFeatures, actionItems, connections, onActionClick }: AcademicInsightItemProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
   const typeColors = {
     strength: 'text-green-600',
     opportunity: 'text-blue-600',
@@ -1745,15 +1747,13 @@ const AcademicInsightItem = ({ title, description, time, type, impact, pendingGa
   };
 
   const getCheckmarkColor = (type: string, impact: string) => {
-    // Handle special types first
     if (type === 'warning' && impact === 'medium') {
-      return 'text-muted-foreground'; // Gray for missed opportunity
+      return 'text-muted-foreground';
     }
     if (type === 'concern') {
-      return 'text-red-500'; // Red for negative impact
+      return 'text-red-500';
     }
     
-    // Use impact-based colors for regular items
     switch (impact) {
       case 'high':
         return 'text-blue-500';
@@ -1768,30 +1768,28 @@ const AcademicInsightItem = ({ title, description, time, type, impact, pendingGa
 
   const getBorderClass = (type: string, impact: string) => {
     if (type === 'warning' && impact === 'medium') {
-      return 'border-2 border-muted-foreground/30'; // Gray for missed opportunity
+      return 'border border-muted-foreground/30';
     }
     if (type === 'concern') {
-      return 'border-2 border-red-500';
+      return 'border border-red-500/50';
     }
     if (impact === 'high') {
-      return 'border-2 border-blue-500 shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_8px_rgba(59,130,246,0.3)]';
+      return 'border border-blue-500/50';
     }
     if (impact === 'medium') {
-      return 'border-2 border-green-500';
+      return 'border border-green-500/50';
     }
-    return 'border-2 border-yellow-500';
+    return 'border border-yellow-500/50';
   };
 
   const getImpactBadgeColors = (type: string, impact: string) => {
-    // Handle special types first
     if (type === 'warning' && impact === 'medium') {
-      return 'bg-muted text-muted-foreground border-muted'; // Gray for missed opportunity
+      return 'bg-muted text-muted-foreground border-muted';
     }
     if (type === 'concern') {
-      return 'bg-red-100 text-red-700 border-red-300'; // Red for negative impact
+      return 'bg-red-100 text-red-700 border-red-300';
     }
     
-    // Use impact-based colors for regular items
     switch (impact) {
       case 'high':
         return 'bg-blue-100 text-blue-700 border-blue-300';
@@ -1815,87 +1813,36 @@ const AcademicInsightItem = ({ title, description, time, type, impact, pendingGa
   };
 
   return (
-    <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-      <CollapsibleTrigger asChild>
-        <div className={`p-3 rounded-lg shadow-soft hover:shadow-medium transition-all duration-200 cursor-pointer ${getBorderClass(type, impact)}`}>
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className={`h-5 w-5 ${getCheckmarkColor(type, impact)} flex-shrink-0`} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-foreground text-sm truncate">{title}</h4>
-                <div className="flex items-center gap-2 ml-2">
-                  <Badge className={`text-xs px-2 py-1 ${getImpactBadgeColors(type, impact)}`}>
-                    {getImpactText(type, impact)}
-                  </Badge>
-                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{time}</p>
+    <div className={`p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 bg-card ${getBorderClass(type, impact)}`}>
+      <div className="space-y-3">
+        {/* Header */}
+        <div className="flex items-start gap-3">
+          <CheckCircle2 className={`h-4 w-4 mt-0.5 ${getCheckmarkColor(type, impact)} flex-shrink-0`} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <h4 className="font-semibold text-foreground text-sm leading-tight">{title}</h4>
+              <Badge className={`text-xs px-2 py-0.5 flex-shrink-0 ${getImpactBadgeColors(type, impact)}`}>
+                {getImpactText(type, impact)}
+              </Badge>
             </div>
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{description}</p>
           </div>
         </div>
-      </CollapsibleTrigger>
-      
-      <CollapsibleContent className="mt-2">
-        <div className={`p-4 rounded-lg border ${getBorderClass(type, impact)} bg-background/50`}>
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-            
-            <div className="text-right">
-              <div className="text-xs text-muted-foreground mb-2 flex items-center justify-end gap-1 font-medium">
-                <Scale className="h-3 w-3" />
-                Estimated Impact
-              </div>
-              <div className="space-y-1 opacity-75">
-                {Object.entries(pendingGains).map(([key, value]) => (
-                  <div key={key} className="text-xs font-medium text-muted-foreground">
-                    {key === 'missedOpportunity' ? 'Missed: ' : value >= 0 ? '+' : ''}
-                    {value.toFixed(2)} {key === 'missedOpportunity' ? 'potential' : key}
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="bg-primary/5 rounded-md p-2 border border-primary/20">
-              <h5 className="font-medium text-foreground text-xs mb-2 flex items-center gap-2">
-                <Link className="h-3 w-3" />
-                Feature Connections
-              </h5>
-              <div className="flex flex-wrap gap-1 mb-2">
-                {relatedFeatures.map((feature, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs px-1 py-0">
-                    {feature}
-                  </Badge>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground italic">{connections}</p>
-            </div>
-
-            <div className="bg-secondary/10 rounded-md p-2 border border-secondary/30">
-              <h5 className="font-medium text-foreground text-xs mb-2 flex items-center gap-2">
-                <Zap className="h-3 w-3" />
-                Recommended Actions
-              </h5>
-              <div className="space-y-2">
-                {actionItems.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground flex-1">{item.action}</span>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-xs h-6 ml-2 font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
-                      onClick={() => onActionClick?.(item.action)}
-                    >
-                      {item.buttonText}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        
+        {/* Action Button */}
+        <div className="flex justify-end">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs h-7 font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
+            onClick={() => onActionClick?.(actionItems[0]?.action || title)}
+          >
+            <ArrowRight className="h-3 w-3 mr-1" />
+            {actionItems[0]?.buttonText || 'View Details'}
+          </Button>
         </div>
-      </CollapsibleContent>
-    </Collapsible>
+      </div>
+    </div>
   );
 };
 

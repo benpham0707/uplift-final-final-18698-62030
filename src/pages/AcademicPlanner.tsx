@@ -598,10 +598,10 @@ const AcademicPlanner = () => {
             <LineChart
               data={gpaTimeData}
               margin={{
-                top: 40,
-                right: 50,
-                left: 40,
-                bottom: 40,
+                top: 20,
+                right: 10,
+                left: 20,
+                bottom: 20,
               }}
             >
               <CartesianGrid strokeDasharray="2 2" stroke="#f1f5f9" strokeWidth={1} />
@@ -610,7 +610,7 @@ const AcademicPlanner = () => {
                 tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
                 axisLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
                 tickLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
-                height={60}
+                height={50}
               />
               <YAxis 
                 domain={[2.8, 4.0]}
@@ -624,7 +624,7 @@ const AcademicPlanner = () => {
                   position: 'insideLeft',
                   style: { textAnchor: 'middle', fontSize: '14px', fontWeight: '600', fill: '#475569' }
                 }}
-                width={70}
+                width={50}
               />
               <Tooltip 
                 contentStyle={{

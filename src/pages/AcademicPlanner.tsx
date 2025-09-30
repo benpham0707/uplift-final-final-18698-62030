@@ -797,7 +797,7 @@ const AcademicPlanner = () => {
                 </CollapsibleTrigger>
                 
                 <CollapsibleContent className="mt-3">
-                  <ScrollArea className="h-[180px] pr-4">
+                  <ScrollArea className="h-[120px] pr-4">
                     {/* A-G Subject Requirements - Smaller emphasis */}
                     <div className="mb-3">
                       <button 

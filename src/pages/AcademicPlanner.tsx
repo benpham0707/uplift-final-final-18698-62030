@@ -162,7 +162,7 @@ const SubjectPerformanceAnalytics: React.FC = () => {
           <Collapsible key={year} open={expandedYears.includes(year)} onOpenChange={() => toggleYear(year)}>
             <CollapsibleTrigger asChild>
               <Card className="cursor-pointer hover:bg-accent/50 transition-colors border-l-4 border-l-primary/60">
-                <CardContent className="p-3">
+                <CardContent className="p-2">
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
@@ -175,13 +175,13 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                         <Badge variant="secondary" className="text-xs">{data.status}</Badge>
                       </div>
                       <div className="ml-6">
-                        <div className="text-lg font-bold text-primary">{data.overallGPA}</div>
-                        <div className="text-xs text-muted-foreground">GPA</div>
+                        <div className="text-base font-bold text-primary">{data.overallGPA}</div>
+                        <div className="text-[10px] text-muted-foreground">GPA</div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col items-center p-2 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                         <div className="flex items-center gap-1">
                           {data.detailedMetrics.gpaImprovement.includes('+') ? (
                             <TrendingUp className="w-3 h-3 text-green-600" />
@@ -190,7 +190,7 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                           ) : (
                             <TrendingDown className="w-3 h-3 text-orange-600" />
                           )}
-                          <span className="text-xs font-semibold text-foreground">
+                          <span className="text-[11px] font-semibold text-foreground">
                             {data.detailedMetrics.gpaImprovement.includes('+') ? 
                               '+' + (data.detailedMetrics.gpaImprovement.match(/\+([0-9.]+)/)?.[1] || '0.0') : 
                               data.detailedMetrics.gpaImprovement.includes('Maintained') ? '0.0' : 
@@ -198,13 +198,13 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                             }
                           </span>
                         </div>
-                        <div className="text-xs text-muted-foreground">Trend</div>
+                        <div className="text-[10px] text-muted-foreground">Trend</div>
                       </div>
                       
-                      <div className="flex flex-col items-center p-2 rounded-lg bg-gradient-to-br from-amber/10 to-amber/5 border border-amber/20">
+                      <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-amber/10 to-amber/5 border border-amber/20">
                         <div className="flex items-center gap-1">
                           <Brain className="w-3 h-3 text-amber-600" />
-                          <span className="text-xs font-semibold text-foreground">
+                          <span className="text-[11px] font-semibold text-foreground">
                             {data.detailedMetrics.courseDifficulty.includes('Standard') ? '2.5' :
                              data.detailedMetrics.courseDifficulty.includes('15%') ? '3.0' :
                              data.detailedMetrics.courseDifficulty.includes('25%') ? '4.0' :
@@ -212,20 +212,20 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                             }/5
                           </span>
                         </div>
-                        <div className="text-xs text-muted-foreground">Difficulty</div>
+                        <div className="text-[10px] text-muted-foreground">Difficulty</div>
                       </div>
                       
-                      <div className="flex flex-col items-center p-2 rounded-lg bg-gradient-to-br from-blue/10 to-blue/5 border border-blue/20">
+                      <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-blue/10 to-blue/5 border border-blue/20">
                         <div className="flex items-center gap-1">
                           <Star className="w-3 h-3 text-blue-600" />
-                          <span className="text-xs font-semibold text-foreground">
+                          <span className="text-[11px] font-semibold text-foreground">
                             {data.detailedMetrics.notableAchievements.includes('AP') ? 
                               data.detailedMetrics.notableAchievements.match(/(\d+)\s*AP/)?.[1] || '0' : 
                               '0'
                             }
                           </span>
                         </div>
-                        <div className="text-xs text-muted-foreground">AP</div>
+                        <div className="text-[10px] text-muted-foreground">AP</div>
                       </div>
                     </div>
                   </div>

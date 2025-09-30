@@ -782,10 +782,10 @@ const AcademicPlanner = () => {
             </div>
 
             {/* Academic Course Requirements Checklist */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 border border-primary/20 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 border border-primary/20 shadow-xl hover:shadow-2xl transition-all duration-300">
               <Collapsible defaultOpen={false}>
                 <CollapsibleTrigger asChild>
-                  <button className="flex items-center gap-2 text-lg font-semibold text-foreground hover:text-primary transition-colors w-full group">
+                  <button className="flex items-center gap-2 text-base font-semibold text-foreground hover:text-primary transition-colors w-full group">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                     <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
                       Academic Course Requirements Checklist
@@ -795,9 +795,9 @@ const AcademicPlanner = () => {
                   </button>
                 </CollapsibleTrigger>
                 
-                <CollapsibleContent className="mt-4">
+                <CollapsibleContent className="mt-3">
                   {/* A-G Subject Requirements - Smaller emphasis */}
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <button 
                       onClick={() => setExpandedAG(!expandedAG)}
                       className="flex items-center gap-2 text-xs w-full hover:bg-muted p-2 rounded-md transition-colors"
@@ -805,12 +805,12 @@ const AcademicPlanner = () => {
                       <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600">
                         <Check className="h-2 w-2 text-white" />
                       </div>
-                      <span className="font-medium">A-G Subject Requirements (UC/CSU Foundation)</span>
+                      <span className="font-medium text-foreground">A-G Subject Requirements (UC/CSU Foundation)</span>
                       <ChevronDown className={`h-3 w-3 transition-transform ${expandedAG ? 'rotate-180' : ''}`} />
                     </button>
                       
                     {expandedAG && (
-                      <div className="mt-2 p-2 bg-muted rounded-md text-xs">
+                      <div className="mt-2 p-2 bg-muted rounded-md text-xs text-foreground">
                         <div className="flex items-center gap-2">
                           <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-slate-400 bg-slate-400">
                             <X className="h-2 w-2 text-white" />
@@ -822,7 +822,7 @@ const AcademicPlanner = () => {
                   </div>
                   
                   {/* Academic Achievement Requirements in 2 columns */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-foreground">
                     {/* AP & Course Rigor */}
                     <div className="flex items-center gap-2">
                       <div className="flex items-center justify-center h-3 w-3 rounded-full border-2 border-green-600 bg-green-600 flex-shrink-0">

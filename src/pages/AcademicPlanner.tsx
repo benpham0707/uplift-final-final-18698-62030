@@ -630,7 +630,7 @@ const AcademicPlanner = () => {
         </div>
         
         {/* Compact summary stats */}
-        <div className="flex justify-center gap-8 pt-1">
+        <div className="flex justify-center gap-8 pt-1 pb-3">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
             <div className="text-sm">
@@ -902,23 +902,23 @@ const AcademicPlanner = () => {
 
           {/* Combined Performance Analytics Section */}
           <Card className="shadow-medium mb-8">
-            <CardHeader className="rounded-t-lg">
+              <CardHeader className="rounded-t-lg pb-2">
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
                 Subject Performance & GPA Analytics
               </CardTitle>
               <p className="text-sm text-muted-foreground">Analysis of your academic performance with trends and GPA visualization</p>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <CardContent className="pb-0">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 {/* Subject Performance Analytics - Half width */}
                 <div>
                   <SubjectPerformanceAnalytics />
                 </div>
                 
                 {/* GPA Analysis - Half width */}
-                <div>
-                  <div className="sticky top-0">
+                 <div>
+                   <div className="">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                       <TrendingUp className="h-5 w-5 text-primary" />
                       GPA Trends

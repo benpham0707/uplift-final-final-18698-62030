@@ -453,43 +453,8 @@ const AcademicPlanner = () => {
             <GPALineChart />
           </div>
         </div>
-      )
-    },
-    // Card 3: Course Requirements (Medium - 1x2)
-    {
-      content: (
-        <div className="h-full flex flex-col">
-          <div className="card__header mb-4">
-            <div className="card__label text-purple-300">Requirements</div>
-          </div>
-          <div className="card__content flex-1">
-            <h2 className="card__title text-xl font-bold text-white mb-2">Course Checklist</h2>
-            <p className="card__description text-white/70 mb-4 text-sm">Academic requirements tracker</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-white">
-                <Check className="h-3 w-3 text-green-400" />
-                <span>4+ AP Courses Completed</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white">
-                <Check className="h-3 w-3 text-green-400" />
-                <span>On Track for Graduation</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white">
-                <Check className="h-3 w-3 text-green-400" />
-                <span>Honors Diploma Track</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <X className="h-3 w-3 text-red-400" />
-                <span>8+ AP Courses Planned</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <X className="h-3 w-3 text-red-400" />
-                <span>AP Capstone Program</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
+      ),
+      className: "gpa-card"
     },
     // Card 4: Recent Insights (Large - 4x1)
     {
@@ -530,11 +495,12 @@ const AcademicPlanner = () => {
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
-              ))}
+                ))}
             </div>
           </div>
         </div>
-      )
+      ),
+      className: "insights-full"
     },
     // Card 5: Trophy Case (Large - 2x2)
     {
@@ -649,10 +615,11 @@ const AcademicPlanner = () => {
                   </div>
                 </CollapsibleContent>
               </Collapsible>
-            </div>
+             </div>
           </div>
         </div>
-      )
+      ),
+      className: "trophy-card"
     },
     // Card 6: Academic Tasks (Large - 2x2)
     {
@@ -795,10 +762,11 @@ const AcademicPlanner = () => {
                   </div>
                 </CollapsibleContent>
               </Collapsible>
-            </div>
+             </div>
           </div>
         </div>
-      )
+      ),
+      className: "tasks-card"
     }
   ];
 

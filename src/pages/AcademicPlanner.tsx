@@ -857,7 +857,7 @@ const AcademicPlanner = () => {
       </div>
 
       {/* MagicBento Grid Section */}
-      <div className="w-full p-6 bg-background">
+      <div className="w-full p-6 hero-gradient">
         <div className="max-w-7xl mx-auto">
           <MagicBento 
             cards={bentoCards}
@@ -870,7 +870,7 @@ const AcademicPlanner = () => {
             clickEffect={true}
             spotlightRadius={300}
             particleCount={12}
-            glowColor="132, 0, 255"
+            glowColor="147, 51, 234"
           />
         </div>
       </div>

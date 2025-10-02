@@ -91,6 +91,7 @@ const ParticleCard: React.FC<ParticleCardProps> = ({
   const memoizedParticles = useRef<HTMLElement[]>([]);
   const particlesInitialized = useRef(false);
   const magnetismAnimationRef = useRef<gsap.core.Tween | null>(null);
+  const lastSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
   const initializeParticles = useCallback(() => {
     if (particlesInitialized.current || !cardRef.current) return;
@@ -297,12 +298,30 @@ const ParticleCard: React.FC<ParticleCardProps> = ({
     element.addEventListener('mousemove', handleMouseMove);
     element.addEventListener('click', handleClick);
 
+    // Observe size changes to re-seed particles so they cover the full card area
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      if (width === lastSizeRef.current.width && height === lastSizeRef.current.height) return;
+      lastSizeRef.current = { width, height };
+      particlesInitialized.current = false;
+      memoizedParticles.current = [];
+      if (isHoveredRef.current) {
+        clearAllParticles();
+        initializeParticles();
+        animateParticles();
+      }
+    });
+    resizeObserver.observe(element);
+
     return () => {
       isHoveredRef.current = false;
       element.removeEventListener('mouseenter', handleMouseEnter);
       element.removeEventListener('mouseleave', handleMouseLeave);
       element.removeEventListener('mousemove', handleMouseMove);
       element.removeEventListener('click', handleClick);
+      resizeObserver.disconnect();
       clearAllParticles();
     };
   }, [animateParticles, clearAllParticles, disableAnimations, enableTilt, enableMagnetism, clickEffect, glowColor]);

@@ -206,30 +206,44 @@ const SubjectPerformanceAnalytics: React.FC = () => {
     }]
   } as const;
   const toggleYear = (year: string) => {
-    setExpandedYears(prev => prev.includes(year) ? [] : [year]);
+    setExpandedYears(prev => 
+      prev.includes(year) 
+        ? prev.filter(y => y !== year) 
+        : [...prev, year]
+    );
   };
   return <div className="space-y-4">
       {Object.entries(academicYearsData).map(([year, data]) => <Collapsible key={year} open={expandedYears.includes(year)} onOpenChange={() => toggleYear(year)}>
           <CollapsibleTrigger asChild>
-            <Card className="cursor-pointer transition-colors border-l-4 border-l-primary/60 bg-gradient-to-br from-purple-950/60 to-indigo-950/40 border border-purple-500/30 hover:from-purple-900/60 hover:to-indigo-900/40">
-              <CardContent className="p-2">
+            <Card className="cursor-pointer transition-all duration-200 border-l-4 border-l-primary border border-purple-500/50 hover:border-primary/30 hover:shadow-lg backdrop-blur-sm rounded-xl shadow-sm relative overflow-hidden group" style={{background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(99, 102, 241, 0.35), rgba(59, 130, 246, 0.4))'}}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <CardContent className="p-2 relative z-10">
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       {expandedYears.includes(year) ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />}
                       <h3 className="font-semibold text-sm text-white">{data.year}</h3>
-                      <Badge variant="secondary" className="text-xs">{data.status}</Badge>
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs ${
+                          data.status === 'complete' 
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                            : 'bg-amber-100 text-amber-800 border-amber-200'
+                        }`}
+                      >
+                        {data.status}
+                      </Badge>
                     </div>
                     <div className="ml-6">
-                      <div className="text-base font-bold text-primary">{data.overallGPA}</div>
+                      <div className="text-base font-bold text-white">{data.overallGPA}</div>
                       <div className="text-[10px] text-white/70">GPA</div>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200/60 shadow-sm">
                       <div className="flex items-center gap-1">
-                        {data.detailedMetrics.gpaImprovement.includes('+') ? <TrendingUp className="w-3 h-3 text-green-400" /> : data.detailedMetrics.gpaImprovement.includes('Maintained') ? <Minus className="w-3 h-3 text-blue-400" /> : <TrendingDown className="w-3 h-3 text-orange-400" />}
+                        {data.detailedMetrics.gpaImprovement.includes('+') ? <TrendingUp className="w-3 h-3 text-emerald-600" /> : data.detailedMetrics.gpaImprovement.includes('Maintained') ? <Minus className="w-3 h-3 text-blue-600" /> : <TrendingDown className="w-3 h-3 text-amber-600" />}
                         <span className="text-[11px] font-semibold text-white">
                           {data.detailedMetrics.gpaImprovement.includes('+') ? '+' + (data.detailedMetrics.gpaImprovement.match(/\+([0-9.]+)/)?.[1] || '0.0') : data.detailedMetrics.gpaImprovement.includes('Maintained') ? '0.0' : '-0.1'}
                         </span>
@@ -237,9 +251,9 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                       <div className="text-[10px] text-white/70">Trend</div>
                     </div>
                     
-                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-amber/10 to-amber/5 border border-amber/20">
+                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-200/60 shadow-sm">
                       <div className="flex items-center gap-1">
-                        <Brain className="w-3 h-3 text-amber-400" />
+                        <Brain className="w-3 h-3 text-amber-600" />
                         <span className="text-[11px] font-semibold text-white">
                           {data.detailedMetrics.courseDifficulty.includes('Standard') ? '2.5' : data.detailedMetrics.courseDifficulty.includes('15%') ? '3.0' : data.detailedMetrics.courseDifficulty.includes('25%') ? '4.0' : data.detailedMetrics.courseDifficulty.includes('35%') ? '4.5' : '2.0'}/5
                         </span>
@@ -247,9 +261,9 @@ const SubjectPerformanceAnalytics: React.FC = () => {
                       <div className="text-[10px] text-white/70">Difficulty</div>
                     </div>
                     
-                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-blue/10 to-blue/5 border border-blue/20">
+                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/60 shadow-sm">
                       <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-blue-400" />
+                        <Star className="w-3 h-3 text-blue-600" />
                         <span className="text-[11px] font-semibold text-white">
                           {data.detailedMetrics.notableAchievements.includes('AP') ? data.detailedMetrics.notableAchievements.match(/(\d+)\s*AP/)?.[1] || '0' : '0'}
                         </span>
@@ -262,22 +276,47 @@ const SubjectPerformanceAnalytics: React.FC = () => {
             </Card>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
-            <Card className="bg-background/60 border border-purple-500/20">
-              <CardContent className="p-4">
+            <Card className="border border-purple-500/50 backdrop-blur-sm rounded-xl shadow-sm relative overflow-hidden" style={{background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(99, 102, 241, 0.35), rgba(59, 130, 246, 0.4))'}}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent"></div>
+              <CardContent className="p-4 relative z-10">
                 <h4 className="font-medium mb-3 text-white text-sm">Subject Performance Details</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {(subjectPerformanceData[year as keyof typeof subjectPerformanceData] || []).map((subject, idx) => <Card key={idx} className="bg-gradient-to-br from-purple-900/30 to-indigo-900/20 border border-purple-500/20">
-                      <CardContent className="p-3">
+                  {(subjectPerformanceData[year as keyof typeof subjectPerformanceData] || []).map((subject, idx) => <Card key={idx} className="border border-purple-500/50 hover:border-primary/40 transition-all duration-200 hover:shadow-md backdrop-blur-sm rounded-lg shadow-sm relative overflow-hidden group" style={{background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(99, 102, 241, 0.35), rgba(59, 130, 246, 0.4))'}}>
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <CardContent className="p-3 relative z-10">
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             <h5 className="font-medium text-white text-sm">{subject.subject}</h5>
-                            <Badge variant={subject.grade.includes('A') ? 'default' : subject.grade.includes('B') ? 'secondary' : 'outline'} className="text-xs">{subject.grade}</Badge>
+                            <Badge 
+                              variant={subject.grade.includes('A') ? 'default' : subject.grade.includes('B') ? 'secondary' : 'outline'} 
+                              className={`text-xs ${
+                                subject.grade.includes('A') 
+                                  ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                                  : subject.grade.includes('B') 
+                                    ? 'bg-blue-100 text-blue-800 border-blue-200' 
+                                    : 'bg-slate-100 text-slate-800 border-slate-200'
+                              }`}
+                            >
+                              {subject.grade}
+                            </Badge>
                           </div>
                           <div className="space-y-1 text-xs">
-                            <div className="flex justify-between"><span className="text-white/70">Relevance:</span><span className="font-medium text-white">{subject.relevance}</span></div>
-                            <div className="flex justify-between"><span className="text-white/70">Class Avg:</span><span className="font-medium text-white">{subject.avgGPA}</span></div>
-                            <div className="flex justify-between"><span className="text-white/70">Class Rank:</span><span className="font-medium text-white">{subject.classRank}</span></div>
-                            <div className="flex justify-between"><span className="text-white/70">vs Last Year:</span><span className="font-medium text-white">{subject.improvement}</span></div>
+                            <div className="flex justify-between">
+                              <span className="text-white/70">Relevance:</span>
+                              <span className="font-medium text-white">{subject.relevance}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/70">Class Avg:</span>
+                              <span className="font-medium text-white">{subject.avgGPA}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/70">Class Rank:</span>
+                              <span className="font-medium text-white">{subject.classRank}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/70">vs Last Year:</span>
+                              <span className="font-medium text-white">{subject.improvement}</span>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
@@ -291,6 +330,10 @@ const SubjectPerformanceAnalytics: React.FC = () => {
 };
 
 const AcademicPlanner = () => {
+  // State for chart toggle
+  const [chartView, setChartView] = useState<'line' | 'hexagon'>('line');
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Hard coded data values for current academic standing and progress
   const currentGPA = {
     weighted: 4.2,
@@ -416,6 +459,301 @@ const AcademicPlanner = () => {
     setTaskPlanningOpen(true);
   };
 
+  // Academic Subject Performance Data
+  const subjectPerformanceData = [
+    { subject: 'Math', score: 85, color: '#9333ea' },
+    { subject: 'Science', score: 78, color: '#3b82f6' },
+    { subject: 'English/ELA', score: 92, color: '#10b981' },
+    { subject: 'History', score: 88, color: '#f59e0b' },
+    { subject: 'World Language', score: 75, color: '#ef4444' },
+    { subject: 'Arts', score: 90, color: '#8b5cf6' }
+  ];
+
+  // Hexagonal Chart Component - Holographic Tech Style
+  const HexagonalChart = () => {
+    const centerX = 200; // Centered in new viewBox
+    const centerY = 200; // Centered in new viewBox
+    const radius = 140; // Increased radius to fill more space
+    const maxScore = 100;
+
+    // Calculate hexagon points
+    const hexPoints = Array.from({ length: 6 }, (_, i) => {
+      const angle = (i * 60 - 90) * (Math.PI / 180); // Start from top (-90 degrees)
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      return { x, y };
+    });
+
+    // Calculate performance points
+    const performancePoints = subjectPerformanceData.map((subject, i) => {
+      const angle = (i * 60 - 90) * (Math.PI / 180);
+      const scoreRadius = (subject.score / maxScore) * radius;
+      const x = centerX + scoreRadius * Math.cos(angle);
+      const y = centerY + scoreRadius * Math.sin(angle);
+      return { x, y, subject: subject.subject, score: subject.score, color: subject.color };
+    });
+
+    // Create path for performance area
+    const performancePath = performancePoints.map((point, i) => 
+      `${i === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+    ).join(' ') + ' Z';
+
+    return (
+      <div className="h-[400px] w-full flex items-center justify-center relative">
+        {/* Subtle static background glow (performance-friendly) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-blue-500/10 rounded-full blur-2xl" />
+        
+        <svg width="450" height="400" viewBox="-25 -25 450 400" className="relative z-10">
+          <defs>
+            {/* Simple glow filter */}
+            <filter id="simpleGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            
+            {/* Holographic gradient for performance area */}
+            <linearGradient id="holographicGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00ffff" stopOpacity="0.4" />
+              <stop offset="25%" stopColor="#9333ea" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.4" />
+              <stop offset="75%" stopColor="#8b5cf6" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#00ffff" stopOpacity="0.4" />
+            </linearGradient>
+            
+            {/* Glowing effect for grid lines */}
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            
+            {/* Neon glow for points */}
+            <filter id="neonGlow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            
+            {/* 3D effect gradient */}
+            <linearGradient id="pointGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="#00ffff" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#9333ea" stopOpacity="0.9" />
+            </linearGradient>
+            
+            {/* Holographic text effect */}
+            <filter id="textGlow">
+              <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+
+            {/* Hologram diagonal stripe pattern */}
+            <pattern id="holoStripes" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(30)">
+              <rect width="12" height="12" fill="transparent" />
+              <rect x="0" y="0" width="6" height="12" fill="#7dd3fc" opacity="0.08" />
+            </pattern>
+
+            {/* Soft radial highlight for hologram look */}
+            <radialGradient id="holoRadial" cx="50%" cy="50%" r="70%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.25" />
+              <stop offset="60%" stopColor="#a78bfa" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.05" />
+            </radialGradient>
+          </defs>
+
+          {/* White background hexagon (render first so markers show on top) */}
+          <polygon
+            points={hexPoints.map(p => `${p.x},${p.y}`).join(' ')}
+            fill="#ffffff"
+            fillOpacity="1"
+          />
+          
+          {/* Milestone demarkers - concentric hexagons */}
+          {[0.2, 0.4, 0.6, 0.8].map((scale, i) => (
+            <polygon
+              key={i}
+              points={hexPoints.map(p => `${centerX + (p.x - centerX) * scale},${centerY + (p.y - centerY) * scale}`).join(' ')}
+              fill="none"
+              stroke="#2d3748"
+              strokeWidth="1"
+              strokeOpacity="0.5"
+            />
+          ))}
+          
+          {/* Milestone labels with subtle pills */}
+          {[20, 40, 60, 80].map((value, i) => {
+            const scale = [0.2, 0.4, 0.6, 0.8][i];
+            const labelX = centerX + (hexPoints[0].x - centerX) * scale;
+            const labelY = centerY + (hexPoints[0].y - centerY) * scale - 2;
+            
+            return (
+              <g key={i}>
+                <rect
+                  x={labelX - 14}
+                  y={labelY - 9}
+                  width={28}
+                  height={18}
+                  rx={9}
+                  fill="#ffffff"
+                  opacity="0.35"
+                  stroke="url(#holographicGradient)"
+                  strokeOpacity="0.5"
+                  strokeWidth="0.5"
+                />
+                <text
+                  x={labelX}
+                  y={labelY + 4}
+                  textAnchor="middle"
+                  fill="#374151"
+                  style={{ fontSize: '10px', fontWeight: '600' }}
+                >
+                  {value}
+                </text>
+              </g>
+            );
+          })}
+          
+          {/* Clean hexagonal border */}
+          <polygon
+            points={hexPoints.map(p => `${p.x},${p.y}`).join(' ')}
+            fill="none"
+            stroke="url(#holographicGradient)"
+            strokeWidth="2"
+            filter="url(#glow)"
+          />
+          
+          {/* Aesthetic points at hexagon corners */}
+          {hexPoints.map((point, i) => (
+            <circle
+              key={i}
+              cx={point.x}
+              cy={point.y}
+              r="3"
+              fill="url(#holographicGradient)"
+              stroke="#ffffff"
+              strokeWidth="1"
+            />
+          ))}
+          
+          {/* Performance area with layered holographic fills */}
+          <g>
+            {/* Base holographic gradient */}
+            <path
+              d={performancePath}
+              fill="url(#holographicGradient)"
+              fillOpacity="0.35"
+              stroke="url(#holographicGradient)"
+              strokeWidth="2"
+              filter="url(#glow)"
+            />
+            {/* Diagonal stripe shimmer */}
+            <path d={performancePath} fill="url(#holoStripes)" opacity="0.12" />
+            {/* Radial highlight */}
+            <path d={performancePath} fill="url(#holoRadial)" opacity="0.12" />
+          </g>
+          
+          {/* No per-point inner numbers; milestone values are on the ring vertices */}
+          
+          {/* Subject labels with holographic aesthetic */}
+          {hexPoints.map((point, i) => {
+            const subject = subjectPerformanceData[i];
+            const labelAngle = (i * 60 - 90) * (Math.PI / 180);
+            const corner = hexPoints[i];
+            // Offset tuning: provide adequate spacing for labels with larger hexagon
+            const labelOffset = subject.subject === 'History' ? 25 : subject.subject === 'Math' ? 35 : 45;
+            const labelX = corner.x + labelOffset * Math.cos(labelAngle);
+            const labelY = corner.y + labelOffset * Math.sin(labelAngle);
+            
+            // Calculate dynamic width based on text length with better sizing
+            const textLength = subject.subject.length;
+            const baseWidth = Math.max(70, textLength * 9); // Increased minimum and per-character width
+            const width = Math.min(baseWidth, 110); // Increased cap for very long text
+            
+            return (
+              <g key={i}>
+                {/* Holographic label background */}
+                <rect
+                  x={labelX - width/2}
+                  y={labelY - 14}
+                  width={width}
+                  height="36"
+                  rx="16"
+                  fill="url(#holographicGradient)"
+                  fillOpacity="0.3"
+                  stroke="url(#holographicGradient)"
+                  strokeWidth="1"
+                  filter="url(#glow)"
+                />
+                
+                {/* Holographic label text with reduced glow */}
+                <text
+                  x={labelX}
+                  y={labelY + 0}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="fill-white text-sm font-semibold"
+                  style={{ 
+                    textShadow: '0 0 3px #00ffff, 0 0 1px #ffffff',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  {subject.subject}
+                </text>
+                {/* Subtle underline under subject title */}
+                <line
+                  x1={labelX - width/2 + 8}
+                  x2={labelX + width/2 - 8}
+                  y1={labelY + 6}
+                  y2={labelY + 6}
+                  stroke="url(#holographicGradient)"
+                  strokeWidth="1"
+                  strokeOpacity="0.4"
+                />
+                {/* Score below subject label with more spacing */}
+                <text
+                  x={labelX}
+                  y={labelY + 18}
+                  textAnchor="middle"
+                  className="fill-white"
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    textShadow: '0 0 4px rgba(0,255,255,0.7), 0 0 2px #ffffff'
+                  }}
+                >
+                  {subject.score}
+                </text>
+                {/* Underline under the score number */}
+                <line
+                  x1={labelX - Math.min(24, width/2 - 10)}
+                  x2={labelX + Math.min(24, width/2 - 10)}
+                  y1={labelY + 22}
+                  y2={labelY + 22}
+                  stroke="url(#holographicGradient)"
+                  strokeWidth="1"
+                  strokeOpacity="0.5"
+                />
+              </g>
+            );
+          })}
+          
+          </svg>
+      </div>
+    );
+  };
+
   // GPA Line Chart Component
   const GPALineChart = () => {
     return <div className="space-y-2">
@@ -463,9 +801,60 @@ const AcademicPlanner = () => {
             <div className="card__label text-purple-300">Trends</div>
           </div>
           <div className="card__content flex-1">
-            <h2 className="card__title text-xl font-bold text-white mb-2">GPA Analysis</h2>
-            <p className="card__description text-white/70 mb-4 text-sm">Track your GPA progression over time</p>
-            <GPALineChart />
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="card__title text-xl font-bold text-white">GPA Analysis</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setChartView('line')}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    chartView === 'line' 
+                      ? 'bg-purple-600 text-white' 
+                      : 'bg-white/10 text-white/70 hover:bg-white/20'
+                  }`}
+                  title="Line Chart View"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setChartView('hexagon')}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    chartView === 'hexagon' 
+                      ? 'bg-purple-600 text-white' 
+                      : 'bg-white/10 text-white/70 hover:bg-white/20'
+                  }`}
+                  title="Hexagon Chart View"
+                >
+                  <Target className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="p-1.5 rounded-md bg-white/10 text-white/70 hover:bg-white/20 transition-colors"
+                  title={isExpanded ? "Collapse" : "Expand"}
+                >
+                  {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <p className="card__description text-white/70 mb-4 text-sm">
+              {chartView === 'line' ? 'Track your GPA progression over time' : 'View performance across academic subjects'}
+            </p>
+            
+            {!isExpanded ? (
+              // Single chart view
+              chartView === 'line' ? <GPALineChart /> : <HexagonalChart />
+            ) : (
+              // Expanded view with both charts
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-white mb-2">GPA Trends Over Time</h3>
+                  <GPALineChart />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-white mb-2">Subject Performance Analysis</h3>
+                  <HexagonalChart />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ),
@@ -878,13 +1267,12 @@ const AcademicPlanner = () => {
             cards={bentoCards}
             textAutoHide={false}
             enableStars={true}
-            enableSpotlight={true}
+            enableSpotlight={false}
             enableBorderGlow={true}
             enableTilt={true}
-            enableMagnetism={true}
-            clickEffect={true}
-            spotlightRadius={300}
-            particleCount={12}
+            enableMagnetism={false}
+            clickEffect={false}
+            particleCount={6}
             glowColor="147, 51, 234"
           />
         </div>

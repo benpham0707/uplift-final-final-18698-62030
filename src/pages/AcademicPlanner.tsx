@@ -787,25 +787,25 @@ const AcademicPlanner = () => {
 
           {/* Academic Metrics Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {currentGPA.weighted}
               </div>
               <div className="text-sm text-purple-700 font-medium mt-1">Weighted GPA</div>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {currentGPA.unweighted}
               </div>
               <div className="text-sm text-purple-700 font-medium mt-1">Unweighted GPA</div>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {Math.round((1 - currentGPA.classRank / currentGPA.totalStudents) * 100)}th
               </div>
               <div className="text-sm text-purple-700 font-medium mt-1">Percentile</div>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {Math.round((currentGPA.creditsCompleted / currentGPA.totalCredits) * 100)}%
               </div>
@@ -815,7 +815,7 @@ const AcademicPlanner = () => {
 
           {/* Progress Bar and Requirements Checklist */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 border border-primary/20 shadow-xl">
+            <div className="bg-background/70 backdrop-blur-md rounded-xl p-6 border border-primary/20 shadow-glow">
               <h3 className="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
                 <TrendingUp className="h-5 w-5 mr-2 text-primary" />
                 Academic Progress
@@ -838,7 +838,7 @@ const AcademicPlanner = () => {
               </div>
             </div>
 
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 border border-primary/20 shadow-xl">
+            <div className="bg-background/70 backdrop-blur-md rounded-xl p-4 border border-primary/20 shadow-glow">
               <div className="flex items-center gap-2 text-base font-semibold text-foreground mb-3">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
                 <span>Requirements Checklist</span>

@@ -7,6 +7,20 @@ const DEFAULT_SPOTLIGHT_RADIUS = 300;
 const DEFAULT_GLOW_COLOR = '132, 0, 255';
 const MOBILE_BREAKPOINT = 768;
 
+const clampNumber = (value: number, min: number, max: number) => {
+  return Math.max(min, Math.min(max, value));
+};
+
+const getTiltCapForElement = (element: HTMLElement) => {
+  const rect = element.getBoundingClientRect();
+  const maxDimension = Math.max(rect.width, rect.height);
+  // Reduce tilt as components get bigger; cap larger cards closer to small-card feel
+  if (maxDimension >= 800) return 3;   // very large
+  if (maxDimension >= 600) return 4;   // large
+  if (maxDimension >= 420) return 5;   // medium
+  return 6;                            // small
+};
+
 const createParticleElement = (x: number, y: number, color: string = DEFAULT_GLOW_COLOR) => {
   const el = document.createElement('div');
   el.className = 'particle';
@@ -161,9 +175,10 @@ const ParticleCard: React.FC<ParticleCardProps> = ({
       animateParticles();
 
       if (enableTilt) {
+        const maxTilt = getTiltCapForElement(element);
         gsap.to(element, {
-          rotateX: 5,
-          rotateY: 5,
+          rotateX: maxTilt * 0.25,
+          rotateY: maxTilt * 0.25,
           duration: 0.3,
           ease: 'power2.out',
           transformPerspective: 1000,
@@ -204,8 +219,11 @@ const ParticleCard: React.FC<ParticleCardProps> = ({
       const centerY = rect.height / 2;
 
       if (enableTilt) {
-        const rotateX = ((y - centerY) / centerY) * -10;
-        const rotateY = ((x - centerX) / centerX) * 10;
+        const maxTilt = getTiltCapForElement(element);
+        const normalizedX = (x - centerX) / centerX;
+        const normalizedY = (y - centerY) / centerY;
+        const rotateX = clampNumber(-normalizedY * maxTilt, -maxTilt, maxTilt);
+        const rotateY = clampNumber(normalizedX * maxTilt, -maxTilt, maxTilt);
 
         gsap.to(element, {
           rotateX,

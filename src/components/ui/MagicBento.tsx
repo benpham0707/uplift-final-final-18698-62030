@@ -52,27 +52,13 @@ const updateCardGlowProperties = (
   radius: number
 ) => {
   const rect = card.getBoundingClientRect();
-  const localX = mouseX - rect.left;
-  const localY = mouseY - rect.top;
-  const relativeX = (localX / rect.width) * 100;
-  const relativeY = (localY / rect.height) * 100;
+  const relativeX = ((mouseX - rect.left) / rect.width) * 100;
+  const relativeY = ((mouseY - rect.top) / rect.height) * 100;
 
   card.style.setProperty('--glow-x', `${relativeX}%`);
   card.style.setProperty('--glow-y', `${relativeY}%`);
-  // Avoid heavy style churn if outside influence range
-  if (glow <= 0.01) {
-    card.style.setProperty('--glow-intensity', '0');
-    card.style.setProperty('--edge-intensity', '0');
-    return;
-  }
   card.style.setProperty('--glow-intensity', glow.toString());
-  card.style.setProperty('--edge-intensity', (glow * 0.6).toString());
   card.style.setProperty('--glow-radius', `${radius}px`);
-  card.style.setProperty('--glow-radius-inner', `${Math.max(40, Math.round(radius * 0.45))}px`);
-  // No shimmer: remove cursor/angle driven props
-  card.style.removeProperty('--cursor-x');
-  card.style.removeProperty('--cursor-y');
-  card.style.removeProperty('--glow-angle');
 };
 
 interface ParticleCardProps {

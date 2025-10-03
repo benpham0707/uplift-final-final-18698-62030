@@ -308,7 +308,7 @@ const PortfolioScanner = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-dashboard">
+    <div className="min-h-screen bg-background">
       {/* Uplift Platform Navigation */}
       <nav className="sticky top-0 z-50 w-full bg-white/10 dark:bg-black/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-black/5 border-b border-white/20 dark:border-white/10 shadow-lg shadow-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -439,60 +439,72 @@ const PortfolioScanner = () => {
         </div>
       </nav>
 
-      {/* Header Section with Scores */}
-      <div className="bg-gradient-to-br from-[#6B5BFF]/20 via-[#7E8BFF]/16 to-[#2FD7C0]/20 border-b border-border/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ textShadow: '0 0 14px rgba(255,255,255,0.35), 0 2px 10px rgba(0,0,0,0.08)' }}>
+      {/* Header Section with Scores - AcademicPlanner aesthetic */}
+      <div className="hero-gradient text-white">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
               Portfolio Dashboard
             </h1>
-            <p className="text-white/85 text-lg max-w-2xl mx-auto mb-6" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.15)' }}>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
               Build your comprehensive profile step by step. Track your progress and unlock new opportunities.
             </p>
-            
-            {/* Overall Portfolio Strength and Completion */}
-            <div className="flex items-center justify-center gap-8 mb-8">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white" style={{ textShadow: '0 0 10px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.06)' }}>
-                  {(aiOverall || overallScore).toFixed(1)}/10
-                </div>
-                <div className="text-sm text-white/80 font-medium">Portfolio Strength</div>
+          </div>
+
+          {/* Strength and Completion Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {(aiOverall || overallScore).toFixed(1)}
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white" style={{ textShadow: '0 0 10px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.06)' }}>
-                  {overallProgress}%
-                </div>
-                <div className="text-sm text-white/80 font-medium">Complete</div>
+              <div className="text-sm text-purple-700 font-medium mt-1">Portfolio Strength</div>
+            </div>
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {overallProgress}%
               </div>
+              <div className="text-sm text-purple-700 font-medium mt-1">Complete</div>
+            </div>
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {(rubricScores.academicExcellence.score || 0).toFixed(1)}
+              </div>
+              <div className="text-sm text-purple-700 font-medium mt-1">Academic Excellence</div>
+            </div>
+            <div className="text-center p-4 rounded-xl border shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-900/40 to-indigo-900/30 border-purple-500/30">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {(rubricScores.leadershipPotential.score || 0).toFixed(1)}
+              </div>
+              <div className="text-sm text-purple-700 font-medium mt-1">Leadership Potential</div>
             </div>
           </div>
 
-          {/* Metric Boxes */}
-          <div className="flex flex-wrap justify-center gap-5 mb-8">
-            {[
-              { key: 'academicExcellence', label: 'Academic Excellence', icon: GraduationCap },
-              { key: 'leadershipPotential', label: 'Leadership Potential', icon: Users },
-              { key: 'personalGrowth', label: 'Personal Growth', icon: TrendingUp },
-              { key: 'communityImpact', label: 'Community Impact', icon: Heart },
-              { key: 'uniqueValue', label: 'Unique Value', icon: Sparkles },
-              { key: 'futureReadiness', label: 'Future Readiness', icon: Target }
-             ].map(({ key, label, icon: Icon }) => {
-               const score = rubricScores[key as keyof typeof rubricScores]?.score || 0;
-              
-              return (
-                <Card key={key} className="bg-background border border-border hover-lift transition-all duration-300 w-auto min-w-[150px]">
-                  <CardContent className="p-3 text-center">
-                    <Icon className="h-5 w-5 mx-auto mb-1 text-primary" />
-                    <div className="text-lg md:text-xl font-bold mb-1 bg-gradient-to-r from-[#6B5BFF] to-[#2FD7C0] bg-clip-text text-transparent">
-                      {score.toFixed(1)}
-                    </div>
-                    <div className="text-sm text-muted-foreground font-medium">
-                      {label}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          {/* Metrics Glass Grid */}
+          <div className="bg-background/70 backdrop-blur-md rounded-xl p-4 border border-primary/20 shadow-glow">
+            <div className="flex flex-wrap justify-center gap-4">
+              {[
+                { key: 'personalGrowth', label: 'Personal Growth', icon: TrendingUp },
+                { key: 'communityImpact', label: 'Community Impact', icon: Heart },
+                { key: 'uniqueValue', label: 'Unique Value', icon: Sparkles },
+                { key: 'futureReadiness', label: 'Future Readiness', icon: Target }
+              ].map(({ key, label, icon: Icon }) => {
+                const score = rubricScores[key as keyof typeof rubricScores]?.score || 0;
+                return (
+                  <Card key={key} className="bg-white/80 backdrop-blur-sm rounded-lg border border-white/20 shadow-sm hover:shadow-md transition-all duration-200 min-w-[160px]">
+                    <CardContent className="p-3 text-center">
+                      <Icon className="h-5 w-5 mx-auto mb-1 text-purple-600" />
+                      <div className="text-lg font-bold mb-1 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                        {score.toFixed(1)}
+                      </div>
+                      <div className="text-xs text-gray-700 font-medium">
+                        {label}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

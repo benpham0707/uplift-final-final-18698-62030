@@ -43,10 +43,13 @@
   --glow-x: 50%;
   --glow-y: 50%;
   --glow-intensity: 0;
-  --glow-radius: 140px;
-  --glow-radius-inner: 70px;
-  --edge-intensity: 0;
-  /* shimmer variables removed */
+  --glow-radius: 150px;
+}
+
+/* Always visible subtle border glow */
+.card--border-glow {
+  border: 1px solid rgba(var(--glow-color), 0.3);
+  box-shadow: 0 0 0 1px rgba(var(--glow-color), 0.1);
 }
 
 .card:hover {
@@ -163,25 +166,69 @@
   }
 }
 
-/* Lightweight proximity sheen on borders (no heavy masks) */
+/* Border glow effect - precise border thickness */
 .card--border-glow::after {
   content: '';
   position: absolute;
   inset: 0;
+  padding: 3px;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.8)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.4)) 30%,
+    transparent 60%
+  );
   border-radius: inherit;
-  box-shadow:
-    0 0 0 1px rgba(147, 51, 234, calc(var(--edge-intensity) * 0.6)),
-    0 0 18px rgba(147, 51, 234, calc(var(--edge-intensity) * 0.35)),
-    0 0 28px rgba(59, 130, 246, calc(var(--edge-intensity) * 0.25));
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: subtract;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
   pointer-events: none;
+  z-index: 1;
+}
+
+/* Bright inner metallic band - simplified for performance */
+.card--border-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(255, 255, 255, calc(var(--glow-intensity) * 0.9)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 1.0)) 10%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.7)) 25%,
+    transparent 40%
+  );
+  border-radius: inherit;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: subtract;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.card--border-glow:hover::after {
+  opacity: 1;
+}
+
+.card--border-glow:hover::before {
   opacity: 1;
 }
 
 .card--border-glow:hover {
   box-shadow:
-    0 6px 18px rgba(147, 51, 234, 0.18),
-    0 0 22px rgba(147, 51, 234, 0.18),
-    0 0 34px rgba(59, 130, 246, 0.14);
+    0 4px 20px rgba(46, 24, 78, 0.4),
+    0 0 30px rgba(var(--glow-color), 0.2);
 }
 
 .particle-container {

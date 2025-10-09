@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { User, GraduationCap, Briefcase, Heart, Target, Users2, BookOpen, Lock, Check, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import PersonalGrowthWizard from './PersonalGrowthWizard';
 import FamilyResponsibilitiesWizard from './FamilyResponsibilitiesWizard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import FlowingBanner from './FlowingBanner';
 
 interface PortfolioPathwayProps {
   onProgressUpdate: (progress: number) => void;
@@ -151,8 +152,13 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
     fetchProgress();
   }, [user]);
 
+  // Demo toggle: force one section to appear completed for styling preview
+  const DEMO_FORCE_COMPLETE = true;
+  const DEMO_SECTION_ID = 'academic-journey';
+
   // Calculate section status - ALL UNLOCKED FOR TESTING
-  const pathwaySections: PathwaySection[] = useMemo(() => [
+  const pathwaySections: PathwaySection[] = useMemo(() => {
+    const sections: PathwaySection[] = [
     {
       id: 'personal-info',
       title: 'Personal Information',
@@ -216,7 +222,14 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
       status: sectionProgress['growth'] === 100 ? 'completed' : 
                sectionProgress['growth'] > 0 ? 'in-progress' : 'available',
     }
-  ], [sectionProgress]);
+  ];
+
+    // Demo override
+    if (DEMO_FORCE_COMPLETE) {
+      return sections.map((s) => s.id === DEMO_SECTION_ID ? { ...s, status: 'completed', progress: 100 } : s);
+    }
+    return sections;
+  }, [sectionProgress]);
 
   // Calculate overall progress
   useEffect(() => {
@@ -252,6 +265,34 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
     setOpenSection(null);
   };
 
+  // Track node positions to create a split banner that "teleports" across the box
+  const nodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [gapMap, setGapMap] = useState<Record<string, { left: number; right: number; width: number }>>({});
+  const [bannerVisibility, setBannerVisibility] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const updateGaps = () => {
+      const next: Record<string, { left: number; right: number; width: number }> = {};
+      pathwaySections.forEach((s) => {
+        const el = nodeRefs.current[s.id];
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        next[s.id] = { left: rect.left, right: rect.right, width: rect.width };
+      });
+      setGapMap(next);
+    };
+
+    updateGaps();
+    window.addEventListener('resize', updateGaps);
+    window.addEventListener('scroll', updateGaps, { passive: true });
+    return () => {
+      window.removeEventListener('resize', updateGaps);
+      window.removeEventListener('scroll', updateGaps);
+    };
+  }, [pathwaySections]);
+
+  // Banner visibility will now be driven by node animation active state via AnimatedContent
+
   return (
     <div className="min-h-screen bg-background relative">
       {/* Simplified Background */}
@@ -265,24 +306,49 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
         <div className="relative flex flex-col items-center space-y-44">
           {pathwaySections.map((section, index) => (
             <div key={section.id} className="relative">
-              {/* Simple Connection Line */}
-              {index < pathwaySections.length - 1 && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0.5 h-44 bg-gradient-to-b from-border to-transparent z-0" />
-              )}
-              
               {/* Pathway Node */}
-              <div className="relative z-10">
+              <div className="relative z-10" ref={(el) => (nodeRefs.current[section.id] = el)}>
+                {/* Simple full-width banner behind the node */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-screen z-0 pointer-events-none">
+                  <FlowingBanner
+                    tone={section.status === 'completed' ? 'completed' : section.status === 'in-progress' ? 'in-progress' : 'uncompleted'}
+                    items={buildBannerItems(section)}
+                    visible={Boolean(bannerVisibility[section.id])}
+                    durationSec={section.status === 'completed' ? 18 : section.status === 'in-progress' ? 34 : 58}
+                    appearDelayMs={80 + Math.floor(20 * index)}
+                    direction="ltr"
+                  />
+                </div>
                 <AnimatedContent
-                  distance={220}
+                  distance={240}
                   direction="vertical"
                   reverse={false}
-                  duration={1.6}
+                  duration={2.0}
                   ease="power3.out"
                   initialOpacity={0}
                   animateOpacity
                   scale={1.02}
-                  threshold={0.08}
-                  delay={0.03 * index}
+                  threshold={0.24}
+                  enterThreshold={(section.id === 'support' || section.id === 'growth') ? 0.30 : 0.26}
+                  leaveThreshold={(section.id === 'support' || section.id === 'growth') ? 0.46 : 0.40}
+                  delay={0.05 * index}
+                  reversible
+                  leaveOpacity={0}
+                  leaveScale={0.96}
+                  enterBackDelay={0.12}
+                  enterBackDurationMultiplier={1.55}
+                  initialReveal={index === 0}
+                  endExtendPct={section.id === 'growth' ? 18 : (section.id === 'support' ? 12 : 0)}
+                  hideDuration={1.6}
+                  onActiveChange={(active) => {
+                    if (active) {
+                      window.setTimeout(() => {
+                        setBannerVisibility((prev) => ({ ...prev, [section.id]: true }));
+                      }, 80);
+                    } else {
+                      setBannerVisibility((prev) => ({ ...prev, [section.id]: false }));
+                    }
+                  }}
                 >
                   <PathwayNode
                     section={section}
@@ -293,6 +359,8 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
             </div>
           ))}
         </div>
+        {/* Bottom spacer to allow last node to fully enter viewport */}
+        <div aria-hidden="true" className="h-72 md:h-96"></div>
 
         {/* Completion Celebration */}
         {currentProgress === 100 && (
@@ -384,3 +452,74 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
 };
 
 export default PortfolioPathway;
+
+function getBannerMessage(section: any): string {
+  const status = section.status;
+  const base = {
+    'personal-info': {
+      done: 'Great start! Personal Profile Complete',
+      todo: 'Uncompleted — Tell us about you',
+    },
+    'academic-journey': {
+      done: 'Academics on Track — Awesome Work',
+      todo: 'Uncompleted — Add your courses and GPA',
+    },
+    'experiences': {
+      done: 'Experiences Captured — Leader in the making',
+      todo: 'Uncompleted — Add activities and roles',
+    },
+    'family': {
+      done: 'Context Matters — Thanks for sharing',
+      todo: 'Uncompleted — Family responsibilities',
+    },
+    'goals': {
+      done: 'Aiming High — Goals set',
+      todo: 'Uncompleted — Define your goals',
+    },
+    'support': {
+      done: 'Backed by a Village — Support listed',
+      todo: 'Uncompleted — Who supports you?',
+    },
+    'growth': {
+      done: 'Reflection Complete — Growth documented',
+      todo: 'Uncompleted — Share your growth',
+    },
+  } as const;
+
+  const conf = (base as any)[section.id];
+  if (!conf) return status === 'completed' ? 'Section Complete' : 'Uncompleted';
+  return status === 'completed' ? conf.done : conf.todo;
+}
+
+function getBannerImage(section: any): string | undefined {
+  const images: Record<string, string> = {
+    'personal-info': 'https://picsum.photos/600/400?random=11',
+    'academic-journey': 'https://picsum.photos/600/400?random=12',
+    'experiences': 'https://picsum.photos/600/400?random=13',
+    'family': 'https://picsum.photos/600/400?random=14',
+    'goals': 'https://picsum.photos/600/400?random=15',
+    'support': 'https://picsum.photos/600/400?random=16',
+    'growth': 'https://picsum.photos/600/400?random=17',
+  };
+  return images[section.id];
+}
+
+function buildBannerItems(section: any) {
+  const img = getBannerImage(section);
+  const status = section.status as string;
+  if (status === 'completed') {
+    return [
+      { text: getBannerMessage(section).split(' — ')[0], image: img },
+      { text: getBannerMessage(section).split(' — ')[1] || '', image: img },
+    ];
+  }
+  // For uncompleted/in-progress, separate the UNCOMPLETED tag from the message
+  const full = getBannerMessage(section);
+  const parts = full.split(' — ');
+  const first = parts[0] || full;
+  const rest = parts.slice(1).join(' — ');
+  return [
+    { text: first, image: img },
+    { text: rest, image: img },
+  ];
+}

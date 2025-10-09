@@ -96,6 +96,7 @@ const PathwayNode = ({ section, onClick }: PathwayNodeProps) => {
         }}
         onClick={config.clickable ? onClick : undefined}
       >
+      {/* Banner is rendered outside this component to avoid tilt and ensure background layering */}
       {/* Color tint overlay for depth */}
       <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500/12 via-blue-500/10 to-cyan-400/12" />
       {/* Subtle vignette */}

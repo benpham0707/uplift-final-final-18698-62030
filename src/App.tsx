@@ -16,6 +16,7 @@ import ProjectManagement from "./pages/ProjectManagement";
 import ProjectDiscovery from "./pages/ProjectDiscovery";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import PortfolioInsights from "./pages/PortfolioInsights";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/portfolio-scanner" element={<PortfolioScanner />} />
+            <Route path="/portfolio-insights" element={<PortfolioInsights />} />
             <Route path="/extracurricular-optimizer" element={<ExtracurricularOptimizer />} />
             <Route path="/academic-planner" element={<AcademicPlanner />} />
             <Route path="/project-incubation" element={<ProjectIncubationHub />} />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,6 +43,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import GradientText from '@/components/ui/GradientText';
+// StarBorder removed per revert
 
 const PortfolioScanner = () => {
   const { user, loading, signOut } = useAuth();
@@ -56,6 +57,12 @@ const PortfolioScanner = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiOverall, setAiOverall] = useState<number | null>(null);
+  type MetricId = 'impact' | 'academic' | 'curiosity' | 'story' | 'character';
+  const [selectedMetric, setSelectedMetric] = useState<MetricId | null>(null);
+  const [isInsightsOpen, setIsInsightsOpen] = useState(false);
+  const metricRefs = useRef<Record<MetricId, HTMLDivElement | null>>({ impact: null, academic: null, curiosity: null, story: null, character: null });
+  const insightsPanelRef = useRef<HTMLDivElement | null>(null);
+  const [carrotLeft, setCarrotLeft] = useState<number | null>(null);
   
 
   // Navigation items for portfolio scanner dropdown
@@ -202,6 +209,27 @@ const PortfolioScanner = () => {
     };
   };
 
+  // Toggle open/close when clicking the same metric; open when selecting a new one
+  const handleMetricClick = (metric: MetricId) => {
+    if (isInsightsOpen && selectedMetric === metric) {
+      setIsInsightsOpen(false);
+      return;
+    }
+    setSelectedMetric(metric);
+    setIsInsightsOpen(true);
+  };
+
+  // Current display value for each metric (mirrors the demo mapping used in tiles)
+  const getDisplayMetricValue = (metric: MetricId): number => {
+    const showDemo = true;
+    const demo = { impact: 8.2, academic: 8.1, curiosity: 7.6, story: 7.9, character: 7.3 } as const;
+    if (metric === 'impact') return showDemo ? demo.impact : (rubricScores.leadershipPotential.score || 0);
+    if (metric === 'academic') return showDemo ? demo.academic : (rubricScores.academicExcellence.score || 0);
+    if (metric === 'curiosity') return showDemo ? demo.curiosity : (rubricScores.futureReadiness.score || 0);
+    if (metric === 'story') return showDemo ? demo.story : (aiOverall || overallScore || 0);
+    return showDemo ? demo.character : (rubricScores.communityImpact.score || 0);
+  };
+
   // Guard route and load profile state from Supabase
   useEffect(() => {
     if (loading) return;
@@ -307,6 +335,46 @@ const PortfolioScanner = () => {
 
   const currentLevel = completionLevels.find(level => overallProgress >= level.min) || 
                       { level: 'Getting Started', color: 'bg-muted', description: 'Begin Your Journey' };
+
+  const getMetricTheme = (metric: 'overall' | 'completion' | 'academic' | 'leadership' | 'growth' | 'uniqueness') => {
+    const overallVal = (aiOverall ?? overallScore) || 0;
+    const completionVal = overallProgress / 10; // reuse tone mapping 0-10
+    const academicVal = rubricScores.academicExcellence.score || 0;
+    const leadershipVal = rubricScores.leadershipPotential.score || 0;
+    const growthVal = rubricScores.personalGrowth.score || 0;
+    const uniqueVal = rubricScores.uniqueValue.score || 0;
+    const value = metric === 'overall' ? overallVal : metric === 'completion' ? completionVal : metric === 'academic' ? academicVal : metric === 'leadership' ? leadershipVal : metric === 'growth' ? growthVal : uniqueVal;
+    const tone = getHoloToneClass(value) as any;
+    const colors = toneToColors(tone);
+    const start = colors[0];
+    const end = colors[1];
+    const gradientCss = `linear-gradient(90deg, ${start}, ${end})`;
+    return { start, end, gradientCss };
+  };
+
+  // helper to compute carrot alignment under the selected metric
+  useEffect(() => {
+    const updateCarrot = () => {
+      if (!selectedMetric || !isInsightsOpen) {
+        setCarrotLeft(null);
+        return;
+      }
+      const el = metricRefs.current[selectedMetric as MetricId];
+      const panel = insightsPanelRef.current;
+      if (!el || !panel) return;
+      const rect = el.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      setCarrotLeft(centerX - panelRect.left);
+    };
+    updateCarrot();
+    window.addEventListener('resize', updateCarrot);
+    window.addEventListener('scroll', updateCarrot, { passive: true });
+    return () => {
+      window.removeEventListener('resize', updateCarrot);
+      window.removeEventListener('scroll', updateCarrot);
+    };
+  }, [selectedMetric, isInsightsOpen]);
 
   if (initializing) {
     return (
@@ -478,47 +546,44 @@ const PortfolioScanner = () => {
             </p>
           </div>
 
-          {/* Strength and Completion Grid - holographic (demo values to preview all tones) */}
+          {/* Profile Completion */}
+          <div className="mb-8">
+            <div className="rounded-2xl border border-white/25 bg-white/15 backdrop-blur-md p-4 shadow-lg">
+              <div className="flex items-center justify-between gap-4">
+                <div className="text-xs uppercase tracking-wide text-white/85">Profile Completion</div>
+                <div className="text-xs font-semibold text-white/95">{overallProgress}%</div>
+              </div>
+              <div className="mt-2">
+                <Progress value={overallProgress} className="h-3.5 bg-white/25" />
+              </div>
+            </div>
+          </div>
+
+          {/* Five Key Metrics grid */}
           {(() => {
-            const showColorDemo = true;
-            const demo = {
-              overall: 9.4,      // blue
-              completion: 62,    // yellow
-              academic: 8.1,     // green
-              leadership: 4.5,   // red
-            };
-            const overallVal = showColorDemo ? demo.overall : (aiOverall || overallScore);
-            const completionVal = showColorDemo ? demo.completion : overallProgress;
-            const academicVal = showColorDemo ? demo.academic : (rubricScores.academicExcellence.score || 0);
-            const leadershipVal = showColorDemo ? demo.leadership : (rubricScores.leadershipPotential.score || 0);
+            const showDemo = true;
+            const demo = { impact: 8.2, academic: 8.1, curiosity: 7.6, story: 7.9, character: 7.3 };
+            const impactVal = showDemo ? demo.impact : (rubricScores.leadershipPotential.score || 0);
+            const academicVal = showDemo ? demo.academic : (rubricScores.academicExcellence.score || 0);
+            const curiosityVal = showDemo ? demo.curiosity : (rubricScores.futureReadiness.score || 0);
+            const storyVal = showDemo ? demo.story : (aiOverall || overallScore);
+            const characterVal = showDemo ? demo.character : (rubricScores.communityImpact.score || 0);
 
             return (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-3">
+                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover cursor-pointer" ref={(el) => (metricRefs.current.impact = el)} onClick={() => handleMetricClick('impact')}>
                   <GradientText 
                     className="text-3xl font-bold metric-value"
-                    colors={toneToColors(getHoloToneClass(overallVal) as any)}
+                    colors={toneToColors(getHoloToneClass(impactVal) as any)}
                     animationSpeed={10}
                     showBorder={false}
                     textOnly
                   >
-                    {overallVal.toFixed(1)}
+                    {impactVal.toFixed(1)}
                   </GradientText>
-                  <div className="text-sm metric-label font-semibold mt-1">Portfolio Strength</div>
+                  <div className="text-sm metric-label font-semibold mt-1">Impact & Leadership</div>
                 </div>
-                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover">
-                  <GradientText
-                    className="text-3xl font-bold metric-value"
-                    colors={toneToColors(getHoloToneClass((completionVal) / 10) as any)}
-                    animationSpeed={10}
-                    showBorder={false}
-                    textOnly
-                  >
-                    {completionVal}%
-                  </GradientText>
-                  <div className="text-sm metric-label font-semibold mt-1">Complete</div>
-                </div>
-                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover">
+                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover cursor-pointer" ref={(el) => (metricRefs.current.academic = el)} onClick={() => handleMetricClick('academic')}>
                   <GradientText
                     className="text-3xl font-bold metric-value"
                     colors={toneToColors(getHoloToneClass(academicVal) as any)}
@@ -528,26 +593,224 @@ const PortfolioScanner = () => {
                   >
                     {academicVal.toFixed(1)}
                   </GradientText>
-                  <div className="text-sm metric-label font-semibold mt-1">Academic Excellence</div>
+                  <div className="text-sm metric-label font-semibold mt-1">Academic Performance</div>
                 </div>
-                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover">
+                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover cursor-pointer" ref={(el) => (metricRefs.current.curiosity = el)} onClick={() => handleMetricClick('curiosity')}>
                   <GradientText
                     className="text-3xl font-bold metric-value"
-                    colors={toneToColors(getHoloToneClass(leadershipVal) as any)}
+                    colors={toneToColors(getHoloToneClass(curiosityVal) as any)}
                     animationSpeed={10}
                     showBorder={false}
                     textOnly
                   >
-                    {leadershipVal.toFixed(1)}
+                    {curiosityVal.toFixed(1)}
                   </GradientText>
-                  <div className="text-sm metric-label font-semibold mt-1">Leadership Potential</div>
+                  <div className="text-sm metric-label font-semibold mt-1">Intellectual Curiosity</div>
+                </div>
+                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover cursor-pointer" ref={(el) => (metricRefs.current.story = el)} onClick={() => handleMetricClick('story')}>
+                  <GradientText
+                    className="text-3xl font-bold metric-value"
+                    colors={toneToColors(getHoloToneClass(storyVal) as any)}
+                    animationSpeed={10}
+                    showBorder={false}
+                    textOnly
+                  >
+                    {storyVal.toFixed(1)}
+                  </GradientText>
+                  <div className="text-sm metric-label font-semibold mt-1">Storytelling</div>
+                </div>
+                <div className="text-center p-4 rounded-xl holo-surface holo-sheen elev-strong elev-hover cursor-pointer" ref={(el) => (metricRefs.current.character = el)} onClick={() => handleMetricClick('character')}>
+                  <GradientText
+                    className="text-3xl font-bold metric-value"
+                    colors={toneToColors(getHoloToneClass(characterVal) as any)}
+                    animationSpeed={10}
+                    showBorder={false}
+                    textOnly
+                  >
+                    {characterVal.toFixed(1)}
+                  </GradientText>
+                  <div className="text-sm metric-label font-semibold mt-1">Character & Community</div>
                 </div>
               </div>
             );
           })()}
 
+          {/* Insights inside hero gradient */}
+          <Collapsible open={isInsightsOpen} onOpenChange={setIsInsightsOpen}>
+            {selectedMetric && (
+              <CollapsibleContent>
+                <div
+                  className="rounded-2xl border shadow-xl relative overflow-hidden my-6 max-w-7xl mx-auto"
+                  ref={insightsPanelRef}
+                  style={{
+                    borderColor: 'rgba(0,0,0,0.1)',
+                    background: 'rgba(255,255,255,0.92)',
+                  }}
+                >
+                  <div className="h-1 w-full" style={{ backgroundImage: getMetricTheme((selectedMetric === 'impact' ? 'leadership' : selectedMetric === 'curiosity' ? 'growth' : selectedMetric === 'story' ? 'overall' : selectedMetric === 'character' ? 'uniqueness' : selectedMetric) as any).gradientCss }} />
+                  {carrotLeft !== null && (
+                    <div
+                      className="absolute -top-2 h-3.5 w-3.5 rotate-45"
+                      style={{
+                        left: Math.max(12, Math.min(carrotLeft - 7, (insightsPanelRef.current?.clientWidth || 0) - 14)),
+                        backgroundImage: getMetricTheme((selectedMetric === 'impact' ? 'leadership' : selectedMetric === 'curiosity' ? 'growth' : selectedMetric === 'story' ? 'overall' : selectedMetric === 'character' ? 'uniqueness' : selectedMetric) as any).gradientCss,
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(0,0,0,0.1)'
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  <div className="p-5 md:p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-semibold text-foreground">
+                          {(selectedMetric === 'impact' && 'Impact & Leadership - Insights') ||
+                           (selectedMetric === 'academic' && 'Academic Rigor - Insights') ||
+                           (selectedMetric === 'curiosity' && 'Intellectual Curiosity - Insights') ||
+                           (selectedMetric === 'story' && 'Storytelling - Insights') ||
+                           'Character & Community - Insights'}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            const param =
+                              selectedMetric === 'impact' ? 'leadershipPotential' :
+                              selectedMetric === 'academic' ? 'academicExcellence' :
+                              selectedMetric === 'curiosity' ? 'futureReadiness' :
+                              selectedMetric === 'story' ? 'overall' :
+                              'communityImpact';
+                            const qp = new URLSearchParams({ metric: param });
+                            navigate(`/portfolio-insights?${qp.toString()}`);
+                          }}
+                        >
+                          View all insights
+                        </Button>
+                        <button
+                          className="text-muted-foreground hover:text-foreground transition"
+                          onClick={() => setIsInsightsOpen(false)}
+                          aria-label="Close insights"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 grid md:grid-cols-1 gap-8">
+                      <section className="space-y-1">
+                        <div className="text-sm uppercase tracking-wide text-muted-foreground mb-2">Overview</div>
+                        <div className="space-y-2">
+                          <p className="text-sm text-foreground/90 leading-6">
+                            {selectedMetric === 'impact' && 'Admissions look for proof you move people and projects. Quantify outcomes (people helped, dollars raised, time saved) and show roles where others relied on you.'}
+                            {selectedMetric === 'academic' && 'Top schools value trajectory and rigor. Show a steady climb in course challenge with A-/B+ or better and highlight the toughest classes you can succeed in next.'}
+                            {selectedMetric === 'curiosity' && 'Demonstrate self-driven learning: independent projects, research outreach, or certifications. Tie exploration to a clear interest arc.'}
+                            {selectedMetric === 'story' && 'Connect your activities to a single throughline—why you do them and what you’re building toward. Evidence beats adjectives.'}
+                            {selectedMetric === 'character' && 'Translate values into community outcomes. Spotlight 1–2 commitments where you consistently show up and make a difference.'}
+                          </p>
+                          <div className="grid md:grid-cols-3 gap-3">
+                            <div className="rounded-lg border p-3 bg-white/60">
+                              <div className="text-xs uppercase text-muted-foreground">What top admits show</div>
+                              <div className="text-sm mt-1 leading-6 text-foreground">
+                                {selectedMetric === 'impact' && 'Clear evidence of steering people and resources to a measurable win—projects that grow, teams that improve, or communities that benefit in ways you can quantify.'}
+                                {selectedMetric === 'academic' && 'A transcript that stretches into challenging courses with a rising trajectory, paired with proof you can master difficult material.'}
+                                {selectedMetric === 'curiosity' && 'Self-propelled exploration that turns questions into prototypes, brief write-ups, or collaborations beyond the classroom.'}
+                                {selectedMetric === 'story' && 'A coherent narrative where choices stack toward a purpose, with results that make that purpose believable.'}
+                                {selectedMetric === 'character' && 'Long-haul commitment to people or places—consistent service that leaves behind systems or outcomes others can point to.'}
+                              </div>
+                            </div>
+                            <div className="rounded-lg border p-3 bg-white/60">
+                              <div className="text-xs uppercase text-muted-foreground">Your quick opportunity</div>
+                              <div className="text-sm mt-1 leading-6 text-foreground">
+                                {selectedMetric === 'impact' && 'Choose one current initiative and set a 6–8 week goal tied to a number (beneficiaries, dollars, or hours saved); publish a short update when you hit it.'}
+                                {selectedMetric === 'academic' && 'Enroll in one stretch class and pre-schedule weekly support (office hours, peer tutor); track progress with two short reflections.'}
+                                {selectedMetric === 'curiosity' && 'Run a 4–6 week mini‑project with weekly deliverables and one mentor touchpoint; ship a public artifact at the end.'}
+                                {selectedMetric === 'story' && 'Write a 2–3 sentence thesis for your application story and reframe your three main activities to prove it with outcomes.'}
+                                {selectedMetric === 'character' && 'Pick one cause and show up weekly; capture before/after metrics or testimonials to make the benefit visible.'}
+                              </div>
+                            </div>
+                            <div className="rounded-lg border p-3 bg-white/60">
+                              <div className="text-xs uppercase text-muted-foreground">Distance to top tier</div>
+                              <div className="text-sm mt-1 leading-6 text-foreground">
+                                {(() => {
+                                  const current = getDisplayMetricValue(selectedMetric || 'impact');
+                                  const target = 9.2;
+                                  const gap = Math.max(0, Number((target - current).toFixed(1)));
+                                  return gap === 0 ? 'You are performing at or above typical Top‑25 admit levels—focus on sustaining visible outcomes.' : `${gap} points from a typical Top‑25 admit profile—close it with 2–3 focused moves in the next 60–90 days.`;
+                                })()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+
+                      <hr className="border-t border-black/10" />
+
+                      <section>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-sm uppercase tracking-wide text-muted-foreground">Top 4 Improvements</div>
+                        </div>
+                        <ol className="mt-1 grid md:grid-cols-2 gap-x-6 gap-y-3">
+                          {(() => {
+                            if (selectedMetric === 'impact') return [
+                              'Quantify your outcomes by reporting people helped, revenue raised, or hours saved for each major initiative.',
+                              'Elevate your responsibility by training peers or leading a small sub-team with clear goals and check-ins.',
+                              'Ship one visible deliverable within 6–8 weeks and communicate results to the stakeholders who benefit.',
+                              'Document proof with one or two public links (website, repo, media, or a short testimonial).'
+                            ];
+                            if (selectedMetric === 'academic') return [
+                              'Add one stretch course next term and write an explicit support plan that includes office hours or tutoring.',
+                              'Visualize your semester-by-semester grade trend and annotate what changed to drive improvement.',
+                              'Take an external benchmark (AP/IB/dual-enroll/competition) to validate your readiness for rigor.',
+                              'Publish a brief reflection that explains a hard concept you mastered and why it matters for your interests.'
+                            ];
+                            if (selectedMetric === 'curiosity') return [
+                              'Launch a 6‑week independent project with weekly milestones and one guiding research question.',
+                              'Email one mentor or researcher for feedback and summarize the three most important insights you gained.',
+                              'Produce a tangible artifact such as a public repo, prototype, short paper, or tutorial video.',
+                              'Connect the project to your longer arc with a clear statement of the next experiment.'
+                            ];
+                            if (selectedMetric === 'story') return [
+                              'Draft a 2–3 sentence thesis that explains your why and the impact you aim to create.',
+                              'Align your top three activities under this thesis and downsize items that do not reinforce it.',
+                              'Rewrite activity descriptions to lead with outcomes and concrete evidence instead of duties.',
+                              'Secure one recommendation that explicitly reinforces this thesis with specific examples.'
+                            ];
+                            return [
+                              'Choose one or two causes and commit weekly time for the next two months to create continuity.',
+                              'Measure who benefits and how by capturing before/after numbers or brief testimonials.',
+                              'Add one leadership act within your service work such as coordination, training, or resource design.',
+                              'Attach a visible proof link (program page, photo log, letter, or media mention).'
+                            ];
+                          })().map((p, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span
+                                className="h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-semibold text-white flex-shrink-0"
+                                style={{ backgroundImage: getMetricTheme((selectedMetric === 'impact' ? 'leadership' : selectedMetric === 'curiosity' ? 'growth' : selectedMetric === 'story' ? 'overall' : selectedMetric === 'character' ? 'uniqueness' : selectedMetric) as any).gradientCss }}
+                              >
+                                {i + 1}
+                              </span>
+                              <span className="text-[14px] text-foreground leading-6">{p}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            )}
+          </Collapsible>
+
           {/* Secondary metrics row removed to avoid repetition */}
         </div>
+      </div>
+
+      {/* Soft divider between header and journey */}
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="my-8 md:my-12 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
       </div>
 
       {/* Main Content Area */}

@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "tsx src/http/server.ts",
+    "server": "PORT=8789 tsx src/http/server.ts",
     "dev:full": "run-p server dev"
   },
   "dependencies": {

@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/utils';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,7 +51,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data } = await supabase.auth.getSession();
         const accessToken = data.session?.access_token;
-        const resp = await fetch('/api/v1/assessment/complete', {
+        const resp = await apiFetch('/api/v1/assessment/complete', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

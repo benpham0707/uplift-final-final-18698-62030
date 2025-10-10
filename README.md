@@ -60,6 +60,25 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Local development (frontend + API)
+
+1) Copy env template and fill keys:
+
+```sh
+cp .env.example .env
+# Fill in SUPABASE_* and OpenAI keys
+```
+
+2) Start both servers:
+
+```sh
+npm run dev:full
+```
+
+Notes:
+- Backend runs on port 8789 (proxied from Vite). Update `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` for the frontend, and `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` for the backend.
+- One of `uplift-openai-key`, `UPLIFT_OPENAI_KEY`, or `OPENAI_API_KEY` must be set for analytics scoring.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/4535e3eb-552c-4d87-be7b-31bc73aa9b06) and click on Share -> Publish.

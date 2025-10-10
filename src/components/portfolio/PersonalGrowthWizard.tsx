@@ -270,7 +270,7 @@ const PersonalGrowthWizard: React.FC<Props> = ({ onComplete, onCancel, onProgres
         const session = await supabase.auth.getSession();
         const token = session.data.session?.access_token;
         if (token) {
-          await fetch('/api/v1/analytics/reconcile', {
+          await apiFetch('/api/v1/analytics/reconcile', {
             method: 'POST',
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -522,7 +522,7 @@ const PersonalGrowthWizard: React.FC<Props> = ({ onComplete, onCancel, onProgres
                   const session = await supabase.auth.getSession();
                   const token = session.data.session?.access_token;
                   if (token) {
-                    await fetch('/api/v1/analytics/reconcile', {
+                    await apiFetch('/api/v1/analytics/reconcile', {
                       method: 'POST',
                       headers: { Authorization: `Bearer ${token}` }
                     });

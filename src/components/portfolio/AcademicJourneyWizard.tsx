@@ -405,7 +405,7 @@ const AcademicJourneyWizard: React.FC<Props> = ({ onComplete, onCancel, onProgre
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
       if (token) {
-        await fetch('/api/v1/analytics/reconcile', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        await apiFetch('/api/v1/analytics/reconcile', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
         window.dispatchEvent(new CustomEvent('analytics:reconciled'));
       }
     } catch { /* non-blocking */ }

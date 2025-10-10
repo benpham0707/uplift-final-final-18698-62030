@@ -42,6 +42,7 @@ import PortfolioPathway from '@/components/portfolio/PortfolioPathway';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '@/lib/utils';
 import GradientText from '@/components/ui/GradientText';
 
 const PortfolioScanner = () => {
@@ -76,12 +77,12 @@ const PortfolioScanner = () => {
 
   // Default rubric scores - will be updated from API when available
   const [rubricScores, setRubricScores] = useState({
-    academicExcellence: { score: 7.5 as number | null },
-    leadershipPotential: { score: 7.2 as number | null },
-    personalGrowth: { score: 8.1 as number | null },
-    communityImpact: { score: 6.8 as number | null },
-    uniqueValue: { score: 7.9 as number | null },
-    futureReadiness: { score: 7.4 as number | null }
+    academicExcellence: { score: null as number | null },
+    leadershipPotential: { score: null as number | null },
+    personalGrowth: { score: null as number | null },
+    communityImpact: { score: null as number | null },
+    uniqueValue: { score: null as number | null },
+    futureReadiness: { score: null as number | null }
   });
 
   const overallScore = Math.round(
@@ -259,7 +260,7 @@ const PortfolioScanner = () => {
         setAiError(null);
         const session = await supabase.auth.getSession();
         const token = session.data.session?.access_token;
-        const resp = await fetch('/api/v1/analytics/portfolio-strength', {
+        const resp = await apiFetch('/api/v1/analytics/portfolio-strength', {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {})
           }
@@ -478,19 +479,12 @@ const PortfolioScanner = () => {
             </p>
           </div>
 
-          {/* Strength and Completion Grid - holographic (demo values to preview all tones) */}
+          {/* Strength and Completion Grid */}
           {(() => {
-            const showColorDemo = true;
-            const demo = {
-              overall: 9.4,      // blue
-              completion: 62,    // yellow
-              academic: 8.1,     // green
-              leadership: 4.5,   // red
-            };
-            const overallVal = showColorDemo ? demo.overall : (aiOverall || overallScore);
-            const completionVal = showColorDemo ? demo.completion : overallProgress;
-            const academicVal = showColorDemo ? demo.academic : (rubricScores.academicExcellence.score || 0);
-            const leadershipVal = showColorDemo ? demo.leadership : (rubricScores.leadershipPotential.score || 0);
+            const overallVal = (aiOverall ?? overallScore);
+            const completionVal = overallProgress;
+            const academicVal = (rubricScores.academicExcellence.score || 0);
+            const leadershipVal = (rubricScores.leadershipPotential.score || 0);
 
             return (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

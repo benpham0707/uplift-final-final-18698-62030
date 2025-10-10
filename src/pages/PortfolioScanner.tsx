@@ -829,7 +829,7 @@ const PortfolioScanner = () => {
 
                     return (
                       <div className="space-y-5">
-                        <div className="text-white/90 text-[15px] leading-7">
+                        <div className="text-white/90 text-[15px] leading-7 text-hero-contrast">
                           {aiDetailed?.narrativeSummary || (() => {
                             const overall = toFixed((aiOverall ?? overallScore) || 0);
                             const strengthText = top2.map(d => d.key).join(' and ');

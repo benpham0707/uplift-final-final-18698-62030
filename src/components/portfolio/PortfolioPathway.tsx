@@ -305,7 +305,7 @@ const PortfolioPathway = ({ onProgressUpdate, currentProgress }: PortfolioPathwa
         {/* Centered Pathway with snap points */}
         <div className="relative flex flex-col items-center">
           {pathwaySections.map((section, index) => (
-            <div key={section.id} className="relative snap-center snap-always min-h-[85vh] md:min-h-screen flex items-center justify-center">
+            <div id={section.id} key={section.id} className="relative snap-center snap-always min-h-[85vh] md:min-h-screen flex items-center justify-center">
               {/* Pathway Node */}
               <div className="relative z-10" ref={(el) => (nodeRefs.current[section.id] = el)}>
                 {/* Simple full-width banner behind the node */}

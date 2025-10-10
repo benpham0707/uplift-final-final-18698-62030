@@ -32,6 +32,7 @@ import {
   Calendar,
   BookOpen,
   Users,
+  Users2,
   Settings,
   Plus,
   GraduationCap,
@@ -39,8 +40,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Pencil,
-  Check
+  Check,
+  Briefcase,
+  RefreshCw
 } from 'lucide-react';
+import Dock from '@/components/Dock';
 import OnboardingFlow from '@/components/portfolio/OnboardingFlow';
 import PortfolioPathway from '@/components/portfolio/PortfolioPathway';
 import { useAuth } from '@/hooks/useAuth';
@@ -50,6 +54,8 @@ import { apiFetch } from '@/lib/utils';
 import GradientText from '@/components/ui/GradientText';
 // StarBorder removed per revert
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap } from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
 const PortfolioScanner = () => {
   const { user, loading, signOut } = useAuth();
@@ -74,6 +80,75 @@ const PortfolioScanner = () => {
   const [unifyIndex, setUnifyIndex] = useState(0);
   const [proofIndex, setProofIndex] = useState(0);
   const [sequenceIndex, setSequenceIndex] = useState(0);
+  const activeTweenRef = useRef<any>(null);
+
+  useEffect(() => {
+    try {
+      gsap.registerPlugin(ScrollToPlugin);
+    } catch {}
+  }, []);
+
+  // Temporarily disable CSS scroll snap during animated scroll for smoother control
+  const disableScrollSnap = () => {
+    const root = document.documentElement;
+    const body = document.body;
+    const prevRoot = root.style.scrollSnapType;
+    const prevBody = body.style.scrollSnapType;
+    root.style.scrollSnapType = 'none';
+    body.style.scrollSnapType = 'none';
+    let restored = false;
+    return () => {
+      if (restored) return;
+      restored = true;
+      // Restore to mandatory snapping for this page
+      root.style.scrollSnapType = prevRoot || 'y mandatory';
+      body.style.scrollSnapType = prevBody || 'y mandatory';
+    };
+  };
+
+  // Fallback animator when GSAP ScrollTo isn't available
+  const animateScrollFallback = (toY: number, durationMs: number) => {
+    const startY = window.scrollY;
+    const delta = toY - startY;
+    if (Math.abs(delta) < 1) return Promise.resolve();
+    const start = performance.now();
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    return new Promise<void>((resolve) => {
+      const step = (now: number) => {
+        const elapsed = now - start;
+        const t = Math.min(1, elapsed / durationMs);
+        const eased = easeInOutCubic(t);
+        window.scrollTo({ top: startY + delta * eased, behavior: 'auto' });
+        if (t < 1) requestAnimationFrame(step); else resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  };
+
+  const alignAfterRestore = (sectionId: string, element: HTMLElement) => {
+    try {
+      // Avoid second snap for header — GSAP already used offset
+      if (sectionId === 'overview') return;
+      window.setTimeout(() => {
+        const rect = element.getBoundingClientRect();
+        const viewportH = window.innerHeight || document.documentElement.clientHeight;
+        const bottomPad = parseInt(getComputedStyle(document.documentElement).scrollPaddingBottom || '0', 10) || 0;
+        const visualCenter = viewportH / 2 - bottomPad / 2;
+        const delta = Math.abs(rect.top + rect.height / 2 - visualCenter);
+        // Only correct if we're noticeably off-center (>6px)
+        if (delta > 6) {
+          // compute a corrected center that accounts for bottom padding
+          const targetY = window.scrollY + rect.top + rect.height / 2 - visualCenter;
+          try {
+            gsap.to(window, { duration: 0.3, ease: 'power2.out', scrollTo: { y: targetY, autoKill: true } });
+          } catch {
+            window.scrollTo({ top: targetY });
+          }
+        }
+        try { (ScrollTrigger as any)?.refresh?.(); } catch {}
+      }, 30);
+    } catch {}
+  };
 
   // Compute top two strengths for narrative generation
   const getTopTwo = () => {
@@ -150,10 +225,93 @@ const PortfolioScanner = () => {
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
     const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (!element) return;
+    const durationSec = 1.0;
+    const hasScrollTo = Boolean((gsap as any)?.plugins && (gsap as any).plugins.ScrollToPlugin);
+    const restore = disableScrollSnap();
+    // Kill any active tween to prevent leaving snap disabled
+    try { activeTweenRef.current?.kill?.(); } catch {}
+    activeTweenRef.current = null;
+
+    if (hasScrollTo) {
+      if (sectionId === 'overview') {
+        const tween = gsap.to(window, {
+          duration: durationSec,
+          ease: 'power2.out',
+          scrollTo: { y: element, offsetY: 64, autoKill: true },
+          onComplete: () => { restore(); alignAfterRestore(sectionId, element); activeTweenRef.current = null; },
+          onInterrupt: () => { restore(); alignAfterRestore(sectionId, element); activeTweenRef.current = null; }
+        });
+        activeTweenRef.current = tween;
+        // hard fallback restore
+        window.setTimeout(restore, Math.ceil(durationSec * 1000) + 100);
+        return;
+      }
+      const rect = element.getBoundingClientRect();
+      const viewportH = window.innerHeight || document.documentElement.clientHeight;
+      const targetY = window.scrollY + rect.top + rect.height / 2 - viewportH / 2;
+      const tween = gsap.to(window, {
+        duration: durationSec,
+        ease: 'power2.inOut',
+        scrollTo: { y: targetY, autoKill: true },
+        onComplete: () => { restore(); alignAfterRestore(sectionId, element); activeTweenRef.current = null; },
+        onInterrupt: () => { restore(); alignAfterRestore(sectionId, element); activeTweenRef.current = null; }
+      });
+      activeTweenRef.current = tween;
+      window.setTimeout(restore, Math.ceil(durationSec * 1000) + 100);
+      return;
+    }
+
+    // Fallback animation with the same duration
+    try {
+      const rect = element.getBoundingClientRect();
+      const viewportH = window.innerHeight || document.documentElement.clientHeight;
+      const targetY = sectionId === 'overview'
+        ? Math.max(0, window.scrollY + rect.top - 64)
+        : window.scrollY + rect.top + rect.height / 2 - viewportH / 2;
+      animateScrollFallback(targetY, durationSec * 1000).finally(() => { restore(); alignAfterRestore(sectionId, element); });
+    } catch {
+      element.scrollIntoView({ behavior: 'smooth', block: sectionId === 'overview' ? 'start' : 'center' });
+      restore();
     }
   };
+
+  const dockItems = [
+    { icon: <Home size={18} />, label: 'Home', onClick: () => scrollToSection('overview') },
+    { icon: <User size={18} />, label: 'Personal', onClick: () => scrollToSection('personal-info') },
+    { icon: <GraduationCap size={18} />, label: 'Academic', onClick: () => scrollToSection('academic-journey') },
+    { icon: <Briefcase size={18} />, label: 'Experiences', onClick: () => scrollToSection('experiences') },
+    { icon: <Heart size={18} />, label: 'Family', onClick: () => scrollToSection('family') },
+    { icon: <Target size={18} />, label: 'Goals', onClick: () => scrollToSection('goals') },
+    { icon: <Users2 size={18} />, label: 'Support', onClick: () => scrollToSection('support') },
+    { icon: <BookOpen size={18} />, label: 'Growth', onClick: () => scrollToSection('growth') },
+    {
+      icon: <RefreshCw size={18} />,
+      label: 'Update',
+      className: 'variant-update',
+      onClick: async () => {
+        try {
+          setAiLoading(true);
+          setAiError(null);
+          const session = await supabase.auth.getSession();
+          const token = session.data.session?.access_token;
+          await apiFetch('/api/v1/analytics/reconcile', {
+            method: 'POST',
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {})
+            }
+          });
+          window.dispatchEvent(new CustomEvent('analytics:reconciled'));
+        } catch (e: any) {
+          // eslint-disable-next-line no-console
+          console.error('Update reconcile failed', e);
+          setAiError(e?.message || 'Failed to update analytics');
+        } finally {
+          setAiLoading(false);
+        }
+      }
+    },
+  ];
 
   // Default rubric scores - will be updated from API when available
   const [rubricScores, setRubricScores] = useState({
@@ -422,6 +580,8 @@ const PortfolioScanner = () => {
     const prevOverscrollBody = body.style.overscrollBehaviorY;
     const prevScrollPaddingRoot = (root.style as any).scrollPaddingTop;
     const prevScrollPaddingBody = (body.style as any).scrollPaddingTop;
+    const prevScrollPaddingBottomRoot = (root.style as any).scrollPaddingBottom;
+    const prevScrollPaddingBottomBody = (body.style as any).scrollPaddingBottom;
 
     // Apply scroll snap to the viewport and contain momentum chaining
     root.style.scrollSnapType = 'y mandatory';
@@ -431,6 +591,10 @@ const PortfolioScanner = () => {
     // Account for sticky navbar height (h-16 ~ 64px)
     (root.style as any).scrollPaddingTop = '64px';
     (body.style as any).scrollPaddingTop = '64px';
+    // Account for dock height at bottom so snap-center appears visually centered
+    const dockSafePx = 84; // panel ~68px + margins
+    (root.style as any).scrollPaddingBottom = `${dockSafePx}px`;
+    (body.style as any).scrollPaddingBottom = `${dockSafePx}px`;
 
     return () => {
       root.style.scrollSnapType = prevSnapType;
@@ -439,6 +603,8 @@ const PortfolioScanner = () => {
       body.style.overscrollBehaviorY = prevOverscrollBody;
       (root.style as any).scrollPaddingTop = prevScrollPaddingRoot || '';
       (body.style as any).scrollPaddingTop = prevScrollPaddingBody || '';
+      (root.style as any).scrollPaddingBottom = prevScrollPaddingBottomRoot || '';
+      (body.style as any).scrollPaddingBottom = prevScrollPaddingBottomBody || '';
     };
   }, []);
 
@@ -1191,6 +1357,12 @@ const PortfolioScanner = () => {
         <PortfolioPathway 
           onProgressUpdate={setOverallProgress}
           currentProgress={overallProgress}
+        />
+        <Dock 
+          items={dockItems}
+          panelHeight={68}
+          baseItemSize={50}
+          magnification={70}
         />
       </main>
     </div>

@@ -1,0 +1,136 @@
+.dock-outer {
+  margin: 0 0.5rem;
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+}
+
+.dock-panel {
+  position: fixed;
+  bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  width: fit-content;
+  gap: 1rem;
+  border-radius: 1rem;
+  background: hsl(var(--card) / 0.15);
+  border: 1px solid hsl(var(--primary) / 0.25);
+  padding: 0 0.5rem 0.5rem;
+  z-index: 60;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 18px 40px -14px hsl(var(--primary) / 0.35), 0 2px 0 hsl(var(--background) / 0.3) inset;
+}
+
+.dock-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--gradient-dashboard);
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.dock-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.25) inset,
+              0 8px 24px -12px hsl(var(--primary) / 0.45) inset;
+  pointer-events: none;
+}
+
+.dock-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid hsl(var(--primary) / 0.3);
+  box-shadow: 0 6px 18px -8px hsl(var(--foreground) / 0.2), 0 1px 0 hsl(var(--background) / 0.15) inset;
+  cursor: pointer;
+  outline: none;
+  transition: transform 180ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+
+/* Variant: update/accent tile uses secondary gradient and tinted border */
+.dock-item.variant-update {
+  border-color: hsl(var(--secondary) / 0.35);
+}
+
+.dock-item.variant-update::before {
+  background: var(--gradient-secondary);
+}
+
+.dock-item.variant-update:hover {
+  border-color: hsl(var(--secondary) / 0.6);
+  box-shadow: 0 12px 34px -10px hsl(var(--secondary) / 0.45);
+}
+
+.dock-item.variant-update .dock-icon {
+  color: hsl(var(--secondary-foreground));
+}
+
+.dock-item::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 10px;
+  background: var(--gradient-primary);
+  filter: saturate(120%);
+  opacity: 0.9;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.dock-item:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--primary) / 0.55);
+  box-shadow: var(--shadow-medium, 0 12px 34px -10px hsl(var(--primary) / 0.35));
+}
+
+.dock-item:active {
+  transform: translateY(0);
+}
+
+.dock-item:focus-visible {
+  outline: 2px solid hsl(var(--primary) / 0.7);
+  outline-offset: 2px;
+}
+
+.dock-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--primary-foreground));
+  position: relative;
+  z-index: 1;
+}
+
+.dock-icon svg {
+  width: 1.15em;
+  height: 1.15em;
+  stroke-width: 2px;
+}
+
+.dock-label {
+  position: absolute;
+  top: -1.7rem;
+  left: 50%;
+  width: fit-content;
+  white-space: pre;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border) / 0.35);
+  background: linear-gradient(180deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.75));
+  padding: 0.125rem 0.55rem;
+  font-size: 0.75rem;
+  color: hsl(var(--foreground));
+  transform: translateX(-50%);
+  box-shadow: 0 6px 16px -8px hsl(var(--foreground) / 0.25);
+}
+
+

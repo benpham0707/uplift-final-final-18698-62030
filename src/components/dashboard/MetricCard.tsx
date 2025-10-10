@@ -47,15 +47,15 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   const getVariantClasses = () => {
     switch (variant) {
       case 'primary':
-        return 'gradient-gpa text-white';
+        return 'gradient-gpa text-white border-l-4 border-l-purple-500';
       case 'secondary':
-        return 'gradient-percentile text-white';
+        return 'gradient-percentile text-white border-l-4 border-l-blue-500';
       case 'success':
-        return 'gradient-progress text-white';
+        return 'gradient-progress text-white border-l-4 border-l-emerald-500';
       case 'warning':
-        return 'gradient-requirements text-white';
+        return 'gradient-requirements text-white border-l-4 border-l-amber-500';
       default:
-        return 'bg-card border-gradient';
+        return 'bg-card border-gradient border-l-4 border-l-gray-300';
     }
   };
 

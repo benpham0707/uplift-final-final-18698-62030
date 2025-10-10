@@ -127,7 +127,15 @@ const PortfolioScanner = () => {
   const alignAfterRestore = (sectionId: string, element: HTMLElement) => {
     try {
       window.setTimeout(() => {
-        element.scrollIntoView({ behavior: 'auto', block: sectionId === 'overview' ? 'start' : 'center' });
+        // Only apply in fallback flows or when we're clearly off; avoid tiny re-adjustments
+        const rect = element.getBoundingClientRect();
+        const viewportH = window.innerHeight || document.documentElement.clientHeight;
+        const bottomPad = parseInt(getComputedStyle(document.documentElement).scrollPaddingBottom || '0', 10) || 0;
+        const visualCenter = viewportH / 2 - bottomPad / 2;
+        const delta = Math.abs(rect.top + rect.height / 2 - (sectionId === 'overview' ? 64 : visualCenter));
+        if (delta > 12) {
+          element.scrollIntoView({ behavior: 'auto', block: sectionId === 'overview' ? 'start' : 'center' });
+        }
         try { (ScrollTrigger as any)?.refresh?.(); } catch {}
       }, 30);
     } catch {}
@@ -228,8 +236,8 @@ const PortfolioScanner = () => {
           duration: durationSec,
           ease: 'power2.out',
           scrollTo: { y: element, offsetY: 64, autoKill: true },
-          onComplete: () => { restore(); restoreSnapRef.current = null; alignAfterRestore(sectionId, element); activeTweenRef.current = null; },
-          onInterrupt: () => { restore(); restoreSnapRef.current = null; alignAfterRestore(sectionId, element); activeTweenRef.current = null; }
+          onComplete: () => { restore(); restoreSnapRef.current = null; try { (ScrollTrigger as any)?.refresh?.(); } catch {}; activeTweenRef.current = null; },
+          onInterrupt: () => { restore(); restoreSnapRef.current = null; try { (ScrollTrigger as any)?.refresh?.(); } catch {}; activeTweenRef.current = null; }
         });
         activeTweenRef.current = tween;
         // hard fallback restore
@@ -240,21 +248,18 @@ const PortfolioScanner = () => {
       const viewportH = window.innerHeight || document.documentElement.clientHeight;
       const bottomPad = parseInt(getComputedStyle(document.documentElement).scrollPaddingBottom || '0', 10) || 0;
       const visualCenter = viewportH / 2 - bottomPad / 2;
-      const targetY = window.scrollY + rect.top + rect.height / 2 - visualCenter;
+      const targetY = Math.round(window.scrollY + rect.top + rect.height / 2 - visualCenter);
       const tween = gsap.to(window, {
         duration: durationSec,
         ease: 'power2.inOut',
         scrollTo: { y: targetY, autoKill: true },
         onComplete: () => {
           restore(); restoreSnapRef.current = null;
-          // Nudge to exact snap to re-enable natural snapping next scroll
-          try { element.scrollIntoView({ behavior: 'auto', block: 'center' }); } catch {}
           try { (ScrollTrigger as any)?.refresh?.(); } catch {}
           activeTweenRef.current = null;
         },
         onInterrupt: () => {
           restore(); restoreSnapRef.current = null;
-          try { element.scrollIntoView({ behavior: 'auto', block: 'center' }); } catch {}
           try { (ScrollTrigger as any)?.refresh?.(); } catch {}
           activeTweenRef.current = null;
         }

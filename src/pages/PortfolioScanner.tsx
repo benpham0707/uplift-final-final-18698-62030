@@ -63,6 +63,7 @@ const PortfolioScanner = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiOverall, setAiOverall] = useState<number | null>(null);
+	const [aiDetailed, setAiDetailed] = useState<any | null>(null);
   type MetricId = 'impact' | 'academic' | 'curiosity' | 'story' | 'character';
   const [selectedMetric, setSelectedMetric] = useState<MetricId | null>(null);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
@@ -294,14 +295,25 @@ const PortfolioScanner = () => {
 
   // Current display value for each metric (mirrors the demo mapping used in tiles)
   const getDisplayMetricValue = (metric: MetricId): number => {
-    const showDemo = true;
-    const demo = { impact: 8.2, academic: 8.1, curiosity: 7.6, story: 7.9, character: 7.3 } as const;
-    if (metric === 'impact') return showDemo ? demo.impact : (rubricScores.leadershipPotential.score || 0);
-    if (metric === 'academic') return showDemo ? demo.academic : (rubricScores.academicExcellence.score || 0);
-    if (metric === 'curiosity') return showDemo ? demo.curiosity : (rubricScores.futureReadiness.score || 0);
-    if (metric === 'story') return showDemo ? demo.story : (aiOverall || overallScore || 0);
-    return showDemo ? demo.character : (rubricScores.communityImpact.score || 0);
+    if (metric === 'impact') return (rubricScores.leadershipPotential.score || 0);
+    if (metric === 'academic') return (rubricScores.academicExcellence.score || 0);
+    if (metric === 'curiosity') return (rubricScores.futureReadiness.score || 0);
+    if (metric === 'story') return (aiOverall || overallScore || 0);
+    return (rubricScores.communityImpact.score || 0);
   };
+
+	// Map UI metric ids to backend detailed.dimensions keys
+	const metricToDimKey: Record<MetricId, string | null> = {
+		impact: 'leadershipPotential',
+		academic: 'academicExcellence',
+		curiosity: 'futureReadiness',
+		story: null, // narrative uses detailed.narrativeSummary
+		character: 'communityImpact'
+	};
+	const getDim = (m: MetricId) => {
+		const key = metricToDimKey[m];
+		return key && aiDetailed?.dimensions ? (aiDetailed.dimensions as any)[key] : null;
+	};
 
   // Guard route and load profile state from Supabase
   useEffect(() => {
@@ -369,10 +381,11 @@ const PortfolioScanner = () => {
           const text = await resp.text();
           throw new Error(text || `Request failed: ${resp.status}`);
         }
-        const json = await resp.json();
+		const json = await resp.json();
         if (typeof json?.overall === 'number') {
           setAiOverall(Number(json.overall));
         }
+		setAiDetailed(json?.detailed ?? null);
         const d = json?.dimensions || {};
         setRubricScores(prev => ({
           ...prev,
@@ -690,13 +703,11 @@ const PortfolioScanner = () => {
 
           {/* Five Key Metrics grid */}
           {(() => {
-            const showDemo = true;
-            const demo = { impact: 8.2, academic: 8.1, curiosity: 7.6, story: 7.9, character: 7.3 };
-            const impactVal = showDemo ? demo.impact : (rubricScores.leadershipPotential.score || 0);
-            const academicVal = showDemo ? demo.academic : (rubricScores.academicExcellence.score || 0);
-            const curiosityVal = showDemo ? demo.curiosity : (rubricScores.futureReadiness.score || 0);
-            const storyVal = showDemo ? demo.story : (aiOverall || overallScore);
-            const characterVal = showDemo ? demo.character : (rubricScores.communityImpact.score || 0);
+            const impactVal = (rubricScores.leadershipPotential.score || 0);
+            const academicVal = (rubricScores.academicExcellence.score || 0);
+            const curiosityVal = (rubricScores.futureReadiness.score || 0);
+            const storyVal = (aiOverall || overallScore);
+            const characterVal = (rubricScores.communityImpact.score || 0);
 
             return (
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-3">
@@ -818,8 +829,8 @@ const PortfolioScanner = () => {
 
                     return (
                       <div className="space-y-5">
-                        <div className="text-[15px] leading-7 text-hero-contrast">
-                          {(() => {
+                        <div className="text-white/90 text-[15px] leading-7">
+                          {aiDetailed?.narrativeSummary || (() => {
                             const overall = toFixed((aiOverall ?? overallScore) || 0);
                             const strengthText = top2.map(d => d.key).join(' and ');
                             const focusText = bottom2.map(d => d.key).join(' and ');
@@ -1044,32 +1055,47 @@ const PortfolioScanner = () => {
                       <section className="space-y-1">
                         <div className="text-sm uppercase tracking-wide text-muted-foreground mb-2">Overview</div>
                         <div className="space-y-2">
-                          <p className="text-sm text-foreground/90 leading-6">
-                            {selectedMetric === 'impact' && 'Admissions look for proof you move people and projects. Quantify outcomes (people helped, dollars raised, time saved) and show roles where others relied on you.'}
-                            {selectedMetric === 'academic' && 'Top schools value trajectory and rigor. Show a steady climb in course challenge with A-/B+ or better and highlight the toughest classes you can succeed in next.'}
-                            {selectedMetric === 'curiosity' && 'Demonstrate self-driven learning: independent projects, research outreach, or certifications. Tie exploration to a clear interest arc.'}
-                            {selectedMetric === 'story' && 'Connect your activities to a single throughline—why you do them and what you’re building toward. Evidence beats adjectives.'}
-                            {selectedMetric === 'character' && 'Translate values into community outcomes. Spotlight 1–2 commitments where you consistently show up and make a difference.'}
-                          </p>
+                          {(() => {
+                            const dim = getDim(selectedMetric as MetricId);
+                            const fallback =
+                              (selectedMetric === 'impact' && 'Admissions look for proof you move people and projects. Quantify outcomes (people helped, dollars raised, time saved) and show roles where others relied on you.') ||
+                              (selectedMetric === 'academic' && 'Top schools value trajectory and rigor. Show a steady climb in course challenge with A-/B+ or better and highlight the toughest classes you can succeed in next.') ||
+                              (selectedMetric === 'curiosity' && 'Demonstrate self-driven learning: independent projects, research outreach, or certifications. Tie exploration to a clear interest arc.') ||
+                              (selectedMetric === 'story' && (aiDetailed?.narrativeSummary || 'Connect your activities to a single throughline—why you do them and what you’re building toward. Evidence beats adjectives.')) ||
+                              'Translate values into community outcomes. Spotlight 1–2 commitments where you consistently show up and make a difference.';
+                            return (
+                              <p className="text-sm text-foreground/90 leading-6">{dim?.feedback || fallback}</p>
+                            );
+                          })()}
                           <div className="grid md:grid-cols-3 gap-3">
                             <div className="rounded-lg border p-3 bg-white/60">
                               <div className="text-xs uppercase text-muted-foreground">What top admits show</div>
                               <div className="text-sm mt-1 leading-6 text-foreground">
-                                {selectedMetric === 'impact' && 'Clear evidence of steering people and resources to a measurable win—projects that grow, teams that improve, or communities that benefit in ways you can quantify.'}
-                                {selectedMetric === 'academic' && 'A transcript that stretches into challenging courses with a rising trajectory, paired with proof you can master difficult material.'}
-                                {selectedMetric === 'curiosity' && 'Self-propelled exploration that turns questions into prototypes, brief write-ups, or collaborations beyond the classroom.'}
-                                {selectedMetric === 'story' && 'A coherent narrative where choices stack toward a purpose, with results that make that purpose believable.'}
-                                {selectedMetric === 'character' && 'Long-haul commitment to people or places—consistent service that leaves behind systems or outcomes others can point to.'}
+                                {(() => {
+                                  const dim = getDim(selectedMetric as MetricId);
+                                  const fb =
+                                    (selectedMetric === 'impact' && 'Clear evidence of steering people and resources to a measurable win—projects that grow, teams that improve, or communities that benefit in ways you can quantify.') ||
+                                    (selectedMetric === 'academic' && 'A transcript that stretches into challenging courses with a rising trajectory, paired with proof you can master difficult material.') ||
+                                    (selectedMetric === 'curiosity' && 'Self-propelled exploration that turns questions into prototypes, brief write-ups, or collaborations beyond the classroom.') ||
+                                    (selectedMetric === 'story' && 'A coherent narrative where choices stack toward a purpose, with results that make that purpose believable.') ||
+                                    'Long-haul commitment to people or places—consistent service that leaves behind systems or outcomes others can point to.';
+                                  return dim?.strengths?.[0] || fb;
+                                })()}
                               </div>
                             </div>
                             <div className="rounded-lg border p-3 bg-white/60">
                               <div className="text-xs uppercase text-muted-foreground">Your quick opportunity</div>
                               <div className="text-sm mt-1 leading-6 text-foreground">
-                                {selectedMetric === 'impact' && 'Choose one current initiative and set a 6–8 week goal tied to a number (beneficiaries, dollars, or hours saved); publish a short update when you hit it.'}
-                                {selectedMetric === 'academic' && 'Enroll in one stretch class and pre-schedule weekly support (office hours, peer tutor); track progress with two short reflections.'}
-                                {selectedMetric === 'curiosity' && 'Run a 4–6 week mini‑project with weekly deliverables and one mentor touchpoint; ship a public artifact at the end.'}
-                                {selectedMetric === 'story' && 'Write a 2–3 sentence thesis for your application story and reframe your three main activities to prove it with outcomes.'}
-                                {selectedMetric === 'character' && 'Pick one cause and show up weekly; capture before/after metrics or testimonials to make the benefit visible.'}
+                                {(() => {
+                                  const dim = getDim(selectedMetric as MetricId);
+                                  const fb =
+                                    (selectedMetric === 'impact' && 'Choose one current initiative and set a 6–8 week goal tied to a number (beneficiaries, dollars, or hours saved); publish a short update when you hit it.') ||
+                                    (selectedMetric === 'academic' && 'Enroll in one stretch class and pre-schedule weekly support (office hours, peer tutor); track progress with two short reflections.') ||
+                                    (selectedMetric === 'curiosity' && 'Run a 4–6 week mini‑project with weekly deliverables and one mentor touchpoint; ship a public artifact at the end.') ||
+                                    (selectedMetric === 'story' && 'Write a 2–3 sentence thesis for your application story and reframe your three main activities to prove it with outcomes.') ||
+                                    'Pick one cause and show up weekly; capture before/after metrics or testimonials to make the benefit visible.';
+                                  return dim?.growthAreas?.[0] || fb;
+                                })()}
                               </div>
                             </div>
                             <div className="rounded-lg border p-3 bg-white/60">
@@ -1095,36 +1121,40 @@ const PortfolioScanner = () => {
                         </div>
                         <ol className="mt-1 grid md:grid-cols-2 gap-x-6 gap-y-3">
                           {(() => {
-                            if (selectedMetric === 'impact') return [
-                              'Quantify your outcomes by reporting people helped, revenue raised, or hours saved for each major initiative.',
-                              'Elevate your responsibility by training peers or leading a small sub-team with clear goals and check-ins.',
-                              'Ship one visible deliverable within 6–8 weeks and communicate results to the stakeholders who benefit.',
-                              'Document proof with one or two public links (website, repo, media, or a short testimonial).'
-                            ];
-                            if (selectedMetric === 'academic') return [
-                              'Add one stretch course next term and write an explicit support plan that includes office hours or tutoring.',
-                              'Visualize your semester-by-semester grade trend and annotate what changed to drive improvement.',
-                              'Take an external benchmark (AP/IB/dual-enroll/competition) to validate your readiness for rigor.',
-                              'Publish a brief reflection that explains a hard concept you mastered and why it matters for your interests.'
-                            ];
-                            if (selectedMetric === 'curiosity') return [
-                              'Launch a 6‑week independent project with weekly milestones and one guiding research question.',
-                              'Email one mentor or researcher for feedback and summarize the three most important insights you gained.',
-                              'Produce a tangible artifact such as a public repo, prototype, short paper, or tutorial video.',
-                              'Connect the project to your longer arc with a clear statement of the next experiment.'
-                            ];
-                            if (selectedMetric === 'story') return [
-                              'Draft a 2–3 sentence thesis that explains your why and the impact you aim to create.',
-                              'Align your top three activities under this thesis and downsize items that do not reinforce it.',
-                              'Rewrite activity descriptions to lead with outcomes and concrete evidence instead of duties.',
-                              'Secure one recommendation that explicitly reinforces this thesis with specific examples.'
-                            ];
-                            return [
-                              'Choose one or two causes and commit weekly time for the next two months to create continuity.',
-                              'Measure who benefits and how by capturing before/after numbers or brief testimonials.',
-                              'Add one leadership act within your service work such as coordination, training, or resource design.',
-                              'Attach a visible proof link (program page, photo log, letter, or media mention).'
-                            ];
+                            const dim = getDim(selectedMetric as MetricId);
+                            const fb = ((): string[] => {
+                              if (selectedMetric === 'impact') return [
+                                'Quantify your outcomes by reporting people helped, revenue raised, or hours saved for each major initiative.',
+                                'Elevate your responsibility by training peers or leading a small sub-team with clear goals and check-ins.',
+                                'Ship one visible deliverable within 6–8 weeks and communicate results to the stakeholders who benefit.',
+                                'Document proof with one or two public links (website, repo, media, or a short testimonial).'
+                              ];
+                              if (selectedMetric === 'academic') return [
+                                'Add one stretch course next term and write an explicit support plan that includes office hours or tutoring.',
+                                'Visualize your semester-by-semester grade trend and annotate what changed to drive improvement.',
+                                'Take an external benchmark (AP/IB/dual-enroll/competition) to validate your readiness for rigor.',
+                                'Publish a brief reflection that explains a hard concept you mastered and why it matters for your interests.'
+                              ];
+                              if (selectedMetric === 'curiosity') return [
+                                'Launch a 6‑week independent project with weekly milestones and one guiding research question.',
+                                'Email one mentor or researcher for feedback and summarize the three most important insights you gained.',
+                                'Produce a tangible artifact such as a public repo, prototype, short paper, or tutorial video.',
+                                'Connect the project to your longer arc with a clear statement of the next experiment.'
+                              ];
+                              if (selectedMetric === 'story') return [
+                                'Draft a 2–3 sentence thesis that explains your why and the impact you aim to create.',
+                                'Align your top three activities under this thesis and downsize items that do not reinforce it.',
+                                'Rewrite activity descriptions to lead with outcomes and concrete evidence instead of duties.',
+                                'Secure one recommendation that explicitly reinforces this thesis with specific examples.'
+                              ];
+                              return [
+                                'Choose one or two causes and commit weekly time for the next two months to create continuity.',
+                                'Measure who benefits and how by capturing before/after numbers or brief testimonials.',
+                                'Add one leadership act within your service work such as coordination, training, or resource design.',
+                                'Attach a visible proof link (program page, photo log, letter, or media mention).'
+                              ];
+                            })();
+                            return (dim?.growthAreas && dim.growthAreas.length > 0 ? dim.growthAreas.slice(0,4) : fb);
                           })().map((p, i) => (
                             <li key={i} className="flex items-start gap-2">
                               <span

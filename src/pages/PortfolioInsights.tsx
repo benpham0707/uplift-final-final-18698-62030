@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Award, ChevronRight, Lightbulb, Target } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { apiFetch } from '@/lib/utils';
 import MagicBento, { BentoCard } from '@/components/ui/MagicBento';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
 
@@ -76,7 +77,7 @@ export default function PortfolioInsights() {
         setError(null);
         const session = await supabase.auth.getSession();
         const token = session.data.session?.access_token;
-        const resp = await fetch('/api/v1/analytics/portfolio-strength', {
+        const resp = await apiFetch('/api/v1/analytics/portfolio-strength', {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {})
           }

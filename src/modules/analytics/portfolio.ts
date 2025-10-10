@@ -2,7 +2,12 @@ import type { Request, Response, NextFunction } from "express";
 import OpenAI from "openai";
 import { supabaseAdmin } from "@/supabase/admin";
 
-const OPENAI_KEY = process.env["uplift-openai-key"] || process.env["UPLIFT_OPENAI_KEY"] || process.env["OPENAI_API_KEY"];
+// Accept multiple env names for OpenAI key to match various dashboards
+const OPENAI_KEY =
+  process.env["uplift-openai-key"] ||
+  process.env["UPLIFT_OPENAI_KEY"] ||
+  process.env["OPENAI_API_KEY"] ||
+  process.env["VITE_OPENAI_API_KEY"]; // fallback for misconfigured envs
 
 function buildPrompt(userData: any): string {
 	return `You are an expert college admissions evaluator with deep understanding of holistic application review. You specialize in recognizing potential in students from diverse backgrounds, including first-generation, low-income, and underrepresented students.

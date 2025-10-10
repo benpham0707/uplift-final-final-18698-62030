@@ -286,14 +286,14 @@ const PortfolioScanner = () => {
   };
 
   const dockItems = [
-    { icon: <Home size={18} />, label: 'Home', onClick: () => scrollToSection('overview') },
-    { icon: <User size={18} />, label: 'Personal', onClick: () => scrollToSection('personal-info') },
-    { icon: <GraduationCap size={18} />, label: 'Academic', onClick: () => scrollToSection('academic-journey') },
-    { icon: <Briefcase size={18} />, label: 'Experiences', onClick: () => scrollToSection('experiences') },
-    { icon: <Heart size={18} />, label: 'Family', onClick: () => scrollToSection('family') },
-    { icon: <Target size={18} />, label: 'Goals', onClick: () => scrollToSection('goals') },
-    { icon: <Users2 size={18} />, label: 'Support', onClick: () => scrollToSection('support') },
-    { icon: <BookOpen size={18} />, label: 'Growth', onClick: () => scrollToSection('growth') },
+    { icon: <Home size={18} />, label: 'Home', onClick: () => scrollToSection('overview'), className: activeSection === 'overview' ? 'is-active' : undefined },
+    { icon: <User size={18} />, label: 'Personal', onClick: () => scrollToSection('personal-info'), className: activeSection === 'personal-info' ? 'is-active' : undefined },
+    { icon: <GraduationCap size={18} />, label: 'Academic', onClick: () => scrollToSection('academic-journey'), className: activeSection === 'academic-journey' ? 'is-active' : undefined },
+    { icon: <Briefcase size={18} />, label: 'Experiences', onClick: () => scrollToSection('experiences'), className: activeSection === 'experiences' ? 'is-active' : undefined },
+    { icon: <Heart size={18} />, label: 'Family', onClick: () => scrollToSection('family'), className: activeSection === 'family' ? 'is-active' : undefined },
+    { icon: <Target size={18} />, label: 'Goals', onClick: () => scrollToSection('goals'), className: activeSection === 'goals' ? 'is-active' : undefined },
+    { icon: <Users2 size={18} />, label: 'Support', onClick: () => scrollToSection('support'), className: activeSection === 'support' ? 'is-active' : undefined },
+    { icon: <BookOpen size={18} />, label: 'Growth', onClick: () => scrollToSection('growth'), className: activeSection === 'growth' ? 'is-active' : undefined },
     {
       icon: <RefreshCw size={18} />,
       label: 'Update',
@@ -679,6 +679,34 @@ const PortfolioScanner = () => {
       window.removeEventListener('scroll', updateCarrot);
     };
   }, [selectedMetric, isInsightsOpen]);
+
+  // Track active section by scroll position for dock highlighting
+  useEffect(() => {
+    const updateActive = () => {
+      const ids = ['overview','personal-info','academic-journey','experiences','family','goals','support','growth'];
+      const viewportH = window.innerHeight || document.documentElement.clientHeight;
+      const bottomPad = parseInt(getComputedStyle(document.documentElement).scrollPaddingBottom || '0', 10) || 0;
+      const visualCenter = viewportH / 2 - bottomPad / 2;
+      let bestId = activeSection;
+      let bestDist = Number.POSITIVE_INFINITY;
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const center = rect.top + rect.height / 2;
+        const dist = Math.abs(center - visualCenter);
+        if (dist < bestDist) { bestDist = dist; bestId = id; }
+      });
+      if (bestId && bestId !== activeSection) setActiveSection(bestId);
+    };
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive);
+    return () => {
+      window.removeEventListener('scroll', updateActive);
+      window.removeEventListener('resize', updateActive);
+    };
+  }, [activeSection]);
 
   // When insights toggle/metric changes, refresh thresholds and nudge scroll to the header snap point for alignment
   useEffect(() => {

@@ -32,6 +32,7 @@
   background: var(--gradient-dashboard);
   opacity: 0.38;
   pointer-events: none;
+  z-index: 0;
 }
 
 .dock-panel::after {
@@ -42,6 +43,7 @@
   box-shadow: 0 0 0 1px hsl(var(--primary) / 0.25) inset,
               0 8px 24px -12px hsl(var(--primary) / 0.45) inset;
   pointer-events: none;
+  z-index: 0;
 }
 
 .dock-item {
@@ -56,6 +58,7 @@
   cursor: pointer;
   outline: none;
   transition: transform 180ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
+  z-index: 1;
 }
 
 /* Variant: update/accent tile uses secondary gradient and tinted border */
@@ -65,6 +68,10 @@
 
 .dock-item.variant-update::before {
   background: var(--gradient-secondary);
+}
+
+.dock-item.variant-update .dock-icon svg {
+  filter: drop-shadow(0 1px 1px hsl(0 0% 0% / 0.2));
 }
 
 .dock-item.variant-update:hover {
@@ -100,6 +107,17 @@
 .dock-item:focus-visible {
   outline: 2px solid hsl(var(--primary) / 0.7);
   outline-offset: 2px;
+}
+
+/* Active state driven by page position */
+.dock-item.is-active {
+  transform: translateY(-3px);
+  border-color: hsl(var(--primary));
+  box-shadow: 0 14px 40px -12px hsl(var(--primary) / 0.45), 0 0 0 1px hsl(var(--primary) / 0.3) inset;
+}
+.dock-item.is-active::before {
+  opacity: 1;
+  filter: saturate(135%);
 }
 
 .dock-icon {

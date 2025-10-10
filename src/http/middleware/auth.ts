@@ -1,8 +1,14 @@
 import type { Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 
+// Support multiple env names to match local/dev and Render dashboards
 const supabaseUrl = (process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL) as string | undefined;
-const supabaseAnon = (process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY) as string | undefined;
+const supabaseAnon = (
+  process.env.VITE_SUPABASE_ANON_KEY ||
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_PUBLISHABLE_KEY
+) as string | undefined;
 const supabase = supabaseUrl && supabaseAnon
   ? createClient(supabaseUrl, supabaseAnon)
   : null;

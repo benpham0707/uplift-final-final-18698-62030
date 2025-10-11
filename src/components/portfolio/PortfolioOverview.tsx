@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { InsightCard, InsightCardProps } from './InsightCard';
+import { InsightHero } from './InsightHero';
+import { InsightSection } from './InsightSection';
 import { TimelineVisualization } from './insights/TimelineVisualization';
 import { ComparisonVisualization } from './insights/ComparisonVisualization';
 import { NetworkVisualization } from './insights/NetworkVisualization';
+import { cn } from '@/lib/utils';
 import { 
   BookOpen,
   Users,
   Trophy,
   GraduationCap,
   Code,
-  Lightbulb
+  Lightbulb,
+  AlertTriangle
 } from 'lucide-react';
 
 // MOCK DATA - Hard-coded insight examples demonstrating the types of valuable analysis
@@ -170,86 +173,149 @@ const MOCK_INSIGHTS: InsightCardProps[] = [
 ];
 
 export const PortfolioOverview = () => {
-  const [selectedType, setSelectedType] = useState<'all' | InsightCardProps['type']>('all');
-  const [sortBy, setSortBy] = useState<'priority' | 'impact'>('priority');
+  const [activeTab, setActiveTab] = useState<'critical' | 'high' | 'all'>('critical');
 
-  const filteredInsights = selectedType === 'all' 
-    ? MOCK_INSIGHTS 
-    : MOCK_INSIGHTS.filter(i => i.type === selectedType);
+  // Organize insights by priority
+  const criticalInsights = MOCK_INSIGHTS.filter(i => i.priority === 'critical');
+  const highInsights = MOCK_INSIGHTS.filter(i => i.priority === 'high');
+  const mediumLowInsights = MOCK_INSIGHTS.filter(i => i.priority === 'medium' || i.priority === 'low');
 
-  const sortedInsights = [...filteredInsights].sort((a, b) => {
-    if (sortBy === 'priority') {
-      const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    }
-    return (b.impactScore || 0) - (a.impactScore || 0);
-  });
+  // Get insights for current tab
+  const getVisibleInsights = () => {
+    if (activeTab === 'critical') return criticalInsights;
+    if (activeTab === 'high') return [...criticalInsights, ...highInsights];
+    return MOCK_INSIGHTS;
+  };
 
-  const insightTypes = [
-    { value: 'all', label: 'All Insights', count: MOCK_INSIGHTS.length },
-    { value: 'pattern', label: 'Patterns', count: MOCK_INSIGHTS.filter(i => i.type === 'pattern').length },
-    { value: 'gap', label: 'Gaps', count: MOCK_INSIGHTS.filter(i => i.type === 'gap').length },
-    { value: 'strength', label: 'Strengths', count: MOCK_INSIGHTS.filter(i => i.type === 'strength').length },
-    { value: 'opportunity', label: 'Opportunities', count: MOCK_INSIGHTS.filter(i => i.type === 'opportunity').length },
-  ];
+  const visibleInsights = getVisibleInsights();
+  const heroInsight = criticalInsights[0];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-bold text-foreground">Portfolio Insights</h2>
-          <p className="text-muted-foreground text-lg">
-            Valuable patterns and opportunities discovered through AI analysis of your complete profile
-          </p>
-        </div>
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold text-foreground">Portfolio Insights</h1>
+        <p className="text-muted-foreground text-lg">
+          AI-discovered patterns and opportunities you wouldn't notice on your own
+        </p>
+      </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <span className="text-sm font-semibold text-muted-foreground">Filter:</span>
-          {insightTypes.map((type) => (
-            <Badge
-              key={type.value}
-              variant={selectedType === type.value ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-primary/10 transition-colors"
-              onClick={() => setSelectedType(type.value as any)}
-            >
-              {type.label} ({type.count})
-            </Badge>
-          ))}
-          
-          <div className="ml-auto flex items-center gap-2">
-            <span className="text-sm font-semibold text-muted-foreground">Sort by:</span>
-            <Badge
-              variant={sortBy === 'priority' ? 'default' : 'outline'}
-              className="cursor-pointer"
-              onClick={() => setSortBy('priority')}
-            >
-              Priority
-            </Badge>
-            <Badge
-              variant={sortBy === 'impact' ? 'default' : 'outline'}
-              className="cursor-pointer"
-              onClick={() => setSortBy('impact')}
-            >
-              Impact Score
-            </Badge>
+      {/* Tab Navigation */}
+      <div className="flex items-center gap-2 border-b border-border">
+        <button
+          onClick={() => setActiveTab('critical')}
+          className={cn(
+            'px-6 py-3 font-semibold border-b-2 transition-colors',
+            activeTab === 'critical'
+              ? 'border-destructive text-destructive'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          )}
+        >
+          Critical
+          <Badge variant="destructive" className="ml-2">
+            {criticalInsights.length}
+          </Badge>
+        </button>
+        <button
+          onClick={() => setActiveTab('high')}
+          className={cn(
+            'px-6 py-3 font-semibold border-b-2 transition-colors',
+            activeTab === 'high'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          )}
+        >
+          High Priority
+          <Badge variant="default" className="ml-2">
+            {highInsights.length}
+          </Badge>
+        </button>
+        <button
+          onClick={() => setActiveTab('all')}
+          className={cn(
+            'px-6 py-3 font-semibold border-b-2 transition-colors',
+            activeTab === 'all'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          )}
+        >
+          All Insights
+          <Badge variant="outline" className="ml-2">
+            {MOCK_INSIGHTS.length}
+          </Badge>
+        </button>
+      </div>
+
+      {/* Hero Insight - Only shown on critical tab */}
+      {activeTab === 'critical' && heroInsight && (
+        <InsightHero
+          icon={AlertTriangle}
+          headline={heroInsight.headline}
+          insight={heroInsight.insight}
+          action={heroInsight.action || { label: 'Take Action', onClick: () => {} }}
+          colorClass="text-destructive"
+          bgClass="bg-destructive/10"
+        />
+      )}
+
+      {/* Critical Insights Section */}
+      {(activeTab === 'critical' || activeTab === 'high' || activeTab === 'all') && (
+        <div className="space-y-6">
+          {activeTab !== 'critical' && (
+            <h2 className="text-2xl font-bold text-foreground">Critical Actions</h2>
+          )}
+          <div className="space-y-6">
+            {criticalInsights.slice(activeTab === 'critical' ? 1 : 0).map((insight, index) => (
+              <InsightCard key={`critical-${index}`} {...insight} />
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* Insights Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedInsights.map((insight, index) => (
-          <InsightCard key={index} {...insight} />
-        ))}
-      </div>
-
-      {sortedInsights.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          No insights found for the selected filter.
-        </div>
       )}
+
+      {/* High Priority Section - Collapsible */}
+      {(activeTab === 'high' || activeTab === 'all') && highInsights.length > 0 && (
+        <InsightSection
+          title="High Priority Insights"
+          count={highInsights.length}
+          defaultExpanded={activeTab === 'high'}
+          variant="high"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {highInsights.map((insight, index) => (
+              <InsightCard 
+                key={`high-${index}`} 
+                {...insight}
+                collapsed={activeTab === 'all'}
+              />
+            ))}
+          </div>
+        </InsightSection>
+      )}
+
+      {/* Additional Insights Section - Collapsible */}
+      {activeTab === 'all' && mediumLowInsights.length > 0 && (
+        <InsightSection
+          title="Additional Insights"
+          count={mediumLowInsights.length}
+          defaultExpanded={false}
+          variant="medium"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mediumLowInsights.map((insight, index) => (
+              <InsightCard 
+                key={`other-${index}`} 
+                {...insight}
+                collapsed={true}
+              />
+            ))}
+          </div>
+        </InsightSection>
+      )}
+
+      {/* Progress Indicator */}
+      <div className="text-center text-sm text-muted-foreground pt-4">
+        Viewing {visibleInsights.length} of {MOCK_INSIGHTS.length} insights
+      </div>
     </div>
   );
 };

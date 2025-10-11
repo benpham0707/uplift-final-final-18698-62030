@@ -41,6 +41,8 @@ export interface InsightCardProps {
   priority: InsightPriority;
   impactScore?: number;
   className?: string;
+  collapsed?: boolean;
+  onExpand?: () => void;
 }
 
 const INSIGHT_CONFIG: Record<InsightType, {
@@ -146,21 +148,60 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   priority,
   impactScore,
   className,
+  collapsed = false,
+  onExpand,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isEvidenceExpanded, setIsEvidenceExpanded] = useState(false);
+  const [isCardExpanded, setIsCardExpanded] = useState(!collapsed);
   
   const config = INSIGHT_CONFIG[type];
   const priorityConfig = PRIORITY_CONFIG[priority];
   const Icon = config.icon;
 
+  const handleCardClick = () => {
+    if (collapsed && !isCardExpanded) {
+      setIsCardExpanded(true);
+      onExpand?.();
+    }
+  };
+
+  // Minimal collapsed view
+  if (collapsed && !isCardExpanded) {
+    return (
+      <Card 
+        className={cn(
+          'group cursor-pointer hover:border-primary/40 transition-all duration-300',
+          'border',
+          config.borderClass,
+          className
+        )}
+        onClick={handleCardClick}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className={cn('p-2 rounded-lg', config.bgClass)}>
+                <Icon className={cn('h-4 w-4', config.colorClass)} />
+              </div>
+              <h3 className="font-semibold text-base leading-tight text-foreground truncate">
+                {headline}
+              </h3>
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Full expanded view
   return (
     <Card 
       className={cn(
-        'group hover-lift transition-all duration-300 overflow-hidden',
-        'border-2',
-        config.borderClass,
-        priorityConfig.sizeClass,
-        priority === 'critical' && 'shadow-large',
+        'group transition-all duration-300 overflow-hidden',
+        priority === 'critical' ? 'border-l-4 border-l-destructive' : 'border-l-4',
+        priority === 'high' ? 'border-l-primary' : '',
+        priority === 'critical' && 'shadow-lg',
         className
       )}
     >
@@ -170,31 +211,25 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <div className="flex items-center gap-3 flex-1">
             <div className={cn(
               'p-2.5 rounded-xl flex-shrink-0',
-              config.bgClass,
-              'transition-transform duration-300 group-hover:scale-110'
+              config.bgClass
             )}>
               <Icon className={cn('h-5 w-5', config.colorClass)} />
             </div>
             <div className="flex-1 min-w-0">
-              <Badge variant="outline" className="mb-2">
-                {config.label}
-              </Badge>
-              <h3 className="font-bold text-xl leading-tight text-foreground">
+              <h3 className={cn(
+                'font-bold leading-tight text-foreground',
+                priority === 'critical' ? 'text-2xl' : 'text-xl'
+              )}>
                 {headline}
               </h3>
             </div>
           </div>
           
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            <Badge variant={priorityConfig.badgeVariant}>
-              {priorityConfig.label}
+          {priority === 'critical' && impactScore && (
+            <Badge variant="destructive" className="font-mono flex-shrink-0">
+              Impact: {impactScore}/10
             </Badge>
-            {impactScore && (
-              <Badge variant="outline" className="font-mono">
-                {impactScore}/10
-              </Badge>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Main Insight */}
@@ -230,20 +265,20 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => setIsEvidenceExpanded(!isEvidenceExpanded)}
             className="w-full justify-between px-0 hover:bg-transparent"
           >
             <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Evidence Trail ({evidence.length})
+              Evidence ({evidence.length})
             </span>
-            {isExpanded ? (
+            {isEvidenceExpanded ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
           
-          {isExpanded && (
+          {isEvidenceExpanded && (
             <div className="flex flex-wrap gap-2 pt-2 animate-accordion-down">
               {evidence.map((item, index) => (
                 <Badge 
@@ -264,11 +299,8 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <div className="pt-2">
             <Button
               onClick={action.onClick}
-              className={cn(
-                'w-full',
-                config.colorClass
-              )}
-              variant="outline"
+              variant={priority === 'critical' ? 'default' : 'outline'}
+              className="w-full"
             >
               {action.label}
             </Button>

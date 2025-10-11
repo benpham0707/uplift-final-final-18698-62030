@@ -57,20 +57,30 @@ export function ImpactMetricCard({
   return (
     <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-md border-border/50">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2">
           <div className="p-1.5 rounded-md bg-accent/50">
             <Icon className="h-4 w-4" style={{ color }} />
           </div>
-          <span className="text-xs font-medium text-foreground">{label}</span>
+          <span className="text-sm font-medium text-foreground">{label}</span>
         </div>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 cursor-help">
-                <VerificationIcon className="h-3 w-3" style={{ color: verification.color }} />
-                <span className="text-[10px] text-muted-foreground">{verification.label}</span>
-              </div>
+              <Badge 
+                variant={verificationStatus === 'verified' ? 'default' : 'secondary'}
+                className="h-6 gap-1 cursor-help"
+                style={verificationStatus === 'verified' ? { 
+                  backgroundColor: 'hsl(var(--success))',
+                  color: 'hsl(var(--success-foreground))'
+                } : verificationStatus === 'pending' ? {
+                  backgroundColor: 'hsl(var(--warning))',
+                  color: 'hsl(var(--warning-foreground))'
+                } : undefined}
+              >
+                <VerificationIcon className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">{verification.label}</span>
+              </Badge>
             </TooltipTrigger>
             <TooltipContent>
               <p>{verification.tooltip}</p>
@@ -103,18 +113,23 @@ export function ImpactMetricCard({
       </div>
 
       {/* Sparkline */}
-      <div className="h-12 px-2 pb-2">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={sparklineData}>
-            <Line 
-              type="monotone" 
-              dataKey="value" 
-              stroke={color}
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="px-4 pb-3">
+        <div className="text-[10px] text-muted-foreground mb-1 uppercase tracking-wide">
+          Progress over time
+        </div>
+        <div className="h-12">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={sparklineData}>
+              <Line 
+                type="monotone" 
+                dataKey="value" 
+                stroke={color}
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </Card>
   );

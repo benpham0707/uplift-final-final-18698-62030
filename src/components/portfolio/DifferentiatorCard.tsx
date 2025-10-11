@@ -72,33 +72,30 @@ export function DifferentiatorCard({
         {description}
       </p>
 
-      {/* Footer */}
-      <div className="flex items-center gap-4 px-4 py-3 mt-2 border-t border-border/50">
-        <div className="flex-1">
+      {/* Evidence Trail */}
+      <div className="px-4 py-3 mt-2 border-t border-border/50 space-y-2">
+        <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1.5">
+          Evidence Trail
+        </div>
+        <div className="flex flex-wrap gap-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="cursor-help">
-                  <div className="text-xs text-muted-foreground mb-0.5">Where it shows</div>
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {effect}
-                  </Badge>
-                </div>
+                <Badge variant="secondary" className="text-xs font-normal gap-1">
+                  📍 {effect}
+                </Badge>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Activities where this strength appears</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
-        <div className="flex-1">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="cursor-help">
-                  <div className="text-xs text-muted-foreground mb-0.5">Backed by</div>
-                  <div className="text-xs text-foreground font-medium">{evidence}</div>
-                </div>
+                <Badge variant="outline" className="text-xs font-normal gap-1">
+                  ✓ {evidence}
+                </Badge>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Supporting evidence from your portfolio</p>

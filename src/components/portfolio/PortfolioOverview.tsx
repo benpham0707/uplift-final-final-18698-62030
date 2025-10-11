@@ -151,29 +151,30 @@ export function PortfolioOverview() {
         {/* Differentiators Section - 60% width on desktop */}
         <div className="lg:col-span-6 space-y-4">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">Your Unique Strengths</h3>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <p>Standout qualities that make you distinctive. Pin your top strengths to prioritize them in recommendations.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              {differentiators.filter(d => d.isPinned).length > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  {differentiators.filter(d => d.isPinned).length} pinned
-                </span>
-              )}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">
+                1
+              </span>
+              <h3 className="text-xl font-bold text-foreground">Your Unique Strengths</h3>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>These are the standout qualities that make you unique compared to other applicants. Pin the ones most important to your story.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-            <p className="text-sm text-muted-foreground">
-              These are the 3-5 qualities that set you apart from other candidates, backed by evidence from your activities.
+            <p className="text-sm text-muted-foreground mb-1">
+              What sets you apart from other candidates
+            </p>
+            <p className="text-xs text-muted-foreground italic">
+              💡 Pin your top strengths to prioritize them in recommendations
+              {differentiators.filter(d => d.isPinned).length > 0 && 
+                ` • ${differentiators.filter(d => d.isPinned).length} currently pinned`
+              }
             </p>
           </div>
           
@@ -204,22 +205,27 @@ export function PortfolioOverview() {
         {/* Impact Summary Section - 40% width on desktop */}
         <div className="lg:col-span-4 space-y-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-chart-1" />
-              <h3 className="text-lg font-semibold text-foreground">Measurable Impact</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-success text-success-foreground text-sm font-bold">
+                2
+              </span>
+              <h3 className="text-xl font-bold text-foreground">Measurable Impact</h3>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p>Quantifiable outcomes from your activities. Verified metrics carry more weight with reviewers.</p>
+                    <p>Quantifiable achievements that demonstrate real-world outcomes. Verified metrics strengthen your application credibility.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Real-world outcomes and reach from your projects, volunteering, and leadership activities.
+            <p className="text-sm text-muted-foreground mb-1">
+              Key numbers that demonstrate your real-world outcomes
+            </p>
+            <p className="text-xs text-muted-foreground italic">
+              📊 Add evidence to verify metrics and increase your credibility
             </p>
           </div>
 

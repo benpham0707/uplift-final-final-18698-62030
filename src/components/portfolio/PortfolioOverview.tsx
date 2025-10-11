@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { DifferentiatorCard } from './DifferentiatorCard';
 import { ImpactMetricCard } from './ImpactMetricCard';
-import { Brain, Lightbulb, Users, Network, Award, UserCheck, DollarSign, Clock, MessageSquare } from 'lucide-react';
+import { Brain, Lightbulb, Users, Network, Award, UserCheck, DollarSign, Clock, MessageSquare, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Mock data - these values are hard coded as placeholders for demonstration
 // In production, this data would come from API analysis of the user's portfolio
@@ -141,22 +142,39 @@ export function PortfolioOverview() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Portfolio Overview</h2>
-        <p className="text-sm text-muted-foreground">
-          Your standout strengths and measurable impact at a glance
+        <p className="text-muted-foreground max-w-3xl">
+          A high-level analysis of your unique qualities and real-world contributions. This overview helps reviewers quickly understand what makes you distinctive and the tangible difference you've made.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
         {/* Differentiators Section - 60% width on desktop */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Award className="h-5 w-5 text-primary" />
-              Differentiators
-            </h3>
-            <span className="text-xs text-muted-foreground">
-              {differentiators.filter(d => d.isPinned).length} pinned
-            </span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Award className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold text-foreground">Your Unique Strengths</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Standout qualities that make you distinctive. Pin your top strengths to prioritize them in recommendations.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              {differentiators.filter(d => d.isPinned).length > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {differentiators.filter(d => d.isPinned).length} pinned
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              These are the 3-5 qualities that set you apart from other candidates, backed by evidence from your activities.
+            </p>
           </div>
           
           <div className="space-y-3">
@@ -185,11 +203,24 @@ export function PortfolioOverview() {
 
         {/* Impact Summary Section - 40% width on desktop */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-chart-1" />
-              Impact Summary
-            </h3>
+              <h3 className="text-lg font-semibold text-foreground">Measurable Impact</h3>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>Quantifiable outcomes from your activities. Verified metrics carry more weight with reviewers.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Real-world outcomes and reach from your projects, volunteering, and leadership activities.
+            </p>
           </div>
 
           <div className="space-y-3">

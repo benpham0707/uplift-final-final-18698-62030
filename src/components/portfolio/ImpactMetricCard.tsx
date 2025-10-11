@@ -1,7 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LucideIcon, TrendingUp, TrendingDown, CheckCircle2, Clock } from 'lucide-react';
+import { LucideIcon, TrendingUp, TrendingDown, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ImpactMetricCardProps {
   label: string;
@@ -30,9 +31,24 @@ export function ImpactMetricCard({
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : null;
   
   const verificationConfig = {
-    verified: { icon: CheckCircle2, color: 'hsl(var(--success))', label: 'Verified' },
-    pending: { icon: Clock, color: 'hsl(var(--warning))', label: 'Pending' },
-    unverified: { icon: Clock, color: 'hsl(var(--muted-foreground))', label: 'Submit Evidence' },
+    verified: { 
+      icon: CheckCircle2, 
+      color: 'hsl(var(--success))', 
+      label: 'Verified',
+      tooltip: 'This metric has been verified with supporting evidence'
+    },
+    pending: { 
+      icon: Clock, 
+      color: 'hsl(var(--warning))', 
+      label: 'Pending Review',
+      tooltip: 'Evidence submitted and awaiting verification'
+    },
+    unverified: { 
+      icon: AlertCircle, 
+      color: 'hsl(var(--muted-foreground))', 
+      label: 'Add Evidence',
+      tooltip: 'Submit supporting documentation to verify this metric'
+    },
   };
 
   const verification = verificationConfig[verificationStatus];
@@ -48,10 +64,19 @@ export function ImpactMetricCard({
           </div>
           <span className="text-xs font-medium text-foreground">{label}</span>
         </div>
-        <div className="flex items-center gap-1">
-          <VerificationIcon className="h-3 w-3" style={{ color: verification.color }} />
-          <span className="text-[10px] text-muted-foreground">{verification.label}</span>
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 cursor-help">
+                <VerificationIcon className="h-3 w-3" style={{ color: verification.color }} />
+                <span className="text-[10px] text-muted-foreground">{verification.label}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{verification.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Main Display */}

@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pin, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DifferentiatorCardProps {
   id: string;
@@ -74,14 +75,36 @@ export function DifferentiatorCard({
       {/* Footer */}
       <div className="flex items-center gap-4 px-4 py-3 mt-2 border-t border-border/50">
         <div className="flex-1">
-          <div className="text-xs text-muted-foreground mb-0.5">Effect</div>
-          <Badge variant="secondary" className="text-xs font-normal">
-            {effect}
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="cursor-help">
+                  <div className="text-xs text-muted-foreground mb-0.5">Where it shows</div>
+                  <Badge variant="secondary" className="text-xs font-normal">
+                    {effect}
+                  </Badge>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Activities where this strength appears</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex-1">
-          <div className="text-xs text-muted-foreground mb-0.5">Evidence</div>
-          <div className="text-xs text-foreground font-medium">{evidence}</div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="cursor-help">
+                  <div className="text-xs text-muted-foreground mb-0.5">Backed by</div>
+                  <div className="text-xs text-foreground font-medium">{evidence}</div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Supporting evidence from your portfolio</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </Card>

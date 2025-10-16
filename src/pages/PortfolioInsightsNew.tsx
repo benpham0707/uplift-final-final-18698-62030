@@ -65,8 +65,11 @@ const PortfolioInsightsNew: React.FC = () => {
   // Sync tab with URL query params
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && tabParam !== activeTab) {
-      setActiveTab(tabParam);
+    if (!tabParam) return;
+    // Map legacy "context" to new "coherence" tab
+    const normalized = tabParam === 'context' ? 'coherence' : tabParam;
+    if (normalized !== activeTab) {
+      setActiveTab(normalized);
     }
   }, [searchParams]);
 

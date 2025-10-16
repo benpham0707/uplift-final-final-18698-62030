@@ -90,9 +90,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ summary, onNavigateToT
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Trajectory</span>
             </TabsTrigger>
-            <TabsTrigger value="context" className="flex items-center gap-2 data-[state=active]:bg-background">
+            <TabsTrigger value="coherence" className="flex items-center gap-2 data-[state=active]:bg-background">
               <MapPin className="w-4 h-4" />
-              <span className="hidden sm:inline">Context</span>
+              <span className="hidden sm:inline">Coherence</span>
             </TabsTrigger>
             <TabsTrigger value="evidence" className="flex items-center gap-2 data-[state=active]:bg-background">
               <FileText className="w-4 h-4" />
@@ -126,9 +126,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ summary, onNavigateToT
             </div>
           </TabsContent>
 
-          <TabsContent value="context" className="mt-8">
+          <TabsContent value="coherence" className="mt-8">
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Context & Contribution tab coming soon...</p>
+              <p className="text-muted-foreground">Coherence (with contextual factors) coming soon...</p>
             </div>
           </TabsContent>
 

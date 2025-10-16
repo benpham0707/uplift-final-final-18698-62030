@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProfileCard from '@/components/portfolio/ProfileCard';
-import { Rocket, Target, AlertTriangle, ArrowRight, LayoutDashboard, Award, TrendingUp, MapPin, FileText, Lightbulb } from 'lucide-react';
+import { Rocket, Target, TrendingUp, ArrowRight, LayoutDashboard, Award, MapPin, FileText, Lightbulb, Sparkles } from 'lucide-react';
 import { HolisticSummary, renderRich } from '../portfolioInsightsData';
 import { NavigationControls } from '../NavigationControls';
 import { ScoreIndicator } from '../ScoreIndicator';
@@ -184,22 +184,21 @@ const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) 
   };
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 pb-12">
       {/* SPINE - Full width at top (most important) */}
-      <Card className="relative overflow-hidden border-2 border-green-500/30 bg-gradient-to-br from-green-500/10 via-green-500/5 to-background hover:shadow-xl transition-shadow">
-        <div className="p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-green-500/10">
-                <Target className="w-7 h-7 text-green-600 dark:text-green-500" />
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        <div className="p-6 space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1 flex-1">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold text-foreground">Your Narrative Thread</h3>
               </div>
-              <div>
-                <Badge variant="outline" className="mb-1 border-green-500/50">Your Spine</Badge>
-                <h3 className="text-2xl font-bold text-foreground">Narrative Thread</h3>
-                <p className="text-xs text-muted-foreground mt-1">The cohesive story connecting all your activities</p>
-              </div>
+              <p className="text-xs text-muted-foreground">
+                The cohesive story connecting all your activities
+              </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <ScoreIndicator 
                 score={currentSpine.score} 
                 isRecommended={isHighestScore(verdictOptions.spine, spineIndex)}
@@ -212,37 +211,35 @@ const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) 
               />
             </div>
           </div>
-          <p className="text-base leading-relaxed text-foreground/90">
+          
+          <p className="text-sm leading-relaxed text-foreground">
             {renderRich(currentSpine.text)}
           </p>
-          <div className="pt-2 border-t border-green-500/20">
-            <p className="text-sm text-muted-foreground italic">
+
+          {currentSpine.reasoning && (
+            <p className="text-xs text-muted-foreground pt-3 border-t">
               <strong>Why this works:</strong> {currentSpine.reasoning}
             </p>
-          </div>
+          )}
         </div>
       </Card>
 
       {/* SPIKE & LIFT - Side by side (more room for each) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SPIKE - What to amplify */}
-        <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background hover:shadow-lg transition-shadow">
-          <div className="p-6 space-y-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-primary/10">
-                    <Rocket className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <Badge variant="default" className="mb-1">Your Spike</Badge>
-                    <h3 className="text-xl font-bold text-foreground">What Stands Out</h3>
-                  </div>
+        <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div className="p-5 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center gap-2">
+                  <Rocket className="w-4 h-4 text-foreground" />
+                  <h3 className="text-base font-semibold">What Stands Out</h3>
                 </div>
+                <p className="text-xs text-muted-foreground">Your strongest differentiators</p>
               </div>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <ScoreIndicator 
-                  score={currentSpike.score} 
+                  score={currentSpike.score}
                   isRecommended={isHighestScore(verdictOptions.spike, spikeIndex)}
                 />
                 <NavigationControls
@@ -253,35 +250,33 @@ const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) 
                 />
               </div>
             </div>
+            
             <p className="text-sm leading-relaxed text-foreground/90">
               {renderRich(currentSpike.text)}
             </p>
-            <div className="pt-2 border-t border-primary/20">
-              <p className="text-xs text-muted-foreground italic">
+
+            {currentSpike.reasoning && (
+              <p className="text-xs text-muted-foreground pt-2 border-t">
                 {currentSpike.reasoning}
               </p>
-            </div>
+            )}
           </div>
         </Card>
 
         {/* LIFT - Biggest improvement */}
-        <Card className="relative overflow-hidden border-2 border-destructive/30 bg-gradient-to-br from-destructive/5 to-background hover:shadow-lg transition-shadow">
-          <div className="p-6 space-y-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-destructive/10">
-                    <AlertTriangle className="w-6 h-6 text-destructive" />
-                  </div>
-                  <div>
-                    <Badge variant="destructive" className="mb-1">Critical Lift</Badge>
-                    <h3 className="text-xl font-bold text-foreground">What to Improve</h3>
-                  </div>
+        <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div className="p-5 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-foreground" />
+                  <h3 className="text-base font-semibold">What to Improve</h3>
                 </div>
+                <p className="text-xs text-muted-foreground">Critical gaps to address</p>
               </div>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <ScoreIndicator 
-                  score={currentLift.score} 
+                  score={currentLift.score}
                   isRecommended={isHighestScore(verdictOptions.lift, liftIndex)}
                 />
                 <NavigationControls
@@ -292,46 +287,50 @@ const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) 
                 />
               </div>
             </div>
+            
             <p className="text-sm leading-relaxed text-foreground/90">
               {renderRich(currentLift.text)}
             </p>
-            <div className="pt-2 border-t border-destructive/20">
-              <p className="text-xs text-muted-foreground italic">
+
+            {currentLift.reasoning && (
+              <p className="text-xs text-muted-foreground pt-2 border-t">
                 {currentLift.reasoning}
               </p>
-            </div>
+            )}
           </div>
         </Card>
       </div>
 
       {/* Story Coherence */}
-      <Card className="border-2">
-        <div className="p-6 space-y-4">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-bold text-foreground">Story Coherence</h3>
-              <div className="text-2xl font-bold text-primary">{insight.storyCoherencePercent}%</div>
+      <Card className="shadow-sm">
+        <div className="p-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Story Coherence</h3>
             </div>
-            <Progress value={insight.storyCoherencePercent} className="h-3 mb-4" />
-            <p className="text-sm leading-relaxed text-foreground/90">
-              {renderRich(insight.storyCoherenceLine)}
-            </p>
+            <span className="text-lg font-bold text-primary">{insight.storyCoherencePercent}%</span>
           </div>
+          <Progress value={insight.storyCoherencePercent} className="h-2" />
+          <p className="text-sm text-foreground/90 leading-relaxed">
+            {renderRich(insight.storyCoherenceLine)}
+          </p>
         </div>
       </Card>
 
       {/* How to Tell This Story */}
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
-        <div className="p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="space-y-2">
-              <Badge variant="default" className="text-xs">Strategic Positioning</Badge>
-              <h3 className="text-2xl font-bold text-foreground">How to Tell This Story</h3>
-              <p className="text-base font-semibold text-primary">{currentStory.positioning}</p>
+      <Card className="relative overflow-hidden shadow-sm">
+        <div className="p-6 space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2 flex-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                Strategic Positioning
+              </p>
+              <h3 className="text-xl font-bold text-foreground">{currentStory.positioning}</h3>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <ScoreIndicator 
-                score={currentStory.score} 
+                score={currentStory.score}
                 isRecommended={isHighestScore(storyTellingOptions, storyIndex)}
               />
               <NavigationControls
@@ -343,32 +342,33 @@ const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) 
             </div>
           </div>
           
-          <p className="text-base leading-relaxed text-foreground/90">
+          <p className="text-sm leading-relaxed text-foreground/90">
             {renderRich(currentStory.narrative)}
           </p>
 
-          <div className="pt-2 border-t border-primary/20">
-            <p className="text-sm text-muted-foreground italic">
-              <strong>Strategic rationale:</strong> {currentStory.reasoning}
+          {currentStory.reasoning && (
+            <p className="text-xs text-muted-foreground pt-3 border-t">
+              <strong>Rationale:</strong> {currentStory.reasoning}
             </p>
-          </div>
+          )}
 
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap gap-3 pt-4">
+          <div className="flex flex-wrap gap-3 pt-2">
             <Button 
+              size="default"
               onClick={() => onNavigateToTab?.('evidence')}
-              size="lg"
+              className="gap-2"
             >
-              View Detailed Evidence
-              <ArrowRight className="w-4 h-4 ml-2" />
+              View Evidence
+              <ArrowRight className="w-4 h-4" />
             </Button>
             <Button 
+              variant="outline" 
+              size="default"
               onClick={() => onNavigateToTab?.('recommendations')}
-              variant="outline"
-              size="lg"
+              className="gap-2"
             >
-              See Recommendations
-              <ArrowRight className="w-4 h-4 ml-2" />
+              See Actions
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
         </div>

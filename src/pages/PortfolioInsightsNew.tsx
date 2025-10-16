@@ -1,7 +1,23 @@
-import React, { useEffect } from 'react';
-import { HolisticPortfolioHero } from '@/components/portfolio/HolisticPortfolioHero';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OverviewTab } from '@/components/portfolio/tabs/OverviewTab';
+import { Badge } from '@/components/ui/badge';
+import { MOCK_HOLISTIC_SUMMARY } from '@/components/portfolio/portfolioInsightsData';
+import { 
+  LayoutDashboard, 
+  Target, 
+  Award, 
+  TrendingUp, 
+  MapPin, 
+  FileText, 
+  Lightbulb 
+} from 'lucide-react';
 
 const PortfolioInsightsNew: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
+
   // SEO: title, description, canonical, and basic structured data
   useEffect(() => {
     const title = 'Portfolio Insights – Holistic Summary';
@@ -45,9 +61,121 @@ const PortfolioInsightsNew: React.FC = () => {
     document.head.appendChild(script);
   }, []);
 
+  // Sync tab with URL query params
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value });
+  };
+
+  const handleNavigateToTab = (tab: string) => {
+    handleTabChange(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const summary = MOCK_HOLISTIC_SUMMARY;
+
   return (
-    <main role="main" className="min-h-screen bg-background">
-      <HolisticPortfolioHero />
+    <main role="main" className="min-h-screen bg-gradient-to-b from-background via-accent/5 to-background">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        {/* Page Header */}
+        <div className="text-center space-y-3 mb-8">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
+            <Badge variant="default" className="text-xs">
+              {summary.tierName}
+            </Badge>
+            <span className="text-sm font-medium">•</span>
+            <span className="text-sm font-medium">{summary.tierPercentile}</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+            Portfolio Insights
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            A comprehensive analysis of your application profile with actionable recommendations
+          </p>
+        </div>
+
+        {/* Tab Navigation */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-muted/50 p-2 mb-8">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <LayoutDashboard className="w-4 h-4" />
+              <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="impact" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <Target className="w-4 h-4" />
+              <span className="hidden sm:inline">Impact</span>
+            </TabsTrigger>
+            <TabsTrigger value="recognition" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <Award className="w-4 h-4" />
+              <span className="hidden sm:inline">Recognition</span>
+            </TabsTrigger>
+            <TabsTrigger value="trajectory" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <TrendingUp className="w-4 h-4" />
+              <span className="hidden sm:inline">Trajectory</span>
+            </TabsTrigger>
+            <TabsTrigger value="context" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <MapPin className="w-4 h-4" />
+              <span className="hidden sm:inline">Context</span>
+            </TabsTrigger>
+            <TabsTrigger value="evidence" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Evidence</span>
+            </TabsTrigger>
+            <TabsTrigger value="recommendations" className="flex items-center gap-2 data-[state=active]:bg-background">
+              <Lightbulb className="w-4 h-4" />
+              <span className="hidden sm:inline">Actions</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tab Content */}
+          <TabsContent value="overview" className="mt-0">
+            <OverviewTab summary={summary} onNavigateToTab={handleNavigateToTab} />
+          </TabsContent>
+
+          <TabsContent value="impact" className="mt-0">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Impact Footprint tab coming soon...</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="recognition" className="mt-0">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Recognition Mix tab coming soon...</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="trajectory" className="mt-0">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Trajectory & Durability tab coming soon...</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="context" className="mt-0">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Context & Contribution tab coming soon...</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="evidence" className="mt-0">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Evidence & Analysis tab coming soon...</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="recommendations" className="mt-0">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Recommendations tab coming soon...</p>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </main>
   );
 };

@@ -81,7 +81,6 @@ const PortfolioInsightsNew: React.FC = () => {
   };
 
   const summary = MOCK_HOLISTIC_SUMMARY;
-  const overall100 = Math.round(summary.overallScore * 10);
 
   return (
     <main role="main" className="min-h-screen bg-gradient-to-b from-background via-accent/5 to-background">
@@ -104,130 +103,7 @@ const PortfolioInsightsNew: React.FC = () => {
         </div>
 
         {/* Portfolio Card - Fixed at top */}
-        <div className="flex justify-center mb-12">
-          <div className="inline-block">
-            <div className="pc-wrapper">
-              <div className="pc-card">
-                <div className="pc-header">
-                  <div className="pc-avatar">
-                    <div className="pc-avatar-inner bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold text-xl">
-                      P
-                    </div>
-                  </div>
-                  <div className="pc-user-info">
-                    <div className="pc-name">Your Portfolio</div>
-                    <div className="pc-title">{summary.tierName} • {summary.tierPercentile}</div>
-                    <div className="pc-handle">@portfolio</div>
-                  </div>
-                </div>
-                <div className="pc-body">
-                  <div className="pc-sides">
-                    <div className="pc-side-col">
-                      <div className="pc-side-line">
-                        <div className="pc-side-num">7.8</div>
-                        <div className="pc-side-label">Academic</div>
-                      </div>
-                      <div className="pc-side-line">
-                        <div className="pc-side-num">8.5</div>
-                        <div className="pc-side-label">Readiness</div>
-                      </div>
-                    </div>
-                    <div className="pc-side-col">
-                      <div className="pc-side-line">
-                        <div className="pc-side-num">8.5</div>
-                        <div className="pc-side-label">Leadership</div>
-                      </div>
-                      <div className="pc-side-line">
-                        <div className="pc-side-num">8.3</div>
-                        <div className="pc-side-label">Community</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="pc-overall-plaque">
-                    <div className="pc-overall-num">{overall100}</div>
-                    <div className="pc-overall-label">Overall</div>
-                  </div>
-                </div>
-                <div className="pc-status-badge">Analyzed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-muted/50 p-2 mb-8">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="impact" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <Target className="w-4 h-4" />
-              <span className="hidden sm:inline">Impact</span>
-            </TabsTrigger>
-            <TabsTrigger value="recognition" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <Award className="w-4 h-4" />
-              <span className="hidden sm:inline">Recognition</span>
-            </TabsTrigger>
-            <TabsTrigger value="trajectory" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <TrendingUp className="w-4 h-4" />
-              <span className="hidden sm:inline">Trajectory</span>
-            </TabsTrigger>
-            <TabsTrigger value="context" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <MapPin className="w-4 h-4" />
-              <span className="hidden sm:inline">Context</span>
-            </TabsTrigger>
-            <TabsTrigger value="evidence" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Evidence</span>
-            </TabsTrigger>
-            <TabsTrigger value="recommendations" className="flex items-center gap-2 data-[state=active]:bg-background">
-              <Lightbulb className="w-4 h-4" />
-              <span className="hidden sm:inline">Actions</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Tab Content */}
-          <TabsContent value="overview" className="mt-0">
-            <OverviewTab summary={summary} onNavigateToTab={handleNavigateToTab} />
-          </TabsContent>
-
-          <TabsContent value="impact" className="mt-0">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Impact Footprint tab coming soon...</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="recognition" className="mt-0">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Recognition Mix tab coming soon...</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="trajectory" className="mt-0">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Trajectory & Durability tab coming soon...</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="context" className="mt-0">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Context & Contribution tab coming soon...</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="evidence" className="mt-0">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Evidence & Analysis tab coming soon...</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="recommendations" className="mt-0">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Recommendations tab coming soon...</p>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <OverviewTab summary={summary} onNavigateToTab={handleNavigateToTab} activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
     </main>
   );

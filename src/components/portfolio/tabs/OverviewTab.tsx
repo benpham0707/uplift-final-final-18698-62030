@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProfileCard from '@/components/portfolio/ProfileCard';
 import { Rocket, Target, AlertTriangle, ArrowRight, LayoutDashboard, Award, TrendingUp, MapPin, FileText, Lightbulb } from 'lucide-react';
 import { HolisticSummary, renderRich } from '../portfolioInsightsData';
+import { NavigationControls } from '../NavigationControls';
+import { ScoreIndicator } from '../ScoreIndicator';
 
 interface OverviewTabProps {
   summary: HolisticSummary;
@@ -151,61 +153,153 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ summary, onNavigateToT
 
 // Separate component for overview content
 const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) => void }> = ({ insight, onNavigateToTab }) => {
+  const [spineIndex, setSpineIndex] = React.useState(0);
+  const [spikeIndex, setSpikeIndex] = React.useState(0);
+  const [liftIndex, setLiftIndex] = React.useState(0);
+  const [storyIndex, setStoryIndex] = React.useState(0);
+
+  const { verdictOptions, storyTellingOptions } = insight;
+
+  // Auto-select highest-scored options on mount
+  React.useEffect(() => {
+    const findHighestIndex = (options: any[]) => {
+      return options.reduce((maxIdx, curr, idx, arr) => 
+        curr.score > arr[maxIdx].score ? idx : maxIdx, 0
+      );
+    };
+
+    setSpineIndex(findHighestIndex(verdictOptions.spine));
+    setSpikeIndex(findHighestIndex(verdictOptions.spike));
+    setLiftIndex(findHighestIndex(verdictOptions.lift));
+    setStoryIndex(findHighestIndex(storyTellingOptions));
+  }, [verdictOptions, storyTellingOptions]);
+
+  const currentSpine = verdictOptions.spine[spineIndex];
+  const currentSpike = verdictOptions.spike[spikeIndex];
+  const currentLift = verdictOptions.lift[liftIndex];
+  const currentStory = storyTellingOptions[storyIndex];
+
+  const isHighestScore = (options: any[], index: number) => {
+    return options[index].score === Math.max(...options.map(o => o.score));
+  };
+
   return (
     <div className="space-y-8 pb-12">
-      {/* Spine, Spike, Lift - Three Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* SPIKE - What to amplify */}
-        <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background hover:shadow-lg transition-shadow">
-          <div className="p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <Rocket className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <Badge variant="default" className="mb-1">Your Spike</Badge>
-                <h3 className="text-xl font-bold text-foreground">What Stands Out</h3>
-              </div>
-            </div>
-            <p className="text-sm leading-relaxed text-foreground/90">
-              {renderRich(insight.verdict.spike)}
-            </p>
-          </div>
-        </Card>
-
-        {/* SPINE - Thematic thread */}
-        <Card className="relative overflow-hidden border-2 border-green-500/30 bg-gradient-to-br from-green-500/5 to-background hover:shadow-lg transition-shadow">
-          <div className="p-6 space-y-4">
+      {/* SPINE - Full width at top (most important) */}
+      <Card className="relative overflow-hidden border-2 border-green-500/30 bg-gradient-to-br from-green-500/10 via-green-500/5 to-background hover:shadow-xl transition-shadow">
+        <div className="p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-green-500/10">
-                <Target className="w-6 h-6 text-green-600 dark:text-green-500" />
+                <Target className="w-7 h-7 text-green-600 dark:text-green-500" />
               </div>
               <div>
                 <Badge variant="outline" className="mb-1 border-green-500/50">Your Spine</Badge>
-                <h3 className="text-xl font-bold text-foreground">Narrative Thread</h3>
+                <h3 className="text-2xl font-bold text-foreground">Narrative Thread</h3>
+                <p className="text-xs text-muted-foreground mt-1">The cohesive story connecting all your activities</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <ScoreIndicator 
+                score={currentSpine.score} 
+                isRecommended={isHighestScore(verdictOptions.spine, spineIndex)}
+              />
+              <NavigationControls
+                current={spineIndex}
+                total={verdictOptions.spine.length}
+                onPrev={() => setSpineIndex(prev => Math.max(0, prev - 1))}
+                onNext={() => setSpineIndex(prev => Math.min(verdictOptions.spine.length - 1, prev + 1))}
+              />
+            </div>
+          </div>
+          <p className="text-base leading-relaxed text-foreground/90">
+            {renderRich(currentSpine.text)}
+          </p>
+          <div className="pt-2 border-t border-green-500/20">
+            <p className="text-sm text-muted-foreground italic">
+              <strong>Why this works:</strong> {currentSpine.reasoning}
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* SPIKE & LIFT - Side by side (more room for each) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* SPIKE - What to amplify */}
+        <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-background hover:shadow-lg transition-shadow">
+          <div className="p-6 space-y-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-primary/10">
+                    <Rocket className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <Badge variant="default" className="mb-1">Your Spike</Badge>
+                    <h3 className="text-xl font-bold text-foreground">What Stands Out</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <ScoreIndicator 
+                  score={currentSpike.score} 
+                  isRecommended={isHighestScore(verdictOptions.spike, spikeIndex)}
+                />
+                <NavigationControls
+                  current={spikeIndex}
+                  total={verdictOptions.spike.length}
+                  onPrev={() => setSpikeIndex(prev => Math.max(0, prev - 1))}
+                  onNext={() => setSpikeIndex(prev => Math.min(verdictOptions.spike.length - 1, prev + 1))}
+                />
               </div>
             </div>
             <p className="text-sm leading-relaxed text-foreground/90">
-              {renderRich(insight.verdict.spine)}
+              {renderRich(currentSpike.text)}
             </p>
+            <div className="pt-2 border-t border-primary/20">
+              <p className="text-xs text-muted-foreground italic">
+                {currentSpike.reasoning}
+              </p>
+            </div>
           </div>
         </Card>
 
         {/* LIFT - Biggest improvement */}
         <Card className="relative overflow-hidden border-2 border-destructive/30 bg-gradient-to-br from-destructive/5 to-background hover:shadow-lg transition-shadow">
           <div className="p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-destructive/10">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-destructive/10">
+                    <AlertTriangle className="w-6 h-6 text-destructive" />
+                  </div>
+                  <div>
+                    <Badge variant="destructive" className="mb-1">Critical Lift</Badge>
+                    <h3 className="text-xl font-bold text-foreground">What to Improve</h3>
+                  </div>
+                </div>
               </div>
-              <div>
-                <Badge variant="destructive" className="mb-1">Critical Lift</Badge>
-                <h3 className="text-xl font-bold text-foreground">What to Improve</h3>
+              <div className="flex items-center justify-between gap-3">
+                <ScoreIndicator 
+                  score={currentLift.score} 
+                  isRecommended={isHighestScore(verdictOptions.lift, liftIndex)}
+                />
+                <NavigationControls
+                  current={liftIndex}
+                  total={verdictOptions.lift.length}
+                  onPrev={() => setLiftIndex(prev => Math.max(0, prev - 1))}
+                  onNext={() => setLiftIndex(prev => Math.min(verdictOptions.lift.length - 1, prev + 1))}
+                />
               </div>
             </div>
             <p className="text-sm leading-relaxed text-foreground/90">
-              {renderRich(insight.verdict.lift)}
+              {renderRich(currentLift.text)}
             </p>
+            <div className="pt-2 border-t border-destructive/20">
+              <p className="text-xs text-muted-foreground italic">
+                {currentLift.reasoning}
+              </p>
+            </div>
           </div>
         </Card>
       </div>
@@ -229,14 +323,35 @@ const OverviewContent: React.FC<{ insight: any; onNavigateToTab?: (tab: string) 
       {/* How to Tell This Story */}
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
         <div className="p-8 space-y-6">
-          <div className="space-y-2">
-            <Badge variant="default" className="text-xs">Strategic Positioning</Badge>
-            <h3 className="text-2xl font-bold text-foreground">How to Tell This Story</h3>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="space-y-2">
+              <Badge variant="default" className="text-xs">Strategic Positioning</Badge>
+              <h3 className="text-2xl font-bold text-foreground">How to Tell This Story</h3>
+              <p className="text-base font-semibold text-primary">{currentStory.positioning}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <ScoreIndicator 
+                score={currentStory.score} 
+                isRecommended={isHighestScore(storyTellingOptions, storyIndex)}
+              />
+              <NavigationControls
+                current={storyIndex}
+                total={storyTellingOptions.length}
+                onPrev={() => setStoryIndex(prev => Math.max(0, prev - 1))}
+                onNext={() => setStoryIndex(prev => Math.min(storyTellingOptions.length - 1, prev + 1))}
+              />
+            </div>
           </div>
           
           <p className="text-base leading-relaxed text-foreground/90">
-            {renderRich(insight.concludingNarrative)}
+            {renderRich(currentStory.narrative)}
           </p>
+
+          <div className="pt-2 border-t border-primary/20">
+            <p className="text-sm text-muted-foreground italic">
+              <strong>Strategic rationale:</strong> {currentStory.reasoning}
+            </p>
+          </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-3 pt-4">

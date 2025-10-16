@@ -13,8 +13,28 @@ export interface KeyTakeaway {
 export type EvidenceProps = { text: string; details: string[] };
 export type RichSegment = string | EvidenceProps;
 
+export interface VerdictOption {
+  id: string;
+  text: RichSegment[];
+  score: number;
+  reasoning: string;
+}
+
+export interface StoryTellingOption {
+  id: string;
+  positioning: string;
+  narrative: RichSegment[];
+  score: number;
+  reasoning: string;
+}
+
 export interface OverarchingInsight {
-  verdict: { spike: RichSegment[]; spine: RichSegment[]; lift: RichSegment[] };
+  verdictOptions: {
+    spine: VerdictOption[];
+    spike: VerdictOption[];
+    lift: VerdictOption[];
+  };
+  storyTellingOptions: StoryTellingOption[];
   readinessInContext: RichSegment[];
   storyCoherencePercent: number;
   storyCoherenceLine: RichSegment[];
@@ -23,7 +43,6 @@ export interface OverarchingInsight {
   trajectoryDurability: RichSegment[];
   contextContribution: RichSegment[];
   committeeSoundBite: RichSegment[];
-  concludingNarrative: RichSegment[];
 }
 
 export interface HolisticSummary {
@@ -102,27 +121,170 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
     colorClass: 'border-destructive',
   },
   overarchingInsight: {
-    verdict: {
-      spike: [
-        'A distinctive spike in engineering-for-access with real adoption - your ',
-        { text: 'tutoring platform', details: ['118 weekly active students last month', 'MOUs with two partner schools', 'Tutor roster grew 6 to 19'] },
-        ' consistently serves local schools, and the ',
-        { text: 'adaptive controller kits', details: ['18 robotics members using kits', 'Open-source repo: 42 stars, 9 forks'] },
-        ' lowered barriers for new participants.'
-      ],
+    verdictOptions: {
       spine: [
-        'Your spine is clear: using technology to democratize access - from ',
-        { text: 'Title I workshops', details: ['Free cycles for two Title I partners', 'Avg 24 students/session'] },
-        ' to mentoring first-time coders via the ',
-        { text: 'library program', details: ['Monthly beginner cohorts since Jan 2024', 'Consistent waitlist demand'] },
-        '.'
+        {
+          id: 'civic-tech-democratizer',
+          text: [
+            'Your spine is clear: using technology to democratize access - from ',
+            { text: 'Title I workshops', details: ['Free cycles for two Title I partners', 'Avg 24 students/session'] },
+            ' to mentoring first-time coders via the ',
+            { text: 'library program', details: ['Monthly beginner cohorts since Jan 2024', 'Consistent waitlist demand'] },
+            '.'
+          ],
+          score: 9.2,
+          reasoning: 'Strongest narrative thread - unifies technical skills, community impact, and leadership across all activities'
+        },
+        {
+          id: 'education-equity-champion',
+          text: [
+            'You are an education equity champion who leverages ',
+            { text: 'technical expertise', details: ['Full-stack platform, 118 weekly users', 'Adaptive controller kits for inclusion'] },
+            ' to expand opportunity for underserved students, with a track record of ',
+            { text: 'sustained mentorship', details: ['18 months tutoring program', '24 mentees across two cohorts'] },
+            ' that demonstrates genuine investment beyond building.'
+          ],
+          score: 8.7,
+          reasoning: 'Emphasizes social justice angle - highly valued but slightly narrower than democratization theme'
+        },
+        {
+          id: 'systems-builder',
+          text: [
+            'You are a systems thinker who identifies inefficiencies and builds ',
+            { text: 'scalable solutions', details: ['Platform architecture serves 2 schools', 'Open-source controller repo: 42 stars'] },
+            ' that outlive your direct involvement, as evidenced by ',
+            { text: 'handoff documentation', details: ['Onboarding checklist, weekly runbook', 'Successor training materials'] },
+            ' ensuring continuity.'
+          ],
+          score: 8.3,
+          reasoning: 'Highlights analytical and architectural abilities, but less emotionally resonant than access narrative'
+        },
+        {
+          id: 'cross-disciplinary-connector',
+          text: [
+            'You bridge policy, data science, and community organizing - translating ',
+            { text: 'budget PDFs into dashboards', details: ['Civic Tech Challenge finalist', 'Public changelog, partner quotes'] },
+            ' while simultaneously running ',
+            { text: 'hands-on programs', details: ['Weekly tutoring sessions', 'Monthly beginner workshops'] },
+            ' that connect technical work to human outcomes.'
+          ],
+          score: 7.9,
+          reasoning: 'Unique positioning but may seem unfocused without careful framing - requires precise essay execution'
+        }
+      ],
+      spike: [
+        {
+          id: 'quantifiable-impact',
+          text: [
+            'Your ',
+            { text: 'quantifiable community impact', details: ['118 students weekly through tutoring platform', 'MOUs with two partner schools', 'Tutor roster grew 6 to 19', 'Retention improving 12 pts'] },
+            ' is exceptional - concrete adoption metrics and institutional partnerships that separate you from peers who claim "impact" without evidence.'
+          ],
+          score: 9.5,
+          reasoning: 'Most distinctive spike - hard numbers validate claims and demonstrate scale rarely seen in high school portfolios'
+        },
+        {
+          id: 'technical-leadership',
+          text: [
+            'A distinctive spike in engineering-for-access with real adoption - your ',
+            { text: 'tutoring platform', details: ['118 weekly active students last month', 'MOUs with two partner schools', 'Tutor roster grew 6 to 19'] },
+            ' consistently serves local schools, and the ',
+            { text: 'adaptive controller kits', details: ['18 robotics members using kits', 'Open-source repo: 42 stars, 9 forks'] },
+            ' lowered barriers for new participants.'
+          ],
+          score: 8.8,
+          reasoning: 'Demonstrates technical maturity and sustained operation - shows you can shepherd projects from idea to adoption'
+        },
+        {
+          id: 'external-validation',
+          text: [
+            'Your spike is in externally validated impact: ',
+            { text: 'national finalist recognition', details: ['Civic Tech Challenge - finalist (top 10/1,200)'] },
+            ' for civic technology combined with ',
+            { text: 'state-level awards', details: ['State CS Olympiad - 2nd place', 'State Service Innovation Award - winner'] },
+            ' that validate both technical craft and community contribution.'
+          ],
+          score: 8.4,
+          reasoning: 'Third-party validation carries weight, but slightly weaker than direct adoption metrics'
+        }
       ],
       lift: [
-        'Biggest lift: convert effort into public outcomes. Instead of logging hours, surface a compact metrics layer - a single ',
-        { text: 'impact hub', details: ['One page consolidating beneficiaries, before/after, artifacts, testimonials'] },
-        ' that quantifies who benefited and how across programs.'
+        {
+          id: 'recognition-pursuit',
+          text: [
+            'Biggest lift: convert effort into public outcomes. Instead of logging hours, surface a compact metrics layer - a single ',
+            { text: 'impact hub', details: ['One page consolidating beneficiaries, before/after, artifacts, testimonials'] },
+            ' that quantifies who benefited and how across programs.'
+          ],
+          score: 9.0,
+          reasoning: 'Most critical gap - you have strong work that lacks third-party validation. National competitions would dramatically strengthen credibility'
+        },
+        {
+          id: 'leadership-breadth',
+          text: [
+            'You should ',
+            { text: 'expand leadership beyond tech', details: ['Consider student government role', 'Arts/culture leadership opportunity', 'Cross-domain club presidency'] },
+            ' to demonstrate versatility. Your technical leadership is clear, but schools want to see you can lead in contexts where you\'re not the expert.'
+          ],
+          score: 7.5,
+          reasoning: 'Would strengthen well-roundedness, but lower priority than recognition - your tech leadership is already strong'
+        }
       ]
     },
+    storyTellingOptions: [
+      {
+        id: 'civic-tech-narrative',
+        positioning: 'Civic-Tech Builder',
+        narrative: [
+          'Frame your application around: building technology for civic good. Lead with the ',
+          { text: 'tutoring platform', details: ['118 weekly active students', 'Two schools', 'Retention improving'] },
+          ' as living proof of impact at scale. In your personal statement, focus on the moment you realized code could ',
+          { text: 'democratize access', details: ['Title I workshops expanding reach', 'Library program removing barriers'] },
+          ' to education. Position supplements around how each project serves underserved communities. This narrative aligns perfectly with top-tier college values (innovation + equity).'
+        ],
+        score: 9.1,
+        reasoning: 'Best aligns with top-tier college values - innovation paired with social impact. Most compelling for T10 schools'
+      },
+      {
+        id: 'equity-advocate-narrative',
+        positioning: 'Education Equity Advocate',
+        narrative: [
+          'Position yourself as someone who uses tech to expand opportunity. Center your ',
+          { text: 'sustained mentorship', details: ['18 months tutoring program', '24 mentees across cohorts', 'Documented skill progression'] },
+          ' and frame the platform as a tool that emerged from seeing tutors struggle with coordination. Personal statement should explore your ',
+          { text: 'identity connection', details: ['First-gen college aspirant', 'Resource constraints shaped perspective'] },
+          ' to access issues. This narrative is powerful but requires authentic personal connection to avoid seeming performative.'
+        ],
+        score: 8.6,
+        reasoning: 'Strong social justice angle - highly valued but competitive. Requires authentic personal connection to resonate'
+      },
+      {
+        id: 'systems-thinker-narrative',
+        positioning: 'Technical Systems Architect',
+        narrative: [
+          'Tell the story of someone who sees inefficient systems and builds ',
+          { text: 'scalable solutions', details: ['Platform architecture', 'Open-source contributions', 'Handoff documentation'] },
+          '. Your narrative centers on sustainability - projects that ',
+          { text: 'outlive your involvement', details: ['Documented handoffs', 'Successor training', 'Maintained operations'] },
+          '. This positions you as mature and systems-oriented, ideal for engineering programs that value architectural thinking.'
+        ],
+        score: 8.2,
+        reasoning: 'Appeals to technical programs but less emotionally compelling - best for pure CS/engineering applications'
+      },
+      {
+        id: 'policy-to-action-narrative',
+        positioning: 'Policy-to-Action Translator',
+        narrative: [
+          'Frame yourself as bridging the gap between policy and implementation. Start with ',
+          { text: 'civic tech work', details: ['Budget visualization dashboard', 'Policy data made accessible'] },
+          ' and show how this connects to hands-on programs. Position your technical skills as a means to ',
+          { text: 'translate complex systems', details: ['Data visualization for accessibility', 'Platform reducing coordination friction'] },
+          ' into actionable tools. This narrative works well for schools with strong public policy + CS intersections (Stanford, Harvard, Princeton).'
+        ],
+        score: 7.8,
+        reasoning: 'Unique angle but requires careful execution - risk of seeming scattered across too many domains'
+      }
+    ],
     readinessInContext: [
       'Readiness is strong relative to availability: you maximized rigor and show an upward trend. With ',
       { text: 'limited AP availability', details: ['School profile lists 6 AP vs district 12'] },
@@ -168,13 +330,6 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
       '"Admit as the ',
       { text: 'civic-tech builder', details: ['Budget PDF to dashboard prototype; partner quotes; public changelog'] },
       ' who turns messy policy data into tools people actually use."'
-    ],
-    concludingNarrative: [
-      'Taken together, your narrative is a builder-teacher translating technical skill into access at scale. Lead with the ',
-      { text: 'tutoring platform', details: ['118 weekly active students; two schools; retention improving'] },
-      ' as living proof, braid in the research and outreach that sharpened the tools, and anchor credibility with the ',
-      { text: 'national finalist', details: ['Civic Tech Challenge finalist (top 10/1,200)'] },
-      ' read. Over the next 60-90 days, publish a monthly update with before/after metrics and a brief note from a beneficiary. With quantified outcomes and documented handoffs, your profile reads not as "busy" but as a systems builder whose work keeps running without you.'
     ]
   }
 };

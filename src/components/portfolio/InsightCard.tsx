@@ -205,7 +205,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         className
       )}
     >
-      <CardContent className="p-6 space-y-4">
+      <CardContent className="p-7 md:p-8 space-y-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3 flex-1">
@@ -217,8 +217,8 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <h3 className={cn(
-                'font-bold leading-tight text-foreground',
-                priority === 'critical' ? 'text-2xl' : 'text-xl'
+                'font-extrabold leading-tight text-foreground',
+                priority === 'critical' ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl'
               )}>
                 {headline}
               </h3>
@@ -238,17 +238,17 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           config.bgClass,
           config.borderClass
         )}>
-          <p className="text-base font-medium leading-relaxed text-foreground">
+          <p className="text-lg md:text-xl font-medium leading-relaxed text-foreground">
             {insight}
           </p>
         </div>
 
         {/* Significance */}
         <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <p className="text-base font-semibold uppercase tracking-wide text-muted-foreground">
             Why This Matters
           </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
             {significance}
           </p>
         </div>
@@ -268,7 +268,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             onClick={() => setIsEvidenceExpanded(!isEvidenceExpanded)}
             className="w-full justify-between px-0 hover:bg-transparent"
           >
-            <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <span className="text-base font-semibold uppercase tracking-wide text-muted-foreground">
               Evidence ({evidence.length})
             </span>
             {isEvidenceExpanded ? (
@@ -284,9 +284,9 @@ export const InsightCard: React.FC<InsightCardProps> = ({
                 <Badge 
                   key={index} 
                   variant="secondary" 
-                  className="text-xs"
+                  className="text-sm"
                 >
-                  {item.icon && <item.icon className="h-3 w-3 mr-1" />}
+                  {item.icon && <item.icon className="h-4 w-4 mr-1" />}
                   {item.label}
                 </Badge>
               ))}
@@ -300,7 +300,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             <Button
               onClick={action.onClick}
               variant={priority === 'critical' ? 'default' : 'outline'}
-              className="w-full"
+              className="w-full text-lg py-6"
             >
               {action.label}
             </Button>

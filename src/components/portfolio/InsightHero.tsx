@@ -26,30 +26,30 @@ export const InsightHero: React.FC<InsightHeroProps> = ({
 }) => {
   return (
     <Card className="border-2 border-destructive/30 shadow-xl overflow-hidden">
-      <CardContent className="p-8 md:p-12 text-center space-y-6">
+      <CardContent className="p-10 md:p-14 text-center space-y-8">
         {/* Icon */}
         <div className="flex justify-center">
           <div className={cn(
             'p-4 rounded-2xl',
             bgClass
           )}>
-            <Icon className={cn('h-12 w-12', colorClass)} />
+            <Icon className={cn('h-14 w-14 md:h-16 md:w-16', colorClass)} />
           </div>
         </div>
 
         {/* Content */}
         <div className="space-y-4 max-w-3xl mx-auto">
           <div className="inline-block">
-            <span className="text-sm font-bold uppercase tracking-wider text-destructive">
+            <span className="text-base md:text-lg font-bold uppercase tracking-wider text-destructive">
               Most Important Action
             </span>
           </div>
           
-          <h2 className="text-4xl font-bold text-foreground leading-tight">
+          <h2 className="text-5xl md:text-6xl font-extrabold text-foreground leading-tight">
             {headline}
           </h2>
           
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
             {insight}
           </p>
         </div>
@@ -59,14 +59,14 @@ export const InsightHero: React.FC<InsightHeroProps> = ({
           <Button
             onClick={action.onClick}
             size="lg"
-            className="text-lg px-8"
+            className="text-xl md:text-2xl px-10 md:px-12 py-7"
           >
             {action.label}
           </Button>
         </div>
 
         {/* Progress Indicator */}
-        <p className="text-sm text-muted-foreground pt-2">
+        <p className="text-base text-muted-foreground pt-2">
           Critical insight 1 of 2
         </p>
       </CardContent>

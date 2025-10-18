@@ -62,7 +62,7 @@ export interface HolisticSummary {
 const InlineEvidence: React.FC<EvidenceProps> = ({ text, details }) => (
   <HoverCard>
     <HoverCardTrigger asChild>
-      <span className="underline decoration-dotted underline-offset-4 cursor-help text-primary/90 hover:text-primary">
+      <span className="underline decoration-dotted underline-offset-4 cursor-help text-sky-600 hover:text-sky-700">
         {text}
       </span>
     </HoverCardTrigger>

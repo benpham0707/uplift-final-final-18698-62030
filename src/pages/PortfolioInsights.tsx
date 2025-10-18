@@ -312,10 +312,10 @@ export default function PortfolioInsights() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-border shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-5 md:py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/portfolio-scanner')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+            <Button variant="ghost" size="lg" onClick={() => navigate('/portfolio-scanner')}>
+              <ArrowLeft className="h-5 w-5 mr-2" />
               Back
             </Button>
             <div className="flex items-center gap-3">
@@ -325,12 +325,12 @@ export default function PortfolioInsights() {
                 {overall?.toFixed(1) || '—'}
               </div>
               <div>
-                <div className="font-semibold text-sm">Portfolio Insights</div>
-                <div className="text-xs text-muted-foreground">Research Analysis</div>
+                <div className="font-semibold text-base md:text-lg">Portfolio Insights</div>
+                <div className="text-sm text-muted-foreground">Research Analysis</div>
               </div>
             </div>
           </div>
-          <div className="text-sm text-muted-foreground hidden sm:block">Live Analytics</div>
+          <div className="text-base md:text-lg text-muted-foreground hidden sm:block">Live Analytics</div>
         </div>
       </div>
 
@@ -343,10 +343,10 @@ export default function PortfolioInsights() {
         {/* Section 2: Dimensional Analysis (MagicBento 3x2) */}
         <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-3">
-            <Award className="h-7 w-7 text-purple-600" />
-            <h2 className="text-3xl font-bold">Dimensional Analysis</h2>
+            <Award className="h-8 w-8 text-purple-600" />
+            <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Dimensional Analysis</h2>
           </div>
-          <p className="text-muted-foreground leading-relaxed">
+          <p className="text-muted-foreground leading-relaxed text-lg md:text-xl">
             Detailed breakdown of each assessment dimension with identified strengths and development opportunities.
           </p>
 
@@ -383,10 +383,10 @@ export default function PortfolioInsights() {
         {hiddenStrengthsCount > 0 && (
           <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-3">
-              <Sparkles className="h-7 w-7 text-purple-600" />
-              <h2 className="text-3xl font-bold">Unique Differentiators Discovered</h2>
+              <Sparkles className="h-8 w-8 text-purple-600" />
+              <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent">Unique Differentiators Discovered</h2>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-lg md:text-xl">
               Hidden strengths identified through cross-dimensional analysis of your experiences and achievements.
             </p>
 
@@ -405,17 +405,17 @@ export default function PortfolioInsights() {
                       <Sparkles className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm leading-tight">Unique Strengths Unlocked</h3>
-                      <div className="text-xs text-muted-foreground mt-0.5">
+                      <h3 className="font-semibold text-base leading-tight">Unique Strengths Unlocked</h3>
+                      <div className="text-sm text-muted-foreground mt-0.5">
                         {hiddenStrengthsCount} differentiators identified
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold" style={{ color: 'hsl(280, 80%, 65%)' }}>
+                    <div className="text-3xl md:text-4xl font-extrabold" style={{ color: 'hsl(280, 80%, 65%)' }}>
                       {hiddenStrengthsCount}
                     </div>
-                    <div className="text-xs text-muted-foreground">found</div>
+                    <div className="text-sm text-muted-foreground">found</div>
                   </div>
                 </div>
 
@@ -424,7 +424,7 @@ export default function PortfolioInsights() {
                   {detailed?.hiddenStrengths?.map((strength, idx) => (
                     <Badge
                       key={idx}
-                      className="px-3 py-1.5 text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-md animate-fade-in hover:scale-105 transition-transform"
+                      className="px-3 py-1.5 text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-md animate-fade-in hover:scale-105 transition-transform"
                       style={{ animationDelay: `${idx * 0.05}s` }}
                     >
                       <Sparkles className="h-3 w-3 mr-1.5" />
@@ -441,10 +441,10 @@ export default function PortfolioInsights() {
         {detailed?.prioritizedRecommendations && detailed.prioritizedRecommendations.length > 0 && (
           <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-3">
-              <Target className="h-7 w-7 text-amber-600" />
-              <h2 className="text-3xl font-bold">Strategic Recommendations</h2>
+              <Target className="h-8 w-8 text-amber-600" />
+              <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Strategic Recommendations</h2>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-lg md:text-xl">
               Prioritized actions based on comprehensive analysis of your portfolio strengths and development areas.
             </p>
 
@@ -478,10 +478,10 @@ export default function PortfolioInsights() {
         {gaps.length > 0 && (
           <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <div className="flex items-center gap-3">
-              <TrendingUp className="h-7 w-7 text-amber-600" />
-              <h2 className="text-3xl font-bold">Growth Opportunities</h2>
+              <TrendingUp className="h-8 w-8 text-amber-600" />
+              <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Growth Opportunities</h2>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-lg md:text-xl">
               Dimensions with the largest opportunity for improvement, along with actionable strategies to close the gaps.
             </p>
 
@@ -514,10 +514,10 @@ export default function PortfolioInsights() {
         {/* Section 6: Detailed Evidence Breakdown (Accordion) */}
         <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
           <div className="flex items-center gap-3">
-            <BookOpen className="h-7 w-7 text-purple-600" />
-            <h2 className="text-3xl font-bold">Detailed Evidence Breakdown</h2>
+            <BookOpen className="h-8 w-8 text-purple-600" />
+            <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Detailed Evidence Breakdown</h2>
           </div>
-          <p className="text-muted-foreground leading-relaxed">
+          <p className="text-muted-foreground leading-relaxed text-lg md:text-xl">
             Comprehensive analysis of each dimension including evidence, expert feedback, and detailed recommendations.
           </p>
 
@@ -535,7 +535,7 @@ export default function PortfolioInsights() {
                   value={dim.key}
                   className="border-2 rounded-xl overflow-hidden bg-white"
                 >
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-slate-50">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-slate-50">
                     <div className="flex items-center gap-4 text-left w-full">
                       <div 
                         className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg flex-shrink-0"
@@ -544,8 +544,8 @@ export default function PortfolioInsights() {
                         <Icon className="h-6 w-6" />
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-lg">{dim.label}</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="font-semibold text-xl">{dim.label}</div>
+                        <div className="text-base text-muted-foreground">
                           Score: <span className="font-semibold" style={{ color: dim.color }}>
                             {score !== null ? score.toFixed(1) : '—'}
                           </span>/10
@@ -557,12 +557,12 @@ export default function PortfolioInsights() {
                     {/* Evidence */}
                     {dimData.evidence && dimData.evidence.length > 0 && (
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-sm uppercase tracking-wide text-foreground">
+                        <h4 className="font-semibold text-base uppercase tracking-wide text-foreground">
                           Evidence Collected
                         </h4>
                         <ul className="space-y-2">
                           {dimData.evidence.map((item, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2 leading-relaxed">
+                            <li key={idx} className="text-base text-muted-foreground flex items-start gap-2 leading-relaxed">
                               <span className="text-purple-500 mt-1">•</span>
                               <span>{item}</span>
                             </li>
@@ -574,10 +574,10 @@ export default function PortfolioInsights() {
                     {/* Expert Feedback */}
                     {dimData.feedback && (
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-sm uppercase tracking-wide text-foreground">
+                        <h4 className="font-semibold text-base uppercase tracking-wide text-foreground">
                           Expert Analysis
                         </h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
+                        <p className="text-base text-muted-foreground leading-relaxed">
                           {dimData.feedback}
                         </p>
                       </div>
@@ -586,12 +586,12 @@ export default function PortfolioInsights() {
                     {/* Strengths */}
                     {dimData.strengths && dimData.strengths.length > 0 && (
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-sm uppercase tracking-wide text-emerald-600">
+                        <h4 className="font-semibold text-base uppercase tracking-wide text-emerald-600">
                           Identified Strengths
                         </h4>
                         <ul className="space-y-2">
                           {dimData.strengths.map((strength, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2 leading-relaxed">
+                            <li key={idx} className="text-base text-muted-foreground flex items-start gap-2 leading-relaxed">
                               <Award className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
                               <span>{strength}</span>
                             </li>
@@ -603,12 +603,12 @@ export default function PortfolioInsights() {
                     {/* Growth Areas */}
                     {dimData.growthAreas && dimData.growthAreas.length > 0 && (
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-sm uppercase tracking-wide text-amber-600">
+                        <h4 className="font-semibold text-base uppercase tracking-wide text-amber-600">
                           Development Recommendations
                         </h4>
                         <ul className="space-y-2">
                           {dimData.growthAreas.map((area, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2 leading-relaxed">
+                            <li key={idx} className="text-base text-muted-foreground flex items-start gap-2 leading-relaxed">
                               <Target className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
                               <span>{area}</span>
                             </li>

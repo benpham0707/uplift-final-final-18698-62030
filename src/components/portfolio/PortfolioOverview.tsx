@@ -194,8 +194,8 @@ export const PortfolioOverview = () => {
     <div className="space-y-12">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Portfolio Insights</h1>
-        <p className="text-muted-foreground text-lg">
+        <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Portfolio Insights</h1>
+        <p className="text-muted-foreground text-xl md:text-2xl">
           AI-discovered patterns and opportunities you wouldn't notice on your own
         </p>
       </div>
@@ -205,7 +205,7 @@ export const PortfolioOverview = () => {
         <button
           onClick={() => setActiveTab('critical')}
           className={cn(
-            'px-6 py-3 font-semibold border-b-2 transition-colors',
+            'px-7 py-4 text-lg font-semibold border-b-2 transition-colors',
             activeTab === 'critical'
               ? 'border-destructive text-destructive'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -219,7 +219,7 @@ export const PortfolioOverview = () => {
         <button
           onClick={() => setActiveTab('high')}
           className={cn(
-            'px-6 py-3 font-semibold border-b-2 transition-colors',
+            'px-7 py-4 text-lg font-semibold border-b-2 transition-colors',
             activeTab === 'high'
               ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -233,7 +233,7 @@ export const PortfolioOverview = () => {
         <button
           onClick={() => setActiveTab('all')}
           className={cn(
-            'px-6 py-3 font-semibold border-b-2 transition-colors',
+            'px-7 py-4 text-lg font-semibold border-b-2 transition-colors',
             activeTab === 'all'
               ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -262,7 +262,7 @@ export const PortfolioOverview = () => {
       {(activeTab === 'critical' || activeTab === 'high' || activeTab === 'all') && (
         <div className="space-y-6">
           {activeTab !== 'critical' && (
-            <h2 className="text-2xl font-bold text-foreground">Critical Actions</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-rose-600 to-red-500 bg-clip-text text-transparent">Critical Actions</h2>
           )}
           <div className="space-y-6">
             {criticalInsights.slice(activeTab === 'critical' ? 1 : 0).map((insight, index) => (

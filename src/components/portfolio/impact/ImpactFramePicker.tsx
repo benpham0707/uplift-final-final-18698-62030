@@ -71,25 +71,7 @@ export const ImpactFramePicker: React.FC<ImpactFramePickerProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <h2 className="text-2xl font-bold text-foreground">Impact Perspectives</h2>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="w-4 h-4 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs text-xs">
-                View your impact through different strategic lenses. Each frame is a valid way to 
-                tell your story—choose the one that best fits your narrative goals.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      <Tabs value={activeFrame} onValueChange={setActiveFrame} className="w-full">
+    <Tabs value={activeFrame} onValueChange={setActiveFrame} className="w-full">
         <TabsList className="grid grid-cols-5 w-full">
           {frames.map((frame) => {
             const Icon = frameIcons[frame.id];
@@ -154,6 +136,5 @@ export const ImpactFramePicker: React.FC<ImpactFramePickerProps> = ({
           </TabsContent>
         ))}
       </Tabs>
-    </div>
   );
 };

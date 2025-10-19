@@ -647,7 +647,227 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
         durability: {
           status: 'ongoing' as const,
           successor: 'Junior coordinator trained with documented handoff. Platform continues serving 100+ students weekly after transition.'
-        }
+        },
+        impactScore: {
+          overall: 8.7,
+          assessment: 'This initiative demonstrates exceptional scale and sustained operation with measurable outcomes. Strong evidence base, clear beneficiary focus, and institutional adoption set it apart from typical student-run programs.',
+          dimensions: [
+            {
+              id: 'scale',
+              name: 'Scale & Reach',
+              score: 9.2,
+              status: 'strong' as const,
+              assessment: 'Your platform serves 118 students weekly—this is exceptional scale for a student-run initiative. Most peer programs serve 10-30 students. The 18-month sustained operation demonstrates this is not a one-time event but a reliable system.',
+              evidence: '118 weekly active students, 2 schools, 18 months ongoing'
+            },
+            {
+              id: 'depth',
+              name: 'Depth of Impact',
+              score: 8.7,
+              status: 'strong' as const,
+              assessment: 'The 12-point retention improvement shows students found sustained value. This goes beyond attendance—you are measuring actual engagement and persistence, which is a higher bar than most programs track.',
+              evidence: '76% retention (+12pts), student testimonials about confidence gains'
+            },
+            {
+              id: 'evidence',
+              name: 'Evidence & Credibility',
+              score: 9.0,
+              status: 'strong' as const,
+              assessment: 'You have multiple evidence types: quantitative analytics, partner testimonials, and institutional adoption (MOU). This triangulated approach is rare and highly credible.',
+              evidence: 'Platform analytics, coordinator testimonial, district MOU'
+            },
+            {
+              id: 'sustainability',
+              name: 'Sustainability & Durability',
+              score: 9.5,
+              status: 'strong' as const,
+              assessment: 'Strong handoff with documented processes ensures continuity. The fact that the program continues serving 100+ students after your transition proves true sustainability—not just a claim.',
+              evidence: 'Documented handoff, trained successor, ongoing 100+ students'
+            },
+            {
+              id: 'systems',
+              name: 'Systems Change & Multiplier Effect',
+              score: 8.4,
+              status: 'strong' as const,
+              assessment: 'The district adopting your scheduling framework for other programs is the gold standard—you did not just run a program, you changed how the institution operates. This multiplier effect extends your impact beyond direct service.',
+              evidence: 'District adopted scheduling protocol, framework replicated at 3rd school'
+            },
+            {
+              id: 'efficiency',
+              name: 'Resource Efficiency',
+              score: 8.8,
+              status: 'strong' as const,
+              assessment: 'Minimal funding ($500 grant) yet sustained 118 students is exceptionally efficient. Recruiting 19 peer tutors shows you leveraged volunteer capacity rather than trying to do everything yourself.',
+              evidence: '$500 budget, 19 volunteer tutors, 118 beneficiaries'
+            },
+            {
+              id: 'beneficiary',
+              name: 'Beneficiary Clarity & Demographics',
+              score: 9.3,
+              status: 'strong' as const,
+              assessment: 'Exceptional demographic detail—you specify 83% free/reduced lunch, 62% first-gen, 74% students of color. This level of specificity shows you understand your beneficiaries and demonstrates equity focus.',
+              evidence: '83% free/reduced lunch, 62% first-gen, 74% students of color'
+            }
+          ]
+        },
+        reframing: {
+          whatYouActuallyBuilt: [
+            {
+              title: 'A TECHNOLOGY PLATFORM',
+              icon: '🏗️',
+              description: 'Created a scheduling and matching system that solved a coordination problem affecting 118 students. This is infrastructure, not just service delivery.'
+            },
+            {
+              title: 'A SUSTAINABLE SYSTEM',
+              icon: '🔄',
+              description: 'Designed an operation that continued after your leadership transition—you built institutional capacity, not just a project dependent on you.'
+            },
+            {
+              title: 'A MULTIPLIER FRAMEWORK',
+              icon: '📈',
+              description: 'Your scheduling protocol was adopted district-wide, extending your impact beyond direct service. You changed HOW the institution operates.'
+            },
+            {
+              title: 'AN EQUITY INTERVENTION',
+              icon: '💎',
+              description: 'Targeted 83% free/reduced lunch students—this wasn't random service, it was intentional work addressing systemic barriers to STEM access.'
+            }
+          ]
+        },
+        leadershipSkills: [
+          {
+            skill: 'SYSTEMS DESIGN',
+            description: 'You did not just work harder—you identified the structural problem (scheduling chaos) and built a system to solve it at scale. This is the difference between service and systems change.'
+          },
+          {
+            skill: 'RESOURCE LEVERAGE',
+            description: 'With minimal budget ($500), you recruited 19 peer tutors and served 118 students. This shows you understand force multiplication—impact doesn't require massive resources, it requires smart strategy.'
+          },
+          {
+            skill: 'INSTITUTIONAL PARTNERSHIP',
+            description: 'Securing an MOU and getting district adoption shows you know how to navigate bureaucracy and build legitimacy. Many students run programs; few get institutional buy-in.'
+          },
+          {
+            skill: 'SUCCESSION PLANNING',
+            description: 'You documented processes and trained a successor before graduating. Most student leaders don't think this way—you prioritized sustainability over personal credit.'
+          }
+        ],
+        lessonsLearned: [
+          {
+            lesson: 'PROBLEM IDENTIFICATION > EFFORT',
+            description: 'You learned that solving the right problem (coordination) matters more than working harder at the wrong problem (adding more tutors).'
+          },
+          {
+            lesson: 'DATA DRIVES CREDIBILITY',
+            description: 'Tracking retention rates and workshop attendance transformed your program from "we're helping" to "we improved retention by 12 points." Evidence turns anecdotes into arguments.'
+          },
+          {
+            lesson: 'SUSTAINABILITY REQUIRES HUMILITY',
+            description: 'Planning your own succession shows maturity—you cared more about the program's future than your own indispensability. True leaders build systems that outlast them.'
+          },
+          {
+            lesson: 'EQUITY REQUIRES INTENTIONALITY',
+            description: 'You specifically targeted Title I schools with 83% free/reduced lunch rather than serving students randomly. Impact work without demographic focus often misses those who need it most.'
+          }
+        ],
+        impressiveAngles: [
+          {
+            lens: '📐 THROUGH A POLICY LENS',
+            description: 'Your district adopted your scheduling framework. This means your student project influenced institutional policy—you changed the rules rather than asking for permission.'
+          },
+          {
+            lens: '💻 THROUGH A TECHNOLOGY LENS',
+            description: 'You built a platform that solved a coordination problem at scale. This is product thinking—identifying user pain points (scheduling chaos) and building tech solutions.'
+          },
+          {
+            lens: '🌍 THROUGH A SOCIAL ENTREPRENEURSHIP LENS',
+            description: 'Minimal funding, volunteer leverage, measurable outcomes, institutional adoption—you essentially ran a social enterprise with $500.'
+          },
+          {
+            lens: '📊 THROUGH A RESEARCH LENS',
+            description: 'You ran what amounts to a pilot study: tested an intervention (tutoring + scheduling), measured outcomes (retention), and demonstrated replicability (adopted at 3rd school).'
+          }
+        ],
+        retrospective: {
+          whatToKeep: [
+            'Focus on systems (scheduling) not just effort',
+            'Evidence collection from day one',
+            'Partnership with school administration',
+            'Peer tutor recruitment model'
+          ],
+          whatToAdd: [
+            'Pre/post academic assessments (grades, test scores) to complement retention data',
+            'Student voice surveys to capture confidence/attitude shifts, not just behavioral outcomes',
+            'Longer-term follow-up (6-12 months) to see if gains persisted'
+          ],
+          whatToDoDifferently: [
+            'Start documentation earlier—you built great processes but waited until handoff to write them down',
+            'Seek external validation (awards, media) while program was running, not after',
+            'Connect with similar initiatives earlier to learn from others' mistakes'
+          ]
+        },
+        growthOpportunities: [
+          {
+            id: 'longitudinal-study',
+            category: 'evidence' as const,
+            title: 'Conduct Longitudinal Follow-Up Study',
+            rationale: 'Right now you have immediate outcomes (retention, learning gains). Following students for 6-12 months would show lasting impact—did the confidence/skills persist? This elevates your evidence from "activity" to "transformation."',
+            steps: [
+              'Email students who participated 6+ months ago',
+              'Send 5-question survey (academic outcomes, continued STEM engagement, confidence)',
+              'Aim for 30+ responses (50% response rate)',
+              'Visualize in simple before/after chart',
+              'Include 2-3 quotes in your application'
+            ],
+            effort: 'medium' as const,
+            impact: 'high' as const
+          },
+          {
+            id: 'expand-schools',
+            category: 'scale' as const,
+            title: 'Expand to Additional Schools',
+            rationale: 'You've proven the model works at 2 schools. Expanding to 3-5 schools would demonstrate true scalability and increase your beneficiary count significantly.',
+            steps: [
+              'Create one-page replication guide from your handoff docs',
+              'Reach out to counselors at 3 nearby Title I schools',
+              'Offer to train their coordinators (2-hour session)',
+              'Track adoption and monthly check-ins',
+              'Report "X schools using framework" in applications'
+            ],
+            effort: 'high' as const,
+            impact: 'high' as const
+          },
+          {
+            id: 'national-awards',
+            category: 'recognition' as const,
+            title: 'Apply for National Service Awards',
+            rationale: 'Your work has the metrics and evidence to compete nationally. External validation from organizations like Prudential Spirit of Community or Congressional Award would significantly boost credibility.',
+            steps: [
+              'Review Prudential Spirit of Community Awards criteria',
+              'Draft 500-word application highlighting 118 students, retention data',
+              'Request 2 letters of recommendation (coordinator + principal)',
+              'Submit by November deadline',
+              'If recognized, prominently feature in college apps'
+            ],
+            effort: 'medium' as const,
+            impact: 'high' as const
+          },
+          {
+            id: 'case-study',
+            category: 'evidence' as const,
+            title: 'Create Multimedia Impact Case Study',
+            rationale: 'A polished 2-minute video or interactive website documenting your journey would be a powerful supplement to traditional applications and make your work more memorable.',
+            steps: [
+              'Film 30-second interviews with 3 students and 1 coordinator',
+              'Screen record platform analytics dashboard',
+              'Create simple timeline visualization (Canva or Figma)',
+              'Edit into 2-minute narrative with music',
+              'Host on personal website or YouTube, link in applications'
+            ],
+            effort: 'high' as const,
+            impact: 'medium' as const
+          }
+        ]
       },
       {
         id: 'workshop-series',
@@ -912,4 +1132,3 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
     }
   }
 };
-``

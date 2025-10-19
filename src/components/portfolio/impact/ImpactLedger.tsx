@@ -28,25 +28,72 @@ export interface Initiative {
     status: 'ongoing' | 'handed-off' | 'completed';
     successor?: string;
   };
+  
+  // Initiative-specific analysis for deep reflection
+  impactScore?: {
+    overall: number; // 0-10
+    assessment: string;
+    dimensions: Array<{
+      id: string;
+      name: string;
+      score: number; // 0-10
+      status: 'strong' | 'developing' | 'opportunity';
+      assessment: string;
+      evidence: string;
+    }>;
+  };
+  
+  // Sophisticated reframing
+  reframing?: {
+    whatYouActuallyBuilt: Array<{
+      title: string;
+      description: string;
+      icon: string;
+    }>;
+  };
+  
+  // Leadership & strategic thinking
+  leadershipSkills?: Array<{
+    skill: string;
+    description: string;
+  }>;
+  
+  // Lessons learned
+  lessonsLearned?: Array<{
+    lesson: string;
+    description: string;
+  }>;
+  
+  // Impressive angles
+  impressiveAngles?: Array<{
+    lens: string;
+    description: string;
+  }>;
+  
+  // Retrospective wisdom
+  retrospective?: {
+    whatToKeep: string[];
+    whatToAdd: string[];
+    whatToDoDifferently: string[];
+  };
+  
+  // Growth opportunities
+  growthOpportunities?: Array<{
+    id: string;
+    category: 'scale' | 'evidence' | 'recognition' | 'depth' | 'systems' | 'sustainability';
+    title: string;
+    rationale: string;
+    steps: string[];
+    effort: 'low' | 'medium' | 'high';
+    impact: 'low' | 'medium' | 'high';
+  }>;
 }
 
 interface ImpactLedgerProps {
   initiatives: Initiative[];
-  impactQuality?: {
-    overallAssessment: string;
-    dimensions: Array<{
-      id: string;
-      name: string;
-      score: number;
-      explanation?: string;
-      suggestion?: string;
-      improvements?: string[];
-      status?: string;
-    }>;
-  };
 }
 
-export const ImpactLedger: React.FC<ImpactLedgerProps> = ({ initiatives, impactQuality }) => {
+export const ImpactLedger: React.FC<ImpactLedgerProps> = ({ initiatives }) => {
   const [selectedInitiative, setSelectedInitiative] = useState<Initiative | null>(null);
 
   return (
@@ -65,7 +112,6 @@ export const ImpactLedger: React.FC<ImpactLedgerProps> = ({ initiatives, impactQ
         initiative={selectedInitiative}
         isOpen={!!selectedInitiative}
         onClose={() => setSelectedInitiative(null)}
-        impactQuality={impactQuality}
       />
     </>
   );

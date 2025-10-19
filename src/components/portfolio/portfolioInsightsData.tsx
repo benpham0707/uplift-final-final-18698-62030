@@ -730,7 +730,7 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
             {
               title: 'AN EQUITY INTERVENTION',
               icon: '💎',
-              description: 'Targeted 83% free/reduced lunch students—this wasn't random service, it was intentional work addressing systemic barriers to STEM access.'
+              description: 'Targeted 83% free/reduced lunch students—this was not random service, it was intentional work addressing systemic barriers to STEM access.'
             }
           ]
         },
@@ -741,7 +741,7 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           },
           {
             skill: 'RESOURCE LEVERAGE',
-            description: 'With minimal budget ($500), you recruited 19 peer tutors and served 118 students. This shows you understand force multiplication—impact doesn't require massive resources, it requires smart strategy.'
+            description: 'With minimal budget ($500), you recruited 19 peer tutors and served 118 students. This shows you understand force multiplication—impact does not require massive resources, it requires smart strategy.'
           },
           {
             skill: 'INSTITUTIONAL PARTNERSHIP',
@@ -749,7 +749,7 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           },
           {
             skill: 'SUCCESSION PLANNING',
-            description: 'You documented processes and trained a successor before graduating. Most student leaders don't think this way—you prioritized sustainability over personal credit.'
+            description: 'You documented processes and trained a successor before graduating. Most student leaders do not think this way—you prioritized sustainability over personal credit.'
           }
         ],
         lessonsLearned: [
@@ -759,11 +759,11 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           },
           {
             lesson: 'DATA DRIVES CREDIBILITY',
-            description: 'Tracking retention rates and workshop attendance transformed your program from "we're helping" to "we improved retention by 12 points." Evidence turns anecdotes into arguments.'
+            description: 'Tracking retention rates and workshop attendance transformed your program from general claims to concrete evidence of 12 point improvement. Evidence turns anecdotes into arguments.'
           },
           {
             lesson: 'SUSTAINABILITY REQUIRES HUMILITY',
-            description: 'Planning your own succession shows maturity—you cared more about the program's future than your own indispensability. True leaders build systems that outlast them.'
+            description: 'Planning your own succession shows maturity—you cared more about the program future than your own indispensability. True leaders build systems that outlast them.'
           },
           {
             lesson: 'EQUITY REQUIRES INTENTIONALITY',
@@ -803,7 +803,7 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           whatToDoDifferently: [
             'Start documentation earlier—you built great processes but waited until handoff to write them down',
             'Seek external validation (awards, media) while program was running, not after',
-            'Connect with similar initiatives earlier to learn from others' mistakes'
+            'Connect with similar initiatives earlier to learn from their mistakes'
           ]
         },
         growthOpportunities: [
@@ -811,7 +811,7 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
             id: 'longitudinal-study',
             category: 'evidence' as const,
             title: 'Conduct Longitudinal Follow-Up Study',
-            rationale: 'Right now you have immediate outcomes (retention, learning gains). Following students for 6-12 months would show lasting impact—did the confidence/skills persist? This elevates your evidence from "activity" to "transformation."',
+            rationale: 'Right now you have immediate outcomes (retention, learning gains). Following students for 6-12 months would show lasting impact—did the confidence and skills persist? This elevates your evidence from activity to transformation.',
             steps: [
               'Email students who participated 6+ months ago',
               'Send 5-question survey (academic outcomes, continued STEM engagement, confidence)',
@@ -826,7 +826,7 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
             id: 'expand-schools',
             category: 'scale' as const,
             title: 'Expand to Additional Schools',
-            rationale: 'You've proven the model works at 2 schools. Expanding to 3-5 schools would demonstrate true scalability and increase your beneficiary count significantly.',
+            rationale: 'You have proven the model works at 2 schools. Expanding to 3-5 schools would demonstrate true scalability and increase your beneficiary count significantly.',
             steps: [
               'Create one-page replication guide from your handoff docs',
               'Reach out to counselors at 3 nearby Title I schools',

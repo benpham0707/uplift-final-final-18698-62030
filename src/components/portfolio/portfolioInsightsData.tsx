@@ -377,6 +377,621 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
       { text: 'civic-tech builder', details: ['Budget PDF to dashboard prototype; partner quotes; public changelog'] },
       ' who turns messy policy data into tools people actually use."'
     ],
+    // HARD-CODED DATA: Comprehensive impact and recognition data for results board
+    kpis: [
+      {
+        id: 'reach',
+        value: 118,
+        label: 'Weekly Active Students',
+        context: 'Across 2 Title I schools over 18 months of sustained programming',
+        trend: { direction: 'up' as const, change: '+94 from Sept 2023 baseline (24 students)' },
+        significance: 'Direct service delivery, not one-time event. Demonstrates sustained engagement and operational capacity to manage multi-site programs.'
+      },
+      {
+        id: 'retention',
+        value: '+12pts',
+        label: 'Retention Improvement',
+        context: 'Spring 2024 vs. Fall 2023 cohort completion rates',
+        trend: { direction: 'up' as const, change: 'From 64% completion to 76% completion' },
+        significance: 'Indicates quality and stickiness, not just signup. Behavioral change signal—students found sustained value beyond initial curiosity.'
+      },
+      {
+        id: 'depth',
+        value: '24 avg',
+        label: 'Students Per Workshop',
+        context: '3 cycles delivered, 9 sessions total across Spring 2024',
+        significance: 'Consistent engagement across multiple delivery formats. Shows ability to attract and retain audience beyond platform.'
+      },
+      {
+        id: 'durability',
+        value: '2/2',
+        label: 'Programs Still Running',
+        context: 'After leadership handoff and transition planning',
+        significance: 'Built to last beyond founder involvement. Evidence of institutional buy-in and sustainable design, not just personal charisma.'
+      }
+    ],
+    credibilityRollup: {
+      overallScore: 82,
+      breakdown: [
+        {
+          category: 'awards' as const,
+          weight: 40,
+          items: [
+            { 
+              name: 'Civic Tech Challenge Finalist', 
+              selectivity: 'Top 10 of 1,200 applicants nationwide',
+              date: 'March 2024',
+              link: 'https://example.com/civic-tech-finalist'
+            },
+            { 
+              name: 'State CS Olympiad - 2nd Place', 
+              selectivity: 'Top 3 of 180 competing teams',
+              date: 'February 2024'
+            },
+            { 
+              name: 'State Service Innovation Award', 
+              selectivity: 'Winner among 40 nominees',
+              date: 'April 2024'
+            }
+          ]
+        },
+        {
+          category: 'partners' as const,
+          weight: 30,
+          items: [
+            { 
+              name: 'Metro School District Partnership MOU',
+              selectivity: '1 of 5 approved student-led district programs',
+              date: 'January 2024'
+            },
+            {
+              name: 'State Education Dept Pilot Program',
+              selectivity: 'Selected from 40 applications statewide',
+              date: 'September 2023'
+            }
+          ]
+        },
+        {
+          category: 'press' as const,
+          weight: 15,
+          items: [
+            { 
+              name: 'City Chronicle Feature: "Student Builds Bridge"',
+              date: 'May 2024',
+              link: 'https://news.example.com/student-bridge'
+            }
+          ]
+        },
+        {
+          category: 'institutional' as const,
+          weight: 10,
+          items: [
+            { 
+              name: 'School Board Official Commendation',
+              date: 'April 2024'
+            },
+            {
+              name: 'CS Department Excellence Award',
+              date: 'May 2024'
+            }
+          ]
+        },
+        {
+          category: 'peer' as const,
+          weight: 5,
+          items: [
+            { 
+              name: 'Open Source Project - 42 Stars, 9 Forks',
+              date: 'Ongoing since October 2023'
+            }
+          ]
+        }
+      ],
+      explanation: 'Score combines competitive selection success (40%), institutional partnership validation (30%), media third-party coverage (15%), official recognition (10%), and peer technical adoption (5%). Higher weight on competitive awards reflects their objectivity and selectivity data.'
+    },
+    impactFrames: [
+      {
+        id: 'scale' as const,
+        label: 'Scale & Reach',
+        description: 'Emphasize breadth of impact and number of beneficiaries',
+        narrative: [
+          'Your work reaches ',
+          { text: '118 students weekly', evidence: 'Platform analytics: avg 118 weekly active users Jan-May 2024, verified by partner coordinators' },
+          ' across ',
+          { text: '2 Title I schools', evidence: 'Partnership MOUs with Lincoln HS (83% free/reduced lunch) and Jefferson MS (76% free/reduced lunch)' },
+          ', delivering ',
+          { text: 'sustained programming', evidence: '18 consecutive months of operation (Sept 2023 - Present), no service gaps' },
+          ' rather than one-off events. The workshop series expanded reach to ',
+          { text: '72 additional students', evidence: '3 cycles × 24 avg attendance = 72 cumulative students, verified by sign-in sheets' },
+          ' beyond the platform, demonstrating multi-channel delivery capability and audience diversity.'
+        ],
+        supportingMetrics: [
+          { metric: 'Total Beneficiaries', value: 190, context: '118 platform + 72 workshops' },
+          { metric: 'Service Hours', value: '2,400+', context: '118 students × 2 hrs/week × 18 months' },
+          { metric: 'Geographic Spread', value: '2 districts', context: 'Metro and Riverside districts' }
+        ],
+        strengthScore: 9.2
+      },
+      {
+        id: 'depth' as const,
+        label: 'Depth & Quality',
+        description: 'Emphasize transformation and meaningful change for individuals',
+        narrative: [
+          'Impact shows in behavioral change, not just participation. ',
+          { text: 'Retention improved 12 percentage points', evidence: 'Fall 2023: 64% completion → Spring 2024: 76% completion, tracked via platform analytics' },
+          ', indicating students found sustained value beyond initial curiosity. Pre/post workshop assessments showed ',
+          { text: '18% knowledge gains', evidence: 'Avg pre-quiz: 62%, post-quiz: 80% (n=72 students across 3 cycles)' },
+          '. Qualitative feedback reveals ',
+          { text: 'confidence shifts', evidence: 'Partner coordinator: "Students now volunteer to present their work publicly, which they wouldn\'t before"' },
+          ' beyond test scores—students gained agency in academic contexts, requesting advanced topics and peer teaching opportunities.'
+        ],
+        supportingMetrics: [
+          { metric: 'Retention Rate', value: '76%', context: '+12pts from 64% baseline' },
+          { metric: 'Learning Gains', value: '+18%', context: 'Pre/post quiz delta (62%→80%)' },
+          { metric: 'Testimonials', value: 4, context: 'Unprompted student + partner quotes' }
+        ],
+        strengthScore: 8.7
+      },
+      {
+        id: 'catalyst' as const,
+        label: 'Catalyst & Systems Change',
+        description: 'Emphasize how your work enabled others or changed institutional practices',
+        narrative: [
+          'Your platform didn't just serve students—it ',
+          { text: 'reduced coordinator burden', evidence: 'Partner feedback: "Cuts admin time from 4hrs to 30min/week for session scheduling and tracking"' },
+          ' and ',
+          { text: 'enabled peer tutors', evidence: '19 student tutors recruited and trained across two schools, up from 6 initial tutors' },
+          ' to lead. The district adopted your ',
+          { text: 'scheduling framework', evidence: 'MOU references "scheduling protocol developed by [student]" as model for other programs' },
+          ' for other student-led programs. By building ',
+          { text: 'replicable infrastructure', evidence: 'Handoff docs successfully used by successor program at 3rd school (Riverside HS)' },
+          ', you multiplied impact beyond direct service—creating conditions for others to lead without requiring your presence.'
+        ],
+        supportingMetrics: [
+          { metric: 'Staff Time Saved', value: '3.5 hrs/week', context: 'Per coordinator × 2 sites = 7 hrs/week total' },
+          { metric: 'Peer Leaders Activated', value: 19, context: 'Student tutors recruited and trained' },
+          { metric: 'Institutional Adoption', value: 1, context: 'District protocol based on your model' }
+        ],
+        strengthScore: 8.4
+      },
+      {
+        id: 'policy' as const,
+        label: 'Policy & Data Translation',
+        description: 'Emphasize how you made complex information actionable',
+        narrative: [
+          'You translated ',
+          { text: 'opaque budget PDFs', evidence: 'Screenshot: 200-page district budget PDF with no search or comparison features' },
+          ' into an ',
+          { text: 'interactive dashboard', evidence: 'GitHub repo: civic-budget-viz with filters, search, year-over-year comparison' },
+          ' that community members actually used for ',
+          { text: 'public comment', evidence: 'School board meeting video (April 2024): 3 residents reference dashboard data in public comment' },
+          '. This bridged the gap between policy data and civic participation, demonstrating ',
+          { text: 'information design skills', evidence: 'Dashboard features: budget line item search, year-over-year visualization, department filtering' },
+          ' that lower barriers to civic engagement and enable informed participation in local governance.'
+        ],
+        supportingMetrics: [
+          { metric: 'Dashboard Users', value: 340, context: 'Unique visitors in first 3 months' },
+          { metric: 'Public Comments', value: 3, context: 'School board attendees citing dashboard' },
+          { metric: 'Data Points', value: '2,400+', context: 'Budget line items × 3 years visualized' }
+        ],
+        strengthScore: 7.9
+      },
+      {
+        id: 'research' as const,
+        label: 'Research & Documentation',
+        description: 'Emphasize systematic inquiry and knowledge contribution',
+        narrative: [
+          'You approached tutoring not as service alone but as ',
+          { text: 'design research', evidence: 'User interviews: 12 students, 3 coordinators conducted with documented notes' },
+          '. Pre/post assessments, ',
+          { text: 'structured feedback loops', evidence: 'Bi-weekly student surveys via Google Forms, coordinator debriefs with meeting notes' },
+          ', and documented ',
+          { text: 'iteration logs', evidence: 'GitHub changelog: 47 issues closed with rationale documented for each change' },
+          ' create a knowledge base others can build on. Your ',
+          { text: 'handoff documentation', evidence: 'Shared drive: onboarding checklist, weekly runbook, FAQ, escalation contacts' },
+          ' transforms tacit knowledge into institutional memory, enabling successors to maintain quality without direct mentorship.'
+        ],
+        supportingMetrics: [
+          { metric: 'User Research', value: 15, context: '12 students + 3 coordinators interviewed' },
+          { metric: 'Documentation', value: 8, context: 'Handoff materials (pages)' },
+          { metric: 'Iterations', value: 47, context: 'Documented improvement cycles' }
+        ],
+        strengthScore: 7.6
+      }
+    ],
+    artifacts: [
+      {
+        id: 'analytics',
+        type: 'screenshot' as const,
+        thumbnail: '/artifacts/platform-analytics.png',
+        title: 'Platform Analytics Dashboard',
+        description: '118 weekly active users, 76% retention rate (Spring 2024)',
+        link: '/evidence/tutoring',
+        date: 'May 2024'
+      },
+      {
+        id: 'workshop-report',
+        type: 'document' as const,
+        title: 'Workshop Impact Report',
+        description: 'Pre/post assessments showing 18% knowledge gains (n=72)',
+        link: '/evidence/workshops.pdf',
+        date: 'April 2024'
+      },
+      {
+        id: 'partner-quote',
+        type: 'quote' as const,
+        title: 'Partner Coordinator Testimonial',
+        description: '"Reduced my admin time from 4 hours to 30 minutes weekly"',
+        date: 'March 2024'
+      },
+      {
+        id: 'finalist-badge',
+        type: 'screenshot' as const,
+        thumbnail: '/artifacts/civic-tech-finalist.png',
+        title: 'Civic Tech Challenge Finalist',
+        description: 'Top 10 of 1,200 national applicants',
+        link: 'https://example.com/civic-tech-finalist',
+        date: 'March 2024'
+      },
+      {
+        id: 'handoff-docs',
+        type: 'document' as const,
+        title: 'Program Handoff Documentation',
+        description: 'Onboarding checklist, weekly runbook, escalation contacts',
+        link: '/evidence/handoff',
+        date: 'May 2024'
+      },
+      {
+        id: 'news-feature',
+        type: 'video' as const,
+        thumbnail: '/artifacts/news-thumbnail.png',
+        title: 'City Chronicle News Feature',
+        description: '"Student Builds Bridge to Community Through Tech"',
+        link: 'https://news.example.com/student-bridge-video',
+        date: 'May 2024'
+      },
+      {
+        id: 'mou-document',
+        type: 'document' as const,
+        title: 'School District Partnership MOU',
+        description: 'Official partnership agreement with Metro School District',
+        link: '/evidence/district-mou.pdf',
+        date: 'January 2024'
+      },
+      {
+        id: 'student-testimonials',
+        type: 'quote' as const,
+        title: 'Student Feedback Collection',
+        description: '"I actually understand algebra now" and 3 other quotes',
+        link: '/evidence/student-quotes',
+        date: 'April 2024'
+      }
+    ],
+    initiatives: [
+      {
+        id: 'tutoring-platform',
+        name: 'Peer Tutoring Platform',
+        beneficiary: {
+          who: '118 high school students (weekly active)',
+          demographics: '83% free/reduced lunch eligible, 62% first-generation college-bound, majority students of color (74% at Lincoln, 68% at Jefferson)'
+        },
+        timeSpan: {
+          start: 'September 2023',
+          duration: '18 months (ongoing)'
+        },
+        outcome: {
+          primary: '76% retention rate (+12pts from 64% baseline)',
+          secondary: [
+            '19 peer tutors recruited and trained (up from 6 initial)',
+            'Reduced coordinator admin time by 3.5 hrs/week per site',
+            'Platform framework adopted by district for other programs'
+          ],
+          evidence: [
+            '/evidence/platform-analytics',
+            '/evidence/coordinator-testimonial',
+            '/evidence/district-mou.pdf'
+          ]
+        },
+        resources: {
+          funding: 'District mini-grant ($500), no ongoing funding required',
+          partners: ['Lincoln HS', 'Jefferson MS', 'State Education Dept'],
+          volunteers: 19
+        },
+        durability: {
+          status: 'ongoing' as const,
+          successor: 'Junior coordinator trained with documented handoff. Platform continues serving 100+ students weekly after transition.'
+        }
+      },
+      {
+        id: 'workshop-series',
+        name: 'CS Fundamentals Workshop Series',
+        beneficiary: {
+          who: '72 students cumulative across 3 cycles',
+          demographics: 'Students from schools without CS in curriculum, 68% underrepresented in tech'
+        },
+        timeSpan: {
+          start: 'January 2024',
+          end: 'April 2024',
+          duration: '4 months'
+        },
+        outcome: {
+          primary: '18% average learning gains on pre/post assessments',
+          secondary: [
+            '24 avg students per session (9 sessions total)',
+            '4 unprompted student testimonials collected',
+            'CS teacher adopted curriculum materials for elective course'
+          ],
+          evidence: [
+            '/evidence/workshop-report.pdf',
+            '/evidence/student-quotes',
+            '/evidence/curriculum-adoption'
+          ]
+        },
+        resources: {
+          partners: ['School CS Department', 'City Public Library'],
+          volunteers: 3
+        },
+        durability: {
+          status: 'completed' as const,
+          successor: 'CS teacher integrated materials into CS1 elective course starting Fall 2024'
+        }
+      },
+      {
+        id: 'civic-budget-viz',
+        name: 'Civic Budget Dashboard',
+        beneficiary: {
+          who: '340 community members (unique users)',
+          demographics: 'School board meeting attendees and local civic engagement group members'
+        },
+        timeSpan: {
+          start: 'October 2023',
+          end: 'February 2024',
+          duration: '5 months'
+        },
+        outcome: {
+          primary: 'Dashboard cited in 3 public comments at April school board meeting',
+          secondary: [
+            '2,400+ budget line items visualized across 3 years',
+            'District adopted transparency framework based on project',
+            'Open source repo maintained by local civic group (12 contributors)'
+          ],
+          evidence: [
+            'https://github.com/username/civic-budget-viz',
+            '/evidence/board-meeting-video',
+            '/evidence/district-transparency-initiative'
+          ]
+        },
+        resources: {
+          partners: ['Civic Tech Challenge', 'Local Advocacy Organization']
+        },
+        durability: {
+          status: 'handed-off' as const,
+          successor: 'Open source repo maintained by local civic group. Neighboring district adapted code for their transparency initiative.'
+        }
+      }
+    ],
+    recognitions: [
+      {
+        id: 'civic-tech-finalist',
+        type: 'award' as const,
+        tier: 'national' as const,
+        name: 'Civic Tech Challenge Finalist',
+        issuer: 'National Civic Tech Foundation',
+        selectivity: {
+          accepted: 10,
+          applicants: 1200,
+          description: 'Top 10 of 1,200 applicants nationwide'
+        },
+        date: 'March 2024',
+        significance: 'Validates technical execution and civic impact at national scale. Finalist selected based on code quality, adoption metrics, and community benefit demonstration.',
+        link: 'https://example.com/civic-tech-finalist'
+      },
+      {
+        id: 'state-olympiad',
+        type: 'award' as const,
+        tier: 'state' as const,
+        name: 'State CS Olympiad - 2nd Place',
+        issuer: 'State Education Department',
+        selectivity: {
+          accepted: 3,
+          applicants: 180,
+          description: 'Top 3 of 180 competing teams'
+        },
+        date: 'February 2024',
+        significance: 'Demonstrates CS fundamentals, algorithmic problem-solving, and performance under competition pressure. Validated by judged technical challenges.'
+      },
+      {
+        id: 'state-service-award',
+        type: 'award' as const,
+        tier: 'state' as const,
+        name: 'State Service Innovation Award',
+        issuer: 'Governor Office - Youth Service Initiative',
+        selectivity: {
+          accepted: 1,
+          applicants: 40,
+          description: 'Winner among 40 nominees statewide'
+        },
+        date: 'April 2024',
+        significance: 'Recognition for innovative approach to community service. Evaluated on scale, sustainability, and replicability of impact.'
+      },
+      {
+        id: 'district-partnership',
+        type: 'partnership' as const,
+        tier: 'local' as const,
+        name: 'Metro School District Partnership MOU',
+        issuer: 'District Superintendent Office',
+        selectivity: {
+          accepted: 1,
+          applicants: 5,
+          description: '1 of 5 approved student-led district programs'
+        },
+        date: 'January 2024',
+        significance: 'Institutional trust to run multi-school program. Required board approval and vetting process for student-led initiatives.'
+      },
+      {
+        id: 'state-pilot',
+        type: 'partnership' as const,
+        tier: 'state' as const,
+        name: 'State Education Dept Pilot Program',
+        issuer: 'State Department of Education',
+        selectivity: {
+          accepted: 3,
+          applicants: 40,
+          description: 'Selected from 40 applications statewide'
+        },
+        date: 'September 2023',
+        significance: 'State-level validation for educational program design. Includes access to education consultants and evaluation resources.'
+      },
+      {
+        id: 'news-feature',
+        type: 'media' as const,
+        tier: 'local' as const,
+        name: 'City Chronicle Feature: "Student Builds Bridge"',
+        issuer: 'City Chronicle (daily newspaper)',
+        date: 'May 2024',
+        significance: 'Third-party validation of community impact. Feature story with interviews of beneficiaries and partners.',
+        link: 'https://news.example.com/student-bridge'
+      },
+      {
+        id: 'board-commendation',
+        type: 'institutional' as const,
+        tier: 'local' as const,
+        name: 'School Board Official Commendation',
+        issuer: 'Metro School Board',
+        date: 'April 2024',
+        significance: 'Official recognition by governing body at public board meeting. Recognized for "exceptional service and innovation in education."'
+      },
+      {
+        id: 'cs-dept-award',
+        type: 'institutional' as const,
+        tier: 'local' as const,
+        name: 'CS Department Excellence Award',
+        issuer: 'High School CS Department',
+        date: 'May 2024',
+        significance: 'Departmental recognition for technical leadership and mentorship of junior students.'
+      },
+      {
+        id: 'open-source',
+        type: 'peer' as const,
+        name: 'Budget Viz Open Source Project',
+        issuer: 'GitHub Community',
+        date: 'Ongoing since October 2023',
+        significance: '42 stars, 9 forks on GitHub. Peer adoption and technical credibility signal. Active contributor community with 12 external contributors.'
+      }
+    ],
+    trajectory: [
+      {
+        date: 'Sept 2023',
+        milestone: 'Launch: Single-school pilot',
+        metric: { label: 'Students', value: 24 },
+        description: '6 tutors, 24 students at Lincoln HS. Initial platform MVP with basic scheduling features.'
+      },
+      {
+        date: 'Jan 2024',
+        milestone: 'Scale: Second school partnership',
+        metric: { label: 'Students', value: 118 },
+        inflectionPoint: true,
+        description: 'Expanded to Jefferson MS after successful pilot. 19 tutors, 118 students total. District partnership MOU signed.'
+      },
+      {
+        date: 'March 2024',
+        milestone: 'Recognition: National finalist selection',
+        description: 'Civic Tech Challenge top 10 of 1,200 nationwide. Third-party validation of technical execution and impact.'
+      },
+      {
+        date: 'April 2024',
+        milestone: 'Replication: Curriculum institutional adoption',
+        description: 'Workshop curriculum integrated into CS elective course. Scheduling framework adopted as district model for student-led programs.'
+      },
+      {
+        date: 'May 2024',
+        milestone: 'Handoff: Successful leadership transition',
+        metric: { label: 'Retention', value: '76%' },
+        inflectionPoint: true,
+        description: 'Successor trained with complete documentation. Platform maintains 100+ weekly users. Retention improved to 76% (+12pts from baseline).'
+      }
+    ],
+    durabilityEvidence: [
+      {
+        initiative: 'Tutoring Platform',
+        persistence: {
+          status: 'still-running' as const,
+          since: 'September 2023',
+          evidence: 'Successor coordinator continues weekly sessions. Platform analytics show sustained 100+ weekly active users post-handoff. No service interruptions during transition.'
+        },
+        replication: {
+          adopted: true,
+          sites: 3,
+          description: 'Scheduling framework adopted by Riverside HS using handoff documentation. District references model in MOU template for other student-led programs.'
+        }
+      },
+      {
+        initiative: 'Workshop Curriculum',
+        persistence: {
+          status: 'adopted-by-institution' as const,
+          since: 'May 2024',
+          evidence: 'CS teacher integrated all workshop materials into CS1 elective course syllabus for Fall 2024. Materials listed in official course description.'
+        }
+      },
+      {
+        initiative: 'Budget Dashboard',
+        persistence: {
+          status: 'still-running' as const,
+          since: 'February 2024',
+          evidence: 'Open source repo maintained by local civic engagement group. 12 active contributors. Used in 3 subsequent school board meetings per meeting video records.'
+        },
+        replication: {
+          adopted: true,
+          sites: 1,
+          description: 'Neighboring district (Riverside Unified) adapted codebase for their budget transparency initiative. Forked repo with attribution.'
+        }
+      }
+    ],
+    contextData: {
+      beneficiaries: {
+        primary: '118 students across 2 Title I schools (weekly active)',
+        demographics: [
+          '83% free/reduced lunch eligible at Lincoln HS',
+          '76% free/reduced lunch eligible at Jefferson MS',
+          '62% first-generation college-bound students',
+          'Majority students of color (74% at Lincoln, 68% at Jefferson)'
+        ],
+        quotes: [
+          '"I actually understand algebra now. Before tutoring I was completely lost." - 10th grade student',
+          '"Platform cuts my admin time from 4 hours to 30 minutes weekly. Game changer." - Coordinator, Lincoln HS',
+          '"Students now volunteer to present their work publicly, which they wouldn\'t before." - Partner coordinator',
+          '"My daughter looks forward to tutoring every week. First time she\'s excited about math." - Parent'
+        ]
+      },
+      counterfactual: {
+        description: 'Lincoln HS had no structured peer tutoring system before platform launch. Jefferson MS operated volunteer-based system with 40% tutor no-show rate and no attendance tracking. Coordinators managed scheduling via spreadsheets and GroupMe with frequent miscommunication.',
+        evidence: 'Partner coordinator interview (Jan 2024): "We tried spreadsheets and GroupMe but couldn\'t track attendance effectively or match students with right tutors. It was chaos honestly."'
+      },
+      resources: {
+        funding: [
+          'District mini-grant: $500 (one-time)',
+          'No ongoing operational costs (hosting donated)',
+          'No external funding required for sustainability'
+        ],
+        partners: [
+          'Lincoln HS Administration (site host)',
+          'Jefferson MS Administration (site host)',
+          'State Education Department (MOU and evaluation support)',
+          'City Public Library (workshop space)',
+          'CS Department (technical mentorship)'
+        ],
+        volunteers: 19,
+        timeCommitment: '12 hrs/week average (10 development + 2 coordination)'
+      },
+      attribution: {
+        yourRole: 'Sole developer and program director. Designed platform architecture, wrote all code, recruited tutors, trained coordinators, built curriculum, managed partnerships.',
+        collaborators: [
+          'CS teacher advisor (technical feedback on architecture, not code contribution)',
+          '2 peer coordinators (day-to-day scheduling and student matching, trained by you)'
+        ],
+        clarity: 'You designed platform, wrote all code (verified via GitHub commits), recruited tutors through school presentations, trained coordinators with documented materials. Coordinators handle operational scheduling using platform you built. CS teacher provided technical mentorship (code reviews, architecture feedback) but zero code contribution. Partnership negotiations conducted by you with admin support for contract review.'
+      }
+    },
     impactData: {
       primaryMetric: {
         value: 118,

@@ -9,6 +9,7 @@ import { HolisticSummary, renderRich } from '../portfolioInsightsData';
 import { ChevronLeft, ChevronRight, CheckCircle, Circle, AlertTriangle } from 'lucide-react';
 import { NavigationControls } from '../NavigationControls';
 import { ScoreIndicator } from '../ScoreIndicator';
+import { ImpactTab } from './ImpactTab';
 
 interface OverviewTabProps {
   summary: HolisticSummary;
@@ -111,9 +112,12 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ summary, onNavigateToT
           </TabsContent>
 
           <TabsContent value="impact" className="mt-8">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Impact Footprint tab coming soon...</p>
-            </div>
+            {insight.impactData && insight.recognitionData && (
+              <ImpactTab
+                impactData={insight.impactData}
+                recognitionData={insight.recognitionData}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="recognition" className="mt-8">

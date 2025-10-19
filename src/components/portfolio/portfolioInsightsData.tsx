@@ -28,6 +28,50 @@ export interface StoryTellingOption {
   reasoning: string;
 }
 
+export interface ImpactData {
+  primaryMetric: {
+    value: number;
+    label: string;
+    unit: string;
+  };
+  secondaryMetrics: Array<{
+    value: number | string;
+    label: string;
+  }>;
+  description: string;
+  proofLinks: Array<{
+    label: string;
+    url: string;
+    type: 'internal' | 'external';
+  }>;
+  timeline: Array<{
+    date: string;
+    initiative: string;
+    metric: string;
+    status: 'ongoing' | 'completed' | 'planned';
+  }>;
+}
+
+export interface RecognitionData {
+  summary: string;
+  tiers: Array<{
+    tier: 'national' | 'state' | 'regional' | 'school';
+    count: number;
+    awards: Array<{
+      name: string;
+      date: string;
+      issuer: string;
+      link?: string;
+    }>;
+  }>;
+  tierDefinitions: Array<{
+    tier: string;
+    description: string;
+    percentile: string;
+    colorClass: string;
+  }>;
+}
+
 export interface OverarchingInsight {
   verdictOptions: {
     spine: VerdictOption[];
@@ -43,6 +87,8 @@ export interface OverarchingInsight {
   trajectoryDurability: RichSegment[];
   contextContribution: RichSegment[];
   committeeSoundBite: RichSegment[];
+  impactData: ImpactData;
+  recognitionData: RecognitionData;
 }
 
 export interface HolisticSummary {
@@ -330,6 +376,66 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
       '"Admit as the ',
       { text: 'civic-tech builder', details: ['Budget PDF to dashboard prototype; partner quotes; public changelog'] },
       ' who turns messy policy data into tools people actually use."'
-    ]
+    ],
+    impactData: {
+      primaryMetric: {
+        value: 118,
+        label: 'Students Reached Weekly',
+        unit: 'students'
+      },
+      secondaryMetrics: [
+        { value: 2, label: 'Partner Schools' },
+        { value: '+12pts', label: 'Retention Improvement' },
+        { value: '18mo', label: 'Program Duration' }
+      ],
+      description: 'Your tutoring platform directly serves students across two Title I schools, with measurable improvements in participant retention and engagement.',
+      proofLinks: [
+        { label: 'Platform Analytics Dashboard', url: '/evidence/tutoring', type: 'internal' },
+        { label: 'Workshop Impact Report (PDF)', url: '/evidence/workshops', type: 'internal' },
+        { label: 'Civic Tech Challenge Finalist Page', url: 'https://example.com/finalist', type: 'external' }
+      ],
+      timeline: [
+        { date: 'Sept 2023', initiative: 'Tutoring Platform Launch', metric: '6 tutors, 24 students', status: 'completed' },
+        { date: 'Jan 2024', initiative: 'Second School Partnership', metric: '19 tutors, 118 students', status: 'ongoing' },
+        { date: 'Apr 2024', initiative: 'Workshop Series (3 cycles)', metric: '24 avg students/session', status: 'completed' },
+        { date: 'May 2024', initiative: 'Handoff Documentation', metric: 'Successor training complete', status: 'completed' },
+        { date: 'Fall 2024', initiative: 'Platform V2 (Planned)', metric: 'Mobile app expansion', status: 'planned' }
+      ]
+    },
+    recognitionData: {
+      summary: '1 National Finalist • 2 State Awards • 3 School Honors',
+      tiers: [
+        {
+          tier: 'national' as const,
+          count: 1,
+          awards: [
+            { name: 'Civic Tech Challenge Finalist', date: 'March 2024', issuer: 'National Civic Tech Foundation', link: 'https://example.com' }
+          ]
+        },
+        {
+          tier: 'state' as const,
+          count: 2,
+          awards: [
+            { name: 'State CS Olympiad - 2nd Place', date: 'Feb 2024', issuer: 'State Education Dept' },
+            { name: 'State Service Innovation Award', date: 'April 2024', issuer: 'Governor\'s Office' }
+          ]
+        },
+        {
+          tier: 'school' as const,
+          count: 3,
+          awards: [
+            { name: 'Outstanding Community Service', date: 'May 2024', issuer: 'High School' },
+            { name: 'CS Department Award', date: 'May 2024', issuer: 'High School' },
+            { name: 'Humanitarian Leadership', date: 'May 2023', issuer: 'High School' }
+          ]
+        }
+      ],
+      tierDefinitions: [
+        { tier: 'National', description: 'Recognized among 10,000+ applicants nationwide', percentile: 'Top 1%', colorClass: 'from-amber-500 to-yellow-400' },
+        { tier: 'State', description: 'Distinguished among state-level competitors', percentile: 'Top 5%', colorClass: 'from-blue-500 to-cyan-400' },
+        { tier: 'Regional', description: 'Notable recognition within regional network', percentile: 'Top 15%', colorClass: 'from-orange-500 to-amber-400' },
+        { tier: 'School', description: 'Honored by institution for exceptional contribution', percentile: 'Top 25%', colorClass: 'from-green-500 to-emerald-400' }
+      ]
+    }
   }
 };

@@ -72,6 +72,11 @@ export const ProofStrip: React.FC<ProofStripProps> = ({ artifacts }) => {
           {artifacts.map((artifact) => {
             const config = typeConfig[artifact.type];
             const Icon = config.icon;
+            const compactQuote = artifact.type === 'quote' && !artifact.thumbnail
+              ? (artifact.description?.length > 80
+                ? `${artifact.description.slice(0, 80)}…`
+                : artifact.description)
+              : null;
 
             return (
               <TooltipProvider key={artifact.id} delayDuration={200}>
@@ -98,6 +103,23 @@ export const ProofStrip: React.FC<ProofStripProps> = ({ artifacts }) => {
                               alt={artifact.title}
                               className="w-full h-full object-cover"
                             />
+                          </div>
+                        )}
+
+                        {/* Inline preview for items without thumbnails */}
+                        {!artifact.thumbnail && compactQuote && (
+                          <div className="w-full h-32 rounded-md bg-pink-50 text-pink-700 p-3 text-xs leading-relaxed border border-pink-200">
+                            “{compactQuote}”
+                          </div>
+                        )}
+                        {!artifact.thumbnail && artifact.type === 'document' && (
+                          <div className="w-full h-32 rounded-md bg-green-50 text-green-700 p-3 text-xs leading-relaxed border border-green-200 flex items-center justify-center text-center">
+                            Document preview
+                          </div>
+                        )}
+                        {!artifact.thumbnail && artifact.type === 'data' && (
+                          <div className="w-full h-32 rounded-md bg-amber-50 text-amber-700 p-3 text-xs leading-relaxed border border-amber-200 flex items-center justify-center text-center">
+                            Data artifact
                           </div>
                         )}
 

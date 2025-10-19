@@ -725,7 +725,16 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           name: 'Scale & Reach',
           score: 9,
           explanation: '118 weekly students across 2 schools shows sustained delivery capability beyond one-off events. Multi-site operation demonstrates scalability.',
-          status: 'strong' as const
+          status: 'strong' as const,
+          drivers: [
+            '118 weekly active students sustained for 4+ months',
+            'Multi-site delivery: 2 Title I schools with separate coordinators',
+            'Tutor roster scaled from 6 → 19 while maintaining operations'
+          ],
+          improvements: [
+            'Report unique yearly reach and cumulative beneficiaries',
+            'Add simple map or chart visualizing geographic spread over time'
+          ]
         },
         {
           id: 'depth',
@@ -733,14 +742,32 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           score: 8,
           explanation: '76% retention (+12pts) and 18% learning gains indicate meaningful transformation, not just participation. Behavioral change signals quality.',
           status: 'strong' as const,
-          suggestion: 'Add 2-3 specific student stories showing transformation beyond metrics to make quality more vivid.'
+          suggestion: 'Add 2-3 specific student stories showing transformation beyond metrics to make quality more vivid.',
+          drivers: [
+            'Retention improvement: 64% → 76% semester-over-semester',
+            'Pre/post assessments show +18% learning gains',
+            'Qualitative shift in student confidence and participation'
+          ],
+          improvements: [
+            'Include 1-paragraph case study with baseline → outcome',
+            'Show distribution of gains (median, IQR) if data available'
+          ]
         },
         {
           id: 'duration',
           name: 'Duration & Sustainability',
           score: 9,
           explanation: '18 months of continuous operation with successful handoff. Platform still serving 100+ students after transition shows durability.',
-          status: 'strong' as const
+          status: 'strong' as const,
+          drivers: [
+            '18 months uninterrupted operation documented',
+            'Handoff docs enabled successor to continue service',
+            'Post-handoff usage remains 100+ students weekly'
+          ],
+          improvements: [
+            'Attach uptime or "weeks delivered" chart to evidence locker',
+            'Add a short successor quote confirming continuity'
+          ]
         },
         {
           id: 'beneficiary',
@@ -748,7 +775,16 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           score: 7,
           explanation: 'Clear demographics (83% FRL, 62% first-gen), but light on individual beneficiary perspectives beyond coordinator quotes.',
           status: 'good' as const,
-          suggestion: 'Include 1-2 direct student testimonials describing their experience and how it changed their academic trajectory.'
+          suggestion: 'Include 1-2 direct student testimonials describing their experience and how it changed their academic trajectory.',
+          drivers: [
+            'Demographic clarity: FRL and first-gen stats reported',
+            'Partner coordinator quotes present',
+            'Some student feedback collected but not surfaced prominently'
+          ],
+          improvements: [
+            'Capture 2 student voice snippets (1–2 sentences each)',
+            'Link testimonials directly near metrics for human context'
+          ]
         },
         {
           id: 'counterfactual',
@@ -756,14 +792,31 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
           score: 6,
           explanation: 'Some baseline data (64% vs 76% retention), but could strengthen "what would have happened without your work" narrative.',
           status: 'good' as const,
-          suggestion: 'Add coordinator quote describing the previous system\'s limitations or student outcomes before your platform launched.'
+          suggestion: 'Add coordinator quote describing the previous system\'s limitations or student outcomes before your platform launched.',
+          drivers: [
+            'Baseline retention comparison provided',
+            'Operational friction prior to platform anecdotally referenced'
+          ],
+          improvements: [
+            'Add one-sentence “before state” with concrete numbers (e.g., no-show rate)',
+            'Include time-saved estimate for coordinators prior vs after'
+          ]
         },
         {
           id: 'attribution',
           name: 'Attribution & Role Clarity',
           score: 9,
           explanation: 'Clear role definition: sole developer, program director, partnership lead. GitHub commits verify code authorship. Coordinator roles clearly differentiated.',
-          status: 'strong' as const
+          status: 'strong' as const,
+          drivers: [
+            'GitHub commit history evidences authorship',
+            'Role boundaries vs coordinators documented',
+            'Partnership MOUs list responsibilities'
+          ],
+          improvements: [
+            'Add quick “my role vs partners” bullet list in activity',
+            'Link to 1–2 PRs showing key architectural decisions'
+          ]
         }
       ]
     },
@@ -859,3 +912,4 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
     }
   }
 };
+``

@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Info, CheckCircle, AlertCircle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { QualityRadarChart } from './QualityRadarChart';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +13,9 @@ export interface QualityDimension {
   explanation: string;
   suggestion?: string;
   status: 'strong' | 'good' | 'needs-work';
+  // New: expandable insight content
+  drivers?: string[]; // Why you got this score
+  improvements?: string[]; // How to raise this score
 }
 
 interface ImpactQualityCheckProps {
@@ -63,50 +66,67 @@ export const ImpactQualityCheck: React.FC<ImpactQualityCheckProps> = ({
 
           {/* Dimensions List */}
           <div className="space-y-3">
-            {dimensions.map((dimension) => {
-              const StatusIcon = statusConfig[dimension.status].icon;
-              const percentage = (dimension.score / 10) * 100;
-              
-              return (
-                <TooltipProvider key={dimension.id} delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div 
-                        className={cn(
-                          "p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md",
-                          statusConfig[dimension.status].bgColor,
-                          statusConfig[dimension.status].borderColor
-                        )}
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <StatusIcon className={cn("w-4 h-4", statusConfig[dimension.status].color)} />
-                              <h4 className="text-sm font-semibold text-foreground">{dimension.name}</h4>
-                            </div>
-                            <div className="text-sm font-bold text-foreground">
-                              {dimension.score}/10
-                            </div>
+            <Accordion type="single" collapsible className="w-full">
+              {dimensions.map((dimension) => {
+                const StatusIcon = statusConfig[dimension.status].icon;
+                const percentage = (dimension.score / 10) * 100;
+
+                return (
+                  <AccordionItem key={dimension.id} value={dimension.id} className="border rounded-lg">
+                    <AccordionTrigger className={cn(
+                      "px-3",
+                      statusConfig[dimension.status].bgColor,
+                      statusConfig[dimension.status].borderColor,
+                      "rounded-lg"
+                    )}>
+                      <div className="w-full">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <StatusIcon className={cn("w-4 h-4", statusConfig[dimension.status].color)} />
+                            <h4 className="text-sm font-semibold text-foreground">{dimension.name}</h4>
                           </div>
+                          <div className="text-sm font-bold text-foreground">{dimension.score}/10</div>
+                        </div>
+                        <div className="mt-2">
                           <Progress value={percentage} className="h-1.5" />
                         </div>
                       </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs p-4">
-                      <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground">{dimension.explanation}</p>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-3">
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground leading-relaxed">{dimension.explanation}</p>
                         {dimension.suggestion && (
-                          <div className="pt-2 border-t">
-                            <p className="text-xs font-semibold text-foreground mb-1">💡 Suggestion</p>
+                          <div className="p-3 rounded-md bg-primary/5 border border-primary/10">
+                            <div className="text-xs font-semibold text-foreground mb-1">Suggestion</div>
                             <p className="text-xs text-muted-foreground">{dimension.suggestion}</p>
                           </div>
                         )}
+                        {dimension.drivers && dimension.drivers.length > 0 && (
+                          <div>
+                            <div className="text-xs font-semibold text-foreground mb-1">Why you got this score</div>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                              {dimension.drivers.map((d, i) => (
+                                <li key={i}>{d}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {dimension.improvements && dimension.improvements.length > 0 && (
+                          <div>
+                            <div className="text-xs font-semibold text-foreground mb-1">How to improve</div>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                              {dimension.improvements.map((d, i) => (
+                                <li key={i}>{d}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              );
-            })}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
           </div>
         </div>
       </CardContent>

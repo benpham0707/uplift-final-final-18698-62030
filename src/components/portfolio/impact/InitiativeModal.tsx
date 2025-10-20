@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Initiative } from './ImpactLedger';
 import { ImpactScoreHero } from './ImpactScoreHero';
@@ -18,12 +18,15 @@ import {
   Lightbulb,
   Telescope,
   RotateCcw,
+  TrendingUp,
+  Gem
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
+import PixelTransition from '@/components/portfolio/PixelTransition';
 
 interface InitiativeModalProps {
   initiative: Initiative | null;
@@ -94,7 +97,7 @@ export const InitiativeModal: React.FC<InitiativeModalProps> = ({ initiative, is
         </DialogHeader>
 
         <div className="space-y-8">
-          {/* Initiative Impact Score */}
+          {/* Initiative Impact Score - now above summary */}
           {initiative.impactScore && (
             <ImpactScoreHero 
               score={initiative.impactScore.overall}
@@ -102,139 +105,193 @@ export const InitiativeModal: React.FC<InitiativeModalProps> = ({ initiative, is
             />
           )}
 
-          {/* What You Actually Built */}
-          {initiative.reframing?.whatYouActuallyBuilt && initiative.reframing.whatYouActuallyBuilt.length > 0 && (
-            <section aria-labelledby="reframing-heading" className="rounded-lg border p-6 bg-gradient-to-br from-primary/5 to-primary/10">
-              <div className="flex items-center gap-2 mb-4">
-                <Brain className="w-5 h-5 text-primary" />
-                <h3 id="reframing-heading" className="text-lg font-bold">What You Actually Built</h3>
+          {/* At-a-Glance Summary */}
+          <section aria-labelledby="summary-heading" className="rounded-lg border p-6">
+            <div className="grid grid-cols-1 gap-6">
+              {/* Beneficiaries */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-primary" />
+                  <h3 id="summary-heading" className="text-sm font-semibold">Beneficiaries</h3>
+                </div>
+                <div className="text-sm text-foreground">{initiative.beneficiary.who}</div>
+                {initiative.beneficiary.demographics && (
+                  <div className="text-sm text-muted-foreground">{initiative.beneficiary.demographics}</div>
+                )}
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                You didn't just run a program—here's what you really accomplished in sophisticated terms:
-              </p>
-              <div className="space-y-4">
-                {initiative.reframing.whatYouActuallyBuilt.map((item, idx) => (
-                  <div key={idx} className="rounded-md border bg-card p-4">
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl" role="img" aria-label={item.title}>
-                        {item.icon}
-                      </span>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-base mb-1">{item.title}</h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+
+              <Separator />
+
+              {/* Outcomes + Evidence (compact) */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-primary" />
+                  <h3 className="text-sm font-semibold">Outcomes</h3>
+                </div>
+                <div className="flex flex-col md:flex-row md:items-start md:gap-6">
+                  <div className="space-y-2 md:flex-1">
+                    <div className="text-sm font-medium text-foreground">{initiative.outcome.primary}</div>
+                    {initiative.outcome.secondary && initiative.outcome.secondary.length > 0 && (
+                      <ul className="space-y-1">
+                        {initiative.outcome.secondary.map((outcome, idx) => (
+                          <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <CheckCircle className="w-3 h-3 mt-0.5 text-emerald-500 flex-shrink-0" />
+                            <span>{outcome}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <div className="space-y-2 md:flex-1">
+                    <div className="text-xs font-medium text-muted-foreground">Evidence</div>
+                    {initiative.outcome.evidence.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {initiative.outcome.evidence.map((link, idx) => (
+                          <a
+                            key={idx}
+                            href={link}
+                            className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+                            target={link.startsWith('http') ? '_blank' : '_self'}
+                            rel={link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          >
+                            <Sparkles className="w-3 h-3" /> Evidence {idx + 1}
+                          </a>
+                        ))}
                       </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground">No evidence linked</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Resources */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-primary" />
+                  <h3 className="text-sm font-semibold">Resources</h3>
+                </div>
+                <div className="flex flex-wrap items-start gap-4 text-sm">
+                  <div className="min-w-[180px] flex-1 space-y-1">
+                    <div className="text-muted-foreground">Funding</div>
+                    <div className="text-foreground">{initiative.resources.funding || '—'}</div>
+                  </div>
+                  <div className="min-w-[240px] flex-[2] space-y-1">
+                    <div className="text-muted-foreground">Partners</div>
+                    <div className="flex flex-wrap gap-2">
+                      {initiative.resources.partners.map((p, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">{p}</Badge>
+                      ))}
+                      {initiative.resources.partners.length === 0 && (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section aria-labelledby="beneficiaries-heading" className="rounded-lg border p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-4 h-4 text-primary" />
-                <h3 id="beneficiaries-heading" className="text-sm font-semibold">Beneficiaries</h3>
-              </div>
-              <p className="text-sm text-foreground">{initiative.beneficiary.who}</p>
-              {initiative.beneficiary.demographics && (
-                <p className="text-sm text-muted-foreground mt-1">{initiative.beneficiary.demographics}</p>
-              )}
-            </section>
-          </div>
-
-          <section aria-labelledby="outcomes-heading" className="rounded-lg border p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="w-4 h-4 text-primary" />
-              <h3 id="outcomes-heading" className="text-sm font-semibold">Outcomes</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-foreground">{initiative.outcome.primary}</p>
-                {initiative.outcome.secondary && initiative.outcome.secondary.length > 0 && (
-                  <ul className="space-y-1">
-                    {initiative.outcome.secondary.map((outcome, idx) => (
-                      <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <CheckCircle className="w-3 h-3 mt-0.5 text-emerald-500 flex-shrink-0" />
-                        <span>{outcome}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">Evidence</div>
-                {initiative.outcome.evidence.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {initiative.outcome.evidence.map((link, idx) => (
-                      <a
-                        key={idx}
-                        href={link}
-                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
-                        target={link.startsWith('http') ? '_blank' : '_self'}
-                        rel={link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                      >
-                        <Sparkles className="w-3 h-3" /> Evidence {idx + 1}
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-muted-foreground">No evidence linked</div>
-                )}
-              </div>
-            </div>
-          </section>
-
-          <section aria-labelledby="resources-heading" className="rounded-lg border p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <DollarSign className="w-4 h-4 text-primary" />
-              <h3 id="resources-heading" className="text-sm font-semibold">Resources</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Box className="w-4 h-4" />
-                  <span className="font-medium text-foreground">Funding</span>
-                </div>
-                <div className="text-muted-foreground">
-                  {initiative.resources.funding || '—'}
-                </div>
-              </div>
-              <div className="space-y-1 md:col-span-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Building2 className="w-4 h-4" />
-                  <span className="font-medium text-foreground">Partners</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {initiative.resources.partners.map((p, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">{p}</Badge>
-                  ))}
-                  {initiative.resources.partners.length === 0 && (
-                    <span className="text-muted-foreground">—</span>
+                  {typeof initiative.resources.volunteers === 'number' && (
+                    <div className="min-w-[140px] flex-1 space-y-1">
+                      <div className="text-muted-foreground">Volunteers</div>
+                      <div className="text-foreground">{initiative.resources.volunteers}</div>
+                    </div>
                   )}
                 </div>
               </div>
-              {typeof initiative.resources.volunteers === 'number' && (
-                <div className="space-y-1 md:col-span-1">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="w-4 h-4" />
-                    <span className="font-medium text-foreground">Volunteers</span>
+
+              {/* Sustainability */}
+              {initiative.durability.successor && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <h3 className="text-sm font-semibold">Sustainability</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{initiative.durability.successor}</p>
                   </div>
-                  <div className="text-muted-foreground">{initiative.resources.volunteers}</div>
-                </div>
+                </>
               )}
             </div>
           </section>
 
-          {initiative.durability.successor && (
-            <section aria-labelledby="sustainability-heading" className="rounded-lg border p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-primary" />
-                <h3 id="sustainability-heading" className="text-sm font-semibold">Sustainability</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">{initiative.durability.successor}</p>
-            </section>
-          )}
+          {/* What You Actually Built (carousel, themed icons) */}
+          {initiative.reframing?.whatYouActuallyBuilt && initiative.reframing.whatYouActuallyBuilt.length > 0 && (() => {
+            const [index, setIndex] = useState(0);
+            const items = initiative.reframing!.whatYouActuallyBuilt;
+            const clamp = (i: number) => Math.max(0, Math.min(items.length - 1, i));
+            const current = items[clamp(index)];
+
+            const IconFor = (em: string) => {
+              if (em.includes('🏗')) return Building2;
+              if (em.includes('🔄')) return RotateCcw;
+              if (em.includes('📈')) return TrendingUp;
+              if (em.includes('💎')) return Gem;
+              return Sparkles;
+            };
+            const Icon = IconFor(current.icon);
+
+            return (
+              <section aria-labelledby="reframing-heading" className="rounded-lg border p-6 bg-gradient-to-br from-primary/5 to-primary/10">
+                <div className="flex items-start justify-between mb-4 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-primary" />
+                    <h3 id="reframing-heading" className="text-lg font-bold">What You Actually Built</h3>
+                  </div>
+                  <div>
+                    <div className="inline-flex">
+                      {/* Reuse simple nav controls (no import needed here) */}
+                      <div className="inline-flex items-center gap-1 border border-border/50 rounded-md px-2 py-1">
+                        <button
+                          type="button"
+                          onClick={() => setIndex((i) => clamp(i - 1))}
+                          disabled={index === 0}
+                          className="h-6 w-6 grid place-items-center rounded hover:bg-accent/50 disabled:opacity-50"
+                          aria-label="Previous"
+                        >
+                          <span className="sr-only">Previous</span>
+                          {/* using unicode chevrons to avoid extra imports */}
+                          ‹
+                        </button>
+                        <span className="text-xs text-muted-foreground px-1.5 min-w-[3rem] text-center">
+                          {index + 1} of {items.length}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIndex((i) => clamp(i + 1))}
+                          disabled={index === items.length - 1}
+                          className="h-6 w-6 grid place-items-center rounded hover:bg-accent/50 disabled:opacity-50"
+                          aria-label="Next"
+                        >
+                          <span className="sr-only">Next</span>
+                          ›
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  You didn't just run a program—here's what you really accomplished in sophisticated terms:
+                </p>
+
+                <div className="rounded-md border bg-card p-5 md:p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500/15 to-purple-500/15 border border-indigo-300/30 flex items-center justify-center text-indigo-600">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-base md:text-lg mb-1 tracking-tight text-foreground">
+                        {current.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {current.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            );
+          })()}
+          
 
           {/* Impact Analysis */}
           {initiative.impactScore?.dimensions && initiative.impactScore.dimensions.length > 0 && (
@@ -310,49 +367,131 @@ export const InitiativeModal: React.FC<InitiativeModalProps> = ({ initiative, is
             </section>
           )}
 
-          {/* Impressive Angles */}
-          {initiative.impressiveAngles && initiative.impressiveAngles.length > 0 && (
-            <section aria-labelledby="angles-heading" className="rounded-lg border p-6 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
-              <div className="flex items-center gap-2 mb-4">
-                <Telescope className="w-5 h-5 text-primary" />
-                <h3 id="angles-heading" className="text-lg font-bold">Impressive Angles You May Not Have Considered</h3>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Here's your work viewed through different sophisticated lenses:
-              </p>
-              <div className="space-y-3">
-                {initiative.impressiveAngles.map((angle, idx) => (
-                  <div key={idx} className="rounded-md border bg-card p-4">
-                    <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                      <span className="text-primary">{angle.lens}</span>
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{angle.description}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          {/* Impressive Angles (two-at-a-time carousel) */}
+          {initiative.impressiveAngles && initiative.impressiveAngles.length > 0 && (() => {
+            const [pairIndex, setPairIndex] = useState(0);
+            const items = initiative.impressiveAngles!;
+            const totalPages = Math.ceil(items.length / 2);
+            const start = pairIndex * 2;
+            const visible = items.slice(start, start + 2);
 
-          {/* What This Experience Taught You */}
-          {initiative.lessonsLearned && initiative.lessonsLearned.length > 0 && (
-            <section aria-labelledby="lessons-heading" className="rounded-lg border p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-primary" />
-                <h3 id="lessons-heading" className="text-lg font-bold">What This Experience Taught You</h3>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Deep reflection on personal growth and lessons learned:
-              </p>
-              <div className="space-y-3">
-                {initiative.lessonsLearned.map((lesson, idx) => (
-                  <div key={idx} className="rounded-md border-l-4 border-primary bg-primary/5 p-4">
-                    <h4 className="font-semibold text-sm mb-2">{lesson.lesson}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{lesson.description}</p>
+            return (
+              <section aria-labelledby="angles-heading" className="rounded-lg border p-6 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+                <div className="flex items-start justify-between mb-4 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Telescope className="w-5 h-5 text-primary" />
+                    <h3 id="angles-heading" className="text-lg font-bold">Impressive Angles You May Not Have Considered</h3>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                  <div className="inline-flex items-center gap-1 border border-border/50 rounded-md px-2 py-1">
+                    <button
+                      type="button"
+                      onClick={() => setPairIndex((i) => Math.max(0, i - 1))}
+                      disabled={pairIndex === 0}
+                      className="h-6 w-6 grid place-items-center rounded hover:bg-accent/50 disabled:opacity-50"
+                      aria-label="Previous"
+                    >
+                      ‹
+                    </button>
+                    <span className="text-xs text-muted-foreground px-1.5 min-w-[3rem] text-center">
+                      {pairIndex + 1} of {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPairIndex((i) => Math.min(totalPages - 1, i + 1))}
+                      disabled={pairIndex === totalPages - 1}
+                      className="h-6 w-6 grid place-items-center rounded hover:bg-accent/50 disabled:opacity-50"
+                      aria-label="Next"
+                    >
+                      ›
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Here's your work viewed through different sophisticated lenses:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {visible.map((angle, idx) => (
+                    <div key={`${start + idx}`} className="rounded-md border bg-card p-4">
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary border border-primary/20">
+                          {angle.lens}
+                        </span>
+                      </h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{angle.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          })()}
+
+          {/* What This Experience Taught You (single-card with pixel transition) */}
+          {initiative.lessonsLearned && initiative.lessonsLearned.length > 0 && (() => {
+            const [page, setPage] = useState(0);
+            const [trigger, setTrigger] = useState(0);
+            const items = initiative.lessonsLearned!;
+            const totalPages = items.length;
+
+            return (
+              <section aria-labelledby="lessons-heading" className="rounded-lg border p-6">
+                <div className="flex items-start justify-between mb-4 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-primary" />
+                    <h3 id="lessons-heading" className="text-lg font-bold">What This Experience Taught You</h3>
+                  </div>
+                  <div className="inline-flex items-center gap-1 border border-border/50 rounded-md px-2 py-1">
+                    <button
+                      type="button"
+                      onClick={() => { setPage((i) => Math.max(0, i - 1)); setTimeout(() => setTrigger((t) => t + 1), 0); }}
+                      disabled={page === 0}
+                      className="h-6 w-6 grid place-items-center rounded hover:bg-accent/50 disabled:opacity-50"
+                      aria-label="Previous"
+                    >
+                      ‹
+                    </button>
+                    <span className="text-xs text-muted-foreground px-1.5 min-w-[3rem] text-center">
+                      {page + 1} of {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { setPage((i) => Math.min(totalPages - 1, i + 1)); setTimeout(() => setTrigger((t) => t + 1), 0); }}
+                      disabled={page === totalPages - 1}
+                      className="h-6 w-6 grid place-items-center rounded hover:bg-accent/50 disabled:opacity-50"
+                      aria-label="Next"
+                    >
+                      ›
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">Deep reflection on personal growth and lessons learned:</p>
+                <PixelTransition
+                  firstContent={
+                    <div className="rounded-xl border bg-gradient-to-br from-primary/5 to-background p-6 w-full">
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary grid place-items-center font-semibold">
+                          {(page + 1).toString()}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-base mb-1 tracking-tight">{items[page].lesson}</h4>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{items[page].description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  secondContent={<div />}
+                  gridSize={5}
+                  pixelSizeMin={24}
+                  pixelFill={'linear-gradient(135deg, #6366F1, #22D3EE)'}
+                  glassBlur={1.2}
+                  glassSaturate={1.1}
+                  animationStepDuration={0.28}
+                  className="w-full"
+                  trigger={trigger}
+                  autoHideActive={true}
+                />
+              </section>
+            );
+          })()}
 
           {/* Retrospective Wisdom */}
           {initiative.retrospective && (

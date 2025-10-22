@@ -7,9 +7,23 @@ interface DraftEditorProps {
   draft: string;
   onDraftChange: (draft: string) => void;
   wordCount: number;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  versionInfo: string;
 }
 
-export const DraftEditor: React.FC<DraftEditorProps> = ({ draft, onDraftChange, wordCount }) => {
+export const DraftEditor: React.FC<DraftEditorProps> = ({ 
+  draft, 
+  onDraftChange, 
+  wordCount,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+  versionInfo
+}) => {
   const targetMin = 90;
   const targetMax = 170;
   const progress = Math.min((wordCount / targetMax) * 100, 100);
@@ -30,8 +44,33 @@ export const DraftEditor: React.FC<DraftEditorProps> = ({ draft, onDraftChange, 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold">📝 Your Draft</h3>
-            <div className="text-xs text-muted-foreground">
-              ✓ Autosaved
+            <div className="flex items-center gap-3">
+              {(canUndo || canRedo) && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{versionInfo}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onUndo}
+                    disabled={!canUndo}
+                    className="h-7 px-2"
+                  >
+                    Undo
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onRedo}
+                    disabled={!canRedo}
+                    className="h-7 px-2"
+                  >
+                    Redo
+                  </Button>
+                </div>
+              )}
+              <div className="text-xs text-muted-foreground">
+                ✓ Autosaved
+              </div>
             </div>
           </div>
           <Textarea

@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, Copy, FileText } from 'lucide-react';
 
 interface WorkshopCompleteProps {
+  draft: string;
+  overallScore: number;
   onViewRubric?: () => void;
 }
 
-export const WorkshopComplete: React.FC<WorkshopCompleteProps> = ({ onViewRubric }) => {
+export const WorkshopComplete: React.FC<WorkshopCompleteProps> = ({ draft, overallScore, onViewRubric }) => {
+  const wordCount = draft.trim().split(/\s+/).filter(Boolean).length;
   return (
     <Card className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-950/20 dark:via-emerald-950/20 dark:to-teal-950/20 border-2 border-green-300 dark:border-green-700 shadow-lg">
       <div className="p-10 space-y-8">
@@ -84,7 +87,7 @@ export const WorkshopComplete: React.FC<WorkshopCompleteProps> = ({ onViewRubric
               Overall Narrative Quality
             </div>
             <div className="text-5xl font-bold text-green-600 dark:text-green-400">
-              8.7/10
+              {overallScore.toFixed(1)}/10
             </div>
             <div className="text-base font-semibold text-green-700 dark:text-green-300">
               Strong
@@ -93,7 +96,7 @@ export const WorkshopComplete: React.FC<WorkshopCompleteProps> = ({ onViewRubric
           
           <div className="mt-4 pt-4 border-t border-green-300 dark:border-green-700">
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">20-word draft</span> → <span className="font-semibold text-foreground">145-word polished narrative</span>
+              <span className="font-semibold text-foreground">{wordCount} words</span> in your polished narrative
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Word count: <span className="text-green-600 dark:text-green-400 font-semibold">✓ Perfect</span> (90-170 range)
@@ -106,8 +109,7 @@ export const WorkshopComplete: React.FC<WorkshopCompleteProps> = ({ onViewRubric
             variant="outline" 
             className="flex-1 gap-2"
             onClick={() => {
-              // Copy draft functionality would go here
-              navigator.clipboard.writeText('Draft content would be copied here');
+              navigator.clipboard.writeText(draft);
             }}
           >
             <Copy className="w-4 h-4" />

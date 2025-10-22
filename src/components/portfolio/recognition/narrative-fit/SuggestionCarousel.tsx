@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Wand2, MessageCircle } from 'lucide-react';
 import { EditSuggestion } from './types';
 
 interface SuggestionCarouselProps {
@@ -20,33 +20,65 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-bold uppercase tracking-wide text-green-600 dark:text-green-400">
-          ✏️ Suggested Fix
-        </span>
-        <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground font-medium">
-          {currentIndex + 1} of {suggestions.length}
-        </span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-sm">
+            <Wand2 className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-sm font-bold text-green-600 dark:text-green-400">
+            Suggested Fix
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {suggestions.length > 1 && (
+            <>
+              {suggestions.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    idx === currentIndex
+                      ? 'bg-green-600 dark:bg-green-400 w-6'
+                      : 'bg-green-200 dark:bg-green-900'
+                  }`}
+                />
+              ))}
+            </>
+          )}
+          <span className="text-xs px-2.5 py-1 rounded-md bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-300 font-semibold ml-2">
+            {currentIndex + 1} / {suggestions.length}
+          </span>
+        </div>
       </div>
 
-      <div className="p-5 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-2 border-green-200 dark:border-green-800">
-        <p className="text-base font-medium leading-relaxed">
+      <div className="p-6 rounded-xl bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-950/30 dark:via-emerald-950/30 dark:to-teal-950/20 border-2 border-green-300 dark:border-green-700 shadow-medium">
+        <p className="text-base font-medium leading-relaxed text-foreground">
           {currentSuggestion.text}
         </p>
       </div>
 
-      <div className="pl-4 border-l-2 border-muted">
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          <span className="font-semibold text-foreground">💭 Why this works:</span> {currentSuggestion.rationale}
-        </p>
+      <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl p-4 border-l-4 border-primary">
+        <div className="flex items-start gap-3">
+          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <MessageCircle className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-primary mb-1">
+              Why This Works
+            </p>
+            <p className="text-sm text-foreground/90 leading-relaxed">
+              {currentSuggestion.rationale}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 pt-2">
         <Button
           onClick={() => onApply(currentSuggestion.text, currentSuggestion.type)}
           size="lg"
-          className="flex-1 min-w-[160px] bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transition-all"
+          className="flex-1 min-w-[160px] bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-medium hover:shadow-strong transition-all gap-2"
         >
+          <Wand2 className="w-4 h-4" />
           Apply This Edit
         </Button>
         {currentIndex < suggestions.length - 1 && (
@@ -54,9 +86,9 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
             onClick={onNext}
             variant="outline"
             size="lg"
-            className="gap-2 hover:bg-accent transition-all"
+            className="gap-2 hover:bg-accent hover:border-primary transition-all"
           >
-            Try Next Idea ({currentIndex + 2}/{suggestions.length})
+            Next Suggestion ({currentIndex + 2}/{suggestions.length})
             <ChevronRight className="w-4 h-4" />
           </Button>
         )}

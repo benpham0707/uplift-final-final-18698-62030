@@ -181,7 +181,7 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
         versionInfo={versionInfo}
       />
 
-      <div className="max-w-5xl mx-auto p-8 space-y-8">
+      <div className="max-w-5xl mx-auto p-5 space-y-4">
         <OverallScoreCard
           overallScore={overallScore}
           fixedCount={fixedIssues}
@@ -193,10 +193,10 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
         ) : (
           <>
             <div>
-              <h3 className="text-lg font-semibold text-muted-foreground uppercase tracking-wide text-xs mb-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                 Narrative Quality Rubric
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {dimensions.map((dimension) => (
                   <RubricDimensionCard
                     key={dimension.id}

@@ -40,20 +40,20 @@ export const DraftEditor: React.FC<DraftEditorProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-background via-primary/5 to-background border-b shadow-soft">
-      <div className="max-w-4xl mx-auto p-8 space-y-4">
-        <div className="space-y-4">
+    <div className="bg-gradient-to-br from-background via-primary/5 to-background border-b">
+      <div className="max-w-4xl mx-auto p-5 space-y-3">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-sm">
-                <FileEdit className="w-5 h-5 text-primary-foreground" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <FileEdit className="w-4 h-4 text-primary-foreground" />
               </div>
-              <h3 className="text-xl font-bold">Your Draft</h3>
+              <h3 className="text-lg font-bold">Your Draft</h3>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {(canUndo || canRedo) && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                <>
+                  <span className="text-xs text-muted-foreground">
                     {versionInfo}
                   </span>
                   <Button
@@ -61,25 +61,23 @@ export const DraftEditor: React.FC<DraftEditorProps> = ({
                     size="sm"
                     onClick={onUndo}
                     disabled={!canUndo}
-                    className="h-8 w-8 p-0"
-                    title="Undo"
+                    className="h-7 w-7 p-0"
                   >
-                    <Undo2 className="w-4 h-4" />
+                    <Undo2 className="w-3.5 h-3.5" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={onRedo}
                     disabled={!canRedo}
-                    className="h-8 w-8 p-0"
-                    title="Redo"
+                    className="h-7 w-7 p-0"
                   >
-                    <Redo2 className="w-4 h-4" />
+                    <Redo2 className="w-3.5 h-3.5" />
                   </Button>
-                </div>
+                </>
               )}
-              <div className="flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 px-3 py-1.5 rounded-md">
-                <Save className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Save className="w-3 h-3" />
                 Autosaved
               </div>
             </div>
@@ -88,52 +86,49 @@ export const DraftEditor: React.FC<DraftEditorProps> = ({
             value={draft}
             onChange={(e) => onDraftChange(e.target.value)}
             placeholder="Write about your recognition here... Aim for 90-170 words with specific metrics, selectivity context, and thematic connection."
-            className="min-h-[180px] text-base leading-relaxed resize-none"
+            className="min-h-[160px] text-sm leading-relaxed resize-none"
           />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-3">
-              <span className={`text-lg font-bold ${
+            <div className="flex items-center gap-2">
+              <span className={`text-xl font-bold ${
                 wordCount < 90 ? 'text-yellow-600 dark:text-yellow-400' : 
                 wordCount > 170 ? 'text-red-600 dark:text-red-400' : 
-                'text-green-600 dark:text-green-400'
+                'text-primary'
               }`}>
                 {wordCount}
               </span>
-              <div>
-                <div className="font-medium text-foreground">words</div>
-                <div className="text-xs text-muted-foreground">Target: 90-170</div>
-              </div>
+              <span className="text-muted-foreground">words (target: 90-170)</span>
             </div>
             {wordCount >= 90 && wordCount <= 170 && (
-              <div className="flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 px-3 py-1.5 rounded-md">
-                <Check className="w-3.5 h-3.5" />
+              <span className="text-xs text-primary flex items-center gap-1">
+                <Check className="w-3 h-3" />
                 Perfect Range
-              </div>
+              </span>
             )}
           </div>
-          <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden shadow-inner">
+          <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
             <div 
-              className={`h-full transition-all duration-500 rounded-full ${
-                wordCount < 90 ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 
-                wordCount > 170 ? 'bg-gradient-to-r from-red-500 to-orange-500' : 
-                'bg-gradient-to-r from-green-500 to-emerald-500'
+              className={`h-full transition-all ${
+                wordCount < 90 ? 'bg-yellow-500' : 
+                wordCount > 170 ? 'bg-red-500' : 
+                'bg-primary'
               }`}
               style={{ width: `${Math.min((wordCount / 170) * 100, 100)}%` }}
             />
           </div>
         </div>
 
-        <div className="pt-4 border-t">
-          <p className="text-xs font-medium text-muted-foreground mb-3">Quick Insert Templates:</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="pt-3 border-t">
+          <p className="text-xs text-muted-foreground mb-2">Quick Insert:</p>
+          <div className="flex gap-2 overflow-x-auto">
             <Button
               onClick={() => insertText('This directly reinforces my [theme name] narrative. ')}
               variant="outline"
               size="sm"
-              className="text-xs h-8"
+              className="text-xs whitespace-nowrap"
             >
               Theme Connection
             </Button>
@@ -141,15 +136,15 @@ export const DraftEditor: React.FC<DraftEditorProps> = ({
               onClick={() => insertText('(Top X of Y applicants) ')}
               variant="outline"
               size="sm"
-              className="text-xs h-8"
+              className="text-xs whitespace-nowrap"
             >
-              Selectivity Context
+              Selectivity
             </Button>
             <Button
               onClick={() => insertText('which resulted in ')}
               variant="outline"
               size="sm"
-              className="text-xs h-8"
+              className="text-xs whitespace-nowrap"
             >
               Cause & Effect
             </Button>
@@ -157,7 +152,7 @@ export const DraftEditor: React.FC<DraftEditorProps> = ({
               onClick={() => insertText('This experience taught me ')}
               variant="outline"
               size="sm"
-              className="text-xs h-8"
+              className="text-xs whitespace-nowrap"
             >
               Reflection
             </Button>

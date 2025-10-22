@@ -62,32 +62,33 @@ export const RubricDimensionCard: React.FC<RubricDimensionCardProps> = ({
   const notFixedIssues = dimension.issues.filter(i => i.status !== 'fixed');
 
   return (
-    <Card className={`${config.bg} border-2 ${config.border} shadow-medium overflow-hidden hover:shadow-strong transition-shadow`}>
+    <Card className="border-l-4 border-l-primary overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-6 text-left transition-all"
+        className="w-full p-4 text-left transition-all"
       >
-        <div className="flex items-start justify-between gap-6">
-          <div className="flex gap-4 flex-1">
-            <div className={`w-12 h-12 rounded-xl ${config.iconBg} flex items-center justify-center flex-shrink-0 shadow-medium`}>
-              <StatusIcon className="w-6 h-6 text-white" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex gap-3 flex-1">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+              dimension.status === 'critical' ? 'bg-red-100 dark:bg-red-950/30' :
+              dimension.status === 'needs_work' ? 'bg-yellow-100 dark:bg-yellow-950/30' :
+              dimension.status === 'good' ? 'bg-green-100 dark:bg-green-950/30' :
+              'bg-primary/10'
+            }`}>
+              <StatusIcon className={`w-5 h-5 ${config.iconColor}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-                <h3 className="text-xl font-bold">{dimension.name}</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className={`text-2xl font-bold ${config.color}`}>
-                    {dimension.score.toFixed(1)}
-                  </span>
-                  <span className="text-lg font-semibold text-muted-foreground">/10</span>
-                </div>
+              <div className="flex items-baseline gap-2 mb-1">
+                <h3 className="text-lg font-bold text-primary">{dimension.name}</h3>
+                <span className={`text-lg font-bold ${config.color}`}>
+                  {dimension.score.toFixed(1)}/10
+                </span>
               </div>
-              <p className="text-sm leading-relaxed text-foreground/90">
+              <p className="text-sm text-muted-foreground">
                 {dimension.overview}
               </p>
               {!isExpanded && notFixedIssues.length > 0 && (
-                <div className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-muted-foreground bg-background/50 px-3 py-1.5 rounded-md">
-                  <span className={`w-2 h-2 rounded-full ${config.iconBg}`} />
+                <div className="mt-2 text-xs text-muted-foreground">
                   {notFixedIssues.length} issue{notFixedIssues.length !== 1 ? 's' : ''} to address
                 </div>
               )}
@@ -95,21 +96,21 @@ export const RubricDimensionCard: React.FC<RubricDimensionCardProps> = ({
           </div>
           <div className="flex-shrink-0">
             {isExpanded ? (
-              <ChevronUp className="w-6 h-6 text-muted-foreground" />
+              <ChevronUp className="w-5 h-5 text-muted-foreground" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-muted-foreground" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
             )}
           </div>
         </div>
       </button>
       
       {isExpanded && dimension.issues.length > 0 && (
-        <div className="px-6 pb-6 space-y-3 border-t bg-background/30">
-          <div className="pt-5">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
+        <div className="px-4 pb-4 space-y-2 border-t">
+          <div className="pt-3">
+            <p className="text-xs font-semibold text-muted-foreground mb-2">
               Detected Issues
             </p>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {dimension.issues.map((issue) => (
                 <IssueCard
                   key={issue.id}
@@ -125,11 +126,10 @@ export const RubricDimensionCard: React.FC<RubricDimensionCardProps> = ({
       )}
       
       {isExpanded && dimension.issues.length === 0 && (
-        <div className="px-6 pb-6 pt-5 border-t bg-background/30">
-          <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
-            <CheckCircle className="w-4 h-4" />
-            <span className="font-medium">No issues detected in this dimension. Great work!</span>
-          </div>
+        <div className="px-4 pb-4 pt-3 border-t">
+          <p className="text-sm text-primary">
+            No issues detected. Great work!
+          </p>
         </div>
       )}
     </Card>

@@ -84,6 +84,47 @@ function detectThemeIssues(draft: string): WritingIssue[] {
       currentSuggestionIndex: 0,
       expanded: false
     });
+
+    // Additional complementary issues to reach up to 3 items
+    const lacksThreading = !/through( my)? (work|projects)|across (my )?activities/i.test(draft);
+    if (lacksThreading) {
+      issues.push({
+        id: 'theme_002',
+        dimensionId: 'theme',
+        title: 'No Thread Across Activities',
+        excerpt: `"${firstSentence}"`,
+        analysis: 'There is no explicit thread connecting this recognition to prior work or future direction.',
+        impact: 'Showing continuity across activities helps officers perceive deliberate development rather than disconnected wins.',
+        suggestions: [
+          { text: 'Building on my prior work with school partnerships, this recognition...', rationale: 'Signals continuity from earlier experiences.', type: 'insert_before' },
+          { text: '...advancing the same goal I\'ve pursued across my projects: scalable student support.', rationale: 'Ties recognition to a persistent goal.', type: 'insert_after' },
+          { text: 'This fits into my ongoing arc of applying systems design to education access.', rationale: 'Names the thread explicitly.', type: 'replace' }
+        ],
+        status: 'not_fixed',
+        currentSuggestionIndex: 0,
+        expanded: false
+      });
+    }
+
+    const lacksWhy = !/(because|so that|in order to|to (advance|push|pursue))/i.test(draft);
+    if (lacksWhy) {
+      issues.push({
+        id: 'theme_003',
+        dimensionId: 'theme',
+        title: 'Purpose Not Articulated',
+        excerpt: `"${firstSentence}"`,
+        analysis: 'The motivating purpose behind this work isn\'t stated, weakening thematic clarity.',
+        impact: 'Purpose language anchors the recognition in values and long-term direction, strengthening narrative fit.',
+        suggestions: [
+          { text: 'I pursued this to make weekly academic help accessible at scale,', rationale: 'Explains the why succinctly.', type: 'insert_before' },
+          { text: 'so that students who can\'t attend after-school can still get support.', rationale: 'Purpose framed as beneficiary-centered outcome.', type: 'insert_after' },
+          { text: 'In order to test my hypothesis about scalable mentorship systems,', rationale: 'Links to intellectual curiosity and theme.', type: 'insert_before' }
+        ],
+        status: 'not_fixed',
+        currentSuggestionIndex: 0,
+        expanded: false
+      });
+    }
   }
   
   return issues;
@@ -128,6 +169,47 @@ function detectCausalityIssues(draft: string): WritingIssue[] {
         currentSuggestionIndex: 0,
         expanded: false
       });
+
+      // Additional causality failure modes
+      const lacksAgent = !/(I |my )/i.test(sentences[0]);
+      if (lacksAgent) {
+        issues.push({
+          id: 'causality_002',
+          dimensionId: 'causality',
+          title: 'Agency Not Clear',
+          excerpt: `"${sentences[0].trim()}."`,
+          analysis: 'The sentence obscures your role; causality is stronger when the agent is explicit.',
+          impact: 'Clear agency helps officers attribute outcomes to you rather than to circumstances.',
+          suggestions: [
+            { text: sentences[0].replace(/^/,'I '), rationale: 'Make the subject explicitly you.', type: 'replace' },
+            { text: 'I led the work that...', rationale: 'Leads with agency.', type: 'insert_before' },
+            { text: 'through my design decisions, which led to...', rationale: 'Ties your actions to the effect.', type: 'insert_after' }
+          ],
+          status: 'not_fixed',
+          currentSuggestionIndex: 0,
+          expanded: false
+        });
+      }
+
+      const missingQuant = !/\d/.test(draft);
+      if (missingQuant) {
+        issues.push({
+          id: 'causality_003',
+          dimensionId: 'causality',
+          title: 'Outcomes Not Quantified',
+          excerpt: `"${sentences[1].trim()}."`,
+          analysis: 'Effects are mentioned without numbers, making the strength of causation ambiguous.',
+          impact: 'Quantified outcomes provide the clearest evidence of effect size and impact.',
+          suggestions: [
+            { text: '...which led to a 25% increase in weekly engagement.', rationale: 'Adds measurable effect size.', type: 'insert_after' },
+            { text: 'resulting in 118 students receiving consistent weekly support.', rationale: 'Converts generic outcome to a count.', type: 'replace' },
+            { text: 'enabling 3 partner schools to sustain support with >90% retention.', rationale: 'Strong quantified causal outcome.', type: 'insert_after' }
+          ],
+          status: 'not_fixed',
+          currentSuggestionIndex: 0,
+          expanded: false
+        });
+      }
     }
   }
   

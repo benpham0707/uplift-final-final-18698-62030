@@ -20,6 +20,7 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
   const [currentVersionIndex, setCurrentVersionIndex] = useState(0);
   const [dimensions, setDimensions] = useState<RubricDimension[]>([]);
   const [overallScore, setOverallScore] = useState(0);
+  const [expandedDimensionId, setExpandedDimensionId] = useState<string | null>(null);
 
   const currentDraft = draftVersions[currentVersionIndex].text;
 
@@ -50,6 +51,12 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
       });
       
       setDimensions(updatedDimensions);
+      // If nothing selected yet, choose first dimension needing work; else keep current if still present
+      setExpandedDimensionId(prev => {
+        if (prev && updatedDimensions.some(d => d.id === prev)) return prev;
+        const firstNeedingWork = updatedDimensions.find(d => d.status === 'critical' || d.status === 'needs_work');
+        return firstNeedingWork ? firstNeedingWork.id : updatedDimensions[0]?.id ?? null;
+      });
       setOverallScore(calculateOverallScore(updatedDimensions));
     }, 500);
 
@@ -83,18 +90,25 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
   }, [currentVersionIndex, draftVersions.length]);
 
   const handleToggleIssue = useCallback((issueId: string) => {
-    setDimensions(prev => prev.map(dim => ({
-      ...dim,
-      issues: dim.issues.map(issue =>
-        issue.id === issueId
-          ? {
-              ...issue,
-              expanded: !issue.expanded,
-              status: !issue.expanded && issue.status === 'not_fixed' ? 'in_progress' : issue.status
-            }
-          : issue
-      )
-    })));
+    setDimensions(prev => prev.map(dim => {
+      const containsIssue = dim.issues.some(i => i.id === issueId);
+      if (!containsIssue) return dim;
+      return {
+        ...dim,
+        issues: dim.issues.map(i => {
+          if (i.id === issueId) {
+            const willExpand = !i.expanded;
+            return {
+              ...i,
+              expanded: willExpand,
+              status: willExpand && i.status === 'not_fixed' ? 'in_progress' : i.status
+            };
+          }
+          // Close all other issues in the same dimension
+          return { ...i, expanded: false };
+        })
+      };
+    }));
   }, []);
 
   const handleApplySuggestion = useCallback((
@@ -156,6 +170,23 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
     })));
   }, []);
 
+  const handlePrevSuggestion = useCallback((issueId: string) => {
+    setDimensions(prev => prev.map(dim => ({
+      ...dim,
+      issues: dim.issues.map(issue => {
+        if (issue.id === issueId) {
+          const prevIndex = (issue.currentSuggestionIndex - 1 + issue.suggestions.length) % issue.suggestions.length;
+          return { ...issue, currentSuggestionIndex: prevIndex };
+        }
+        return issue;
+      })
+    })));
+  }, []);
+
+  const toggleDimensionExpand = useCallback((dimensionId: string) => {
+    setExpandedDimensionId(prev => (prev === dimensionId ? null : dimensionId));
+  }, []);
+
   const totalIssues = dimensions.reduce((sum, dim) => sum + dim.issues.length, 0);
   const fixedIssues = dimensions.reduce((sum, dim) => 
     sum + dim.issues.filter(i => i.status === 'fixed').length, 0
@@ -204,6 +235,9 @@ export const NarrativeFitWorkshop: React.FC<NarrativeFitWorkshopProps> = ({ reco
                     onToggleIssue={handleToggleIssue}
                     onApplySuggestion={handleApplySuggestion}
                     onNextSuggestion={handleNextSuggestion}
+                    onPrevSuggestion={handlePrevSuggestion}
+                    isExpanded={expandedDimensionId === dimension.id}
+                    onToggleExpand={() => toggleDimensionExpand(dimension.id)}
                   />
                 ))}
               </div>

@@ -98,10 +98,12 @@ export const IssueCard: React.FC<IssueCardProps> = ({
             <p className="text-xs font-semibold text-muted-foreground mb-1">
               From Your Draft
             </p>
-            <div className="pl-3 border-l-4 border-primary">
-              <p className="text-sm italic text-foreground/80">
+            <div className="relative rounded-md bg-primary/5 p-4">
+              <span className="absolute -top-3 -left-1 text-5xl leading-none text-primary select-none">“</span>
+              <p className="text-sm italic text-foreground/80 px-6">
                 {issue.excerpt.replace(/"/g, '')}
               </p>
+              <span className="absolute -top-3 -right-1 text-5xl leading-none text-primary select-none">”</span>
             </div>
           </div>
 
@@ -114,7 +116,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
             </p>
           </div>
 
-          <div>
+          <div className="mb-4">
             <p className="text-xs font-semibold text-primary mb-1">
               Why It Matters
             </p>
@@ -123,7 +125,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
             </p>
           </div>
 
-          <div className="pt-2 border-t">
+          <div className="pt-4 border-t">
             <SuggestionCarousel
               suggestions={issue.suggestions}
               currentIndex={issue.currentSuggestionIndex}

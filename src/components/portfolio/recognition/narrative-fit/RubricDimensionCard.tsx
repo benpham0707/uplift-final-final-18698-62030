@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { RubricDimension } from './types';
 import { IssueCard } from './IssueCard';
@@ -10,6 +10,8 @@ interface RubricDimensionCardProps {
   onApplySuggestion: (issueId: string, suggestionText: string, type: 'replace' | 'insert_before' | 'insert_after') => void;
   onNextSuggestion: (issueId: string) => void;
   onPrevSuggestion: (issueId: string) => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
 const statusConfig = {
@@ -56,39 +58,43 @@ export const RubricDimensionCard: React.FC<RubricDimensionCardProps> = ({
   onToggleIssue,
   onApplySuggestion,
   onNextSuggestion,
-  onPrevSuggestion
+  onPrevSuggestion,
+  isExpanded,
+  onToggleExpand
 }) => {
-  const [isExpanded, setIsExpanded] = useState(dimension.status === 'critical' || dimension.status === 'needs_work');
   const config = statusConfig[dimension.status];
   const StatusIcon = config.icon;
   const notFixedIssues = dimension.issues.filter(i => i.status !== 'fixed');
+  const compact = isExpanded; // when expanded, compact the header
 
   return (
     <Card className="border-l-4 border-l-primary overflow-hidden">
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={onToggleExpand}
         className="w-full p-4 text-left transition-all"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex gap-3 flex-1">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+            <div className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} rounded-lg flex items-center justify-center flex-shrink-0 ${
               dimension.status === 'critical' ? 'bg-red-100 dark:bg-red-950/30' :
               dimension.status === 'needs_work' ? 'bg-yellow-100 dark:bg-yellow-950/30' :
               dimension.status === 'good' ? 'bg-green-100 dark:bg-green-950/30' :
               'bg-primary/10'
             }`}>
-              <StatusIcon className={`w-5 h-5 ${config.iconColor}`} />
+              <StatusIcon className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} ${config.iconColor}`} />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2 mb-1">
-                <h3 className="text-lg font-bold text-primary">{dimension.name}</h3>
-                <span className={`text-lg font-bold ${config.color}`}>
+                <h3 className={`${compact ? 'text-base' : 'text-lg'} font-bold text-primary`}>{dimension.name}</h3>
+                <span className={`${compact ? 'text-base' : 'text-lg'} font-bold ${config.color}`}>
                   {dimension.score.toFixed(1)}/10
                 </span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {dimension.overview}
-              </p>
+              {!compact && (
+                <p className="text-sm text-muted-foreground">
+                  {dimension.overview}
+                </p>
+              )}
               {!isExpanded && notFixedIssues.length > 0 && (
                 <div className="mt-2 text-xs text-muted-foreground">
                   {notFixedIssues.length} issue{notFixedIssues.length !== 1 ? 's' : ''} to address
@@ -113,7 +119,7 @@ export const RubricDimensionCard: React.FC<RubricDimensionCardProps> = ({
               Detected Issues
             </p>
             <div className="space-y-2">
-              {dimension.issues.map((issue) => (
+              {dimension.issues.slice(0, 3).map((issue) => (
                 <IssueCard
                   key={issue.id}
                   issue={issue}

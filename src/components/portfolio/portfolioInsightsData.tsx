@@ -10,6 +10,8 @@ import { QualityDimension } from '@/components/portfolio/impact/ImpactQualityChe
 import { GuidanceInsight } from '@/components/portfolio/impact/StorytellingGuidance';
 import { RecognitionOverviewData } from '@/components/portfolio/recognition/RecognitionOverview';
 import { RecognitionItem } from '@/components/portfolio/recognition/RecognitionCard';
+import { ExtracurricularOverviewData } from '@/components/portfolio/extracurricular/ExtracurricularOverview';
+import { ExtracurricularItem } from '@/components/portfolio/extracurricular/ExtracurricularCard';
 
 // Types
 export interface KeyTakeaway {
@@ -101,6 +103,9 @@ export interface OverarchingInsight {
   // Recognition Tab Data
   recognitionOverview?: RecognitionOverviewData;
   recognitionItems?: RecognitionItem[];
+  // Extracurricular Tab Data
+  extracurricularOverview?: ExtracurricularOverviewData;
+  extracurricularItems?: ExtracurricularItem[];
   // Impact Tab - Redesigned for reflection and insights
   snapshotSummary?: string;
   snapshotMetrics?: SnapshotMetric[];
@@ -1647,6 +1652,329 @@ export const MOCK_HOLISTIC_SUMMARY: HolisticSummary = {
             { angle: 'Early Trajectory', example: 'Leadership recognized early, sustained over time' }
           ],
           strategicNote: 'The one-year age reduces value. Only include if you need to demonstrate longitudinal commitment or if you have limited honors to list.'
+        }
+      }
+    ],
+    // Extracurricular Tab - Comprehensive activity analysis
+    extracurricularOverview: {
+      portfolioWeightScore: 8.7,
+      assessmentLabel: 'Exceptionally Deep & Balanced',
+      oneLineSummary: 'Your extracurricular portfolio demonstrates sustained commitment (avg 2.8 years), clear leadership progression, and strong alignment with your civic tech narrative spine (88% match).',
+      balanceAnalysis: {
+        totalActivities: 7,
+        categoryBreakdown: {
+          leadership: 3,
+          service: 2,
+          research: 1,
+          academic: 1
+        },
+        averageCommitmentYears: 2.8,
+        totalCommitmentHours: 1840,
+        balanceScore: 'exceptional' as const,
+        spineAlignmentPercent: 88
+      },
+      commitmentDepth: {
+        longevityBenchmark: {
+          theirAverage: 2.8,
+          topApplicantsAverage: 3.2,
+          percentile: 72,
+          interpretation: 'Your commitment spans are strong - 2.8 years per activity places you in the 72nd percentile of top applicants. Most activities show multi-year involvement, demonstrating sustained dedication rather than resume-building.'
+        },
+        leadershipProgression: {
+          activitiesWithGrowth: 4,
+          activitiesStagnant: 3,
+          analysis: 'You show consistent upward movement in 4 of 7 activities, with clear role progression from member to leadership positions. This trajectory signals increasing responsibility and trust from organizations.'
+        },
+        hoursBenchmark: {
+          totalHours: 1840,
+          vsTopApplicants: 'Above average',
+          weeklyAverage: 15
+        }
+      },
+      impactEvolution: {
+        tangibilityDistribution: {
+          highlyMeasurable: 4,
+          moderate: 2,
+          vague: 1,
+          tangibilityScore: 8.2,
+          analysis: 'Your activities have strong concrete outcomes - 57% include specific metrics. This tangibility makes impact claims credible and verifiable.'
+        },
+        skillDevelopment: {
+          technicalSkills: ['Full-stack development', 'Data visualization', 'Product management'],
+          leadershipSkills: ['Team building', 'Strategic planning', 'Budget management'],
+          interpersonalSkills: ['Mentorship', 'Public speaking', 'Stakeholder management'],
+          growthTrajectory: 'Accelerating'
+        }
+      },
+      balanceGapsAnalysis: {
+        criticalGaps: [
+          {
+            issue: 'No arts or humanities extracurriculars',
+            impact: 'Portfolio is heavily STEM-focused, which is fine for technical programs but may limit appeal for liberal arts colleges',
+            priority: 'LOW' as const
+          }
+        ],
+        overweightedCategories: [
+          {
+            category: 'Leadership',
+            count: 3,
+            recommendation: 'Your leadership activities are strong and well-differentiated. No need to add more - you risk diluting impact.'
+          }
+        ],
+        depthVsBreadthRatio: {
+          currentRatio: '4 deep (3+ years), 3 breadth (1-2 years)',
+          idealRatio: '3-4 deep, 2-3 breadth',
+          adjustment: 'Your ratio is ideal - you have depth in core activities while showing breadth of interests.'
+        }
+      },
+      applicationStrategy: {
+        centerpiece: ['Student Government President', 'Community Tutoring Platform'],
+        supporting: ['Robotics Club Vice President', 'Civic Tech Research'],
+        descriptionPriority: [
+          {
+            activity: 'Student Government President',
+            priority: 1,
+            reasonToHighlight: 'Strongest leadership role with quantifiable impact and role progression'
+          },
+          {
+            activity: 'Community Tutoring Platform',
+            priority: 2,
+            reasonToHighlight: 'Demonstrates technical + community impact alignment with spine'
+          }
+        ],
+        essayOpportunities: [
+          {
+            activity: 'Student Government President',
+            promptTypes: ['Leadership challenge', 'Community contribution', 'Overcoming obstacles'],
+            uniqueAngle: 'Implementing digital democracy tools to increase student engagement'
+          },
+          {
+            activity: 'Community Tutoring Platform',
+            promptTypes: ['Problem you solved', 'Impact on community', 'Innovation'],
+            uniqueAngle: 'Building technology to scale mentorship access in underserved schools'
+          }
+        ]
+      }
+    },
+    extracurricularItems: [
+      {
+        id: 'student-gov',
+        name: 'Student Government President',
+        organization: 'Lincoln High School',
+        role: 'President',
+        startDate: 'September 2021',
+        endDate: 'June 2024',
+        hoursPerWeek: 12,
+        weeksPerYear: 40,
+        category: 'leadership' as const,
+        description: 'Led 15-member cabinet representing 2,000+ students. Secured $50K budget increase for student programs. Implemented digital feedback system reaching 85% student participation.',
+        scores: {
+          portfolioContribution: {
+            overall: 9.2,
+            breakdown: {
+              commitmentDepth: 9.5,
+              leadershipTrajectory: 9.8,
+              impactScale: 8.5,
+              narrativeAlignment: 9.0
+            }
+          },
+          commitment: {
+            overall: 9.5,
+            totalHours: 1440,
+            consistencyScore: 9.8,
+            roleGrowth: ['Member (2021)', 'Secretary (2022)', 'Vice President (2023)', 'President (2024)']
+          },
+          impact: {
+            overall: 8.8,
+            metrics: [
+              { label: 'Students represented', value: '2,000+' },
+              { label: 'Budget increase secured', value: '$50K' },
+              { label: 'Participation rate', value: '85%' }
+            ],
+            tangibility: 9.2,
+            analysis: 'Exceptional leadership with concrete outcomes. The digital feedback system demonstrates innovation, while budget increase shows stakeholder negotiation skills.'
+          }
+        },
+        recommendedUse: 'centerpiece' as const,
+        applicationGuidance: {
+          essayFit: [
+            {
+              promptType: 'Leadership challenge',
+              suitability: 9.5,
+              angle: 'Implementing digital democracy tools to overcome student apathy'
+            },
+            {
+              promptType: 'Community contribution',
+              suitability: 9.0,
+              angle: 'Using technology to amplify student voice in school policy'
+            }
+          ],
+          descriptionStrength: {
+            clarity: 9.0,
+            specificityScore: 9.5,
+            actionVerbStrength: 'Strong',
+            issues: [],
+            improvements: ['Consider adding specific example of a program funded by budget increase']
+          }
+        },
+        evolution: {
+          milestones: [
+            { date: 'Sep 2021', event: 'Elected Class Representative', significance: 'First leadership role' },
+            { date: 'May 2022', event: 'Appointed Secretary', significance: 'Recognized for organizational skills' },
+            { date: 'Sep 2023', event: 'Elected Vice President', significance: 'Managed operations and events' },
+            { date: 'Sep 2023', event: 'Launched Digital Feedback System', significance: 'Innovation that increased engagement' },
+            { date: 'May 2024', event: 'Secured $50K Budget Increase', significance: 'Major negotiation victory' }
+          ],
+          skillsGained: ['Public speaking', 'Budget management', 'Stakeholder negotiation', 'Digital platform management']
+        }
+      },
+      {
+        id: 'tutoring-platform',
+        name: 'Community Tutoring Platform',
+        organization: 'Self-founded',
+        role: 'Founder & Lead Developer',
+        startDate: 'January 2022',
+        endDate: 'Present',
+        hoursPerWeek: 15,
+        weeksPerYear: 50,
+        category: 'service' as const,
+        description: 'Built full-stack web platform connecting volunteer tutors with students. Serves 118 weekly active students across 2 partner schools. Led team of 6 developers and 19 tutors.',
+        scores: {
+          portfolioContribution: {
+            overall: 9.5,
+            breakdown: {
+              commitmentDepth: 9.0,
+              leadershipTrajectory: 9.2,
+              impactScale: 9.8,
+              narrativeAlignment: 9.9
+            }
+          },
+          commitment: {
+            overall: 9.2,
+            totalHours: 1875,
+            consistencyScore: 9.5,
+            roleGrowth: ['Solo Developer (2022)', 'Team Lead (2023)', 'Program Director (2024)']
+          },
+          impact: {
+            overall: 9.8,
+            metrics: [
+              { label: 'Weekly active students', value: '118' },
+              { label: 'Partner schools', value: '2' },
+              { label: 'Tutor team size', value: '19' },
+              { label: 'Retention improvement', value: '+12pts' }
+            ],
+            tangibility: 9.9,
+            analysis: 'Exceptional quantifiable impact with institutional partnerships (MOUs). Platform demonstrates sustained operation and measurable outcomes - rare for high school projects.'
+          }
+        },
+        recommendedUse: 'centerpiece' as const,
+        applicationGuidance: {
+          essayFit: [
+            {
+              promptType: 'Problem you solved',
+              suitability: 9.8,
+              angle: 'Building technology to democratize access to quality tutoring'
+            },
+            {
+              promptType: 'Impact on community',
+              suitability: 9.5,
+              angle: 'Scaling mentorship through tech to serve underserved schools'
+            },
+            {
+              promptType: 'Innovation',
+              suitability: 9.2,
+              angle: 'Technical solution to education equity challenge'
+            }
+          ],
+          descriptionStrength: {
+            clarity: 9.5,
+            specificityScore: 10.0,
+            actionVerbStrength: 'Exceptional',
+            issues: [],
+            improvements: ['Perfect as-is. Clear role, concrete metrics, scalable impact.']
+          }
+        },
+        evolution: {
+          milestones: [
+            { date: 'Jan 2022', event: 'Launched MVP', significance: 'First 6 tutors, 12 students' },
+            { date: 'Sep 2022', event: 'First School Partnership (MOU)', significance: 'Institutional validation' },
+            { date: 'Jan 2023', event: 'Grew to 50+ students', significance: 'Scaling challenge' },
+            { date: 'Jun 2023', event: 'Built Developer Team', significance: 'Leadership expansion' },
+            { date: 'Sep 2023', event: 'Second School Partnership', significance: 'Multi-school reach' },
+            { date: 'Mar 2024', event: 'Reached 118 Weekly Active Users', significance: 'Sustained scale' }
+          ],
+          skillsGained: ['Full-stack development', 'Product management', 'Partnership development', 'Team leadership', 'User research']
+        }
+      },
+      {
+        id: 'robotics-vp',
+        name: 'Robotics Club Vice President',
+        organization: 'Lincoln High School',
+        role: 'Vice President',
+        startDate: 'September 2021',
+        endDate: 'Present',
+        hoursPerWeek: 10,
+        weeksPerYear: 45,
+        category: 'academic' as const,
+        description: 'Manage operations for 35-member team. Designed adaptive controller kits lowering barriers for new members. Led outreach to 3 middle schools, introducing 150+ students to robotics.',
+        scores: {
+          portfolioContribution: {
+            overall: 8.5,
+            breakdown: {
+              commitmentDepth: 8.8,
+              leadershipTrajectory: 8.5,
+              impactScale: 8.2,
+              narrativeAlignment: 8.5
+            }
+          },
+          commitment: {
+            overall: 8.8,
+            totalHours: 1350,
+            consistencyScore: 9.0,
+            roleGrowth: ['Member (2021)', 'Build Team Lead (2022)', 'Vice President (2023-24)']
+          },
+          impact: {
+            overall: 8.2,
+            metrics: [
+              { label: 'Team members', value: '35' },
+              { label: 'Middle school students reached', value: '150+' },
+              { label: 'Adaptive kits designed', value: '18' }
+            ],
+            tangibility: 8.5,
+            analysis: 'Strong operational leadership with innovation (adaptive kits) and outreach focus. Good supporting activity that shows breadth.'
+          }
+        },
+        recommendedUse: 'supporting' as const,
+        applicationGuidance: {
+          essayFit: [
+            {
+              promptType: 'Collaboration',
+              suitability: 7.5,
+              angle: 'Managing diverse technical team and coordinating with schools'
+            },
+            {
+              promptType: 'Accessibility/inclusion',
+              suitability: 8.0,
+              angle: 'Designing adaptive tools to lower entry barriers'
+            }
+          ],
+          descriptionStrength: {
+            clarity: 8.5,
+            specificityScore: 8.8,
+            actionVerbStrength: 'Strong',
+            issues: ['Could clarify what "adaptive" means - be more specific'],
+            improvements: ['Add brief explanation: "one-handed controller kits for students with limited dexterity"']
+          }
+        },
+        evolution: {
+          milestones: [
+            { date: 'Sep 2021', event: 'Joined as Member', significance: 'First exposure to robotics' },
+            { date: 'Jan 2022', event: 'Build Team Lead', significance: 'Technical leadership role' },
+            { date: 'Sep 2022', event: 'Elected VP', significance: 'Full operational responsibility' },
+            { date: 'Mar 2023', event: 'Designed Adaptive Kits', significance: 'Accessibility innovation' },
+            { date: 'Sep 2023', event: 'Started Middle School Outreach', significance: 'Community impact expansion' }
+          ],
+          skillsGained: ['Mechanical design', 'Team coordination', 'Outreach program management', 'Inclusive design']
         }
       }
     ]

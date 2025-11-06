@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { ExtracurricularScoreDisplay } from './ExtracurricularScoreDisplay';
 
@@ -36,9 +37,10 @@ export interface ExtracurricularItem {
 
 interface ExtracurricularCardProps {
   activity: ExtracurricularItem;
+  onViewAnalysis?: () => void;
 }
 
-export const ExtracurricularCard: React.FC<ExtracurricularCardProps> = ({ activity }) => {
+export const ExtracurricularCard: React.FC<ExtracurricularCardProps> = ({ activity, onViewAnalysis }) => {
   const [whyItMattersExpanded, setWhyItMattersExpanded] = useState(false);
 
   return (
@@ -88,6 +90,16 @@ export const ExtracurricularCard: React.FC<ExtracurricularCardProps> = ({ activi
               <ul className="text-xs text-amber-700 dark:text-amber-400 space-y-1">{activity.applicationGuidance.descriptionAnalysis.improvements.map((imp, i) => <li key={i}>• {imp}</li>)}</ul>
             </div>
           </div>
+        </div>
+        {/* View Full Analysis CTA */}
+        <div className="mt-4">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={onViewAnalysis}
+          >
+            View Full Analysis →
+          </Button>
         </div>
       </CardContent>
     </Card>

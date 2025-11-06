@@ -170,6 +170,71 @@ All colors MUST be HSL.
     background: var(--gradient-hero);
   }
   
+  /* Smooth fade from hero gradient to page background */
+  .hero-gradient-fade {
+    position: relative;
+    /* Natural fade by masking the hero itself (works in Safari/Chrome/Firefox) */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 72%,
+      rgba(0,0,0,0.97) 80%,
+      rgba(0,0,0,0.8) 88%,
+      rgba(0,0,0,0.5) 94%,
+      transparent 100%
+    );
+            mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 72%,
+      rgba(0,0,0,0.97) 80%,
+      rgba(0,0,0,0.8) 88%,
+      rgba(0,0,0,0.5) 94%,
+      transparent 100%
+    );
+    -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+  }
+  .hero-gradient-fade::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px; /* slightly overlap next section to avoid a seam */
+    height: clamp(360px, 40vw, 720px);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.01) 0%,
+      rgba(255, 255, 255, 0.03) 30%,
+      rgba(255, 255, 255, 0.06) 55%,
+      rgba(255, 255, 255, 0.12) 78%,
+      rgba(255, 255, 255, 0.22) 92%,
+      hsl(var(--background)) 100%
+    );
+    pointer-events: none;
+  }
+  
+  /* Cloud-like, wavy edge to avoid a straight rectangle seam */
+  .hero-gradient-fade::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px; /* overlap to avoid gap */
+    height: clamp(240px, 34vw, 480px);
+    background:
+      radial-gradient(260px 160px at 6% 132%, hsl(0 0% 100% / 0.95) 0 55%, transparent 58%),
+      radial-gradient(320px 190px at 26% 130%, hsl(0 0% 100% / 0.95) 0 55%, transparent 58%),
+      radial-gradient(340px 200px at 50% 134%, hsl(0 0% 100% / 0.95) 0 55%, transparent 58%),
+      radial-gradient(320px 190px at 74% 130%, hsl(0 0% 100% / 0.95) 0 55%, transparent 58%),
+      radial-gradient(260px 160px at 94% 132%, hsl(0 0% 100% / 0.95) 0 55%, transparent 58%);
+    filter: blur(16px);
+    opacity: 0.92;
+    pointer-events: none;
+  }
+  
   /* Holographic + Sheen utilities for magical look */
   .holo-surface {
     position: relative;

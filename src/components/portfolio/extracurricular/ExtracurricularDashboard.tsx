@@ -6,13 +6,14 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/com
 
 interface ExtracurricularDashboardProps {
   activities: ExtracurricularItem[];
+  onViewActivity?: (activity: ExtracurricularItem) => void;
 }
 
 type SortOption = 'contribution' | 'hours' | 'impact';
 type FilterCategory = 'all' | 'leadership' | 'service' | 'research' | 'athletics' | 'arts' | 'academic' | 'work';
 type FilterUse = 'all' | 'centerpiece' | 'supporting' | 'breadth' | 'optional';
 
-export const ExtracurricularDashboard: React.FC<ExtracurricularDashboardProps> = ({ activities }) => {
+export const ExtracurricularDashboard: React.FC<ExtracurricularDashboardProps> = ({ activities, onViewActivity }) => {
   const [sortBy, setSortBy] = useState<SortOption>('contribution');
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all');
   const [filterUse, setFilterUse] = useState<FilterUse>('all');
@@ -188,7 +189,7 @@ export const ExtracurricularDashboard: React.FC<ExtracurricularDashboardProps> =
             <CarouselContent className="-ml-4">
               {sortedActivities.map((activity) => (
                 <CarouselItem key={activity.id} className="pl-4 md:basis-1/2 lg:basis-1/2">
-                  <ExtracurricularCard activity={activity} />
+                  <ExtracurricularCard activity={activity} onViewAnalysis={() => onViewActivity?.(activity)} />
                 </CarouselItem>
               ))}
             </CarouselContent>

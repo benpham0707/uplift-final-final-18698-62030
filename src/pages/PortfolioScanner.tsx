@@ -890,7 +890,7 @@ const PortfolioScanner = () => {
       </nav>
 
       {/* Header Section with Scores - AcademicPlanner aesthetic */}
-      <div id="overview" ref={overviewRef} className="hero-gradient text-white snap-start snap-always">
+      <div id="overview" ref={overviewRef} className="hero-gradient hero-gradient-fade text-white snap-start snap-always">
         <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
@@ -1391,14 +1391,11 @@ const PortfolioScanner = () => {
 
           {/* Secondary metrics row removed to avoid repetition */}
         </div>
-        {/* Extra scroll room at end of header (not a snap target) */}
-        <div className="h-24 md:h-40 lg:h-56 pointer-events-none" aria-hidden="true" />
+        {/* Extra scroll room to allow a longer gradient before the fade */}
+        <div className="h-32 md:h-48 lg:h-64 pointer-events-none" aria-hidden="true" />
       </div>
 
-      {/* Soft divider between header and journey */}
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="my-8 md:my-12 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
-      </div>
+      {/* Divider removed for a seamless cloud-like fade into content */}
 
       {/* Main Content Area */}
       <main className="relative">

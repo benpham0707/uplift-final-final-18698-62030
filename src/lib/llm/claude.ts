@@ -14,16 +14,13 @@ import * as dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// Initialize Anthropic client
-// Prioritize ANTHROPIC_API_KEY (has credits) over CLAUDE_CODE_KEY (no credits)
-const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_KEY;
-if (!apiKey) {
-  throw new Error('CLAUDE_CODE_KEY or ANTHROPIC_API_KEY not found in environment variables. Please check your .env file.');
+// Single-key policy: only use ANTHROPIC_API_KEY (paid/subscription credits).
+// CLAUDE_CODE_KEY is no longer considered.
+const PAID_KEY = process.env.ANTHROPIC_API_KEY || '';
+if (!PAID_KEY) {
+  throw new Error('ANTHROPIC_API_KEY not found in environment variables. Please add it to your .env file.');
 }
-
-const client = new Anthropic({
-  apiKey,
-});
+let client = new Anthropic({ apiKey: PAID_KEY });
 
 // ============================================================================
 // TYPES
@@ -77,24 +74,8 @@ export async function callClaude<T = any>(
   } = options;
 
   try {
-    // Build system message with optional caching
-    const systemMessages: Anthropic.Messages.MessageParam[] = [];
-
-    if (systemPrompt) {
-      if (cacheSystemPrompt) {
-        // Use prompt caching for static system prompts
-        systemMessages.push({
-          type: 'text',
-          text: systemPrompt,
-          cache_control: { type: 'ephemeral' },
-        } as any);
-      } else {
-        systemMessages.push({
-          type: 'text',
-          text: systemPrompt,
-        });
-      }
-    }
+    // Build system prompt (SDK accepts a plain string)
+    const systemParam = systemPrompt ? String(systemPrompt) : undefined;
 
     // Build request parameters
     const requestParams: Anthropic.Messages.MessageCreateParams = {
@@ -112,7 +93,7 @@ export async function callClaude<T = any>(
           ],
         },
       ],
-      ...(systemMessages.length > 0 && { system: systemMessages as any }),
+      ...(systemParam ? { system: systemParam } : {}),
     };
 
     // Make API call

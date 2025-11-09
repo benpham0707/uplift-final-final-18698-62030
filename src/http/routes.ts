@@ -46,10 +46,8 @@ r.post("/analyze-entry", async (req, res) => {
       skip_coaching: skip_coaching || false,
     };
 
-    // Early env check for Anthropic keys to provide a clearer error than module load failure
-    // Prioritize ANTHROPIC_API_KEY (has credits) over CLAUDE_CODE_KEY (no credits)
-    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_KEY;
-    if (!apiKey) {
+    // If caller requests quick depth, always use heuristic (no paid credits)
+    if ((analysisOptions.depth || 'standard') === 'quick') {
       // STRICT HEURISTIC FALLBACK - matches our brutal scoring philosophy
       const text: string = String(entryObj.description_original || '');
       const wc = text.trim().split(/\s+/).filter(Boolean).length;
@@ -174,7 +172,77 @@ r.post("/analyze-entry", async (req, res) => {
         ],
       };
 
-      return res.json({ success: true, result: { report, authenticity, coaching, performance: { total_ms: 1200 } }, engine: 'heuristic_fallback' });
+      return res.json({ success: true, result: { report, authenticity, coaching, performance: { total_ms: 1200 } }, engine: 'heuristic_quick' });
+    }
+
+    // Early env check for Anthropic key. Only ANTHROPIC_API_KEY is considered.
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      // No key: still return heuristic to avoid breaking UI
+      const text: string = String(entryObj.description_original || '');
+      const wc = text.trim().split(/\s+/).filter(Boolean).length;
+      let maxScore = 10;
+      if (wc < 25) maxScore = 1;
+      else if (wc < 50) maxScore = 2;
+      else if (wc < 100) maxScore = 4;
+      const hasStory = text.match(/\b(felt|realized|learned|discovered|struggled|wondered)\b/i);
+      const hasEmotion = text.match(/\b(nervous|excited|frustrated|proud|afraid|confused)\b/i);
+      const hasDialogue = text.includes('"') || text.includes("'");
+      const hasReflection = text.match(/\b(I (learned|realized|understood|discovered))\b/i);
+      let base = 1.5;
+      if (hasStory) base += 1;
+      if (hasEmotion) base += 1.5;
+      if (hasDialogue) base += 1;
+      if (hasReflection) base += 1;
+      base = Math.min(base, maxScore);
+      const report = {
+        id: entryObj.id || undefined,
+        rubric_version: '1.0.0',
+        created_at: new Date().toISOString(),
+        narrative_quality_index: Math.round(base * 10),
+        reader_impression_label: base >= 7 ? 'solid_needs_polish' : base >= 4 ? 'needs_work' : 'weak',
+        categories: [
+          { name: 'voice_integrity', score_0_to_10: +(base).toFixed(1), evidence_snippets: [text.slice(0, 80)], evaluator_notes: 'Heuristic: Resume-style; needs authentic voice and sensory details.' },
+          { name: 'specificity_evidence', score_0_to_10: +(Math.max(1, base - 0.5)).toFixed(1), evidence_snippets: [], evaluator_notes: 'Heuristic: Needs concrete metrics (who/when/how much).' },
+          { name: 'reflection_meaning', score_0_to_10: +(Math.max(0, base - 1)).toFixed(1), evidence_snippets: [], evaluator_notes: 'Heuristic: Needs deeper reflection with transferable insights.' },
+        ],
+        weights: {
+          voice_integrity: 0.10,
+          specificity_evidence: 0.09,
+          transformative_impact: 0.12,
+          role_clarity_ownership: 0.08,
+          narrative_arc_stakes: 0.10,
+          initiative_leadership: 0.10,
+          community_collaboration: 0.08,
+          reflection_meaning: 0.12,
+          craft_language_quality: 0.07,
+          fit_trajectory: 0.07,
+          time_investment_consistency: 0.07,
+        },
+        flags: ['heuristic_scoring', 'no_api_key', ...(wc < 100 ? ['too_short'] : []), ...(wc < 50 ? ['critically_short'] : [])],
+        suggested_fixes_ranked: ['Add story elements (emotion, dialogue, reflection)', 'Add concrete numbers and outcomes', 'Increase word count to 150-200 words'],
+      };
+      const authenticity = {
+        authenticity_score: +(Math.max(3, Math.min(7, base)).toFixed(1)),
+        voice_type: wc < 50 ? 'resume' : (hasStory || hasEmotion ? 'conversational' : 'factual'),
+        red_flags: [...(wc < 80 ? ['too_short'] : []), ...(!hasReflection ? ['no_reflection'] : [])],
+        green_flags: [...(hasStory ? ['story_elements'] : []), ...(hasEmotion ? ['emotional_depth'] : [])],
+      };
+      const coaching = {
+        overall: {
+          narrative_quality_index: report.narrative_quality_index,
+          score_tier: report.narrative_quality_index >= 70 ? 'good' : report.narrative_quality_index >= 40 ? 'needs_work' : 'weak',
+          total_issues: 3,
+          issues_resolved: 0,
+          quick_summary: 'Add story elements (emotion, dialogue), concrete metrics, and deeper reflection to improve from resume-style to narrative.',
+        },
+        categories: [],
+        top_priorities: [
+          { category: 'specificity_evidence', issue_title: 'Add a concrete metric', impact: '+2–3 NQI' },
+          { category: 'reflection_meaning', issue_title: 'Add a one-sentence insight', impact: '+1–2 NQI' },
+        ],
+      };
+      return res.json({ success: true, result: { report, authenticity, coaching, performance: { total_ms: 900 } }, engine: 'heuristic_no_key' });
     }
 
     // Dynamic import to avoid failing server startup if env is missing
@@ -234,7 +302,12 @@ r.post("/analyze-entry", async (req, res) => {
         msg.includes('credit balance') ||
         msg.includes('insufficient') ||
         msg.includes('invalid_request_error') ||
-        msg.includes('Claude API error: 400');
+        msg.includes('Claude API error: 400') ||
+        msg.includes('authentication_error') ||
+        msg.includes('invalid x-api-key') ||
+        msg.includes('Invalid API key') ||
+        msg.includes('Unauthorized') ||
+        msg.includes('401');
 
       if (isCreditIssue) {
         // STRICT HEURISTIC FALLBACK on credit error - matches our brutal scoring philosophy
@@ -300,7 +373,7 @@ r.post("/analyze-entry", async (req, res) => {
         return res.json({ success: true, result: { report, authenticity, coaching: null, performance: { total_ms: 800 } }, engine: 'heuristic_fallback_credit_error' });
       }
 
-      // Unknown failure: return 500
+      // Unknown failure: return 500 with diagnostic
       return res.status(500).json({ message: 'Analysis failed', error: msg });
     }
   } catch (err: any) {
@@ -312,7 +385,13 @@ r.post("/analyze-entry", async (req, res) => {
 
 // Simple health check for dev tooling and frontends
 r.get('/health', (_req, res) => {
-  return res.json({ ok: true, service: 'analysis-api', time: new Date().toISOString() });
+  const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY.length > 10);
+  return res.json({
+    ok: true,
+    service: 'analysis-api',
+    time: new Date().toISOString(),
+    anthropic_key_present: hasAnthropicKey
+  });
 });
 
 export default r;

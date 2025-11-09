@@ -93,7 +93,7 @@ export const ExtracurricularWorkshopNew: React.FC<ExtracurricularWorkshopProps> 
 
         // Call real backend analysis system
         const result = await analyzeExtracurricularEntry(draft, activity, {
-          depth: 'comprehensive',
+          depth: 'comprehensive', // product API calls should use ANTHROPIC_API_KEY as normal
           skip_coaching: false,
         });
 

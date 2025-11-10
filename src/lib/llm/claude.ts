@@ -115,8 +115,14 @@ export async function callClaude<T = any>(
       ...(systemMessages.length > 0 && { system: systemMessages as any }),
     };
 
-    // Make API call
-    const response = await client.messages.create(requestParams);
+    // Make API call with timeout (10 seconds)
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Claude API call timed out after 10 seconds')), 10000)
+    );
+    const response = await Promise.race([
+      client.messages.create(requestParams),
+      timeoutPromise
+    ]) as Anthropic.Messages.Message;
 
     // Extract content
     let content: any;

@@ -96,12 +96,24 @@ export async function callClaude<T = any>(
       ...(systemParam ? { system: systemParam } : {}),
     };
 
-    // Make API call with timeout (5 seconds to enable fast fallback when API key has no credits)
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Claude API call timed out after 5 seconds')), 5000)
-    );
+    // Make API call with timeout (3 seconds to enable fast fallback when API key has no credits)
+    console.log('[Claude API] Starting API call...');
+    const timeoutMs = 3000;
+    let timeoutId: NodeJS.Timeout;
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        console.log(`[Claude API] Timeout triggered after ${timeoutMs}ms`);
+        reject(new Error('Claude API call timed out after 3 seconds'));
+      }, timeoutMs);
+    });
+
     const response = await Promise.race([
-      client.messages.create(requestParams),
+      client.messages.create(requestParams).then(res => {
+        console.log('[Claude API] Call completed successfully');
+        clearTimeout(timeoutId);
+        return res;
+      }),
       timeoutPromise
     ]) as Anthropic.Messages.Message;
 

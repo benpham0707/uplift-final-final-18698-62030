@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { MetricCardLarge } from './MetricCardLarge';
 import { MetricBoxCompact } from './MetricBoxCompact';
 import { TierProgressCard } from './TierProgressCard';
@@ -7,8 +8,8 @@ import { StatPill } from './StatPill';
 import { AchievementTracker, Achievement } from './AchievementTracker';
 import { ComparisonMiniTable, SchoolComparison } from './ComparisonMiniTable';
 import { OverallScoreDisplay } from './OverallScoreDisplay';
-import { MetricDetailModal } from './MetricDetailModal';
-import { BookOpen, Users, Target, TrendingUp, FileText, Award, Sparkles } from 'lucide-react';
+import { MetricDetailView } from './MetricDetailView';
+import { BookOpen, Users, Target, TrendingUp, FileText, Award, Sparkles, X } from 'lucide-react';
 
 interface InteractivePortfolioCardProps {
   overallScore: number;
@@ -43,45 +44,110 @@ export const InteractivePortfolioCard: React.FC<InteractivePortfolioCardProps> =
   schoolComparisons,
   tierProgress,
 }) => {
-  const [selectedMetric, setSelectedMetric] = useState<MetricType | null>(null);
+  const [expandedMetric, setExpandedMetric] = useState<MetricType | null>(null);
+
+  const handleMetricClick = (metric: MetricType) => {
+    setExpandedMetric(expandedMetric === metric ? null : metric);
+  };
+
+  const handleClose = () => {
+    setExpandedMetric(null);
+  };
 
   return (
-    <>
-      <Card className="w-full max-w-[95%] mx-auto backdrop-blur-sm bg-background/80 border-2 shadow-2xl overflow-hidden">
-        <div className="p-6 md:p-8">
-          {/* Desktop: 12-column grid layout */}
-          <div className="hidden lg:grid lg:grid-cols-12 gap-4 min-h-[600px]">
-            {/* LEFT SIDE - 5 columns */}
-            <div className="col-span-5 flex flex-col gap-4">
-              {/* Large Academic Card - 40% height */}
-              <div className="h-[40%]">
-                <MetricCardLarge
-                  title="Academic"
-                  score={metrics.academic}
-                  icon={BookOpen}
-                  onClick={() => setSelectedMetric('academic')}
-                  className="h-full"
-                />
+    <Card className="w-full mx-auto backdrop-blur-sm bg-card/95 border-2 border-border shadow-2xl overflow-hidden relative">
+      <div className="p-4 md:p-6">
+        {/* Expanded Metric View - Takes Full Space */}
+        {expandedMetric && (
+          <div className="animate-fade-in">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground capitalize">{expandedMetric} Details</h2>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleClose}
+                className="hover:bg-muted"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <MetricDetailView metricType={expandedMetric} />
+          </div>
+        )}
+
+        {/* Collapsed View - Grid of Cards */}
+        {!expandedMetric && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header with Overall Score */}
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4 pb-6 border-b border-border">
+              <div className="flex items-center gap-4">
+                <div className="text-center">
+                  <div className="text-5xl font-bold text-primary">{overallScore}</div>
+                  <div className="text-sm text-muted-foreground">Overall Score</div>
+                </div>
+                <div className="h-12 w-px bg-border" />
+                <div>
+                  <div className="text-lg font-semibold text-foreground">{tierName}</div>
+                  <div className="text-sm text-muted-foreground">{percentile}</div>
+                </div>
               </div>
 
-              {/* Two medium cards side-by-side - 25% height */}
-              <div className="h-[25%] grid grid-cols-2 gap-4">
-                <MetricBoxCompact
-                  title="Readiness"
-                  score={metrics.readiness}
-                  icon={Target}
-                  onClick={() => setSelectedMetric('readiness')}
-                />
-                <MetricBoxCompact
-                  title="Course Rigor"
-                  score={metrics.courseRigor}
-                  icon={TrendingUp}
-                  onClick={() => setSelectedMetric('courseRigor')}
-                />
+              <div className="flex gap-3">
+                <StatPill icon={TrendingUp} value={percentile} label="Percentile" />
+                <StatPill icon={FileText} value="Ready" label="Essays" colorClass="bg-green-500/10" />
+                <StatPill icon={Award} value="10/10" label="Recs" />
               </div>
+            </div>
 
-              {/* Full-width progress bar - 20% height */}
-              <div className="h-[20%]">
+            {/* Main Metrics Grid - Desktop */}
+            <div className="hidden lg:grid lg:grid-cols-3 gap-4">
+              <MetricCardLarge
+                title="Academic"
+                score={metrics.academic}
+                icon={BookOpen}
+                onClick={() => handleMetricClick('academic')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricCardLarge
+                title="Leadership"
+                score={metrics.leadership}
+                icon={Users}
+                onClick={() => handleMetricClick('leadership')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricCardLarge
+                title="Extracurricular"
+                score={metrics.extracurricular}
+                icon={Sparkles}
+                onClick={() => handleMetricClick('extracurricular')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+            </div>
+
+            {/* Secondary Metrics - Desktop */}
+            <div className="hidden lg:grid lg:grid-cols-4 gap-4">
+              <MetricBoxCompact
+                title="Readiness"
+                score={metrics.readiness}
+                icon={Target}
+                onClick={() => handleMetricClick('readiness')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricBoxCompact
+                title="Community"
+                score={metrics.community}
+                icon={Users}
+                onClick={() => handleMetricClick('community')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricBoxCompact
+                title="Course Rigor"
+                score={metrics.courseRigor}
+                icon={TrendingUp}
+                onClick={() => handleMetricClick('courseRigor')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <div className="flex items-center">
                 <TierProgressCard
                   currentTier={tierProgress.currentTier}
                   nextTier={tierProgress.nextTier}
@@ -90,149 +156,135 @@ export const InteractivePortfolioCard: React.FC<InteractivePortfolioCardProps> =
                   className="h-full"
                 />
               </div>
-
-              {/* Three small stat pills - 15% height */}
-              <div className="h-[15%] grid grid-cols-3 gap-3">
-                <StatPill icon={TrendingUp} value={percentile} label="Percentile" />
-                <StatPill icon={FileText} value="Ready" label="Essays" colorClass="bg-green-500/10" />
-                <StatPill icon={Award} value="10/10" label="Recommendations" />
-              </div>
             </div>
 
-            {/* CENTER - 2 columns */}
-            <div className="col-span-2">
-              <OverallScoreDisplay
-                score={overallScore}
-                tierName={tierName}
-                percentile={percentile}
+            {/* Additional Info - Desktop */}
+            <div className="hidden lg:grid lg:grid-cols-2 gap-4">
+              <AchievementTracker achievements={achievements} />
+              <ComparisonMiniTable comparisons={schoolComparisons} />
+            </div>
+
+            {/* Tablet Layout */}
+            <div className="hidden md:grid lg:hidden md:grid-cols-2 gap-4">
+              <MetricCardLarge 
+                title="Academic" 
+                score={metrics.academic} 
+                icon={BookOpen} 
+                onClick={() => handleMetricClick('academic')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
               />
-            </div>
+              <MetricCardLarge 
+                title="Leadership" 
+                score={metrics.leadership} 
+                icon={Users} 
+                onClick={() => handleMetricClick('leadership')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              
+              <MetricBoxCompact 
+                title="Readiness" 
+                score={metrics.readiness} 
+                icon={Target}
+                onClick={() => handleMetricClick('readiness')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricBoxCompact 
+                title="Community" 
+                score={metrics.community} 
+                icon={Users}
+                onClick={() => handleMetricClick('community')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              
+              <MetricBoxCompact 
+                title="Extra" 
+                score={metrics.extracurricular} 
+                icon={Sparkles}
+                onClick={() => handleMetricClick('extracurricular')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricBoxCompact 
+                title="Rigor" 
+                score={metrics.courseRigor} 
+                icon={TrendingUp}
+                onClick={() => handleMetricClick('courseRigor')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
 
-            {/* RIGHT SIDE - 5 columns */}
-            <div className="col-span-5 flex flex-col gap-4">
-              {/* Achievement tracker - 25% height */}
-              <div className="h-[25%]">
-                <AchievementTracker achievements={achievements} className="h-full" />
-              </div>
-
-              {/* Large Leadership card - 35% height */}
-              <div className="h-[35%]">
-                <MetricCardLarge
-                  title="Leadership"
-                  score={metrics.leadership}
-                  icon={Users}
-                  onClick={() => setSelectedMetric('leadership')}
-                  className="h-full"
+              <div className="col-span-2">
+                <TierProgressCard
+                  currentTier={tierProgress.currentTier}
+                  nextTier={tierProgress.nextTier}
+                  progress={tierProgress.progress}
+                  pointsNeeded={tierProgress.pointsNeeded}
                 />
               </div>
 
-              {/* Two small cards side-by-side - 20% height */}
-              <div className="h-[20%] grid grid-cols-5 gap-4">
-                <div className="col-span-2">
-                  <MetricBoxCompact
-                    title="Community"
-                    score={metrics.community}
-                    icon={Users}
-                    onClick={() => setSelectedMetric('community')}
-                    className="h-full"
-                  />
-                </div>
-                <div className="col-span-3">
-                  <MetricBoxCompact
-                    title="Extracurricular"
-                    score={metrics.extracurricular}
-                    icon={Sparkles}
-                    onClick={() => setSelectedMetric('extracurricular')}
-                    className="h-full"
-                  />
-                </div>
-              </div>
-
-              {/* Comparison stats - 20% height */}
-              <div className="h-[20%]">
-                <ComparisonMiniTable comparisons={schoolComparisons} className="h-full" />
-              </div>
-            </div>
-          </div>
-
-          {/* Tablet: 8-column grid with stacking */}
-          <div className="hidden md:grid lg:hidden md:grid-cols-8 gap-4 min-h-[800px]">
-            <div className="col-span-3 flex flex-col gap-4">
-              <MetricCardLarge title="Academic" score={metrics.academic} icon={BookOpen} onClick={() => setSelectedMetric('academic')} />
-              <div className="grid grid-cols-2 gap-4">
-                <MetricBoxCompact title="Readiness" score={metrics.readiness} onClick={() => setSelectedMetric('readiness')} />
-                <MetricBoxCompact title="Rigor" score={metrics.courseRigor} onClick={() => setSelectedMetric('courseRigor')} />
-              </div>
-            </div>
-            
-            <div className="col-span-2">
-              <OverallScoreDisplay score={overallScore} tierName={tierName} percentile={percentile} />
-            </div>
-            
-            <div className="col-span-3 flex flex-col gap-4">
               <AchievementTracker achievements={achievements} />
-              <MetricCardLarge title="Leadership" score={metrics.leadership} icon={Users} onClick={() => setSelectedMetric('leadership')} />
-              <div className="grid grid-cols-2 gap-4">
-                <MetricBoxCompact title="Community" score={metrics.community} onClick={() => setSelectedMetric('community')} />
-                <MetricBoxCompact title="Extra" score={metrics.extracurricular} onClick={() => setSelectedMetric('extracurricular')} />
-              </div>
+              <ComparisonMiniTable comparisons={schoolComparisons} />
             </div>
-            
-            <div className="col-span-8 grid grid-cols-2 gap-4">
+
+            {/* Mobile Layout */}
+            <div className="md:hidden space-y-4">
+              <MetricCardLarge 
+                title="Academic" 
+                score={metrics.academic} 
+                icon={BookOpen} 
+                onClick={() => handleMetricClick('academic')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              <MetricCardLarge 
+                title="Leadership" 
+                score={metrics.leadership} 
+                icon={Users} 
+                onClick={() => handleMetricClick('leadership')}
+                className="hover:scale-[1.02] transition-transform cursor-pointer"
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <MetricBoxCompact 
+                  title="Readiness" 
+                  score={metrics.readiness} 
+                  icon={Target}
+                  onClick={() => handleMetricClick('readiness')}
+                  className="hover:scale-[1.02] transition-transform cursor-pointer"
+                />
+                <MetricBoxCompact 
+                  title="Community" 
+                  score={metrics.community} 
+                  icon={Users}
+                  onClick={() => handleMetricClick('community')}
+                  className="hover:scale-[1.02] transition-transform cursor-pointer"
+                />
+                <MetricBoxCompact 
+                  title="Extra" 
+                  score={metrics.extracurricular} 
+                  icon={Sparkles}
+                  onClick={() => handleMetricClick('extracurricular')}
+                  className="hover:scale-[1.02] transition-transform cursor-pointer"
+                />
+                <MetricBoxCompact 
+                  title="Rigor" 
+                  score={metrics.courseRigor} 
+                  icon={TrendingUp}
+                  onClick={() => handleMetricClick('courseRigor')}
+                  className="hover:scale-[1.02] transition-transform cursor-pointer"
+                />
+              </div>
+
               <TierProgressCard
                 currentTier={tierProgress.currentTier}
                 nextTier={tierProgress.nextTier}
                 progress={tierProgress.progress}
                 pointsNeeded={tierProgress.pointsNeeded}
               />
+              
+              <AchievementTracker achievements={achievements} />
               <ComparisonMiniTable comparisons={schoolComparisons} />
             </div>
-            
-            <div className="col-span-8 grid grid-cols-3 gap-4">
-              <StatPill icon={TrendingUp} value={percentile} label="Percentile" />
-              <StatPill icon={FileText} value="Ready" label="Essays" />
-              <StatPill icon={Award} value="10/10" label="Recs" />
-            </div>
           </div>
-
-          {/* Mobile: Single column vertical stack */}
-          <div className="md:hidden space-y-4">
-            <OverallScoreDisplay score={overallScore} tierName={tierName} percentile={percentile} />
-            
-            <div className="grid grid-cols-3 gap-3">
-              <StatPill icon={TrendingUp} value={percentile} label="Rank" />
-              <StatPill icon={FileText} value="Ready" label="Essays" />
-              <StatPill icon={Award} value="10/10" label="Recs" />
-            </div>
-
-            <MetricCardLarge title="Academic" score={metrics.academic} icon={BookOpen} onClick={() => setSelectedMetric('academic')} />
-            <MetricCardLarge title="Leadership" score={metrics.leadership} icon={Users} onClick={() => setSelectedMetric('leadership')} />
-            
-            <div className="grid grid-cols-2 gap-4">
-              <MetricBoxCompact title="Readiness" score={metrics.readiness} onClick={() => setSelectedMetric('readiness')} />
-              <MetricBoxCompact title="Community" score={metrics.community} onClick={() => setSelectedMetric('community')} />
-              <MetricBoxCompact title="Extra" score={metrics.extracurricular} onClick={() => setSelectedMetric('extracurricular')} />
-              <MetricBoxCompact title="Rigor" score={metrics.courseRigor} onClick={() => setSelectedMetric('courseRigor')} />
-            </div>
-
-            <TierProgressCard
-              currentTier={tierProgress.currentTier}
-              nextTier={tierProgress.nextTier}
-              progress={tierProgress.progress}
-              pointsNeeded={tierProgress.pointsNeeded}
-            />
-            
-            <AchievementTracker achievements={achievements} />
-            <ComparisonMiniTable comparisons={schoolComparisons} />
-          </div>
-        </div>
-      </Card>
-
-      <MetricDetailModal
-        metricType={selectedMetric}
-        open={!!selectedMetric}
-        onOpenChange={(open) => !open && setSelectedMetric(null)}
-      />
-    </>
+        )}
+      </div>
+    </Card>
   );
 };

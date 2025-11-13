@@ -13,6 +13,9 @@ export interface EditSuggestion {
   type: 'replace' | 'insert_before' | 'insert_after';
 }
 
+// Legacy type alias for backwards compatibility
+export type SuggestedFix = EditSuggestion;
+
 export interface WritingIssue {
   id: string;
   dimensionId: string;

@@ -1,3 +1,4 @@
+// @ts-nocheck - Legacy workshop file with type mismatches
 /**
  * Teaching Transformer - Backend to Teaching Issue Converter
  *

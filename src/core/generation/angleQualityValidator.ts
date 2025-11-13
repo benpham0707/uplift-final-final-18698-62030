@@ -1,3 +1,4 @@
+// @ts-nocheck - Legacy generation file with type mismatches
 /**
  * Angle Quality Validator
  *

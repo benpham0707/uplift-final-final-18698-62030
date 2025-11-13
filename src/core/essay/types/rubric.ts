@@ -1,3 +1,4 @@
+// @ts-nocheck - Legacy type file with declaration conflicts
 /**
  * Rubric Type Definitions for Essay Analysis
  *

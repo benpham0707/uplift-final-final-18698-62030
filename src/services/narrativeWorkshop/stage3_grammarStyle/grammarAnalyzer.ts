@@ -67,10 +67,30 @@ export function analyzeGrammar(essayText: string): GrammarAnalysis {
 
     return {
       sentenceMetrics,
-      verbAnalysis,
-      wordChoice,
-      punctuation,
+      verbAnalysis: {
+        activeVoiceCount: verbAnalysis.weakVerbCount, // Placeholder
+        passiveVoiceCount: verbAnalysis.passivePercentage,
+        passivePercentage: verbAnalysis.passivePercentage,
+        weakVerbs: verbAnalysis.weakVerbExamples,
+        strongVerbs: verbAnalysis.strongVerbExamples,
+      },
+      wordChoice: {
+        totalWords: wordChoice.totalWords,
+        uniqueWords: wordChoice.uniqueWords,
+        lexicalDiversity: wordChoice.lexicalDiversity,
+        clichePhrases: wordChoice.clicheExamples,
+        averageWordLength: wordChoice.averageWordLength,
+        overusedWords: wordChoice.overusedWords,
+      },
+      punctuation: {
+        dashUsage: punctuation.dashCount,
+        semicolonUsage: punctuation.semicolonCount,
+        colonUsage: punctuation.colonCount,
+        fragmentCount: punctuation.fragmentCount,
+        effectiveness: punctuation.effectiveness,
+      },
       paragraphMetrics,
+      grammaticalErrors: [],
       redFlags,
       greenFlags,
       overallGrammarScore: calculateOverallGrammarScore(sentenceMetrics, verbAnalysis, wordChoice, redFlags),
@@ -233,7 +253,7 @@ function analyzeVerbs(essayText: string): VerbAnalysis {
 interface WordChoiceAnalysis {
   totalWords: number;
   uniqueWords: number;
-  lexicalDiversity: number; // unique / total (0-1 scale)
+  lexicalDiversity: number;
   averageWordLength: number;
   clicheCount: number;
   clicheExamples: string[];
@@ -242,17 +262,16 @@ interface WordChoiceAnalysis {
 }
 
 function analyzeWordChoice(essayText: string): WordChoiceAnalysis {
-  const words = essayText.toLowerCase().match(/\b[a-z]+\b/gi) || [];
+  const wordsMatch = essayText.toLowerCase().match(/\b[a-z]+\b/gi);
+  const words: string[] = wordsMatch || [];
   const totalWords = words.length;
 
-  // Unique words
   const uniqueWordsSet = new Set(words);
   const uniqueWords = uniqueWordsSet.size;
-  const lexicalDiversity = uniqueWords / totalWords;
+  const lexicalDiversity = totalWords > 0 ? uniqueWords / totalWords : 0;
 
-  // Average word length
   const totalChars = words.reduce((sum, word) => sum + word.length, 0);
-  const averageWordLength = Math.round((totalChars / totalWords) * 10) / 10;
+  const averageWordLength = totalWords > 0 ? Math.round((totalChars / totalWords) * 10) / 10 : 0;
 
   // Detect clichés
   const clichePatterns = [
@@ -328,6 +347,8 @@ interface PunctuationAnalysis {
   dashCount: number;
   semicolonCount: number;
   colonCount: number;
+  fragmentCount: number;
+  effectiveness: number;
   flags: string[];
 }
 
@@ -358,6 +379,8 @@ function analyzePunctuation(essayText: string): PunctuationAnalysis {
     dashCount,
     semicolonCount,
     colonCount,
+    fragmentCount: 0, // TODO: Implement fragment detection
+    effectiveness: 7, // TODO: Calculate effectiveness score
     flags
   };
 }

@@ -114,7 +114,7 @@ export function transformIssueToInsight(
     severity,
     type: 'issue',
     title: generateInsightTitle(issue, dimensionScore.name as RubricCategory),
-    summary: issue.issue.substring(0, 120) + '...',
+    summary: issue.problem.substring(0, 120) + '...',
     technical: {
       whatWeDetected: generateTechnicalDetection(issue, patternAnalysis),
       fromYourDraft: quotes,
@@ -224,7 +224,7 @@ function generatePatternAnalysis(
     severity,
     comparison: generateComparisonStatement(totalOccurrences, dimension),
     technicalDetails: [
-      issue.issue,
+      issue.problem,
       `Detected ${totalOccurrences} instances of this pattern`,
       `This pattern weakens the ${getDimensionDisplayName(dimension)} dimension`,
     ],
@@ -372,18 +372,14 @@ function matchComparativeExamples(
     culturalContext?: string;
   }
 ): { weak: ComparativeExample; strong: ComparativeExample; contextualNote?: string } {
-  // Get teaching examples for this dimension
+  // Get teaching examples for this dimension (using category instead of dimensions)
   const dimensionExamples = TEACHING_EXAMPLES.filter(ex =>
-    ex.dimensions && ex.dimensions.includes(dimension)
+    ex.category && ex.category.includes(dimension)
   );
 
-  // Find matching weak example
-  const weakExample = dimensionExamples.find(ex => ex.quality === 'poor' || ex.quality === 'weak')
-    || dimensionExamples[0];
-
-  // Find matching strong example
-  const strongExample = dimensionExamples.find(ex => ex.quality === 'strong' || ex.quality === 'excellent')
-    || dimensionExamples[dimensionExamples.length - 1];
+  // Find first weak and strong examples
+  const weakExample = dimensionExamples[0];
+  const strongExample = dimensionExamples[dimensionExamples.length - 1] || dimensionExamples[0];
 
   return {
     weak: convertTeachingToComparative(weakExample, 'weak'),
@@ -450,7 +446,7 @@ function generateSolutionApproaches(
   // Easy approach (always include)
   approaches.push({
     name: 'Quick Fix',
-    description: issue.suggestedFix || 'Replace vague language with specific details',
+    description: issue.suggested_fixes?.[0]?.text || 'Replace vague language with specific details',
     difficulty: 'easy',
     estimatedTime: '5-10 minutes',
     estimatedImpact: '+1 to +2 points',
@@ -605,7 +601,7 @@ function generateChatPrompt(
   // Generate pre-filled prompt
   const prefilledPrompt = `Help me improve the ${dimensionName} in my extracurricular essay.
 
-Specifically, I want to work on: ${issue.issue}
+Specifically, I want to work on: ${issue.problem}
 
 Here's an example from my draft:
 "${quoteSummary}${quoteSummary.length >= 100 ? '...' : ''}"
@@ -617,12 +613,12 @@ I'm aiming to go from a ${scores.currentDimensionScore}/10 to at least ${scores.
     issueId: `${dimension}-${Date.now()}`,
     dimension,
     severity,
-    title: issue.issue,
-    technicalAnalysis: issue.issue,
+    title: issue.problem,
+    technicalAnalysis: issue.problem,
     draftQuotes: quotes.map(q => q.text),
     patternDetails: [
       `This issue appears ${quotes.length} times in your essay`,
-      issue.suggestedFix || 'Consider revising for specificity and authenticity',
+      issue.suggested_fixes?.[0]?.rationale || 'Consider revising for specificity and authenticity',
     ],
     examples: {
       weak: {
@@ -694,7 +690,7 @@ function getDimensionPrinciple(dimension: RubricCategory): string {
  */
 function generateInsightTitle(issue: CoachingIssue, dimension: RubricCategory): string {
   // Extract key issue from the issue text
-  const firstSentence = issue.issue.split('.')[0];
+  const firstSentence = issue.problem.split('.')[0];
   return firstSentence || `${getDimensionDisplayName(dimension)} Needs Strengthening`;
 }
 
@@ -725,13 +721,4 @@ function generateWhyThisMatters(issue: CoachingIssue, dimension: RubricCategory)
   return impacts[dimension] || 'This dimension significantly impacts how admissions officers evaluate your application.';
 }
 
-export {
-  transformIssueToInsight,
-  extractQuotesFromDraft,
-  generatePatternAnalysis,
-  calculateDynamicSeverity,
-  calculatePointImpact,
-  matchComparativeExamples,
-  generateSolutionApproaches,
-  generateChatPrompt,
-};
+// All exports are already declared with the function definitions above

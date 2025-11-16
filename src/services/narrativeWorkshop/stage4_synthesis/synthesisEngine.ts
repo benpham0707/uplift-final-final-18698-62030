@@ -171,7 +171,7 @@ Grammar:
 - Sentence variety: ${stage3.grammarAnalysis.sentenceMetrics.varietyScore}/10
 - Passive voice: ${stage3.grammarAnalysis.verbAnalysis.passivePercentage.toFixed(1)}% (elite: <15%)
 - Lexical diversity: ${stage3.grammarAnalysis.wordChoice.lexicalDiversity.toFixed(3)} (elite: 0.55-0.65)
-- Cliché phrases: ${stage3.grammarAnalysis.wordChoice.clicheCount}
+- Cliché phrases: ${stage3.grammarAnalysis.wordChoice.clichePhrases.length}
 - Red flags: ${stage3.grammarAnalysis.redFlags.length}
 - Green flags: ${stage3.grammarAnalysis.greenFlags.length}
 

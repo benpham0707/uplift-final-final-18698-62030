@@ -319,38 +319,54 @@ export interface DeepDiveAnalyses {
 // ============================================================================
 
 export interface GrammarAnalysis {
-  // Sentence-level metrics (deterministic)
-  sentenceCount: number;
-  averageSentenceLength: number;
-  sentenceLengthVariance: number;
-  shortSentences: number;                  // <= 8 words
-  longSentences: number;                   // >= 20 words
-  sentenceVarietyScore: number;            // 0-10
-  sentenceMetrics: Array<{ length: number; text: string; }>;
+  // Grouped sentence-level metrics
+  sentenceMetrics: {
+    totalSentences: number;
+    averageLength: number;
+    shortSentences: number;                // 5-10 words
+    mediumSentences: number;               // 11-20 words
+    longSentences: number;                 // 21+ words
+    varietyScore: number;                  // 0-10
+    longestSentence: number;
+    shortestSentence: number;
+  };
 
-  // Verb analysis
-  activeVoiceCount: number;
-  passiveVoiceCount: number;
-  passiveVoiceRatio: number;
-  weakVerbs: string[];                     // "was", "had", "got", etc.
-  strongVerbs: string[];                   // Action verbs
+  // Grouped verb analysis
+  verbAnalysis: {
+    activeVoiceCount: number;
+    passiveVoiceCount: number;
+    passivePercentage: number;
+    weakVerbs: string[];                   // "was", "had", "got", etc.
+    strongVerbs: string[];                 // Action verbs
+  };
 
-  // Word choice
-  totalWords: number;
-  uniqueWords: number;
-  lexicalDiversity: number;                // 0-1
-  clichePhrases: string[];
-  overusedWords: Array<{
-    word: string;
-    count: number;
-  }>;
+  // Grouped word choice
+  wordChoice: {
+    totalWords: number;
+    uniqueWords: number;
+    lexicalDiversity: number;              // 0-1
+    clichePhrases: string[];
+    averageWordLength: number;
+    overusedWords: Array<{
+      word: string;
+      count: number;
+    }>;
+  };
 
-  // Punctuation
-  dashUsage: number;
-  semicolonUsage: number;
-  colonUsage: number;
-  fragmentCount: number;
-  punctuationEffectiveness: number;        // 0-10 (LLM-determined)
+  // Grouped punctuation
+  punctuation: {
+    dashUsage: number;
+    semicolonUsage: number;
+    colonUsage: number;
+    fragmentCount: number;
+    effectiveness: number;                 // 0-10
+  };
+
+  // Paragraph metrics
+  paragraphMetrics: {
+    totalParagraphs: number;
+    averageSentencesPerParagraph: number;
+  };
 
   // Common issues
   grammaticalErrors: Array<{
@@ -363,6 +379,7 @@ export interface GrammarAnalysis {
   redFlags: string[];
   greenFlags: string[];
   overallGrammarScore: number;             // 0-10
+  analysisCompletedAt: string;
 }
 
 export interface WritingStyleAnalysis {
@@ -394,6 +411,8 @@ export interface WritingStyleAnalysis {
   // Originality markers
   originalPhrases: string[];               // Fresh, unique expressions
   genericPhrases: string[];                // Overused college essay language
+  originalityScore: number;                // 0-10
+  voiceDistinctiveness: number;            // 0-10
 
   // Comparative positioning
   styleComparison: string;                 // How style compares to strong essays

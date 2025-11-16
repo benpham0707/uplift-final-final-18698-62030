@@ -181,7 +181,7 @@ export function matchIssuesToSentences(
   });
 
   // Match weak verbs
-  stage3.grammarAnalysis.verbAnalysis.weakVerbExamples.slice(0, 3).forEach(verb => {
+  stage3.grammarAnalysis.verbAnalysis.weakVerbs.slice(0, 3).forEach(verb => {
     const matchedSentence = findSentenceWithWord(sentences, verb);
     if (matchedSentence) {
       matches.push({

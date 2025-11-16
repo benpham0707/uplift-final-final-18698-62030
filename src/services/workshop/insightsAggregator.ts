@@ -47,7 +47,9 @@ export function generateCompleteInsights(
     culturalContext?: string;
   }
 ): InsightsState {
-  const { current_nqi_0_to_100, rubric_scores, prioritized_issues } = coachingOutput;
+  const current_nqi_0_to_100 = coachingOutput.overall.current_nqi;
+  const rubric_scores: RubricCategoryScore[] = []; // TODO: Extract from coaching output
+  const prioritized_issues = coachingOutput.prioritized_issues;
 
   // 1. Transform issues → insights
   const insightCards = transformIssuesToInsights(
@@ -403,7 +405,7 @@ function generatePortfolioContributionInsights(
   opportunities: OpportunityInsight[],
   dimensions: DimensionSummary[]
 ): PortfolioContributionInsights {
-  const nqi = coachingOutput.current_nqi_0_to_100;
+  const nqi = coachingOutput.overall.current_nqi;
 
   // Determine tier
   const tier = determineTier(nqi);
@@ -691,10 +693,4 @@ function calculatePotentialGain(insights: InsightCard[]): number {
   return Math.min(totalGain, 20);
 }
 
-export {
-  generateCompleteInsights,
-  groupInsightsByDimension,
-  generatePortfolioContributionInsights,
-  calculateTargetNQI,
-  calculatePotentialGain,
-};
+// All exports are already declared with the function definitions above

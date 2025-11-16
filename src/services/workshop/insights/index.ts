@@ -39,25 +39,24 @@ export type {
 export { PATTERN_GROUPS, getPatternsForDimension, getPatternById } from '../issuePatterns';
 export type { IssuePattern, PatternGroup } from '../issuePatterns';
 
-// Transformation utilities
-export {
-  transformIssueToInsight,
-  extractQuotesFromDraft,
-  generatePatternAnalysis,
-  calculateDynamicSeverity,
-  calculatePointImpact,
-  matchComparativeExamples,
-  generateSolutionApproaches,
-  generateChatPrompt,
-} from '../insightsTransformer';
+// Comment out all exports - these functions are used internally only
+// export {
+//   extractQuotesFromDraft,
+//   generatePatternAnalysis,
+//   calculateDynamicSeverity,
+//   calculatePointImpact,
+//   matchComparativeExamples,
+//   generateSolutionApproaches,
+//   generateChatPrompt,
+// };
 
 // Strength & opportunity detection
 export { detectStrengths, detectOpportunities } from '../strengthOpportunityDetector';
 
-// Dimension grouping & portfolio insights
-export {
-  groupInsightsByDimension,
-  generatePortfolioContributionInsights,
-  calculateTargetNQI,
-  calculatePotentialGain,
-} from '../insightsAggregator';
+// Comment out unused exports - these functions are used internally only
+// export {
+//   groupInsightsByDimension,
+//   generatePortfolioContributionInsights,
+//   calculateTargetNQI,
+//   calculatePotentialGain,
+// } from '../insightsAggregator';

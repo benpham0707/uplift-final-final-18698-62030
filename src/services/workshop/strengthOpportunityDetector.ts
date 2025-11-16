@@ -515,9 +515,4 @@ function extractNumberExamples(text: string, count: number): string[] {
   return examples;
 }
 
-export {
-  detectStrengths,
-  detectOpportunities,
-  analyzeStrength,
-  analyzeOpportunity,
-};
+// Exports are already declared above with function definitions

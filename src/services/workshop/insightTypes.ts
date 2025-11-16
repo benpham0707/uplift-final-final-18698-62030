@@ -10,7 +10,7 @@
  */
 
 import type { RubricCategory } from '@/components/portfolio/extracurricular/workshop/backendTypes';
-import type { TeachingIssue, TeachingExample } from '@/services/workshop/teachingExamples';
+import type { TeachingExample } from '@/services/workshop/teachingExamples';
 
 // ============================================================================
 // CORE INSIGHT CARD

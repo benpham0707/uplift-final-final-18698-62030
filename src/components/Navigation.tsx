@@ -14,12 +14,13 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="text-2xl font-bold text-primary">
-              Uplift
-            </div>
-            <div className="ml-2 text-sm text-secondary hidden sm:block">
-              Life Guidance, Reimagined
-            </div>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/uplift_logo_lr.png" 
+                alt="Uplift Logo" 
+                className="h-8 w-auto object-contain" 
+              />
+            </Link>
           </div>
 
           {/* Desktop Navigation */}

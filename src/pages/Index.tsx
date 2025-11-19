@@ -1,17 +1,21 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+
+import AnnouncementBar from '@/components/AnnouncementBar';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
-import PlatformOverview from '@/components/PlatformOverview';
-import IntelligentRoadmap from '@/components/IntelligentRoadmap';
-import AICapabilities from '@/components/AICapabilities';
-import SuccessMetrics from '@/components/SuccessMetrics';
-import ComprehensiveTools from '@/components/ComprehensiveTools';
-import Differentiation from '@/components/Differentiation';
-import Pricing from '@/components/Pricing';
+import UniversityBacked from '@/components/UniversityBacked';
+import EmpathySection from '@/components/EmpathySection';
+import HowItWorks from '@/components/HowItWorks';
+import Features from '@/components/Features';
+import AlternativePaths from '@/components/AlternativePaths';
+import TargetAudience from '@/components/TargetAudience';
+import Testimonials from '@/components/Testimonials';
+import TrustSection from '@/components/TrustSection';
+import FAQ from '@/components/FAQ';
 import FinalCTA from '@/components/FinalCTA';
 import Footer from '@/components/Footer';
-import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -23,18 +27,22 @@ const Index = () => {
       navigate('/portfolio-scanner');
     }
   }, [user, loading, navigate]);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-sans antialiased">
+      <AnnouncementBar />
       <Navigation />
-      <main>
+      <main className="flex-1">
         <HeroSection />
-        <PlatformOverview />
-        <IntelligentRoadmap />
-        <AICapabilities />
-        <SuccessMetrics />
-        <ComprehensiveTools />
-        <Differentiation />
-        <Pricing />
+        <UniversityBacked />
+        <EmpathySection />
+        <HowItWorks />
+        <Features />
+        <AlternativePaths />
+        <TargetAudience />
+        <Testimonials />
+        <TrustSection />
+        <FAQ />
         <FinalCTA />
       </main>
       <Footer />

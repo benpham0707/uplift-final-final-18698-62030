@@ -166,97 +166,66 @@ export const UnifiedScoreDashboard: React.FC<UnifiedScoreDashboardProps> = ({
             }}
           />
 
-          {/* Audio Waveform Rings */}
-          <div className="relative">
-            {/* Ring 3 - Treble (Outermost) - Fast, high frequency */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {[...Array(32)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute"
-                  style={{
-                    width: '2px',
-                    height: '15px',
-                    background: 'rgba(139,92,246,0.4)',
-                    borderRadius: '1px',
-                    left: '50%',
-                    top: '50%',
-                    transformOrigin: 'bottom center',
-                    transform: `translateX(-50%) translateY(-85px) rotate(${i * 11.25}deg)`,
-                  }}
-                  animate={{
-                    scaleY: [1, 2.5, 1],
-                    opacity: [0.3, 0.8, 0.3],
-                  }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    delay: (i * 0.03) % 0.8,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
+          {/* Audio Waveform Rings - Concentric circles that pulsate like music */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            {/* Ring 4 - Treble (Outermost) - Fast, high frequency */}
+            <motion.div
+              className="absolute w-[220px] h-[220px] rounded-full border-2 border-violet-400/40"
+              animate={{
+                scale: [1, 1.08, 0.98, 1.05, 1],
+                opacity: [0.4, 0.7, 0.5, 0.8, 0.4],
+              }}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            
+            {/* Ring 3 - High-Mid - Fast-medium */}
+            <motion.div
+              className="absolute w-[190px] h-[190px] rounded-full border-2 border-purple-400/50"
+              animate={{
+                scale: [1, 0.95, 1.1, 0.97, 1],
+                opacity: [0.5, 0.8, 0.6, 0.9, 0.5],
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.1
+              }}
+            />
 
             {/* Ring 2 - Mid (Middle) - Medium speed */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {[...Array(24)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute"
-                  style={{
-                    width: '3px',
-                    height: '18px',
-                    background: 'rgba(147,51,234,0.5)',
-                    borderRadius: '2px',
-                    left: '50%',
-                    top: '50%',
-                    transformOrigin: 'bottom center',
-                    transform: `translateX(-50%) translateY(-67.5px) rotate(${i * 15}deg)`,
-                  }}
-                  animate={{
-                    scaleY: [1, 2.2, 1],
-                    opacity: [0.3, 0.9, 0.3],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    delay: i * 0.05,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
+            <motion.div
+              className="absolute w-[170px] h-[170px] rounded-full border-[3px] border-purple-500/60"
+              animate={{
+                scale: [1, 1.12, 0.94, 1.08, 1],
+                opacity: [0.6, 0.9, 0.7, 1, 0.6],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.2
+              }}
+            />
 
             {/* Ring 1 - Bass (Innermost) - Slow, heavy pulses */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {[...Array(24)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute"
-                  style={{
-                    width: '4px',
-                    height: '20px',
-                    background: 'rgba(6,182,212,0.6)',
-                    borderRadius: '2px',
-                    left: '50%',
-                    top: '50%',
-                    transformOrigin: 'bottom center',
-                    transform: `translateX(-50%) translateY(-50px) rotate(${i * 15}deg)`,
-                  }}
-                  animate={{
-                    scaleY: [1, 1.8, 1],
-                    opacity: [0.4, 1, 0.4],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: (i % 3) * 0.15,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
+            <motion.div
+              className="absolute w-[155px] h-[155px] rounded-full border-[3px] border-cyan-400/70"
+              animate={{
+                scale: [1, 1.15, 0.92, 1.1, 1],
+                opacity: [0.7, 1, 0.8, 0.95, 0.7],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.3
+              }}
+            />
 
             {/* Score Circle - Spins once, then stops */}
             <motion.div

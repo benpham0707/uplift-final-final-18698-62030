@@ -67,28 +67,72 @@ export const UnifiedScoreDashboard: React.FC<UnifiedScoreDashboardProps> = ({
       icon: GraduationCap,
       value: `${metrics.gpa.weighted.toFixed(2)}`,
       subValue: `UW: ${metrics.gpa.unweighted.toFixed(2)}`,
-      label: 'GPA (Weighted)'
+      label: 'GPA (Weighted)',
+      gradient: 'from-purple-50/80 via-white to-pink-50/60',
+      border: 'border-purple-200/50',
+      hoverBorder: 'hover:border-purple-400/80',
+      shadow: 'shadow-[0_4px_20px_rgba(147,51,234,0.15)]',
+      hoverShadow: 'hover:shadow-[0_8px_30px_rgba(147,51,234,0.30)]',
+      hoverGradient: 'group-hover:from-purple-100/40 group-hover:via-pink-100/30 group-hover:to-purple-100/40',
+      highlight: 'from-transparent via-purple-200/80 to-transparent',
+      innerGlow: 'shadow-purple-100/30',
+      iconBg: 'from-purple-100 to-pink-100',
+      iconHoverBg: 'group-hover:from-purple-200 group-hover:to-pink-200',
+      iconColor: 'text-purple-600'
     },
     {
       id: 'sat',
       icon: Brain,
       value: metrics.sat ? `${metrics.sat}` : metrics.act ? `${metrics.act} ACT` : 'N/A',
       subValue: metrics.sat ? 'SAT' : 'ACT',
-      label: 'Test Score'
+      label: 'Test Score',
+      gradient: 'from-blue-50/80 via-white to-cyan-50/60',
+      border: 'border-blue-200/50',
+      hoverBorder: 'hover:border-blue-400/80',
+      shadow: 'shadow-[0_4px_20px_rgba(59,130,246,0.15)]',
+      hoverShadow: 'hover:shadow-[0_8px_30px_rgba(59,130,246,0.30)]',
+      hoverGradient: 'group-hover:from-blue-100/40 group-hover:via-cyan-100/30 group-hover:to-blue-100/40',
+      highlight: 'from-transparent via-blue-200/80 to-transparent',
+      innerGlow: 'shadow-blue-100/30',
+      iconBg: 'from-blue-100 to-cyan-100',
+      iconHoverBg: 'group-hover:from-blue-200 group-hover:to-cyan-200',
+      iconColor: 'text-blue-600'
     },
     {
       id: 'apScores',
       icon: BookOpen,
       value: `${metrics.apScores.total} APs`,
       subValue: `Avg: ${metrics.apScores.average.toFixed(1)} • ${metrics.apScores.fives} 5s`,
-      label: 'AP/IB Scores'
+      label: 'AP/IB Scores',
+      gradient: 'from-cyan-50/80 via-white to-teal-50/60',
+      border: 'border-cyan-200/50',
+      hoverBorder: 'hover:border-cyan-400/80',
+      shadow: 'shadow-[0_4px_20px_rgba(6,182,212,0.15)]',
+      hoverShadow: 'hover:shadow-[0_8px_30px_rgba(6,182,212,0.30)]',
+      hoverGradient: 'group-hover:from-cyan-100/40 group-hover:via-teal-100/30 group-hover:to-cyan-100/40',
+      highlight: 'from-transparent via-cyan-200/80 to-transparent',
+      innerGlow: 'shadow-cyan-100/30',
+      iconBg: 'from-cyan-100 to-teal-100',
+      iconHoverBg: 'group-hover:from-cyan-200 group-hover:to-teal-200',
+      iconColor: 'text-cyan-600'
     },
     {
       id: 'classRank',
       icon: TrendingUp,
       value: `Top ${metrics.classRank.percentage}%`,
       subValue: `${metrics.classRank.rank} / ${metrics.classRank.outOf}`,
-      label: 'Class Rank'
+      label: 'Class Rank',
+      gradient: 'from-violet-50/80 via-white to-purple-50/60',
+      border: 'border-violet-200/50',
+      hoverBorder: 'hover:border-violet-400/80',
+      shadow: 'shadow-[0_4px_20px_rgba(139,92,246,0.15)]',
+      hoverShadow: 'hover:shadow-[0_8px_30px_rgba(139,92,246,0.30)]',
+      hoverGradient: 'group-hover:from-violet-100/40 group-hover:via-purple-100/30 group-hover:to-violet-100/40',
+      highlight: 'from-transparent via-violet-200/80 to-transparent',
+      innerGlow: 'shadow-violet-100/30',
+      iconBg: 'from-violet-100 to-purple-100',
+      iconHoverBg: 'group-hover:from-violet-200 group-hover:to-purple-200',
+      iconColor: 'text-violet-600'
     }
   ];
 
@@ -103,90 +147,220 @@ export const UnifiedScoreDashboard: React.FC<UnifiedScoreDashboardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-background/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-lg overflow-hidden"
+      className="bg-white rounded-3xl border-2 border-purple-400/30 shadow-[0_8px_30px_rgb(147,51,234,0.12)] hover:shadow-[0_12px_40px_rgb(147,51,234,0.16)] transition-shadow duration-500 overflow-hidden"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-[35%_65%] gap-6 p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-8 p-8">
         {/* Left Side - Overall Score */}
-        <div className="flex flex-col items-center justify-center space-y-4 p-6 relative">
-          {/* Pulsing background glow */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 via-purple-400/10 to-cyan-400/10 rounded-lg blur-xl"
-            animate={{
-              opacity: [0.3, 0.6, 0.3],
-              scale: [1, 1.05, 1],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-
-          {/* Orbital Rings */}
-          <div className="relative">
-            {[1, 2, 3].map((ring) => (
-              <motion.div
-                key={ring}
-                className="absolute inset-0 rounded-full border-2 border-cyan-400/20"
-                style={{
-                  width: `${140 + ring * 30}px`,
-                  height: `${140 + ring * 30}px`,
-                  left: `${-15 * ring}px`,
-                  top: `${-15 * ring}px`,
-                }}
-                animate={{
-                  rotate: ring % 2 === 0 ? 360 : -360,
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 15 + ring * 5,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              />
-            ))}
-
-            {/* Score Circle */}
+        <div className="flex flex-col items-center justify-center gap-6 relative min-h-[400px]">
+          {/* Waveform Visualizer Section - Fixed Height Container */}
+          <div className="relative w-full flex items-center justify-center" style={{ height: '340px' }}>
+            {/* Pulsing background glow - Audio response */}
             <motion.div
-              className="relative z-10 w-[140px] h-[140px] rounded-full bg-gradient-to-br from-cyan-400 via-purple-400 to-cyan-500 p-1 shadow-[0_0_40px_rgba(7,198,255,0.4)]"
+              className="absolute inset-0 bg-gradient-to-br from-cyan-300/20 via-purple-300/20 to-cyan-300/20 rounded-2xl blur-3xl"
               animate={{
-                boxShadow: [
-                  '0 0 40px rgba(7,198,255,0.4)',
-                  '0 0 60px rgba(193,55,255,0.5)',
-                  '0 0 40px rgba(7,198,255,0.4)',
-                ],
+                opacity: [0.3, 0.8, 0.3],
+                scale: [1, 1.12, 1],
               }}
               transition={{
-                duration: 4,
+                duration: 2.5,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-            >
-              <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center">
-                <motion.div
-                  className="text-5xl font-bold bg-gradient-to-r from-cyan-500 to-purple-500 bg-clip-text text-transparent"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-                >
-                  {animatedScore.toFixed(1)}
-                </motion.div>
-                <div className="text-sm text-muted-foreground mt-1">/10</div>
+            />
+
+            {/* Audio Waveform Bars - Individual bars arranged in circles */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Ring 4 - Treble (Outermost) - 70 bars at 155px radius */}
+              <div className="absolute w-[310px] h-[310px]">
+                {[...Array(70)].map((_, i) => {
+                  const angle = (i / 70) * 360;
+                  return (
+                    <motion.div
+                      key={`r4-${i}`}
+                      className="absolute left-1/2 top-1/2"
+                      style={{
+                        width: '3px',
+                        height: '20px',
+                        background: 'linear-gradient(to top, rgba(139,92,246,0.6), rgba(167,139,250,0.3))',
+                        borderRadius: '1.5px',
+                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-155px)`,
+                        filter: 'blur(0.5px)',
+                        boxShadow: '0 0 8px rgba(139,92,246,0.6)',
+                      }}
+                      animate={{
+                        scaleY: [1, 2.5, 1.2, 2, 1],
+                      }}
+                      transition={{
+                        duration: 0.6,
+                        repeat: Infinity,
+                        delay: (i * 0.01) % 0.5,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  );
+                })}
               </div>
-            </motion.div>
+
+              {/* Ring 3 - Mid-High - 60 bars at 130px radius */}
+              <div className="absolute w-[260px] h-[260px]">
+                {[...Array(60)].map((_, i) => {
+                  const angle = (i / 60) * 360;
+                  return (
+                    <motion.div
+                      key={`r3-${i}`}
+                      className="absolute left-1/2 top-1/2"
+                      style={{
+                        width: '3px',
+                        height: '20px',
+                        background: 'linear-gradient(to top, rgba(147,51,234,0.7), rgba(192,132,252,0.4))',
+                        borderRadius: '1.5px',
+                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-130px)`,
+                        filter: 'blur(0.5px)',
+                        boxShadow: '0 0 8px rgba(147,51,234,0.6)',
+                      }}
+                      animate={{
+                        scaleY: [1, 3, 1.5, 2.5, 1],
+                      }}
+                      transition={{
+                        duration: 0.9,
+                        repeat: Infinity,
+                        delay: i * 0.015,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Ring 2 - Mid-Low - 50 bars at 105px radius */}
+              <div className="absolute w-[210px] h-[210px]">
+                {[...Array(50)].map((_, i) => {
+                  const angle = (i / 50) * 360;
+                  return (
+                    <motion.div
+                      key={`r2-${i}`}
+                      className="absolute left-1/2 top-1/2"
+                      style={{
+                        width: '3.5px',
+                        height: '22px',
+                        background: 'linear-gradient(to top, rgba(59,130,246,0.8), rgba(147,197,253,0.4))',
+                        borderRadius: '1.75px',
+                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-105px)`,
+                        filter: 'blur(0.5px)',
+                        boxShadow: '0 0 8px rgba(59,130,246,0.6)',
+                      }}
+                      animate={{
+                        scaleY: [1, 2.8, 1.2, 2.3, 1],
+                      }}
+                      transition={{
+                        duration: 1.2,
+                        repeat: Infinity,
+                        delay: (i * 0.024) % 1,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Ring 1 - Bass (Innermost) - 40 bars at 80px radius */}
+              <div className="absolute w-[160px] h-[160px]">
+                {[...Array(40)].map((_, i) => {
+                  const angle = (i / 40) * 360;
+                  return (
+                    <motion.div
+                      key={`r1-${i}`}
+                      className="absolute left-1/2 top-1/2"
+                      style={{
+                        width: '4px',
+                        height: '25px',
+                        background: 'linear-gradient(to top, rgba(6,182,212,0.9), rgba(103,232,249,0.5))',
+                        borderRadius: '2px',
+                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-80px)`,
+                        filter: 'blur(0.5px)',
+                        boxShadow: '0 0 8px rgba(6,182,212,0.7)',
+                      }}
+                      animate={{
+                        scaleY: [1, 2.2, 1.5, 2.5, 1],
+                      }}
+                      transition={{
+                        duration: 1.8,
+                        repeat: Infinity,
+                        delay: Math.floor(i / 4) * 0.15,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Score Circle - Spins once, then stops */}
+              <motion.div
+                className="relative z-10 w-[140px] h-[140px] rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-violet-500 p-[3px]"
+                initial={{ rotate: -180, scale: 0 }}
+                animate={{
+                  rotate: 0,
+                  scale: 1,
+                  boxShadow: [
+                    '0 0 50px rgba(6,182,212,0.5)',
+                    '0 0 70px rgba(147,51,234,0.6)',
+                    '0 0 50px rgba(6,182,212,0.5)',
+                  ],
+                }}
+                transition={{
+                  rotate: { duration: 1.2, ease: "easeOut" },
+                  scale: { duration: 0.8, ease: "backOut" },
+                  boxShadow: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }
+                }}
+              >
+                {/* Center glow ring - pulses with the beat */}
+                <motion.div
+                  className="absolute inset-4 rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(147,51,234,0.2) 0%, transparent 70%)',
+                  }}
+                  animate={{
+                    scale: [1, 1.15, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <div className="w-full h-full rounded-full bg-white shadow-inner flex items-center justify-center relative z-10">
+                  <div className="flex flex-col items-center">
+                    <motion.div
+                      className="text-6xl font-bold bg-gradient-to-r from-cyan-500 via-purple-500 to-violet-600 bg-clip-text text-transparent"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                    >
+                      {animatedScore.toFixed(1)}
+                    </motion.div>
+                    <div className="text-sm text-slate-500 font-semibold">/10</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </div>
 
-          {/* Tier and Percentile */}
-          <div className="flex flex-col items-center gap-2 relative z-10">
-            <Badge className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white border-0 px-3 py-1">
+          {/* Tier and Percentile - Separate Section */}
+          <div className="flex flex-col items-center gap-3 relative z-10">
+            <Badge className="bg-gradient-to-r from-cyan-500 via-purple-500 to-violet-600 text-white border-0 px-5 py-1.5 text-sm font-bold shadow-lg shadow-purple-400/40">
               {tier}
             </Badge>
-            <span className="text-sm text-muted-foreground font-medium">{percentile}</span>
+            <span className="text-sm text-slate-600 font-semibold tracking-wide">{percentile}</span>
           </div>
         </div>
 
         {/* Right Side - Metrics Grid */}
-        <div className="grid grid-cols-2 gap-3 pr-3">
+        <div className="grid grid-cols-2 gap-6 pr-6">
           <TooltipProvider>
             {metricCards.map((metric, index) => {
               const Icon = metric.icon;
@@ -198,27 +372,39 @@ export const UnifiedScoreDashboard: React.FC<UnifiedScoreDashboardProps> = ({
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: index * 0.05 }}
-                      className="bg-card border border-border rounded-xl p-3 hover:border-cyan-400/60 hover:shadow-lg hover:shadow-cyan-400/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
+                      transition={{ duration: 0.4, delay: index * 0.08 }}
+                      className={`relative bg-gradient-to-br ${metric.gradient} border-2 ${metric.border} rounded-2xl p-5 ${metric.shadow} ${metric.hoverBorder} ${metric.hoverShadow} hover:scale-[1.03] transition-all duration-300 cursor-pointer group overflow-hidden`}
                     >
-                      <div className="flex flex-col gap-2">
-                        {/* Label */}
-                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          {metric.label}
-                        </div>
+                      {/* Layer 1: Base gradient (already in className) */}
+                      
+                      {/* Layer 2: Top highlight shine */}
+                      <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r ${metric.highlight}`} />
+                      
+                      {/* Layer 3: Hover gradient overlay */}
+                      <div className={`absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent ${metric.hoverGradient} transition-all duration-300 pointer-events-none rounded-2xl`} />
+                      
+                      {/* Layer 4: Inner glow */}
+                      <div className={`absolute inset-0 rounded-2xl shadow-inner ${metric.innerGlow} pointer-events-none`} />
 
-                        {/* Value and Icon */}
+                      {/* Content */}
+                      <div className="relative z-10 flex flex-col gap-3">
+                        {/* Top: Label + Icon */}
                         <div className="flex items-center justify-between">
-                          <div className="text-2xl font-bold text-foreground">
-                            {metric.value}
-                          </div>
-                          <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-400/10 to-purple-400/10 group-hover:from-cyan-400/20 group-hover:to-purple-400/20 transition-colors">
-                            <Icon className="h-4 w-4 text-cyan-600" />
+                          <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                            {metric.label}
+                          </span>
+                          <div className={`p-2.5 rounded-xl bg-gradient-to-br ${metric.iconBg} shadow-sm group-hover:scale-110 group-hover:shadow-lg ${metric.iconHoverBg} transition-all duration-200`}>
+                            <Icon className={`h-5 w-5 ${metric.iconColor}`} />
                           </div>
                         </div>
 
-                        {/* Subvalue */}
-                        <div className="text-xs text-muted-foreground">
+                        {/* Middle: Value (gradient text) */}
+                        <div className="text-3xl font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-700 bg-clip-text text-transparent">
+                          {metric.value}
+                        </div>
+
+                        {/* Bottom: SubValue */}
+                        <div className="text-sm text-slate-600 font-medium">
                           {metric.subValue}
                         </div>
                       </div>
@@ -228,8 +414,8 @@ export const UnifiedScoreDashboard: React.FC<UnifiedScoreDashboardProps> = ({
                   {analysis && (
                     <TooltipContent 
                       side="top" 
-                      className="w-80 p-4 bg-white/95 backdrop-blur-xl border-2 border-purple-400/40 shadow-xl"
-                      sideOffset={5}
+                      className="w-80 p-5 bg-white/98 backdrop-blur-xl border-2 border-purple-300/40 shadow-2xl rounded-xl"
+                      sideOffset={10}
                     >
                       <div className="space-y-3">
                         {/* Percentile Badge */}

@@ -1,4 +1,5 @@
-import { motion } from 'motion/react';
+import { motion, useScroll, useTransform, useMotionTemplate } from 'motion/react';
+import { useRef } from 'react';
 
 const logos = [
   { name: 'Stanford', src: '/uni_logos/stanford_transparent.png', scale: 1 },
@@ -12,8 +13,24 @@ const logos = [
 ];
 
 const UniversityBacked = () => {
+  const containerRef = useRef(null);
+  
+  // Track scroll progress relative to this component
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 90%", "center center"] 
+  });
+
+  // Map scroll progress to grayscale (100% -> 0%) and opacity (0.3 -> 1)
+  // As it scrolls into view (start 90%), it starts lighting up.
+  // By the time it hits the center (center center), it's fully colored.
+  const grayscaleValue = useTransform(scrollYProgress, [0, 1], [100, 0]);
+  const opacityValue = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
+  
+  const filterStyle = useMotionTemplate`grayscale(${grayscaleValue}%)`;
+
   return (
-    <section className="py-8 border-y bg-slate-50/50 overflow-hidden">
+    <section ref={containerRef} className="py-8 border-y bg-slate-50/50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 text-center">
         <p className="text-sm font-medium text-muted-foreground">
           Backed by professionals from
@@ -27,7 +44,7 @@ const UniversityBacked = () => {
 
         {/* Scrolling Container */}
         <motion.div
-          className="flex gap-8 md:gap-12 items-center"
+          className="flex gap-12 md:gap-20 items-center"
           animate={{
             x: ["0%", "-50%"],
           }}
@@ -41,9 +58,13 @@ const UniversityBacked = () => {
           }}
         >
           {[...logos, ...logos].map((logo, index) => (
-            <div
+            <motion.div
               key={`${logo.name}-${index}`}
-              className="flex-shrink-0 h-16 md:h-20 flex items-center justify-center grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              style={{ 
+                filter: filterStyle,
+                opacity: opacityValue
+              }}
+              className="flex-shrink-0 h-16 md:h-20 flex items-center justify-center transition-all duration-300"
             >
               <img
                 src={logo.src}
@@ -51,7 +72,7 @@ const UniversityBacked = () => {
                 className="max-h-full w-auto object-contain"
                 style={{ transform: `scale(${logo.scale})` }}
               />
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
@@ -60,4 +81,3 @@ const UniversityBacked = () => {
 };
 
 export default UniversityBacked;
-

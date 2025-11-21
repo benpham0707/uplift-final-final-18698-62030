@@ -1,62 +1,72 @@
-import { Shield, Lock, UserCheck, EyeOff } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Shield, Lock, UserCheck, EyeOff } from 'lucide-react';
 
 const TrustSection = () => {
+  const features = [
+    {
+      icon: Lock,
+      text: "You control what you share and what you don’t."
+    },
+    {
+      icon: EyeOff,
+      text: "We never sell your data to colleges or random companies."
+    },
+    {
+      icon: UserCheck,
+      text: "Designed carefully for students under 18, with clear options for involving parents/guardians."
+    },
+    {
+      icon: Shield,
+      text: "You can delete your account and data whenever you want."
+    }
+  ];
+
   return (
-    <section className="py-24 bg-slate-950 text-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+    <section className="py-24 bg-secondary/10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+          <motion.div 
+            className="flex-1"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
               Your data, your story.
             </h2>
-            <p className="text-slate-400 mb-8 text-lg">
-              Uplift exists to help you understand and tell your story – not to judge you or box you in. 
-              You always stay in control of what colleges and programs see.
+            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              Uplift exists to help you understand and tell your story – not to judge you or box you in. You always stay in control of what colleges and programs see.
             </p>
-
-            <ul className="space-y-4">
-              {[
-                "You control what you share and what you don’t.",
-                "We never sell your data to colleges or random companies.",
-                "You can delete your account and data whenever you want.",
-                "Designed carefully for students under 18."
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="mt-1 p-0.5 rounded-full bg-emerald-500/20 text-emerald-400">
-                    <Shield className="w-4 h-4" />
-                  </div>
-                  <span className="text-slate-300">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="relative flex items-center justify-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-emerald-500/20 rounded-full blur-3xl"
-            />
             
-            <div className="relative grid grid-cols-2 gap-4">
-              <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-sm">
-                <Lock className="w-8 h-8 text-emerald-400 mb-4" />
-                <h3 className="font-semibold mb-1">Private</h3>
-                <p className="text-xs text-slate-400">End-to-end encryption for all your data.</p>
-              </div>
-              <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-sm mt-8">
-                <UserCheck className="w-8 h-8 text-indigo-400 mb-4" />
-                <h3 className="font-semibold mb-1">User Controlled</h3>
-                <p className="text-xs text-slate-400">Only you decide who sees your profile.</p>
-              </div>
-              <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-sm -mt-8">
-                <EyeOff className="w-8 h-8 text-purple-400 mb-4" />
-                <h3 className="font-semibold mb-1">No Ad Tracking</h3>
-                <p className="text-xs text-slate-400">We don't track you across the web.</p>
-              </div>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="mt-1 h-5 w-5 text-primary flex-shrink-0">
+                    <feature.icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-sm font-medium">{feature.text}</span>
+                </div>
+              ))}
             </div>
-          </div>
+          </motion.div>
+
+          <motion.div 
+            className="flex-1 w-full max-w-md lg:max-w-full flex justify-center"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="relative w-64 h-64 bg-background border rounded-full flex items-center justify-center shadow-2xl">
+               <div className="absolute inset-0 rounded-full border-2 border-dashed border-primary/20 animate-[spin_10s_linear_infinite]" />
+               <Shield className="h-24 w-24 text-primary/20" />
+               <div className="absolute bottom-8 bg-green-500/10 text-green-600 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                 <Lock className="h-3 w-3" />
+                 <span>Encrypted & Private</span>
+               </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -1,46 +1,67 @@
-import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 const FinalCTA = () => {
   return (
-    <section className="py-24 relative overflow-hidden bg-slate-900 text-white">
-      {/* Background Progress Animation */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:250%_250%] animate-[flow_15s_linear_infinite]" />
+    <section className="py-24 relative overflow-hidden">
+      {/* Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20 -z-10" />
+      
+      {/* Animated Progress Bar Loop */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-border/30">
+        <motion.div
+          className="h-full bg-primary"
+          animate={{ 
+            width: ["0%", "70%", "100%"],
+            opacity: [1, 1, 0],
+            x: ["0%", "0%", "100%"] // resetting
+          }}
+          transition={{ 
+            duration: 3, 
+            repeat: Infinity,
+            times: [0, 0.8, 1],
+            ease: "easeInOut"
+          }}
+        />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <motion.h2
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
+        <motion.h2 
+          className="text-4xl font-bold tracking-tight sm:text-5xl mb-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-bold mb-6"
+          transition={{ duration: 0.5 }}
         >
           Ready to see your story clearly?
         </motion.h2>
-
-        <motion.p
+        
+        <motion.p 
+          className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="text-xl text-slate-300 mb-8"
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           Join the early access list and get your first portfolio scan when we open the next batch.
         </motion.p>
 
         <motion.div
+          className="flex flex-col items-center gap-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Button size="lg" className="h-14 px-8 text-lg bg-white text-slate-900 hover:bg-slate-100">
-            Join early access
-            <ArrowRight className="ml-2 h-5 w-5" />
+          <Button size="lg" className="h-12 px-8 text-base" asChild>
+            <Link to="/waitlist">
+              Join early access
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
-          <p className="mt-4 text-sm text-slate-400">
+          <p className="text-xs text-muted-foreground">
             We’ll only email you about your scan and launch updates. No spam.
           </p>
         </motion.div>

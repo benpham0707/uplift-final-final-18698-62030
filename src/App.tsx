@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import PortfolioInsightsNew from "./pages/PortfolioInsightsNew";
 import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
+import Pricing from "./pages/Pricing";
 import RequireVerified from "@/components/RequireVerified";
 import TestTeachingUnit from "./pages/TestTeachingUnit";
 import TestTeachingUnitSimple from "./pages/TestTeachingUnitSimple";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/pricing" element={<RequireVerified><Pricing /></RequireVerified>} />
             <Route path="/portfolio-scanner" element={<RequireVerified><PortfolioScanner /></RequireVerified>} />
             <Route path="/portfolio-insights" element={<RequireVerified><PortfolioInsightsNew /></RequireVerified>} />
             <Route path="/extracurricular-optimizer" element={<ExtracurricularOptimizer />} />

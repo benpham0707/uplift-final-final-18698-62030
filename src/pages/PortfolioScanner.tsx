@@ -69,7 +69,8 @@ const PortfolioScanner = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiOverall, setAiOverall] = useState<number | null>(null);
-	const [aiDetailed, setAiDetailed] = useState<any | null>(null);
+  const [aiDetailed, setAiDetailed] = useState<any | null>(null);
+  const [credits, setCredits] = useState<number | null>(null);
   type MetricId = 'impact' | 'academic' | 'curiosity' | 'story' | 'character';
   const [selectedMetric, setSelectedMetric] = useState<MetricId | null>(null);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
@@ -494,7 +495,7 @@ const PortfolioScanner = () => {
       // Fetch profile by user_id
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, has_completed_assessment')
+        .select('id, has_completed_assessment, credits')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -511,8 +512,9 @@ const PortfolioScanner = () => {
             user_id: user.id,
             user_context: 'high_school_11th',
             has_completed_assessment: false,
+            credits: 0 // Initialize with 0 credits
           })
-          .select('id, has_completed_assessment')
+          .select('id, has_completed_assessment, credits')
           .single();
         if (insertError) {
           // eslint-disable-next-line no-console
@@ -521,8 +523,10 @@ const PortfolioScanner = () => {
           return;
         }
         setHasCompletedOnboarding(Boolean(created?.has_completed_assessment));
+        setCredits(created?.credits || 0);
       } else {
         setHasCompletedOnboarding(Boolean(data.has_completed_assessment));
+        setCredits(data.credits || 0);
       }
       setInitializing(false);
     };
@@ -878,6 +882,15 @@ const PortfolioScanner = () => {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
+               <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/pricing')}
+                className="hidden md:flex items-center gap-2 border-primary/20 hover:bg-primary/10 text-foreground"
+              >
+                <Zap className="h-4 w-4 text-yellow-500" />
+                <span>{credits ?? 0} Credits</span>
+              </Button>
               <Button variant="ghost" size="sm">
                 <Settings className="h-4 w-4" />
               </Button>

@@ -3,9 +3,16 @@ import { requireAuth } from "./middleware/auth";
 import { completeAssessment } from "@/modules/assessment/complete";
 import { completePersonal } from "@/modules/personal/complete";
 import * as Exp from "@/modules/experiences/controller";
+import * as Billing from "./billing";
 import { computePortfolioStrength, reconcilePortfolioStrength } from "@/modules/analytics/portfolio";
 
 const r = Router();
+
+// Billing API
+r.post("/billing/checkout", requireAuth, Billing.createCheckoutSession);
+r.post("/billing/webhook", Billing.handleWebhook);
+r.post("/billing/verify-session", requireAuth, Billing.verifySession);
+
 r.post("/assessment/complete", requireAuth, completeAssessment);
 r.post("/personal/complete", requireAuth, completePersonal);
 

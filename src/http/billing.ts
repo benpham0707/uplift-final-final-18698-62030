@@ -39,7 +39,7 @@ const PLANS = {
 export const createCheckoutSession = async (req: Request, res: Response) => {
   try {
     const { type, successUrl, cancelUrl } = req.body;
-    const userId = (req as any).user?.id; // Assuming requireAuth adds user to req
+    const userId = (req as any).auth?.userId;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });

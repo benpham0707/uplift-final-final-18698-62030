@@ -21,7 +21,7 @@ const HeroSection = () => {
               </div>
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-7xl text-foreground">
                 Turn your personal narrative into a{' '}
-                <span className="bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-500 bg-clip-text text-transparent block">
+                <span className="bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-500 bg-clip-text text-transparent block pb-2 animate-gradient-flow">
                   powerful story.
                 </span>
               </h1>

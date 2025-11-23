@@ -49,9 +49,12 @@ const Navigation = () => {
             <a href="#pricing" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
               Pricing
             </a>
-            <a href="#schools" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
+            <div className="text-muted-foreground cursor-not-allowed px-3 py-2 rounded-lg text-sm font-medium relative opacity-80">
               For Schools
-            </a>
+              <span className="absolute -top-1 -right-3 px-1.5 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full transform scale-90">
+                SOON
+              </span>
+            </div>
           </div>
 
           {/* Auth Buttons */}
@@ -124,9 +127,9 @@ const Navigation = () => {
             <a href="#pricing" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
               Pricing
             </a>
-            <a href="#schools" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
-              For Schools
-            </a>
+            <div className="block px-3 py-2 text-muted-foreground cursor-not-allowed rounded-lg text-sm font-medium">
+              For Schools <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">SOON</span>
+            </div>
             <div className="pt-2 space-y-2">
               {loading ? (
                 <div className="w-full h-9" />

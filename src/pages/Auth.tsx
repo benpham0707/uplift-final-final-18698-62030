@@ -132,7 +132,7 @@ const Auth = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-md mx-auto w-full self-center"
+            className="max-w-md mx-auto w-full"
           >
             <div className="mb-8">
                <img src="/uplift_logo_lr.png" alt="Uplift Logo" className="h-8 mb-6" />

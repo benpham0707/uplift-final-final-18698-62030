@@ -2,11 +2,20 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    if (!user) {
+      navigate('/auth');
+    } else {
+      navigate(path);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/10 dark:bg-black/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-black/5 border-b border-white/20 dark:border-white/10 shadow-lg shadow-black/5">
@@ -25,19 +34,22 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#platform" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
-              Platform
-            </a>
-            <a href="#features" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
-              Features
-            </a>
-            <a href="#paths" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
-              Paths
-            </a>
-            <a href="#pricing" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
+            <button 
+              onClick={() => handleNavigation('/portfolio-scanner')} 
+              className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
+            >
+              Scanner & Insights
+            </button>
+            <button 
+              onClick={() => handleNavigation('/project-incubation')} 
+              className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
+            >
+              Workshop
+            </button>
+            <a href="#pricing" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
               Pricing
             </a>
-            <a href="#schools" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
+            <a href="#schools" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
               For Schools
             </a>
           </div>
@@ -48,6 +60,14 @@ const Navigation = () => {
               <div className="w-20 h-9" />
             ) : user ? (
               <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center space-x-2"
+                  asChild
+                >
+                  <Link to="/portfolio-scanner">Dashboard</Link>
+                </Button>
                 <div className="flex items-center space-x-2 text-sm text-foreground">
                   <User className="h-4 w-4" />
                   <span>{user.email}</span>
@@ -89,19 +109,22 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-2 bg-white/5 dark:bg-black/5 backdrop-blur-sm border-t border-white/10 dark:border-white/5">
-            <a href="#platform" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
-              Platform
-            </a>
-            <a href="#features" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
-              Features
-            </a>
-            <a href="#paths" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
-              Paths
-            </a>
-            <a href="#pricing" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
+            <button 
+              onClick={() => { handleNavigation('/portfolio-scanner'); setIsMenuOpen(false); }} 
+              className="w-full text-left block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
+            >
+              Scanner & Insights
+            </button>
+            <button 
+              onClick={() => { handleNavigation('/project-incubation'); setIsMenuOpen(false); }} 
+              className="w-full text-left block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
+            >
+              Workshop
+            </button>
+            <a href="#pricing" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
               Pricing
             </a>
-            <a href="#schools" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5">
+            <a href="#schools" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
               For Schools
             </a>
             <div className="pt-2 space-y-2">
@@ -109,6 +132,9 @@ const Navigation = () => {
                 <div className="w-full h-9" />
               ) : user ? (
                 <div className="space-y-2">
+                  <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link to="/portfolio-scanner">Dashboard</Link>
+                  </Button>
                   <div className="flex items-center space-x-2 px-3 py-2 text-sm text-foreground">
                     <User className="h-4 w-4" />
                     <span>{user.email}</span>

@@ -18,13 +18,21 @@ const PAID_KEY = isBrowser
   ? import.meta.env.VITE_ANTHROPIC_API_KEY
   : process.env.ANTHROPIC_API_KEY;
 
-if (!PAID_KEY) {
-  throw new Error('ANTHROPIC_API_KEY not found in environment variables. Please add it to your .env file.');
+// Don't throw immediately - let the app load and check when actually calling Claude
+let client: Anthropic | null = null;
+
+function getClient(): Anthropic {
+  if (!PAID_KEY) {
+    throw new Error('ANTHROPIC_API_KEY not found. Please add VITE_ANTHROPIC_API_KEY to your environment or enable Lovable Cloud for AI features.');
+  }
+  if (!client) {
+    client = new Anthropic({
+      apiKey: PAID_KEY,
+      dangerouslyAllowBrowser: true // Required for client-side usage
+    });
+  }
+  return client;
 }
-let client = new Anthropic({
-  apiKey: PAID_KEY,
-  dangerouslyAllowBrowser: true // Required for client-side usage
-});
 
 // ============================================================================
 // TYPES
@@ -112,8 +120,9 @@ export async function callClaude<T = any>(
       }, timeoutMs);
     });
 
+    const claudeClient = getClient();
     const response = await Promise.race([
-      client.messages.create(requestParams).then(res => {
+      claudeClient.messages.create(requestParams).then(res => {
         console.log('[Claude API] Call completed successfully');
         clearTimeout(timeoutId);
         return res;

@@ -26,7 +26,9 @@ import {
   Target,
   Clock,
   Sparkles,
+  FileEdit,
 } from 'lucide-react';
+import GradientText from '@/components/ui/GradientText';
 import type { TeachingIssue } from '../teachingTypes';
 
 interface EditorViewProps {
@@ -96,8 +98,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
           <div className="p-4">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-primary">Essay Editor</h2>
+                <FileEdit className="w-5 h-5 text-primary" />
+                <GradientText
+                  className="text-lg font-bold"
+                  colors={["#3b82f6", "#8b5cf6", "#3b82f6"]}
+                >
+                  Essay Editor
+                </GradientText>
                 {hasUnsavedChanges && (
                   <Badge variant="secondary" className="text-xs">
                     Unsaved changes

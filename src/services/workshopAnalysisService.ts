@@ -109,30 +109,7 @@ export async function analyzeExtracurricularEntry(
   console.log('');
 
   try {
-    // Fast fail if backend is not reachable to avoid long UI hangs
-    // Try multiple health check paths with increased timeout
-    let healthCheckPassed = false;
-    const healthPaths = ['/api/v1/health', '/api/health'];
-
-    for (const path of healthPaths) {
-      try {
-        console.log(`[Health Check] Trying ${path}...`);
-        const healthRes = await fetch(path, { signal: AbortSignal.timeout(10000) });
-        if (healthRes.ok) {
-          console.log(`[Health Check] ✅ Success via ${path}`);
-          healthCheckPassed = true;
-          break;
-        }
-      } catch (err) {
-        console.log(`[Health Check] ❌ Failed via ${path}:`, err);
-      }
-    }
-
-    if (!healthCheckPassed) {
-      throw new Error(
-        'Analysis server not reachable. Start it with "npm run server" or use "npm run dev:full".'
-      );
-    }
+    // Skip health check - edge function is always available
 
     // Transform to backend format
     const entry = transformToExperienceEntry(description, activity);

@@ -7,11 +7,8 @@
 
 import { ExperienceEntry } from '@/core/types/experience';
 
-// Use relative path so Vite dev proxy (vite.config.ts) handles "/api" in development
-// and same-origin works in production. Avoid process.env in browser bundles.
-const API_BASE_URL = (typeof window !== 'undefined' && (import.meta as any)?.env?.DEV)
-  ? 'http://localhost:8789'
-  : '';
+// Use Supabase edge function for analysis
+const API_BASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 
 /**
  * Analyze an extracurricular entry and get coaching feedback
@@ -31,15 +28,16 @@ export async function analyzeExtracurricular(
   console.log('[extracurricularAnalysis] Timeout set to 30 seconds');
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/analyze-entry`, {
+    const response = await fetch(`${API_BASE_URL}/functions/v1/workshop-analysis`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
       body: JSON.stringify({
         entry,
         options: {
-          depth: options.depth || 'quick',
+          depth: options.depth || 'comprehensive',
           skip_coaching: options.skip_coaching || false,
         },
       }),
@@ -66,8 +64,8 @@ export async function analyzeExtracurricular(
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      console.error('[extracurricularAnalysis] TIMEOUT after 90 seconds');
-      throw new Error('Analysis timed out. Is the backend running on :8789? Try "npm run server" or "npm run dev:full".');
+      console.error('[extracurricularAnalysis] TIMEOUT after 30 seconds');
+      throw new Error('Analysis timed out. Please try again.');
     }
     console.error('[extracurricularAnalysis] Error:', error);
     throw error;

@@ -23,7 +23,16 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
   onPrev,
   onApply
 }) => {
-  const currentSuggestion = suggestions[currentIndex];
+  // Guard against empty suggestions or invalid index
+  if (!suggestions || suggestions.length === 0) {
+    return (
+      <div className="p-4 rounded-lg bg-muted/20 border border-muted">
+        <p className="text-sm text-muted-foreground">No suggestions available</p>
+      </div>
+    );
+  }
+
+  const currentSuggestion = suggestions[currentIndex] || suggestions[0];
 
   // Map backend apply_type to frontend type
   const mapApplyType = (
@@ -51,7 +60,7 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
 
       <div className="p-4 rounded-lg bg-primary/5 border-l-4 border-primary">
         <p className="text-sm leading-relaxed text-foreground">
-          {currentSuggestion.fix_text}
+          {currentSuggestion.text || currentSuggestion.fix_text}
         </p>
       </div>
 
@@ -60,7 +69,7 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
           Why This Works
         </p>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          {currentSuggestion.why_this_works}
+          {currentSuggestion.rationale || currentSuggestion.why_this_works}
         </p>
       </div>
 
@@ -79,8 +88,8 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
         <Button
           onClick={() =>
             onApply(
-              currentSuggestion.fix_text,
-              mapApplyType(currentSuggestion.apply_type)
+              currentSuggestion.text || currentSuggestion.fix_text,
+              currentSuggestion.type || mapApplyType(currentSuggestion.apply_type)
             )
           }
           className="gap-2 bg-primary hover:bg-primary/90"

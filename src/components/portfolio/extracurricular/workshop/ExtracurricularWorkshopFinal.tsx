@@ -208,20 +208,22 @@ export const ExtracurricularWorkshopFinal: React.FC<ExtracurricularWorkshopProps
 
       // Transform teaching issues to WritingIssue format
       const issues: WritingIssue[] = categoryIssues.map((teachingIssue) => {
-        // Transform edit suggestions
+        // Transform edit suggestions from elite essay examples
         const suggestions: EditSuggestion[] = teachingIssue.examples?.map((example, idx) => ({
-          text: example,
-          rationale: teachingIssue.teaching_points?.[idx] || 'Apply this improvement',
+          text: typeof example === 'string' ? example : example.after?.text || '',
+          rationale: typeof example === 'string'
+            ? (teachingIssue.teaching_points?.[idx] || 'Apply this improvement')
+            : example.annotations?.[0]?.explanation || 'Notice how this elite version improves the original',
           type: 'replace' as const,
         })) || [];
 
         return {
           id: teachingIssue.id,
           dimensionId: category.category,
-          title: teachingIssue.title || 'Untitled Issue',
-          excerpt: teachingIssue.context?.relevant_excerpt || '',
-          analysis: (teachingIssue.teaching_points || []).join(' '),
-          impact: teachingIssue.why_it_matters || '',
+          title: teachingIssue.title || teachingIssue.problem?.title || 'Untitled Issue',
+          excerpt: teachingIssue.problem?.from_draft || teachingIssue.context || '',
+          analysis: teachingIssue.problem?.explanation || (teachingIssue.teaching_points || []).join(' '),
+          impact: teachingIssue.problem?.impact_on_score || teachingIssue.why_it_matters || '',
           suggestions,
           status: teachingIssue.status === 'completed' ? 'fixed' : teachingIssue.status === 'in_progress' ? 'in_progress' : 'not_fixed',
           currentSuggestionIndex: 0,

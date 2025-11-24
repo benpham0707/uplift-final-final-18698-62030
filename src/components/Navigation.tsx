@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -70,10 +70,10 @@ const Navigation = () => {
               Scanner & Insights
             </button>
             <button 
-              onClick={() => handleNavigation('/piq-workshop')}
+              onClick={() => navigate('/project-incubation')}
               className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
             >
-              PIQ Workshop
+              Workshop
             </button>
             <button 
               onClick={() => navigate('/pricing')}
@@ -104,26 +104,25 @@ const Navigation = () => {
                   <GradientZap className="h-4 w-4" />
                   <span>{credits ?? 0} Credits</span>
                 </Button>
+                {/* Settings icon */}
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="flex items-center space-x-2"
-                  asChild
+                  size="icon"
+                  onClick={() => navigate('/settings')}
+                  className="text-foreground hover:text-primary"
+                  aria-label="Settings"
                 >
-                  <Link to="/portfolio-scanner">Dashboard</Link>
+                  <Settings className="h-4 w-4" />
                 </Button>
-                <div className="flex items-center space-x-2 text-sm text-foreground">
-                  <User className="h-4 w-4" />
-                  <span>{user.email}</span>
-                </div>
+                {/* Sign out icon */}
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => signOut()}
-                  className="flex items-center space-x-1"
+                  className="text-foreground hover:text-primary"
+                  aria-label="Sign out"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
                 </Button>
               </div>
             ) : (
@@ -160,10 +159,10 @@ const Navigation = () => {
               Scanner & Insights
             </button>
             <button 
-              onClick={() => { handleNavigation('/piq-workshop'); setIsMenuOpen(false); }}
+              onClick={() => { navigate('/project-incubation'); setIsMenuOpen(false); }}
               className="w-full text-left block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
             >
-              PIQ Workshop
+              Workshop
             </button>
             <button
               onClick={() => { navigate('/pricing'); setIsMenuOpen(false); }}

@@ -42,15 +42,14 @@ import {
   Check,
   Briefcase,
   RefreshCw,
-  LogOut,
-  Menu
+  LogOut
 } from 'lucide-react';
 import Dock from '@/components/Dock';
 import OnboardingFlow from '@/components/portfolio/OnboardingFlow';
 import PortfolioPathway from '@/components/portfolio/PortfolioPathway';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '@/lib/utils';
 import GradientText from '@/components/ui/GradientText';
 import GradientZap from '@/components/ui/GradientZap';
@@ -58,6 +57,7 @@ import GradientZap from '@/components/ui/GradientZap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import Navigation from '@/components/Navigation';
 
 const PortfolioScanner = () => {
   const { user, loading, signOut } = useAuth();
@@ -85,7 +85,7 @@ const PortfolioScanner = () => {
   const [sequenceIndex, setSequenceIndex] = useState(0);
   const activeTweenRef = useRef<any>(null);
   const restoreSnapRef = useRef<null | (() => void)>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile menu state
+  // Navigation handled by global Navigation component
 
   useEffect(() => {
     try {
@@ -773,161 +773,7 @@ const PortfolioScanner = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Uplift Platform Navigation - Matched to Landing Page Design */}
-      <nav className="sticky top-0 z-50 w-full bg-white/10 dark:bg-black/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-black/5 border-b border-white/20 dark:border-white/10 shadow-lg shadow-black/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center">
-                <img 
-                  src="/uplift_logo_lr.png" 
-                  alt="Uplift Logo" 
-                  className="h-8 w-auto object-contain" 
-                />
-              </Link>
-            </div>
-
-            {/* Desktop Navigation - Matching Landing Page Links for Dashboard */}
-            <div className="hidden md:flex items-center space-x-8">
-              {/* Scanner & Insights Dropdown */}
-              <Popover open={isPortfolioDropdownOpen} onOpenChange={setIsPortfolioDropdownOpen}>
-                <PopoverTrigger asChild>
-                  <button 
-                    className={`text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium flex items-center gap-1 ${['overview', 'assessment', 'rubric', 'next-steps'].includes(activeSection) ? 'text-primary bg-white/10' : ''}`}
-                  >
-                    Scanner & Insights
-                    <ChevronDown className="h-4 w-4 opacity-50" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-2 bg-card/95 backdrop-blur-md border-border" align="start">
-                  <div className="space-y-1">
-                    {portfolioNavigationItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          scrollToSection(item.id);
-                          setIsPortfolioDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors text-left ${activeSection === item.id ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-accent hover:text-accent-foreground text-muted-foreground'}`}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <button 
-                onClick={() => handleNavigation('/project-incubation')} 
-                className={`text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium ${location.pathname === '/project-incubation' ? 'text-primary bg-white/10' : ''}`}
-              >
-                Workshop
-              </button>
-              <a href="#pricing" className="text-foreground hover:text-primary transition-all duration-200 px-3 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
-                Pricing
-              </a>
-              <div className="text-muted-foreground cursor-not-allowed px-3 py-2 rounded-lg text-sm font-medium relative opacity-80">
-                For Schools
-                <span className="absolute -top-1 -right-3 px-1.5 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full transform scale-90">
-                  SOON
-                </span>
-              </div>
-            </div>
-
-            {/* Dashboard Right Side - Credits & Profile */}
-            <div className="hidden md:flex items-center space-x-3">
-               <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate('/pricing')}
-                className="hidden md:flex items-center gap-2 border-primary/20 hover:bg-primary/10 text-foreground"
-              >
-                <GradientZap className="h-5 w-5" />
-                <span>{credits ?? 0} Credits</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/settings')} // Assuming settings page, or just placeholder
-                className="text-foreground hover:text-primary"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => signOut()}
-                className="text-foreground hover:text-primary"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="md:hidden py-4 space-y-2 bg-white/5 dark:bg-black/5 backdrop-blur-sm border-t border-white/10 dark:border-white/5">
-              <div className="px-3 pb-2">
-                <div className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Scanner & Insights</div>
-                {portfolioNavigationItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => { scrollToSection(item.id); setIsMenuOpen(false); }}
-                    className={`w-full text-left block px-3 py-2 text-sm rounded-md transition-colors ${activeSection === item.id ? 'bg-primary/10 text-primary font-medium' : 'text-foreground hover:bg-white/10 dark:hover:bg-white/5'}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      {item.label}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              
-              <div className="border-t border-white/10 my-2"></div>
-
-              <button 
-                onClick={() => { handleNavigation('/project-incubation'); setIsMenuOpen(false); }} 
-                className="w-full text-left block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium"
-              >
-                Workshop
-              </button>
-              <a href="#pricing" className="block px-3 py-2 text-foreground hover:text-primary transition-all duration-200 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 text-sm font-medium">
-                Pricing
-              </a>
-              <div className="block px-3 py-2 text-muted-foreground cursor-not-allowed rounded-lg text-sm font-medium">
-                For Schools <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">SOON</span>
-              </div>
-              <div className="pt-4 border-t border-white/10 mt-2 space-y-2">
-                 <div className="flex items-center justify-between px-3 py-2">
-                    <span className="text-sm font-medium text-foreground">Credits: {credits ?? 0}</span>
-                    <Button variant="outline" size="sm" onClick={() => navigate('/pricing')}>Top Up</Button>
-                 </div>
-                 <Button 
-                    variant="ghost" 
-                    className="w-full justify-start"
-                    onClick={() => signOut()}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Header Section with Scores - AcademicPlanner aesthetic */}
       <div id="overview" ref={overviewRef} className="hero-gradient hero-gradient-fade text-white snap-start snap-always">

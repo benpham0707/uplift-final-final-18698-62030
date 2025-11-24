@@ -21,7 +21,7 @@ import { EditorView } from '@/components/portfolio/extracurricular/workshop/view
 import { RubricDimensionCard } from '@/components/portfolio/extracurricular/workshop/RubricDimensionCard';
 import type { RubricDimension, WritingIssue, EditSuggestion } from '@/components/portfolio/extracurricular/workshop/types';
 import ContextualWorkshopChat from '@/components/portfolio/extracurricular/workshop/components/ContextualWorkshopChat';
-import { VersionHistory } from '@/components/portfolio/extracurricular/workshop/VersionHistory';
+import { DraftVersionHistory } from '@/components/portfolio/extracurricular/workshop/DraftVersionHistory';
 
 // ============================================================================
 // MOCK DATA - Hardcoded for demonstration
@@ -913,7 +913,7 @@ export default function PIQWorkshop() {
 
       {/* Version history modal */}
       {showVersionHistory && (
-        <VersionHistory
+        <DraftVersionHistory
           versions={draftVersions.map((v, idx) => ({
             id: `v${idx}`,
             description: v.text,

@@ -94,36 +94,42 @@ export const IssueCard: React.FC<IssueCardProps> = ({
         </button>
 
         <div className="space-y-3">
-          <div>
-            <p className="text-xs font-semibold text-muted-foreground mb-1">
-              From Your Draft
-            </p>
-            <div className="relative rounded-md bg-primary/5 py-4 pr-7 pl-7">
-              <span className="absolute top-2 left-1 text-2xl leading-none text-primary select-none pointer-events-none">"</span>
-              <p className="text-sm italic text-foreground/80 pr-2">
-                {issue.excerpt.replace(/"/g, '')}
+          {issue.excerpt && (
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground mb-1">
+                From Your Draft
               </p>
-              <span className="absolute top-2 right-1 text-2xl leading-none text-primary select-none pointer-events-none">"</span>
+              <div className="relative rounded-md bg-primary/5 py-4 pr-7 pl-7">
+                <span className="absolute top-2 left-1 text-2xl leading-none text-primary select-none pointer-events-none">"</span>
+                <p className="text-sm italic text-foreground/80 pr-2">
+                  {(issue.excerpt || '').replace(/"/g, '')}
+                </p>
+                <span className="absolute top-2 right-1 text-2xl leading-none text-primary select-none pointer-events-none">"</span>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div>
-            <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1">
-              The Problem
-            </p>
-            <p className="text-sm text-muted-foreground pl-3 border-l-2 border-red-300 dark:border-red-800">
-              {issue.analysis}
-            </p>
-          </div>
+          {issue.analysis && (
+            <div>
+              <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1">
+                The Problem
+              </p>
+              <p className="text-sm text-muted-foreground pl-3 border-l-2 border-red-300 dark:border-red-800">
+                {issue.analysis}
+              </p>
+            </div>
+          )}
 
-          <div className="mb-4">
-            <p className="text-xs font-semibold text-primary mb-1">
-              Why It Matters
-            </p>
-            <p className="text-sm text-muted-foreground pl-3 border-l-2 border-primary/30">
-              {issue.impact}
-            </p>
-          </div>
+          {issue.impact && (
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-primary mb-1">
+                Why It Matters
+              </p>
+              <p className="text-sm text-muted-foreground pl-3 border-l-2 border-primary/30">
+                {issue.impact}
+              </p>
+            </div>
+          )}
 
           <div className="pt-4 border-t">
             <SuggestionCarousel

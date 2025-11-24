@@ -22,6 +22,7 @@ import RequireVerified from "@/components/RequireVerified";
 import TestTeachingUnit from "./pages/TestTeachingUnit";
 import TestTeachingUnitSimple from "./pages/TestTeachingUnitSimple";
 import WorkshopDemo from "./pages/WorkshopDemo";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/project-incubation/foundation/impact" element={<ProjectFoundation />} />
             <Route path="/project-incubation/projects" element={<ProjectManagement />} />
             <Route path="/project-incubation/discovery" element={<ProjectDiscovery />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/test-teaching-unit" element={<TestTeachingUnit />} />
             <Route path="/test-simple" element={<TestTeachingUnitSimple />} />

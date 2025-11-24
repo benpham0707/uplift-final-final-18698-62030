@@ -497,7 +497,7 @@ export default function PIQWorkshop() {
       insight += `Critical priority: ${criticalNames} ${criticalDimensions.length === 1 ? 'needs' : 'need'} immediate revision—${criticalDimensions[0].issues[0]?.problem || 'address flagged issues'}. `;
     } else if (weakest) {
       insight += `To reach ${score >= 70 ? 'excellence' : 'competitiveness'}, strengthen ${weakest.name.toLowerCase()} (currently ${weakest.score}/${weakest.maxScore})`;
-      if (weakest.issues[0]) {
+      if (weakest.issues[0]?.problem) {
         insight += `—${weakest.issues[0].problem.split('.')[0]}. `;
       } else {
         insight += `. `;

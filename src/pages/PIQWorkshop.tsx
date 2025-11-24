@@ -459,51 +459,49 @@ export default function PIQWorkshop() {
       <div className="relative z-10 mx-auto px-4 py-12 space-y-6">
         {/* Hero section */}
         <div className="space-y-6">
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            {/* Score card */}
-            <Card className="flex-1 p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="text-sm text-muted-foreground mb-1">Narrative Quality Index</div>
-                  <div className="flex items-baseline gap-3">
-                    <div className="text-5xl font-bold text-primary">{currentScore}</div>
-                    <div className="text-lg text-muted-foreground">/100</div>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${nqiConfig.bg} ${nqiConfig.color} border ${nqiConfig.border}`}>
-                  {nqiConfig.label}
+          {/* Score card */}
+          <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Narrative Quality Index</div>
+                <div className="flex items-baseline gap-3">
+                  <div className="text-5xl font-bold text-primary">{currentScore}</div>
+                  <div className="text-lg text-muted-foreground">/100</div>
                 </div>
               </div>
-
-              {scoreDelta !== 0 && (
-                <div className={`flex items-center gap-2 text-sm ${scoreDelta > 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                  {scoreDelta > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  <span>{scoreDelta > 0 ? '+' : ''}{scoreDelta} from initial</span>
-                </div>
-              )}
-
-              <div className="mt-6 grid grid-cols-3 gap-4 pt-4 border-t">
-                <div>
-                  <div className="text-2xl font-bold text-primary">{fixedIssues}/{totalIssues}</div>
-                  <div className="text-xs text-muted-foreground">Issues Fixed</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{needsWorkIssues}</div>
-                  <div className="text-xs text-muted-foreground">Needs Work</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">{criticalIssues}</div>
-                  <div className="text-xs text-muted-foreground">Critical</div>
-                </div>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium ${nqiConfig.bg} ${nqiConfig.color} border ${nqiConfig.border}`}>
+                {nqiConfig.label}
               </div>
-            </Card>
+            </div>
+
+            {scoreDelta !== 0 && (
+              <div className={`flex items-center gap-2 text-sm ${scoreDelta > 0 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                {scoreDelta > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                <span>{scoreDelta > 0 ? '+' : ''}{scoreDelta} from initial</span>
+              </div>
+            )}
+
+            <div className="mt-6 grid grid-cols-3 gap-4 pt-4 border-t">
+              <div>
+                <div className="text-2xl font-bold text-primary">{fixedIssues}/{totalIssues}</div>
+                <div className="text-xs text-muted-foreground">Issues Fixed</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{needsWorkIssues}</div>
+                <div className="text-xs text-muted-foreground">Needs Work</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">{criticalIssues}</div>
+                <div className="text-xs text-muted-foreground">Critical</div>
+              </div>
+            </div>
 
             {/* Action buttons */}
-            <div className="flex flex-col gap-3">
+            <div className="flex gap-3 mt-6 pt-4 border-t">
               <Button 
                 onClick={handleRequestReanalysis}
                 disabled={!needsReanalysis || isAnalyzing}
-                className="gap-2"
+                className="gap-2 flex-1"
               >
                 {isAnalyzing ? (
                   <>
@@ -517,18 +515,18 @@ export default function PIQWorkshop() {
                   </>
                 )}
               </Button>
-              <Button variant="outline" onClick={() => setShowVersionHistory(true)} className="gap-2">
+              <Button variant="outline" onClick={() => setShowVersionHistory(true)} className="gap-2 flex-1">
                 <History className="w-4 h-4" />
                 View History
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Main workshop area */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Left column: Editor + Rubric */}
-          <div className="space-y-6">
+          <div className="lg:col-span-3 space-y-6">
             {/* Editor */}
             <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
               <EditorView
@@ -576,7 +574,7 @@ export default function PIQWorkshop() {
           </div>
 
           {/* Right column: Chat */}
-          <div>
+          <div className="lg:col-span-2">
             <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg sticky top-24">
               <ContextualWorkshopChat
                 activity={MOCK_PIQ as any}

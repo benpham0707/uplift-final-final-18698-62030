@@ -342,15 +342,15 @@ export default function ContextualWorkshopChat({
       {/* Header */}
       <div className="p-4 border-b flex-shrink-0">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-purple-600" />
+          <MessageCircle className="w-5 h-5 text-purple-700" />
           <GradientText
-            className="text-lg font-semibold"
-            colors={["#8b5cf6", "#a78bfa", "#8b5cf6"]}
+            className="text-xl font-semibold"
+            colors={["#7c3aed", "#8b5cf6", "#7c3aed"]}
           >
             AI Essay Coach
           </GradientText>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Ask me anything about your {activity.name} narrative
         </p>
       </div>

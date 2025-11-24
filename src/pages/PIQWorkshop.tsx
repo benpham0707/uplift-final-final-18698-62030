@@ -443,6 +443,7 @@ export default function PIQWorkshop() {
   const scoreDelta = currentScore - initialScore;
 
   // Filter dimensions by status for hover tooltips
+  const goodDimensions = dimensions.filter(d => d.status === 'good');
   const needsWorkDimensions = dimensions.filter(d => d.status === 'needs_work');
   const criticalDimensions = dimensions.filter(d => d.status === 'critical');
 

@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.workshop-analysis]
 verify_jwt = false
+
+[functions.narrative-overview]
+verify_jwt = false

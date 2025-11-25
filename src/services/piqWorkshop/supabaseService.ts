@@ -1,12 +1,20 @@
 /**
- * PIQ Workshop Supabase Service
+ * PIQ Workshop Supabase Service (DEPRECATED)
  *
- * Handles cloud storage, version history, and cross-device sync
+ * This service is being replaced by piqDatabaseService.ts which uses the
+ * existing essay system tables and Clerk authentication.
+ *
+ * The functions here reference a non-existent piq_essay_versions table
+ * and use outdated Supabase auth instead of Clerk.
+ *
+ * @deprecated Use piqDatabaseService.ts instead
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import type { AnalysisResult } from '@/components/portfolio/extracurricular/workshop/backendTypes';
 import type { DraftVersion } from './storageService';
+
+// This entire file is deprecated - use piqDatabaseService.ts instead
 
 export interface CloudVersion {
   id: string;

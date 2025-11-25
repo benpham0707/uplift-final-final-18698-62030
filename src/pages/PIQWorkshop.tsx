@@ -44,11 +44,18 @@ import {
   type PIQWorkshopCache,
   type DraftVersion as StorageDraftVersion
 } from '@/services/piqWorkshop/storageService';
+
+// Database Services (NEW - replaces supabaseService)
 import {
-  saveVersionToCloud,
-  loadVersionsFromCloud,
-  type CloudVersion
-} from '@/services/piqWorkshop/supabaseService';
+  saveOrUpdatePIQEssay,
+  saveAnalysisReport,
+  loadPIQEssay,
+  getVersionHistory,
+  getCurrentEssayId
+} from '@/services/piqWorkshop/piqDatabaseService';
+
+// Authentication
+import { useClerkUserId, useIsAuthenticated } from '@/services/auth/clerkSupabaseAdapter';
 
 // ============================================================================
 // MOCK DATA - Hardcoded for demonstration
@@ -274,8 +281,21 @@ export default function PIQWorkshop() {
   const navigate = useNavigate();
 
   // ============================================================================
+  // AUTHENTICATION
+  // ============================================================================
+
+  const userId = useClerkUserId();
+  const isAuthenticated = useIsAuthenticated();
+
+  // ============================================================================
   // STATE
   // ============================================================================
+
+  // Database state (NEW)
+  const [currentEssayId, setCurrentEssayId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [lastSaveError, setLastSaveError] = useState<string | null>(null);
+  const [isLoadingFromDatabase, setIsLoadingFromDatabase] = useState(false);
 
   const [currentDraft, setCurrentDraft] = useState(MOCK_PIQ.description);
   const [draftVersions, setDraftVersions] = useState<DraftVersion[]>([
@@ -433,6 +453,21 @@ export default function PIQWorkshop() {
       setHasUnsavedChanges(false);
       console.log('✅ Analysis complete - UI updated');
 
+      // AUTO-SAVE analysis result to database (NEW)
+      if (userId && currentEssayId) {
+        console.log('📤 Auto-saving analysis result to database...');
+        const saveResult = await saveAnalysisReport(userId, currentEssayId, result);
+        if (saveResult.success) {
+          console.log('✅ Analysis auto-saved to database:', saveResult.reportId);
+        } else {
+          console.warn('⚠️  Failed to auto-save analysis:', saveResult.error);
+          // Non-blocking - don't interrupt user flow
+        }
+      } else if (userId) {
+        console.log('📝 Essay not saved yet - skipping analysis auto-save');
+        // Analysis will be saved next time user saves the essay
+      }
+
       // Call separate narrative overview endpoint (non-blocking)
       fetchNarrativeOverview(result);
     } catch (error) {
@@ -446,7 +481,7 @@ export default function PIQWorkshop() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [currentDraft, selectedPromptId]);
+  }, [currentDraft, selectedPromptId, userId, currentEssayId]);
 
   // NO auto-analysis - wait for user to click "Analyze" button
 
@@ -498,15 +533,139 @@ export default function PIQWorkshop() {
   // AUTO-SAVE & RESUME SESSION
   // ============================================================================
 
-  // Resume session on mount
+  // Load from database on mount (NEW)
   useEffect(() => {
+    async function loadFromDatabase() {
+      if (!userId || !selectedPromptId) {
+        console.log('⏭️  Skipping database load: no user or prompt selected');
+        return;
+      }
+
+      const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+      if (!selectedPrompt) {
+        console.warn('Invalid prompt selection on mount');
+        return;
+      }
+
+      setIsLoadingFromDatabase(true);
+      console.log(`📥 Loading essay from database for prompt: ${selectedPromptId}`);
+
+      try {
+        const { success, essay, analysis, error } = await loadPIQEssay(
+          userId,
+          selectedPromptId,
+          selectedPrompt.prompt
+        );
+
+        if (!success) {
+          console.error('❌ Failed to load from database:', error);
+          setIsLoadingFromDatabase(false);
+          return;
+        }
+
+        if (essay) {
+          console.log(`✅ Loaded essay from database: ${essay.id} (version ${essay.version})`);
+
+          // Update state with database data
+          setCurrentEssayId(essay.id);
+          setCurrentDraft(essay.draft_current || essay.draft_original);
+
+          // Create initial version from loaded essay
+          const initialVersion: DraftVersion = {
+            text: essay.draft_current || essay.draft_original,
+            timestamp: new Date(essay.updated_at).getTime(),
+            score: 73 // Will be updated if analysis is available
+          };
+
+          setDraftVersions([initialVersion]);
+          setCurrentVersionIndex(0);
+
+          // Load analysis if available
+          if (analysis) {
+            console.log(`✅ Loaded analysis from database: NQI ${analysis.analysis?.narrative_quality_index}`);
+            setAnalysisResult(analysis);
+
+            // Update initial version with actual score
+            if (analysis.analysis?.narrative_quality_index) {
+              initialVersion.score = analysis.analysis.narrative_quality_index;
+              setDraftVersions([initialVersion]);
+              initialScoreRef.current = analysis.analysis.narrative_quality_index;
+            }
+
+            // Transform analysis to UI dimensions (same logic as performFullAnalysis)
+            if (analysis.rubricDimensionDetails && analysis.rubricDimensionDetails.length > 0) {
+              const transformedDimensions: RubricDimension[] = analysis.rubricDimensionDetails.map((dim) => {
+                const status = dim.final_score >= 8 ? 'good' : dim.final_score >= 6 ? 'needs_work' : 'critical';
+
+                const issuesForDimension = (analysis.workshopItems || [])
+                  .filter(item => item.rubric_category === dim.dimension_name);
+
+                const transformedIssues = issuesForDimension.map((item) => ({
+                  id: item.id,
+                  dimensionId: dim.dimension_name,
+                  title: item.problem,
+                  excerpt: item.quote,
+                  analysis: item.why_it_matters,
+                  impact: `Severity: ${item.severity}`,
+                  suggestions: item.suggestions.map((sug) => ({
+                    text: sug.text,
+                    rationale: sug.rationale,
+                    type: sug.type === 'polished_original' ? 'replace' as const :
+                          sug.type === 'voice_amplifier' ? 'replace' as const :
+                          'replace' as const
+                  })),
+                  status: 'not_fixed' as const,
+                  currentSuggestionIndex: 0,
+                  expanded: false,
+                }));
+
+                return {
+                  id: dim.dimension_name,
+                  name: dim.dimension_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                  score: dim.final_score,
+                  maxScore: 10,
+                  status,
+                  weight: 10,
+                  overview: dim.evidence?.justification || 'Analysis in progress',
+                  issues: transformedIssues,
+                };
+              });
+
+              setDimensions(transformedDimensions);
+            }
+          }
+
+          setLastSaveTime(new Date(essay.updated_at));
+          setHasUnsavedChanges(false);
+          console.log('✅ Database load complete');
+
+        } else {
+          console.log('📭 No saved essay in database for this prompt');
+          // Fall through to localStorage check
+        }
+
+      } catch (error) {
+        console.error('❌ Unexpected error loading from database:', error);
+      } finally {
+        setIsLoadingFromDatabase(false);
+      }
+    }
+
+    loadFromDatabase();
+  }, [userId, selectedPromptId]); // Only run when user or prompt changes
+
+  // Resume session on mount (fallback to localStorage if database has nothing)
+  useEffect(() => {
+    // Only check localStorage if we're not loading from database
+    if (isLoadingFromDatabase) return;
+
     const { hasAutoSave, promptId, lastSaved } = hasRecentAutoSave();
 
-    if (hasAutoSave && promptId && lastSaved) {
+    if (hasAutoSave && promptId && lastSaved && !currentEssayId) {
       setShowResumeSessionBanner(true);
       console.log(`📦 Found auto-save from ${formatSaveTime(lastSaved)} for prompt ${promptId}`);
     }
-  }, []);
+  }, [isLoadingFromDatabase, currentEssayId]);
 
   // Auto-save every 30 seconds
   useEffect(() => {
@@ -635,7 +794,10 @@ export default function PIQWorkshop() {
     setHasUnsavedChanges(true);
   }, []);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    console.log('💾 handleSave called');
+
+    // 1. Update local state (keep existing logic for UI responsiveness)
     const newVersion: DraftVersion = {
       text: currentDraft,
       timestamp: Date.now(),
@@ -646,10 +808,91 @@ export default function PIQWorkshop() {
     setDraftVersions(newVersions);
     setCurrentVersionIndex(newVersions.length - 1);
 
-    if (needsReanalysis) {
-      performFullAnalysis(); // Use REAL backend analysis
+    // 2. Save to database (NEW)
+    if (!selectedPromptId || !userId) {
+      console.warn('Cannot save to database: missing prompt or userId');
+      if (!userId) {
+        alert('Please sign in to save your work to the cloud');
+      }
+      // Still allow local save
+      return;
     }
-  }, [currentDraft, draftVersions, currentVersionIndex, needsReanalysis, performFullAnalysis, analysisResult]);
+
+    const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+    if (!selectedPrompt) {
+      console.warn('Cannot save: invalid prompt selection');
+      return;
+    }
+
+    setSaveStatus('saving');
+    setLastSaveError(null);
+
+    try {
+      // Save essay to database
+      console.log('📤 Saving essay to database...');
+      const { success, essayId, error, isNew } = await saveOrUpdatePIQEssay(
+        userId,
+        selectedPromptId,
+        selectedPrompt.prompt,
+        currentDraft,
+        draftVersions[0]?.text // Use first version as original
+      );
+
+      if (!success) {
+        console.error('❌ Failed to save essay:', error);
+        setSaveStatus('error');
+        setLastSaveError(error || 'Failed to save essay');
+        // Don't block the user - they can try again
+        return;
+      }
+
+      // Update current essay ID
+      if (essayId) {
+        setCurrentEssayId(essayId);
+      }
+
+      console.log(`✅ Essay ${isNew ? 'created' : 'updated'}: ${essayId}`);
+
+      // Save analysis result if present
+      if (analysisResult && essayId) {
+        console.log('📤 Saving analysis result to database...');
+        const analysisResult2 = await saveAnalysisReport(userId, essayId, analysisResult);
+
+        if (!analysisResult2.success) {
+          console.warn('⚠️  Failed to save analysis result:', analysisResult2.error);
+          // Non-blocking - analysis can be regenerated
+        } else {
+          console.log('✅ Analysis result saved:', analysisResult2.reportId);
+        }
+      }
+
+      setSaveStatus('saved');
+      setLastSaveTime(new Date());
+      setHasUnsavedChanges(false);
+
+      console.log('✅ Save complete');
+
+    } catch (error) {
+      console.error('❌ Unexpected error during save:', error);
+      setSaveStatus('error');
+      setLastSaveError((error as Error).message);
+    }
+
+    // 3. Re-analyze if needed (but don't trigger auto-save during analysis)
+    if (needsReanalysis) {
+      console.log('🔄 Triggering re-analysis after save...');
+      await performFullAnalysis();
+    }
+  }, [
+    currentDraft,
+    draftVersions,
+    currentVersionIndex,
+    selectedPromptId,
+    userId,
+    analysisResult,
+    needsReanalysis,
+    performFullAnalysis
+  ]);
 
   const handleUndo = useCallback(() => {
     if (currentVersionIndex > 0) {
@@ -996,7 +1239,43 @@ export default function PIQWorkshop() {
               )}
             </p>
           </div>
-          <div className="w-24" />
+
+          {/* Save Status Indicator (NEW) */}
+          <div className="flex items-center gap-2">
+            {saveStatus === 'saving' && (
+              <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+            {saveStatus === 'saved' && (
+              <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
+                <CheckCircle className="w-4 h-4" />
+                <span>Saved</span>
+              </div>
+            )}
+            {saveStatus === 'error' && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 cursor-help">
+                      <XCircle className="w-4 h-4" />
+                      <span>Error</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">{lastSaveError || 'Failed to save'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {!isAuthenticated && (
+              <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                <AlertTriangle className="w-4 h-4" />
+                <span>Sign in to save</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

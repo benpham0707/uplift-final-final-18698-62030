@@ -1,444 +1,760 @@
-# Integration Plan: Complete Narrative Workshop Backend → Frontend
+# PIQ Workshop: Save, Caching, and Versioning System - Implementation Plan
 
 ## Executive Summary
 
-We need to seamlessly integrate our comprehensive narrative workshop backend (shown in `TEST_OUTPUT_FINAL_LEGO.md`) with the PIQWorkshop frontend to ensure students receive ALL valuable insights, scores, and feedback without losing any information.
+The PIQ Workshop currently has a **fundamentally broken save and versioning system**. While the analysis backend works correctly, users cannot reliably persist their work across sessions or devices. This plan addresses critical database infrastructure issues, implements proper save flows, and builds a complete versioning system.
 
-## 🎯 CORE PRINCIPLE: NEVER COMPROMISE QUALITY
+---
 
-**CRITICAL RULE:** We will NEVER lower the quality of backend output to make integration easier. If there are gaps or formatting needs:
-- ✅ **ADD** additional API/LLM calls to enhance or format data
-- ✅ **PRESERVE** all existing backend analysis depth
-- ✅ **USE** the full `runSurgicalWorkshop()` pipeline (not simplified versions)
-- ❌ **NEVER** remove analysis steps or simplify prompts
-- ❌ **NEVER** use shortcuts that reduce insight quality
+## Current System Analysis
 
-The backend analysis in `TEST_OUTPUT_FINAL_LEGO.md` represents our quality bar. We will match or exceed it, never fall below it.
+### What Works ✅
+- **Analysis Engine**: Full 4-stage surgical workshop analysis (voice fingerprint, experience fingerprint, 12-dimension rubric, workshop items)
+- **Local Caching**: Analysis results cached in localStorage for 7 days
+- **Auto-save Timer**: Triggers every 30 seconds when there are unsaved changes
+- **UI/UX**: Score display, dimension cards, workshop chat, editor interface
 
-## Current State Analysis
+### Critical Issues ❌
 
-### Backend Capabilities (from test-final-lego.ts output)
-The backend provides rich analysis through `runSurgicalWorkshop()`:
+#### 1. **Missing Database Table** (BLOCKING)
+- Code references `piq_essay_versions` table that doesn't exist in the database
+- All cloud saves fail with "relation 'piq_essay_versions' does not exist" error
+- No persistent storage across devices or sessions
 
-1. **Overall Assessment**
-   - EQI Score (0-100)
-   - Target Tier classification
-   - Processing time metrics
+#### 2. **Save Button Not Working**
+- `handleSave()` only updates local state
+- No database inserts
+- No analysis result persistence
+- Triggers re-analysis but doesn't save the results
 
-2. **12-Dimension Rubric Breakdown**
-   - `opening_power_scene_entry`
-   - `narrative_arc_stakes_turn`
-   - `character_interiority_vulnerability`
-   - `show_dont_tell_craft`
-   - `reflection_meaning_making`
-   - `intellectual_vitality_curiosity`
-   - `originality_specificity_voice`
-   - `structure_pacing_coherence`
-   - `word_economy_craft`
-   - `context_constraints_disclosure`
-   - `ethical_awareness_humility`
-   - `school_program_fit`
+#### 3. **Versioning Not Persisting**
+- Versions stored only in React state + localStorage (max 10 versions)
+- No cloud backup of version history
+- Cannot view version history after browser clear
+- No comparison between versions
 
-   Each dimension includes:
-   - Raw score (0-10)
-   - Final score (0-10)
-   - Evidence/justification text
+#### 4. **Analysis Results Not Saved to Database**
+- Analysis results cached locally but never inserted into `essay_analysis_reports` table
+- Loss of historical analysis data
+- Cannot track improvement over time
 
-3. **Voice Fingerprint**
-   - Sentence structure patterns & examples
-   - Vocabulary level & signature words
-   - Pacing (speed & rhythm)
-   - Tone (primary & secondary)
+#### 5. **Authentication Mismatch**
+- Code uses `supabase.auth.getUser()` but project uses Clerk authentication
+- Recent commit: "Fix frontend using Supabase token instead of Clerk token" indicates known issue
+- All Supabase calls will fail authentication
 
-4. **Experience Fingerprint (Anti-Convergence System)**
-   - Uniqueness dimensions:
-     - Unusual circumstances
-     - Unexpected emotions
-     - Contrary insights
-     - Specific sensory anchors
-     - Unique relationships
-     - Cultural specificity
-   - Anti-pattern detection flags
-   - Divergence requirements (must include/avoid)
-   - Quality anchors to preserve
-   - Confidence score
+#### 6. **Auto-save Not Triggering Re-analysis**
+- Auto-save correctly doesn't trigger analysis ✅
+- But manually clicking "Save" should save to database (currently doesn't)
 
-5. **Workshop Items (Surgical Fixes)**
-   - Problem identification
-   - Severity level (critical/warning/optimization)
-   - Category mapping
-   - "Why it matters" explanations
-   - Original text quotes
-   - Multiple suggestions (3 types):
-     - `polished_original`
-     - `voice_amplifier`
-     - `divergent_strategy`
-   - Rationale for each suggestion
+---
 
-6. **Performance Metrics**
-   - Stage-by-stage timing breakdown
+## Solution Architecture
 
-### Frontend Current State (PIQWorkshopIntegrated.tsx)
+### Three-Tier Storage System
 
-**What's Working:**
-- Basic analysis display with NQI score
-- Category scores displayed as "Rubric Dimensions"
-- Issue expansion/collapse with arrow navigation through suggestions
-- Draft editor with word count
-- Re-analysis capability
-
-**What's Missing:**
-- No Voice Fingerprint display
-- No Experience Fingerprint display (new anti-convergence system)
-- Limited dimension detail (missing raw vs final scores)
-- No evidence/justification display for dimensions
-- No performance metrics visibility
-- No overall assessment tier display
-- Suggestions don't show their strategic type (polished_original vs voice_amplifier vs divergent_strategy)
-
-## Integration Architecture
-
-### Data Flow
 ```
-User Essay Input
-    ↓
-[runSurgicalWorkshop] (backend)
-    ↓
-SurgicalWorkshopResult {
-  - overallScore
-  - voiceFingerprint
-  - experienceFingerprint ← NEW!
-  - workshopItems
-  - rubricResult (12 dimensions)
-  - performanceMetrics
-}
-    ↓
-[Transform to Frontend Format]
-    ↓
-PIQWorkshopIntegrated UI
+┌─────────────────────────────────────────────────────────────────┐
+│                    1. REACT STATE (Immediate)                    │
+│  currentDraft, analysisResult, dimensions, draftVersions         │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│            2. LOCALSTORAGE (Auto-save every 30s)                 │
+│  - Quick resume on refresh                                       │
+│  - Keep last 10 versions                                         │
+│  - Cache analysis results (7 days)                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│           3. SUPABASE CLOUD (Manual "Save" button)               │
+│  - essays table: current draft                                   │
+│  - essay_revision_history: full version history                  │
+│  - essay_analysis_reports: analysis snapshots                    │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Database Schema Design
+
+### Option A: Use Existing Tables (RECOMMENDED)
+
+**Rationale**: The existing `essay_revision_history` table already provides versioning functionality. We should use it instead of creating a separate `piq_essay_versions` table.
+
+#### Tables to Use:
+
+**1. `essays` table** (already exists)
+```sql
+-- Store current PIQ draft
+- essay_type = 'uc_piq'
+- prompt_text = selected PIQ prompt
+- draft_original = initial draft
+- draft_current = current working draft
+- version = auto-incremented on update (via trigger)
+```
+
+**2. `essay_revision_history` table** (already exists)
+```sql
+-- Automatically populated by trigger when essay.draft_current changes
+- essay_id
+- version (incremented)
+- draft_content (snapshot)
+- word_count
+- created_at
+```
+
+**3. `essay_analysis_reports` table** (already exists)
+```sql
+-- Store analysis results linked to essay
+- essay_id
+- essay_quality_index (maps to narrative_quality_index)
+- dimension_scores (JSONB: store full rubricDimensionDetails)
+- flags (store workshop items)
+- created_at
+```
+
+#### New Fields Needed:
+
+Add to `essay_analysis_reports`:
+```sql
+ALTER TABLE essay_analysis_reports
+ADD COLUMN voice_fingerprint JSONB,
+ADD COLUMN experience_fingerprint JSONB,
+ADD COLUMN workshop_items JSONB,
+ADD COLUMN full_analysis_result JSONB;
+```
+
+### Option B: Create New PIQ-Specific Table
+
+Only if we need PIQ-specific features not covered by existing schema:
+
+```sql
+CREATE TABLE piq_essay_versions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  prompt_id TEXT NOT NULL,  -- 'piq1', 'piq2', etc.
+  prompt_title TEXT NOT NULL,
+  essay_text TEXT NOT NULL,
+  word_count INTEGER NOT NULL,
+  analysis_snapshot JSONB,
+  narrative_quality_index NUMERIC(5,2),
+  version_number INTEGER NOT NULL,
+  is_current BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_piq_versions_user_prompt ON piq_essay_versions(user_id, prompt_id);
+CREATE INDEX idx_piq_versions_current ON piq_essay_versions(user_id, prompt_id, is_current) WHERE is_current = TRUE;
+```
+
+**Decision**: Use **Option A** (existing tables) to reduce complexity and leverage existing infrastructure.
+
+---
 
 ## Implementation Plan
 
-### Phase 1: Backend Service Integration (CRITICAL)
-**Goal:** Ensure PIQ analysis uses the full surgical workshop backend
+### Phase 1: Database Infrastructure (CRITICAL - Must be first)
 
-**Files to modify:**
-1. `src/services/piqWorkshopAnalysisService.ts`
+#### Task 1.1: Add Missing Columns to `essay_analysis_reports`
+```sql
+ALTER TABLE essay_analysis_reports
+ADD COLUMN voice_fingerprint JSONB,
+ADD COLUMN experience_fingerprint JSONB,
+ADD COLUMN workshop_items JSONB,
+ADD COLUMN full_analysis_result JSONB;
+```
 
-**Changes:**
-- Currently uses `/api/analyze-entry` endpoint
-- Need to call `runSurgicalWorkshop()` directly or create new endpoint
-- Ensure we get `SurgicalWorkshopResult` with ALL data
+#### Task 1.2: Fix Authentication Integration
+- **Problem**: Code uses Supabase Auth, but app uses Clerk
+- **Solution**: Create helper function to get Clerk user ID and use it for Supabase RLS
 
-**Action Items:**
-- [ ] Create new service function `analyzePIQWithFullWorkshop()`
-- [ ] Import and call `runSurgicalWorkshop()` from `surgicalOrchestrator.ts`
-- [ ] Transform `SurgicalWorkshopResult` to match frontend `AnalysisResult` type
-- [ ] Preserve ALL data fields (voice, experience fingerprint, etc.)
-
-### Phase 2: Type System Enhancement
-**Goal:** Extend types to support all new data
-
-**Files to modify:**
-1. `src/components/portfolio/extracurricular/workshop/backendTypes.ts`
-
-**Changes:**
-- Add `VoiceFingerprintData` interface
-- Add `ExperienceFingerprintData` interface
-- Extend `AnalysisResult` to include these new fields
-- Add `DimensionScoreDetail` with raw/final scores + evidence
-
-**New Interfaces:**
+**File**: `src/services/auth/clerkSupabaseAdapter.ts` (NEW)
 ```typescript
-export interface VoiceFingerprintData {
-  sentenceStructure: {
-    pattern: string;
-    example: string;
-  };
-  vocabulary: {
-    level: string;
-    signatureWords: string[];
-  };
-  pacing: {
-    speed: string;
-    rhythm: string;
-  };
-  tone: {
-    primary: string;
-    secondary: string;
-  };
+/**
+ * Adapter to bridge Clerk auth with Supabase RLS
+ */
+export async function getCurrentUserId(): Promise<string | null> {
+  // Get Clerk user ID
+  const { userId } = useAuth(); // Clerk hook
+
+  // Map to Supabase user_id (may need user mapping table)
+  return userId;
 }
 
-export interface ExperienceFingerprintData {
-  unusualCircumstance?: {
-    description: string;
-    whyItMatters: string;
-    specificDetail: string;
-  };
-  unexpectedEmotion?: { ... };
-  contraryInsight?: { ... };
-  // ... all other uniqueness dimensions
-  antiPatternFlags: {
-    followsTypicalArc: boolean;
-    hasGenericInsight: boolean;
-    hasManufacturedBeat: boolean;
-    hasCrowdPleaser: boolean;
-    warnings: string[];
-  };
-  divergenceRequirements: {
-    mustInclude: string[];
-    mustAvoid: string[];
-    uniqueAngle: string;
-    authenticTension: string;
-  };
-  qualityAnchors: Array<{
-    sentence: string;
-    whyItWorks: string;
-    preservationPriority: string;
-  }>;
-  confidenceScore: number;
-}
+export async function getSupabaseAuthHeaders(): Promise<{ 'Authorization': string }> {
+  // Get Clerk JWT token
+  const { getToken } = useAuth();
+  const token = await getToken({ template: 'supabase' });
 
-export interface DimensionScoreDetail {
-  dimension_name: string;
-  raw_score: number;
-  final_score: number;
-  evidence: {
-    justification: string;
-  };
+  return { 'Authorization': `Bearer ${token}` };
 }
 ```
 
-### Phase 3: UI Component Development
-**Goal:** Create beautiful, intuitive displays for all data
+#### Task 1.3: Update Supabase Service to Use Clerk Auth
+**File**: `src/services/piqWorkshop/supabaseService.ts`
 
-**New Components to Create:**
-
-1. **`VoiceFingerprintCard.tsx`**
-   - Display sentence structure patterns with examples
-   - Show vocabulary analysis
-   - Visualize pacing characteristics
-   - Present tone analysis
-   - Design: Compact card with expandable sections
-
-2. **`ExperienceFingerprintCard.tsx`**
-   - Show uniqueness dimensions (6 types)
-   - Display anti-pattern warnings (traffic light system)
-   - Present divergence requirements
-   - Show quality anchors to preserve
-   - Design: Prominent card with icon system for different dimension types
-
-3. **`DimensionDetailCard.tsx`** (enhance existing RubricDimensionCard)
-   - Show raw vs final scores with delta
-   - Display full evidence/justification
-   - Better visual hierarchy
-   - Keep existing suggestion navigation
-
-4. **`PerformanceMetricsPanel.tsx`** (optional, low priority)
-   - Show timing breakdown
-   - Useful for debugging/transparency
-
-**UI Layout Strategy:**
-```
-┌─────────────────────────────────────────────────────┐
-│ Header: Score + Navigation                          │
-└─────────────────────────────────────────────────────┘
-┌──────────────────────┬──────────────────────────────┐
-│                      │                              │
-│  Main Analysis       │  Editor Panel                │
-│  (2/3 width)         │  (1/3 width, sticky)         │
-│                      │                              │
-│  ┌───────────────┐   │  ┌────────────────────────┐  │
-│  │ Overall Score │   │  │ Your Essay             │  │
-│  │ + Target Tier │   │  │                        │  │
-│  └───────────────┘   │  │ [Textarea]             │  │
-│                      │  │                        │  │
-│  ┌───────────────┐   │  └────────────────────────┘  │
-│  │ Voice         │   │                              │
-│  │ Fingerprint   │   │  ┌────────────────────────┐  │
-│  └───────────────┘   │  │ Re-analyze Button      │  │
-│                      │  └────────────────────────┘  │
-│  ┌───────────────┐   │                              │
-│  │ Experience    │   │                              │
-│  │ Fingerprint   │   │                              │
-│  │ ⚠️ Flags       │   │                              │
-│  └───────────────┘   │                              │
-│                      │                              │
-│  ┌───────────────┐   │                              │
-│  │ 12 Dimensions │   │                              │
-│  │ [Expandable]  │   │                              │
-│  │               │   │                              │
-│  │ • Dimension 1 │   │                              │
-│  │   Raw: 4      │   │                              │
-│  │   Final: 4    │   │                              │
-│  │   [Issues]    │   │                              │
-│  │               │   │                              │
-│  │ • Dimension 2 │   │                              │
-│  │ ...           │   │                              │
-│  └───────────────┘   │                              │
-│                      │                              │
-└──────────────────────┴──────────────────────────────┘
+Replace all instances of:
+```typescript
+const { data: { user } } = await supabase.auth.getUser();
 ```
 
-### Phase 4: Enhanced Workshop Items Display
-**Goal:** Show suggestion types and better rationale
+With:
+```typescript
+const userId = await getCurrentUserId();
+if (!userId) {
+  return { success: false, error: 'User not authenticated' };
+}
+```
 
-**Files to modify:**
-1. `src/components/portfolio/extracurricular/workshop/RubricDimensionCard.tsx` (or create new)
+#### Task 1.4: Create Database Migration Script
+**File**: `supabase/migrations/2025-11-25_add_piq_analysis_fields.sql`
 
-**Enhancements:**
-- Badge/label for suggestion type (polished_original, voice_amplifier, divergent_strategy)
-- Color coding:
-  - Blue for `polished_original`
-  - Purple for `voice_amplifier`
-  - Orange for `divergent_strategy`
-- Better rationale formatting with "Why it works:" emphasis
-- Keep existing arrow navigation (one suggestion at a time)
+---
 
-### Phase 5: Integration & Testing
+### Phase 2: Save Flow Implementation
 
-**Test Cases:**
-1. **Full Data Flow Test**
-   - Input: Lego essay (from test file)
-   - Verify ALL backend data reaches frontend
-   - Verify no data loss in transformation
+#### Task 2.1: Create PIQ Database Service
+**File**: `src/services/piqWorkshop/piqDatabaseService.ts` (NEW)
 
-2. **UI Display Test**
-   - Voice Fingerprint displays correctly
-   - Experience Fingerprint shows all dimensions
-   - Anti-pattern warnings visible
-   - 12 dimensions with raw/final scores
-   - Workshop items show all 3 suggestion types
+Functions to implement:
+```typescript
+/**
+ * Save or update PIQ essay in database
+ */
+export async function saveOrUpdatePIQEssay(
+  promptId: string,
+  promptText: string,
+  currentDraft: string,
+  analysisResult: AnalysisResult | null
+): Promise<{ success: boolean; essayId?: string; error?: string }>
 
-3. **Interaction Test**
-   - Arrow navigation through suggestions works
-   - Expand/collapse dimensions works
-   - Re-analysis preserves new data
-   - Editor updates properly
+/**
+ * Save analysis result to database
+ */
+export async function saveAnalysisReport(
+  essayId: string,
+  analysisResult: AnalysisResult
+): Promise<{ success: boolean; reportId?: string; error?: string }>
 
-4. **Edge Cases**
-   - Missing voice fingerprint data
-   - Missing experience fingerprint data
-   - Dimensions with 0 issues
-   - Very long justification text
+/**
+ * Load PIQ essay and latest analysis from database
+ */
+export async function loadPIQEssay(
+  promptId: string
+): Promise<{
+  success: boolean;
+  essay?: Essay;
+  analysis?: AnalysisResult;
+  error?: string
+}>
 
-## Technical Considerations
+/**
+ * Get version history for PIQ essay
+ */
+export async function getVersionHistory(
+  essayId: string
+): Promise<{ success: boolean; versions?: EssayVersion[]; error?: string }>
+```
 
-### Performance
-- Full analysis takes ~100-110 seconds (from test output)
-- Need loading states with progress indication
-- Consider caching analysis results
+#### Task 2.2: Fix `handleSave()` in PIQWorkshop.tsx
 
-### Error Handling
-- Graceful fallback if new fields missing
-- Clear error messages
-- Retry mechanism
+**Current code** (line 638-652):
+```typescript
+const handleSave = useCallback(() => {
+  const newVersion: DraftVersion = {
+    text: currentDraft,
+    timestamp: Date.now(),
+    score: analysisResult?.analysis?.narrative_quality_index || 73
+  };
+  const newVersions = draftVersions.slice(0, currentVersionIndex + 1);
+  newVersions.push(newVersion);
+  setDraftVersions(newVersions);
+  setCurrentVersionIndex(newVersions.length - 1);
 
-### Backwards Compatibility
-- Keep existing heuristic fallback functional
-- Don't break current working features
-- Progressive enhancement approach
+  if (needsReanalysis) {
+    performFullAnalysis();
+  }
+}, [currentDraft, draftVersions, currentVersionIndex, needsReanalysis, performFullAnalysis, analysisResult]);
+```
+
+**New implementation**:
+```typescript
+const handleSave = useCallback(async () => {
+  // 1. Update local state (keep existing logic)
+  const newVersion: DraftVersion = {
+    text: currentDraft,
+    timestamp: Date.now(),
+    score: analysisResult?.analysis?.narrative_quality_index || 73
+  };
+  const newVersions = draftVersions.slice(0, currentVersionIndex + 1);
+  newVersions.push(newVersion);
+  setDraftVersions(newVersions);
+  setCurrentVersionIndex(newVersions.length - 1);
+
+  // 2. Save to database
+  if (!selectedPromptId) return;
+
+  const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+  if (!selectedPrompt) return;
+
+  setSaveStatus('saving');
+
+  // Save essay to database
+  const { success, essayId, error } = await saveOrUpdatePIQEssay(
+    selectedPromptId,
+    selectedPrompt.prompt,
+    currentDraft,
+    analysisResult
+  );
+
+  if (!success) {
+    console.error('Failed to save essay:', error);
+    setSaveStatus('error');
+    setLastSaveError(error);
+    return;
+  }
+
+  // Save analysis result if present
+  if (analysisResult && essayId) {
+    await saveAnalysisReport(essayId, analysisResult);
+  }
+
+  setSaveStatus('saved');
+  setLastSaveTime(new Date());
+  setHasUnsavedChanges(false);
+
+  // 3. Re-analyze if needed (but don't trigger auto-save during analysis)
+  if (needsReanalysis) {
+    await performFullAnalysis();
+  }
+}, [currentDraft, selectedPromptId, analysisResult, needsReanalysis]);
+```
+
+#### Task 2.3: Update `performFullAnalysis()` to Auto-Save Results
+
+After analysis completes, automatically save to database:
+
+```typescript
+// Add to performFullAnalysis() after setAnalysisResult(result)
+if (currentEssayId) {
+  await saveAnalysisReport(currentEssayId, result);
+  console.log('✅ Analysis result auto-saved to database');
+}
+```
+
+#### Task 2.4: Add Save Status Indicators
+
+Add state for save status:
+```typescript
+const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+const [lastSaveError, setLastSaveError] = useState<string | null>(null);
+```
+
+Update header to show status:
+```tsx
+{saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
+{saveStatus === 'saved' && <CheckCircle className="w-4 h-4 text-green-500" />}
+{saveStatus === 'error' && (
+  <Tooltip>
+    <TooltipTrigger>
+      <XCircle className="w-4 h-4 text-red-500" />
+    </TooltipTrigger>
+    <TooltipContent>{lastSaveError}</TooltipContent>
+  </Tooltip>
+)}
+```
+
+---
+
+### Phase 3: Versioning System
+
+#### Task 3.1: Create Version History Component
+**File**: `src/components/portfolio/piq/workshop/PIQVersionHistory.tsx` (NEW)
+
+Features:
+- Display all versions from `essay_revision_history`
+- Show score for each version (from `essay_analysis_reports` at that timestamp)
+- Visual diff between versions
+- Restore previous version
+- Compare any two versions side-by-side
+- Filter by score improvement/decline
+
+#### Task 3.2: Integrate Version History into UI
+
+Add "Version History" button to PIQWorkshop:
+```tsx
+<Button
+  variant="outline"
+  onClick={() => setShowVersionHistory(true)}
+  className="gap-2"
+>
+  <History className="w-4 h-4" />
+  Version History ({versionCount})
+</Button>
+```
+
+#### Task 3.3: Implement Version Comparison
+
+Show score delta between versions:
+```tsx
+<div className="flex items-center gap-2">
+  <span>Version {version.version_number}</span>
+  <Badge variant={scoreDelta > 0 ? 'success' : 'destructive'}>
+    {scoreDelta > 0 ? '+' : ''}{scoreDelta} points
+  </Badge>
+</div>
+```
+
+#### Task 3.4: Version Restore Flow
+
+When user restores a version:
+1. Load version content from `essay_revision_history`
+2. Set as `currentDraft`
+3. Create new version in history (don't delete newer versions)
+4. Mark as `needsReanalysis`
+5. Show banner: "Restored version X from [date]"
+
+---
+
+### Phase 4: Auto-Save Improvements
+
+#### Task 4.1: Fix Auto-Save to Not Trigger Re-Analysis ✅
+**Already correct** - auto-save timer only saves to localStorage, doesn't call `performFullAnalysis()`
+
+#### Task 4.2: Add Debounced Local Save
+
+Replace 30-second timer with debounced save (save 2 seconds after user stops typing):
+
+```typescript
+const debouncedSave = useMemo(
+  () => debounce(() => {
+    if (!selectedPromptId || !currentDraft) return;
+
+    const cache: PIQWorkshopCache = {
+      promptId: selectedPromptId,
+      promptTitle: selectedPrompt.title,
+      currentDraft,
+      lastSaved: Date.now(),
+      analysisResult,
+      versions: [...],
+      autoSaveEnabled: true
+    };
+
+    saveToLocalStorage(cache);
+    setLastSaveTime(new Date());
+    console.log('✅ Auto-saved (debounced)');
+  }, 2000),
+  [selectedPromptId, currentDraft, analysisResult]
+);
+
+// Trigger on draft change
+useEffect(() => {
+  if (hasUnsavedChanges) {
+    debouncedSave();
+  }
+}, [currentDraft, hasUnsavedChanges, debouncedSave]);
+```
+
+#### Task 4.3: Keep 30-Second Cloud Backup
+
+Keep the 30-second timer for cloud saves (optional):
+
+```typescript
+// Optional: Auto-save to cloud every 30 seconds in addition to localStorage
+autoSaveTimerRef.current = setInterval(async () => {
+  if (hasUnsavedChanges && currentDraft && enableCloudAutoSave) {
+    await saveOrUpdatePIQEssay(selectedPromptId, promptText, currentDraft, analysisResult);
+    console.log('✅ Auto-saved to cloud');
+  }
+}, 30000);
+```
+
+---
+
+### Phase 5: Load Flow & Resume Session
+
+#### Task 5.1: Load from Database on Mount
+
+```typescript
+useEffect(() => {
+  async function loadInitialData() {
+    if (!selectedPromptId) return;
+
+    // Try loading from database first
+    const { success, essay, analysis } = await loadPIQEssay(selectedPromptId);
+
+    if (success && essay) {
+      setCurrentDraft(essay.draft_current || essay.draft_original);
+      if (analysis) {
+        setAnalysisResult(analysis);
+        // Transform to UI dimensions...
+      }
+      console.log('✅ Loaded from database');
+      return;
+    }
+
+    // Fallback to localStorage
+    const cache = loadFromLocalStorage(selectedPromptId);
+    if (cache) {
+      setCurrentDraft(cache.currentDraft);
+      setAnalysisResult(cache.analysisResult);
+      console.log('✅ Loaded from localStorage');
+    }
+  }
+
+  loadInitialData();
+}, [selectedPromptId]);
+```
+
+#### Task 5.2: Resume Session Banner
+
+Update banner to prioritize database over localStorage:
+```tsx
+{showResumeSessionBanner && (
+  <div className="banner">
+    <p>Found draft from {formatTime}</p>
+    <Button onClick={handleResumeFromCloud}>Resume from Cloud</Button>
+    <Button onClick={handleResumeFromLocal}>Resume Local</Button>
+    <Button onClick={handleStartFresh}>Start Fresh</Button>
+  </div>
+)}
+```
+
+---
+
+### Phase 6: Remove "Save to Cloud" Button
+
+#### Task 6.1: Remove `handleSaveToCloud` Function
+**File**: `src/pages/PIQWorkshop.tsx` (line 596-626)
+
+Delete the `handleSaveToCloud` callback entirely.
+
+#### Task 6.2: Remove `onSaveToCloud` Prop from EditorView
+**File**: `src/pages/PIQWorkshop.tsx` (line 1268)
+
+Remove: `onSaveToCloud={handleSaveToCloud}`
+
+#### Task 6.3: Update EditorView Component
+**File**: `src/components/portfolio/extracurricular/workshop/views/EditorView.tsx`
+
+Remove any UI rendering of "Save to Cloud" button.
+
+#### Task 6.4: Update supabaseService.ts
+**File**: `src/services/piqWorkshop/supabaseService.ts`
+
+Delete or deprecate the old cloud-specific functions:
+- `saveVersionToCloud()` (replace with new service)
+- `loadVersionsFromCloud()` (replace with new service)
+
+---
+
+## Testing Plan
+
+### Test Cases
+
+#### 1. Save Flow
+- [ ] User edits essay → clicks Save → essay saved to database
+- [ ] User clicks Save with analysis → analysis saved to `essay_analysis_reports`
+- [ ] User clicks Save without analysis → only essay saved
+- [ ] Save status indicator shows "Saving..." → "Saved"
+- [ ] Save failure shows error message
+
+#### 2. Auto-Save
+- [ ] User types → auto-save triggers after 2 seconds
+- [ ] Auto-save does NOT trigger re-analysis
+- [ ] Auto-save updates localStorage
+- [ ] Auto-save shows timestamp in UI
+
+#### 3. Analysis & Save
+- [ ] User clicks Analyze → analysis runs → results auto-saved to database
+- [ ] Analysis result cached in localStorage
+- [ ] Analysis result linked to essay in `essay_analysis_reports`
+
+#### 4. Versioning
+- [ ] Each save creates new version in `essay_revision_history`
+- [ ] Version history shows all versions with timestamps
+- [ ] Version history shows score for each version
+- [ ] User can restore previous version
+- [ ] Restoring version creates new version (doesn't overwrite)
+
+#### 5. Load/Resume
+- [ ] User refreshes page → data loaded from database
+- [ ] User switches devices → data loaded from database
+- [ ] User sees resume banner if draft exists
+- [ ] Resume banner prioritizes cloud over local
+
+#### 6. Authentication
+- [ ] Clerk user can save essays
+- [ ] Clerk user can only see their own essays
+- [ ] Supabase RLS enforces user isolation
+
+---
 
 ## Success Criteria
 
-✅ **Complete Integration:**
-- Voice Fingerprint visible in UI
-- Experience Fingerprint visible with all 6 uniqueness dimensions
-- All 12 rubric dimensions show raw + final scores + evidence
-- Workshop items show suggestion types with color coding
-- No data lost in backend → frontend transformation
+### Must Have (MVP)
+1. ✅ Save button saves to database
+2. ✅ Analysis results persisted to database
+3. ✅ Version history accessible and restorable
+4. ✅ Auto-save works without triggering re-analysis
+5. ✅ Authentication works with Clerk
+6. ✅ Data persists across sessions/devices
 
-✅ **User Experience:**
-- Clear visual hierarchy
-- No overwhelming information density
-- Intuitive navigation through insights
-- Beautiful, polished design consistent with existing UI
+### Should Have
+1. ✅ Version comparison UI
+2. ✅ Score tracking over versions
+3. ✅ Save status indicators
+4. ✅ Resume session banner
 
-✅ **Functionality:**
-- All existing features still work (arrow navigation, expand/collapse, re-analyze)
-- New insights are actionable and clear
-- Performance is acceptable (<2 min for full analysis)
+### Nice to Have
+1. Version tagging/notes
+2. Export version history
+3. Share version with others
+4. Batch operations on versions
 
-## Risks & Mitigations
+---
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Backend endpoint doesn't return full data | High | Modify service to call `runSurgicalWorkshop()` directly |
-| UI becomes too dense/overwhelming | Medium | Use progressive disclosure (expand/collapse), clear sections |
-| Type mismatches cause errors | Medium | Strict TypeScript typing, comprehensive testing |
-| Performance degradation | Low | Already ~100s, show progress, consider background processing |
+## Risk Assessment
 
-## Timeline Estimate
+### High Risk
+1. **Authentication integration** - Clerk → Supabase mapping may be complex
+   - Mitigation: Create adapter layer, test thoroughly
+2. **Data migration** - Existing localStorage data needs migration
+   - Mitigation: Keep localStorage as fallback, gradual migration
 
-- Phase 1 (Backend Service): 2-3 hours
-- Phase 2 (Type System): 1 hour
-- Phase 3 (UI Components): 4-5 hours
-- Phase 4 (Enhanced Display): 2 hours
-- Phase 5 (Testing): 2 hours
+### Medium Risk
+1. **Performance** - Saving on every analysis may be slow
+   - Mitigation: Async saves, optimistic UI updates
+2. **Version bloat** - Many versions may slow queries
+   - Mitigation: Archive old versions, pagination
 
-**Total: ~12-14 hours of focused development**
+### Low Risk
+1. **UI changes** - Removing "Save to Cloud" button
+   - Mitigation: Simple removal, low impact
 
-## Quality Enhancement Strategy
+---
 
-### Identifying Gaps During Integration
+## Implementation Timeline
 
-As we integrate, we'll actively look for places where additional analysis would help:
+### Day 1: Database & Auth (4-6 hours)
+- [ ] Task 1.1: Add columns to `essay_analysis_reports`
+- [ ] Task 1.2: Create Clerk-Supabase adapter
+- [ ] Task 1.3: Update supabaseService.ts
+- [ ] Task 1.4: Create and run migration
 
-**Potential Enhancement Opportunities:**
-1. **Dimension Evidence Formatting**
-   - If raw evidence text is too technical, ADD a formatting LLM call
-   - Transform technical justifications into student-friendly explanations
-   - Keep both versions (technical for transparency, friendly for understanding)
+### Day 2: Save Flow (6-8 hours)
+- [ ] Task 2.1: Create piqDatabaseService.ts
+- [ ] Task 2.2: Fix handleSave()
+- [ ] Task 2.3: Update performFullAnalysis()
+- [ ] Task 2.4: Add save status indicators
+- [ ] Testing: Basic save flow
 
-2. **Experience Fingerprint Explanations**
-   - If anti-pattern flags need more context, ADD explanatory prompts
-   - Generate specific examples of what to avoid/include
-   - Create actionable guidance from divergence requirements
+### Day 3: Versioning (6-8 hours)
+- [ ] Task 3.1: Create PIQVersionHistory component
+- [ ] Task 3.2: Integrate into UI
+- [ ] Task 3.3: Implement comparison
+- [ ] Task 3.4: Version restore flow
+- [ ] Testing: Version operations
 
-3. **Suggestion Contextualization**
-   - If students don't understand WHY a suggestion type is recommended, ADD explanation
-   - Generate "when to use this approach" guidance
-   - Provide examples of successful application
+### Day 4: Auto-Save & Load (4-6 hours)
+- [ ] Task 4.2: Debounced local save
+- [ ] Task 5.1: Load from database on mount
+- [ ] Task 5.2: Resume session banner
+- [ ] Testing: Auto-save and load flows
 
-4. **Gap Analysis**
-   - If we discover missing connections between dimensions, ADD synthesis prompts
-   - Generate strategic improvement roadmaps
-   - Create prioritization guidance based on student's specific situation
+### Day 5: Cleanup & Polish (4-6 hours)
+- [ ] Task 6: Remove "Save to Cloud" button
+- [ ] Integration testing
+- [ ] Bug fixes
+- [ ] Documentation
 
-### Quality Checkpoint Process
+**Total Estimated Time: 24-34 hours**
 
-Before considering any phase "complete":
-1. ✅ Compare output quality to `TEST_OUTPUT_FINAL_LEGO.md`
-2. ✅ Verify NO data/insights are lost
-3. ✅ Test with real essays (Lego essay, others)
-4. ✅ If gaps found: ADD analysis, don't remove features
-5. ✅ User testing to ensure insights are actionable
+---
 
 ## Open Questions
 
-1. Should we create a separate endpoint for full surgical workshop, or modify existing?
-   - **Recommendation:** Create separate function that returns full data
-   - **Quality Note:** Must use full `runSurgicalWorkshop()`, not abbreviated version
+1. **Clerk-Supabase Integration**
+   - How is the Clerk user ID mapped to Supabase user_id?
+   - Is there a `user_mappings` table?
+   - Do we need to create Supabase users for Clerk users?
 
-2. How to handle the 100+ second analysis time in UX?
-   - **Recommendation:** Show stage-by-stage progress ("Analyzing voice...", "Scoring dimensions...", etc.)
-   - **Quality Note:** Don't cache/skip any analysis steps to save time
+2. **Existing Data**
+   - Are there users with localStorage data that needs migration?
+   - Should we migrate automatically or prompt users?
 
-3. Should Experience Fingerprint be always visible or expandable?
-   - **Recommendation:** Start collapsed but with visual indicator if anti-patterns detected
-   - **Quality Note:** If we need better "summary view", ADD a summarization prompt
+3. **Essay Ownership**
+   - Can PIQ essays be shared/transferred?
+   - Do counselors need read access?
 
-4. Do we need all performance metrics visible to users?
-   - **Recommendation:** No, keep internal. Maybe show in dev mode only.
-   - **Quality Note:** Transparency is good - consider showing "analysis depth" indicator
+4. **Version Limits**
+   - Should we limit versions per essay?
+   - Archive vs delete old versions?
+
+5. **Performance**
+   - Should we debounce database saves?
+   - Use optimistic updates?
+
+---
+
+## Dependencies
+
+### Required
+- Clerk authentication already configured
+- Supabase client initialized
+- Database migration tools available
+- Existing essay system tables (`essays`, `essay_revision_history`, `essay_analysis_reports`)
+
+### Optional
+- Lodash debounce (for auto-save)
+- diff library (for version comparison)
+- date-fns (for timestamp formatting)
+
+---
+
+## Rollback Plan
+
+If issues arise during implementation:
+
+1. **Phase 1 (Database)**: Revert migration
+   ```sql
+   ALTER TABLE essay_analysis_reports
+   DROP COLUMN voice_fingerprint,
+   DROP COLUMN experience_fingerprint,
+   DROP COLUMN workshop_items,
+   DROP COLUMN full_analysis_result;
+   ```
+
+2. **Phase 2-5 (Code)**: Feature flag to disable new save flow
+   ```typescript
+   const USE_NEW_SAVE_FLOW = false; // Toggle to revert
+   ```
+
+3. **Fallback**: Keep localStorage as primary storage until cloud saves proven stable
+
+---
 
 ## Next Steps
 
-Once you approve this plan, I will:
-1. Start with Phase 1: Backend service integration
-2. Proceed sequentially through each phase
-3. Commit working code at each phase completion
-4. Provide testing results before moving to next phase
+**Before Implementation:**
+1. ✅ Review this plan with team
+2. ✅ Get approval on architecture decisions
+3. ✅ Clarify Clerk-Supabase auth integration
+4. ✅ Set up test environment
 
-**Please review and approve this plan, or provide feedback on any aspect you'd like adjusted.**
+**After Approval:**
+1. Create feature branch: `feature/piq-save-versioning`
+2. Begin Phase 1: Database Infrastructure
+3. Test each phase thoroughly before proceeding
+4. Document any deviations from plan
+
+---
+
+## Notes
+
+- This plan assumes existing essay system infrastructure is production-ready
+- Clerk authentication integration details may require adjustment based on actual implementation
+- LocalStorage will remain as a performance cache even after cloud saves implemented
+- Consider adding analytics to track save success rates and performance

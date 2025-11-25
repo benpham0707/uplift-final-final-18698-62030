@@ -61,20 +61,24 @@ Deno.serve(async (req) => {
     }
 
     console.log('🤖 Starting surgical workshop analysis...');
+    const startTime = Date.now();
 
-    // Stage 1: Voice Fingerprint Analysis
-    const voiceFingerprintResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        temperature: 0.7,
-        system: `You are an expert essay analyst specializing in voice fingerprinting. Analyze the student's unique writing voice across 4 key dimensions.
+    // Stages 1 & 2: Run Voice and Experience Fingerprints in PARALLEL (saves ~20-30s)
+    console.log('🔄 Starting parallel fingerprint analysis...');
+    const [voiceFingerprintResponse, experienceFingerprintResponse] = await Promise.all([
+      // Stage 1: Voice Fingerprint Analysis
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2048,
+          temperature: 0.7,
+          system: `You are an expert essay analyst specializing in voice fingerprinting. Analyze the student's unique writing voice across 4 key dimensions.
 
 Return ONLY valid JSON with this structure:
 {
@@ -95,50 +99,27 @@ Return ONLY valid JSON with this structure:
     "secondary": "string"
   }
 }`,
-        messages: [
-          {
-            role: 'user',
-            content: `Analyze the voice fingerprint of this essay:\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}`
-          }
-        ]
-      })
-    });
-
-    if (!voiceFingerprintResponse.ok) {
-      const errorText = await voiceFingerprintResponse.text();
-      console.error('Voice fingerprint API error:', errorText);
-      throw new Error(`Voice fingerprint analysis failed: ${voiceFingerprintResponse.status}`);
-    }
-
-    const voiceFingerprintResult = await voiceFingerprintResponse.json();
-    const voiceFingerprintText = voiceFingerprintResult.content[0].text;
-
-    // Parse JSON from response (handle code blocks)
-    let voiceFingerprint;
-    try {
-      const jsonMatch = voiceFingerprintText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      const jsonString = jsonMatch ? jsonMatch[1].trim() : voiceFingerprintText.trim();
-      voiceFingerprint = JSON.parse(jsonString);
-    } catch (e) {
-      console.error('Failed to parse voice fingerprint JSON:', voiceFingerprintText);
-      voiceFingerprint = null;
-    }
-
-    console.log('✅ Voice fingerprint complete');
-
-    // Stage 2: Experience Fingerprint (Anti-Convergence Analysis)
-    const experienceFingerprintResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 3072,
-        temperature: 0.7,
-        system: `You are an expert at identifying unique, non-convergent experiences in essays. Analyze for 6 dimensions of uniqueness and detect generic patterns.
+          messages: [
+            {
+              role: 'user',
+              content: `Analyze the voice fingerprint of this essay:\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}`
+            }
+          ]
+        })
+      }),
+      // Stage 2: Experience Fingerprint (Anti-Convergence Analysis)
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 3072,
+          temperature: 0.7,
+          system: `You are an expert at identifying unique, non-convergent experiences in essays. Analyze for 6 dimensions of uniqueness and detect generic patterns.
 
 Return ONLY valid JSON with this structure:
 {
@@ -170,15 +151,38 @@ Return ONLY valid JSON with this structure:
   ],
   "confidenceScore": number (0-10)
 }`,
-        messages: [
-          {
-            role: 'user',
-            content: `Analyze the experience fingerprint of this essay:\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}`
-          }
-        ]
+          messages: [
+            {
+              role: 'user',
+              content: `Analyze the experience fingerprint of this essay:\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}`
+            }
+          ]
+        })
       })
-    });
+    ]);
+    console.log(`✅ Parallel fingerprints complete in ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
 
+    if (!voiceFingerprintResponse.ok) {
+      const errorText = await voiceFingerprintResponse.text();
+      console.error('Voice fingerprint API error:', errorText);
+      throw new Error(`Voice fingerprint analysis failed: ${voiceFingerprintResponse.status}`);
+    }
+
+    const voiceFingerprintResult = await voiceFingerprintResponse.json();
+    const voiceFingerprintText = voiceFingerprintResult.content[0].text;
+
+    // Parse JSON from response (handle code blocks)
+    let voiceFingerprint;
+    try {
+      const jsonMatch = voiceFingerprintText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      const jsonString = jsonMatch ? jsonMatch[1].trim() : voiceFingerprintText.trim();
+      voiceFingerprint = JSON.parse(jsonString);
+    } catch (e) {
+      console.error('Failed to parse voice fingerprint JSON:', voiceFingerprintText);
+      voiceFingerprint = null;
+    }
+
+    // Parse Experience Fingerprint
     if (!experienceFingerprintResponse.ok) {
       const errorText = await experienceFingerprintResponse.text();
       console.error('Experience fingerprint API error:', errorText);
@@ -197,8 +201,6 @@ Return ONLY valid JSON with this structure:
       console.error('Failed to parse experience fingerprint JSON:', experienceFingerprintText);
       experienceFingerprint = null;
     }
-
-    console.log('✅ Experience fingerprint complete');
 
     // Stage 3: 12-Dimension Rubric Analysis
     const rubricResponse = await fetch('https://api.anthropic.com/v1/messages', {

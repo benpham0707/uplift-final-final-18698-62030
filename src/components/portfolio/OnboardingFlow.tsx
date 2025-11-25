@@ -1,5 +1,6 @@
 import { apiFetch } from '@/lib/utils';
 import { useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ interface OnboardingFlowProps {
 }
 
 const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
+  const { getToken } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<OnboardingData>({
     gradeLevel: '',
@@ -47,15 +49,13 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         financialBand: (formData.financialNeed || 'unknown') as 'high' | 'moderate' | 'low' | 'unknown'
       };
       try {
-        // Attach Supabase JWT if available for API auth
-        const { supabase } = await import('@/integrations/supabase/client');
-        const { data } = await supabase.auth.getSession();
-        const accessToken = data.session?.access_token;
+        // Get Clerk Token
+        const token = await getToken();
         const resp = await apiFetch('/api/v1/assessment/complete', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
           },
           credentials: 'include',
           body: JSON.stringify(payload)
@@ -63,6 +63,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         if (!resp.ok) throw new Error('server_unavailable');
         onComplete();
       } catch (e) {
+        console.error("Assessment submission failed:", e);
         // Fallback: write directly from the client using the user's Supabase session
         try {
           await completeAssessmentClientSide(payload);

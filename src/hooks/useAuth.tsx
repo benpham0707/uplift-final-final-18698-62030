@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     user_metadata: clerkUser.publicMetadata,
     app_metadata: clerkUser.unsafeMetadata,
   } : null;
-
+    
   const loading = !isLoaded;
 
   // Shim methods to use Clerk UI

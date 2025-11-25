@@ -25,7 +25,7 @@ const Auth = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             className="max-w-md mx-auto w-full flex justify-center"
-          >
+                            >
              <SignIn />
           </motion.div>
 

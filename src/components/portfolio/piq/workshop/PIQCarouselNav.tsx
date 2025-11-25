@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UC_PIQ_PROMPTS } from './PIQPromptSelector';
+import GradientText from '@/components/ui/GradientText';
 
 interface PIQCarouselNavProps {
   currentPromptId: string;
@@ -31,47 +32,52 @@ export const PIQCarouselNav: React.FC<PIQCarouselNavProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-0.5">
       {/* Navigation row with pipes */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-3 w-full">
         <Button
           variant="ghost"
           size="sm"
           onClick={handlePrevious}
-          className="h-7 w-7 p-0 hover:bg-muted"
+          className="h-8 w-8 p-0 hover:bg-muted"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-5 h-5" />
         </Button>
 
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <span className="text-muted-foreground/50">|</span>
+        <div className="flex items-center gap-3">
+          <span className="text-muted-foreground/50 text-lg">|</span>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="cursor-default whitespace-nowrap">
-                  PIQ #{currentIndex + 1}: {currentPrompt?.title.split(' ')[0] || 'Leadership'}
+                  <GradientText 
+                    colors={["#a855f7", "#8b5cf6", "#c084fc", "#a78bfa", "#a855f7"]}
+                    className="text-xl font-bold"
+                  >
+                    PIQ #{currentIndex + 1}: {currentPrompt?.title || 'Leadership experience'}
+                  </GradientText>
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="max-w-xs text-xs">{currentPrompt?.title}</p>
+                <p className="max-w-xs text-xs">{currentPrompt?.prompt}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <span className="text-muted-foreground/50">|</span>
+          <span className="text-muted-foreground/50 text-lg">|</span>
         </div>
 
         <Button
           variant="ghost"
           size="sm"
           onClick={handleNext}
-          className="h-7 w-7 p-0 hover:bg-muted"
+          className="h-8 w-8 p-0 hover:bg-muted"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-5 h-5" />
         </Button>
       </div>
 
       {/* Dot indicators */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         {UC_PIQ_PROMPTS.map((prompt, index) => (
           <TooltipProvider key={prompt.id}>
             <Tooltip>

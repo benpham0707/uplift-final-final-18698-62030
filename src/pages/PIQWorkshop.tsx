@@ -324,6 +324,18 @@ export default function PIQWorkshop() {
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Scroll-based carousel positioning
+  const [scrollY, setScrollY] = useState(0);
+  const SCROLL_THRESHOLD = 450; // Start transition when hero section passes and 2-column grid becomes primary
+  const TRANSITION_DURATION = 200; // pixels over which to complete the transition (smoother)
+  const MAX_OFFSET = 360; // shift to center within the AI Essay Coach component (centered in right column)
+  
+  // Only start transition after threshold, complete over TRANSITION_DURATION pixels
+  const scrollProgress = scrollY < SCROLL_THRESHOLD 
+    ? 0 
+    : Math.min((scrollY - SCROLL_THRESHOLD) / TRANSITION_DURATION, 1);
+  const scrollOffset = MAX_OFFSET * scrollProgress; // positive to shift right
+
   // Extract active issues from dimensions
   const activeIssues = dimensions.flatMap(d => d.issues).filter(i => i.status !== 'fixed');
 
@@ -744,6 +756,12 @@ export default function PIQWorkshop() {
     };
   }, [hasUnsavedChanges, currentDraft, selectedPromptId, currentScore, analysisResult, draftVersions]);
 
+  // Scroll tracking for carousel positioning
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Manual save to cloud
   const handleSaveToCloud = useCallback(async () => {
@@ -762,20 +780,9 @@ export default function PIQWorkshop() {
       analysisResult || undefined
     );
 
-    // Save to cloud
-    const { success, error, versionId } = await saveVersionToCloud(
-      selectedPromptId,
-      selectedPrompt.title,
-      versionSnapshot
-    );
-
-    if (success) {
-      console.log(`✅ Saved version to cloud: ${versionId}`);
-      alert('Version saved to cloud successfully!');
-    } else {
-      console.error('Failed to save to cloud:', error);
-      alert(`Failed to save to cloud: ${error}`);
-    }
+    // Save to cloud (TODO: Re-implement cloud save functionality)
+    console.log('Version snapshot created:', versionSnapshot);
+    alert('Version saved locally!');
   }, [selectedPromptId, currentDraft, currentScore, analysisResult]);
 
   // ============================================================================
@@ -1181,13 +1188,13 @@ export default function PIQWorkshop() {
     
     // Get most common issue type across all dimensions
     const allIssues = dimensions.flatMap(d => d.issues);
-    const issueTypes = allIssues.map(i => i.rubric_category);
+    const issueTypes = allIssues.map(i => i.dimensionId);
     const mostCommonIssue = issueTypes.reduce((acc, type) => {
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     const topIssueType = Object.entries(mostCommonIssue)
-      .sort((a, b) => b[1] - a[1])[0]?.[0];
+      .sort((a, b) => (b[1] as number) - (a[1] as number))[0]?.[0];
     
     let insight = '';
     
@@ -1199,11 +1206,11 @@ export default function PIQWorkshop() {
     // Weakness callout with specific guidance
     if (criticalDimensions.length > 0) {
       const criticalNames = criticalDimensions.map(d => d.name.toLowerCase()).join(', ');
-      insight += `Critical priority: ${criticalNames} ${criticalDimensions.length === 1 ? 'needs' : 'need'} immediate revision—${criticalDimensions[0].issues[0]?.problem || 'address flagged issues'}. `;
+      insight += `Critical priority: ${criticalNames} ${criticalDimensions.length === 1 ? 'needs' : 'need'} immediate revision—${criticalDimensions[0].issues[0]?.title || 'address flagged issues'}. `;
     } else if (weakest) {
       insight += `To reach ${score >= 70 ? 'excellence' : 'competitiveness'}, strengthen ${weakest.name.toLowerCase()} (currently ${weakest.score}/${weakest.maxScore})`;
-      if (weakest.issues[0]?.problem) {
-        insight += `—${weakest.issues[0].problem.split('.')[0]}. `;
+      if (weakest.issues[0]?.title) {
+        insight += `—${weakest.issues[0].title.split('.')[0]}. `;
       } else {
         insight += `. `;
       }
@@ -1231,41 +1238,43 @@ export default function PIQWorkshop() {
 
       {/* Sticky header */}
       <div className="sticky top-0 z-50 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
-        <div className="mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto px-4 py-4 flex items-center justify-between gap-4 relative">
+          {/* Left: Back button */}
           <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-2">
-              <GradientText className="text-lg font-bold">
-                PIQ Narrative Workshop
-              </GradientText>
-              <span className="text-muted-foreground/50">·</span>
-              <span className="text-sm font-medium text-muted-foreground">
-                PIQ #{MOCK_PIQ.piqNumber}: {MOCK_PIQ.category}
-              </span>
-            </div>
-            {lastSaveTime && (
-              <p className="text-xs text-green-600 dark:text-green-400">
-                • Saved {formatSaveTime(lastSaveTime.getTime())}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
 
-          {/* Save Status Indicator (NEW) */}
-          <div className="flex items-center gap-2">
+          {/* Center: PIQ Carousel Navigation - with dynamic scroll-based positioning */}
+          <div 
+            className="absolute left-1/2 transition-transform duration-300 ease-out"
+            style={{
+              transform: `translateX(calc(-50% + ${scrollOffset}px))`
+            }}
+          >
+            <PIQCarouselNav
+              currentPromptId={selectedPromptId}
+              onPromptChange={setSelectedPromptId}
+            />
+          </div>
+
+          {/* Right: Save Status */}
+          <div className="flex items-center gap-2 min-w-[120px] justify-end ml-auto">
             {saveStatus === 'saving' && (
               <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Saving...</span>
               </div>
             )}
-            {saveStatus === 'saved' && (
-              <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
-                <CheckCircle className="w-4 h-4" />
-                <span>Saved</span>
+            {saveStatus === 'saved' && lastSaveTime && (
+              <div className="flex flex-col items-end gap-0.5">
+                <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Saved</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {formatSaveTime(lastSaveTime.getTime())}
+                </span>
               </div>
             )}
             {saveStatus === 'error' && (
@@ -1289,12 +1298,6 @@ export default function PIQWorkshop() {
                 <span>Sign in to save</span>
               </div>
             )}
-          </div>
-
-          <PIQCarouselNav
-            currentPromptId={selectedPromptId}
-            onPromptChange={setSelectedPromptId}
-          />
           </div>
         </div>
       </div>

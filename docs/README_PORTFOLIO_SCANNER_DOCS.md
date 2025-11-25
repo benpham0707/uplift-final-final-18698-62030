@@ -64,6 +64,7 @@ This directory contains comprehensive planning documents for the **Portfolio Sca
 
 | Document | Purpose | Pages | Key Content |
 |----------|---------|-------|-------------|
+| **TOP_COLLEGE_PRIORITIES_CALIBRATION.md** | **Top 10-30 tier-specific** | 45 | **CRITICAL: Different weights for elite schools** |
 | **ADMISSIONS_REALITY_CALIBRATION_DATABASE.md** | Real admissions data | 69 | NACAC data, GPA stats, EC tiers |
 | **DATA_DRIVEN_PROMPT_CALIBRATION.md** | Prompt engineering | 45 | Updated prompts with research |
 | **RESEARCH_SUMMARY_ACCURACY_CALIBRATION.md** | Research summary | 20 | What we learned, validation |

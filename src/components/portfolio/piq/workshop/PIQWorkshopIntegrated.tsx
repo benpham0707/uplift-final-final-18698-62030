@@ -26,8 +26,14 @@ import type { TeachingCoachingOutput, TeachingIssue } from '@/components/portfol
 import { RubricDimensionCard } from '@/components/portfolio/extracurricular/workshop/RubricDimensionCard';
 import type { RubricDimension, WritingIssue, EditSuggestion } from '@/components/portfolio/extracurricular/workshop/types';
 
+// PIQ Workshop UI Components
+import { VoiceFingerprintCard } from './VoiceFingerprintCard';
+import { ExperienceFingerprintCard } from './ExperienceFingerprintCard';
+import { PIQPromptSelector } from './PIQPromptSelector';
+
 // PIQ-specific analysis service
 import { analyzePIQEntry } from '@/services/piqWorkshopAnalysisService';
+import { getTargetTier } from '@/services/piqSurgicalWorkshopService';
 
 interface PIQWorkshopIntegratedProps {
   initialText: string;
@@ -66,6 +72,9 @@ export const PIQWorkshopIntegrated: React.FC<PIQWorkshopIntegratedProps> = ({
   const [expandedDimensionId, setExpandedDimensionId] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState<RubricDimension[]>([]);
   const [activeView, setActiveView] = useState<'analysis' | 'editor'>('analysis');
+
+  // Prompt selection state
+  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
 
   // ============================================================================
   // ANALYSIS FUNCTION
@@ -381,6 +390,18 @@ export const PIQWorkshopIntegrated: React.FC<PIQWorkshopIntegratedProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Analysis & Dimensions */}
           <div className="lg:col-span-2 space-y-6">
+            {/* PIQ Prompt Selector */}
+            <PIQPromptSelector
+              selectedPromptId={selectedPromptId}
+              onPromptSelect={(promptId) => {
+                setSelectedPromptId(promptId);
+                // Trigger re-analysis if we already have a draft and analysis
+                if (currentDraft && analysisResult) {
+                  setHasUnsavedChanges(true);
+                }
+              }}
+            />
+
             {/* Overall Summary */}
             <Card className="p-6 space-y-4">
               <div className="flex items-center justify-between">
@@ -403,7 +424,22 @@ export const PIQWorkshopIntegrated: React.FC<PIQWorkshopIntegratedProps> = ({
                   <div className="text-xs text-muted-foreground">Potential Gain</div>
                 </div>
               </div>
+              {analysisResult && (
+                <div className="text-sm text-muted-foreground pt-2 border-t">
+                  Target Tier: <span className="font-semibold">{getTargetTier(nqi)}</span>
+                </div>
+              )}
             </Card>
+
+            {/* Voice Fingerprint */}
+            {analysisResult?.voiceFingerprint && (
+              <VoiceFingerprintCard voiceFingerprint={analysisResult.voiceFingerprint} />
+            )}
+
+            {/* Experience Fingerprint */}
+            {analysisResult?.experienceFingerprint && (
+              <ExperienceFingerprintCard experienceFingerprint={analysisResult.experienceFingerprint} />
+            )}
 
             {/* Rubric Dimensions */}
             <div className="space-y-3">
@@ -426,6 +462,7 @@ export const PIQWorkshopIntegrated: React.FC<PIQWorkshopIntegratedProps> = ({
           {/* Right: Editor */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
+              {/* Essay Editor Card */}
               <Card className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold">Your Essay</h3>
@@ -433,6 +470,7 @@ export const PIQWorkshopIntegrated: React.FC<PIQWorkshopIntegratedProps> = ({
                     {currentDraft.trim().split(/\s+/).filter(Boolean).length} words
                   </Badge>
                 </div>
+
                 <Textarea
                   value={currentDraft}
                   onChange={(e) => setCurrentDraft(e.target.value)}

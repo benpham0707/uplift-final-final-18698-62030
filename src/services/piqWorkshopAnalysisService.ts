@@ -1,17 +1,23 @@
 // @ts-nocheck - PIQ analysis service
 /**
- * PIQ Workshop Analysis Service
+ * PIQ Workshop Analysis Service - EDGE FUNCTION INTEGRATION
  *
- * Adapts the extracurricular analysis service for UC Personal Insight Questions
- * Reuses the same backend infrastructure but provides PIQ-specific context
+ * Calls the workshop-analysis edge function (server-side) for Claude API access
+ * Returns ALL insights: voice fingerprint, experience fingerprint, 12 dimensions, workshop items
  */
 
 import type { AnalysisResult } from '@/components/portfolio/extracurricular/workshop/backendTypes';
-import { analyzeElitePatterns } from '@/core/analysis/features/elitePatternDetector';
-import { analyzeLiterarySophistication } from '@/core/analysis/features/literarySophisticationDetector';
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase client for edge function calls
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**
- * Analyze PIQ entry using the full backend system
+ * Analyze PIQ entry using edge function (server-side surgical workshop)
+ *
+ * This is the main entry point - calls workshop-analysis edge function
  */
 export async function analyzePIQEntry(
   essayText: string,
@@ -20,16 +26,273 @@ export async function analyzePIQEntry(
   options: {
     depth?: 'quick' | 'standard' | 'comprehensive';
     skip_coaching?: boolean;
+    essayType?: 'personal_statement' | 'uc_piq' | 'why_us' | 'supplemental' | 'activity_essay';
   } = {}
 ): Promise<AnalysisResult> {
   console.log('='.repeat(80));
-  console.log('PIQ WORKSHOP ANALYSIS SERVICE');
+  console.log('PIQ WORKSHOP ANALYSIS - EDGE FUNCTION CALL');
   console.log('='.repeat(80));
   console.log(`Prompt: ${promptTitle}`);
   console.log(`Essay length: ${essayText.length} chars`);
-  console.log(`Depth: ${options.depth || 'standard'}`);
+  console.log(`Analysis type: COMPLETE (Voice + Experience + 12 Dimensions + Workshop Items)`);
   console.log('');
 
+  try {
+    // Call workshop-analysis edge function
+    console.log('🌐 Calling workshop-analysis edge function...');
+
+    const { data, error } = await supabase.functions.invoke('workshop-analysis', {
+      body: {
+        essayText,
+        essayType: options.essayType || 'uc_piq',
+        promptText,
+        promptTitle,
+        maxWords: 350,
+        targetSchools: ['UC System'],
+        studentContext: {
+          academicStrength: 'moderate',
+          voicePreference: 'concise',
+        }
+      }
+    });
+
+    if (error) {
+      console.error('❌ Edge function error:', error);
+      throw new Error(`Edge function failed: ${error.message}`);
+    }
+
+    if (!data || !data.success) {
+      console.error('❌ Edge function returned error:', data);
+      throw new Error(data?.error || 'Edge function returned unsuccessful result');
+    }
+
+    console.log('✅ Edge function call complete');
+    console.log(`   NQI: ${data.analysis.narrative_quality_index}/100`);
+    console.log(`   Voice Fingerprint: ${data.voiceFingerprint ? 'Yes' : 'Missing!'}`);
+    console.log(`   Experience Fingerprint: ${data.experienceFingerprint ? 'Yes' : 'Not generated'}`);
+    console.log(`   Rubric Dimensions: ${data.rubricDimensionDetails?.length || 0}`);
+    console.log(`   Workshop Items: ${data.workshopItems?.length || 0}`);
+    console.log('='.repeat(80));
+    console.log('');
+
+    // Transform edge function result to AnalysisResult format
+    const analysisResult: AnalysisResult = {
+      analysis: {
+        narrative_quality_index: data.analysis.narrative_quality_index,
+        overall_strengths: data.analysis.overall_strengths || [],
+        overall_weaknesses: data.analysis.overall_weaknesses || [],
+      },
+      voiceFingerprint: data.voiceFingerprint,
+      experienceFingerprint: data.experienceFingerprint,
+      rubricDimensionDetails: data.rubricDimensionDetails,
+      workshopItems: data.workshopItems,
+      categories: {}, // Legacy field - not used
+    };
+
+    return analysisResult;
+
+  } catch (error) {
+    console.error('❌ PIQ ANALYSIS FAILED:', error);
+    console.error('Error details:', error);
+    console.error('Stack trace:', (error as Error).stack);
+
+    // THROW THE ERROR - DO NOT FALL BACK
+    throw new Error(`PIQ workshop analysis failed: ${(error as Error).message}`);
+  }
+}
+
+/**
+ * Transform SurgicalWorkshopResult to AnalysisResult format
+ * CRITICAL: Preserve ALL data - no information loss
+ */
+function transformSurgicalToAnalysisResult(
+  surgical: SurgicalWorkshopResult,
+  essayText: string,
+  promptTitle: string
+): AnalysisResult {
+  // Map 12 dimension names to category keys for compatibility
+  const dimensionNameToKey: Record<string, string> = {
+    'opening_power_scene_entry': 'narrative_arc_stakes',
+    'narrative_arc_stakes_turn': 'narrative_arc_stakes',
+    'character_interiority_vulnerability': 'voice_integrity',
+    'show_dont_tell_craft': 'craft_language_quality',
+    'reflection_meaning_making': 'reflection_meaning',
+    'intellectual_vitality_curiosity': 'reflection_meaning',
+    'originality_specificity_voice': 'originality_voice',
+    'structure_pacing_coherence': 'craft_language_quality',
+    'word_economy_craft': 'craft_language_quality',
+    'context_constraints_disclosure': 'specificity_evidence',
+    'ethical_awareness_humility': 'reflection_meaning',
+    'school_program_fit': 'fit_trajectory'
+  };
+
+  // Build categories from rubric dimensions (aggregate by key)
+  const categoryMap = new Map<string, any>();
+
+  surgical.rubricResult.dimension_scores.forEach((dim) => {
+    const key = dimensionNameToKey[dim.dimension_name] || 'voice_integrity';
+
+    if (!categoryMap.has(key)) {
+      categoryMap.set(key, {
+        category: key,
+        score: 0,
+        maxScore: 10,
+        comments: [],
+        evidence: [],
+        suggestions: []
+      });
+    }
+
+    const cat = categoryMap.get(key);
+    cat.score = Math.max(cat.score, dim.final_score); // Use highest score for category
+    cat.comments.push(`${dim.dimension_name}: ${dim.evidence?.justification || 'No justification'}`);
+    cat.evidence.push(dim.evidence?.justification || '');
+  });
+
+  const categories = Array.from(categoryMap.values());
+
+  // Build complete AnalysisResult
+  return {
+    report: {
+      id: surgical.analysisId,
+      entry_id: 'piq-' + Date.now(),
+      rubric_version: 'surgical-workshop-v17',
+      created_at: new Date().toISOString(),
+      categories,
+      weights: {
+        voice_integrity: 0.10,
+        specificity_evidence: 0.09,
+        transformative_impact: 0.12,
+        role_clarity_ownership: 0.08,
+        narrative_arc_stakes: 0.10,
+        initiative_leadership: 0.10,
+        community_collaboration: 0.08,
+        reflection_meaning: 0.12,
+        craft_language_quality: 0.07,
+        fit_trajectory: 0.07,
+        time_investment_consistency: 0.07,
+      },
+      narrative_quality_index: surgical.overallScore,
+      reader_impression_label: getImpressionLabel(surgical.overallScore),
+      flags: surgical.experienceFingerprint?.antiPatternFlags?.warnings || [],
+      suggested_fixes_ranked: surgical.workshopItems.slice(0, 5).map(item => item.problem),
+      analysis_depth: 'comprehensive',
+    },
+
+    analysis: {
+      id: surgical.analysisId,
+      entry_id: 'piq-' + Date.now(),
+      rubric_version: 'surgical-workshop-v17',
+      created_at: new Date().toISOString(),
+      categories,
+      weights: {} as any,
+      narrative_quality_index: surgical.overallScore,
+      reader_impression_label: getImpressionLabel(surgical.overallScore),
+      flags: [],
+      suggested_fixes_ranked: [],
+      analysis_depth: 'comprehensive',
+    },
+
+    features: extractBasicFeatures(essayText),
+
+    authenticity: {
+      authenticity_score: surgical.voiceFingerprint?.tone ? 8 : 5,
+      voice_type: surgical.voiceFingerprint?.tone?.primary?.toLowerCase().includes('conversational') ? 'conversational' : 'natural',
+      red_flags: surgical.experienceFingerprint?.antiPatternFlags?.warnings || [],
+      green_flags: surgical.experienceFingerprint?.qualityAnchors?.map(a => a.whyItWorks) || [],
+      manufactured_signals: surgical.experienceFingerprint?.antiPatternFlags?.warnings || [],
+      authenticity_markers: [],
+      assessment: `Voice: ${surgical.voiceFingerprint?.tone?.primary || 'Unknown'}`,
+    },
+
+    coaching: {
+      prioritized_issues: surgical.workshopItems.map((item, idx) => ({
+        issue_id: item.id,
+        category: item.rubric_category as any,
+        severity: item.severity as any,
+        title: item.problem,
+        problem: item.problem,
+        impact: item.why_it_matters,
+        suggestions: item.suggestions?.map(s => s.text) || [],
+      })),
+      quick_wins: surgical.workshopItems.slice(0, 3).map((item, idx) => ({
+        issue_id: `quick-win-${idx}`,
+        estimated_minutes: 10,
+        potential_gain: '+3-5 NQI',
+      })),
+      strategic_guidance: {
+        focus_areas: surgical.workshopItems.slice(0, 3).map(item => item.rubric_category as any),
+        estimated_time_minutes: surgical.workshopItems.length * 15,
+        potential_nqi_gain: Math.min(20, surgical.workshopItems.length * 3),
+      },
+    },
+
+    performance: {
+      stage1_ms: surgical.performanceMetrics.stages.holistic_voice || 0,
+      stage2_ms: surgical.performanceMetrics.stages.rubric_scoring || 0,
+      stage3_ms: surgical.performanceMetrics.stages.locators || 0,
+      stage4_ms: surgical.performanceMetrics.stages.surgical_editor || 0,
+      total_ms: surgical.performanceMetrics.totalMs,
+    },
+
+    // ============================================================================
+    // SURGICAL WORKSHOP DATA (COMPLETE - NO DATA LOSS)
+    // ============================================================================
+    voiceFingerprint: surgical.voiceFingerprint,
+    experienceFingerprint: surgical.experienceFingerprint,
+    rubricDimensionDetails: surgical.rubricResult.dimension_scores,
+    workshopItems: surgical.workshopItems,
+  };
+}
+
+/**
+ * Get reader impression label from NQI score
+ */
+function getImpressionLabel(nqi: number): 'captivating_grounded' | 'strong_distinct_voice' | 'solid_needs_polish' | 'patchy_narrative' | 'generic_unclear' {
+  if (nqi >= 85) return 'captivating_grounded';
+  if (nqi >= 70) return 'strong_distinct_voice';
+  if (nqi >= 55) return 'solid_needs_polish';
+  if (nqi >= 40) return 'patchy_narrative';
+  return 'generic_unclear';
+}
+
+/**
+ * Extract basic features for compatibility
+ */
+function extractBasicFeatures(text: string): any {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  return {
+    word_count: words.length,
+    voice: {
+      active_verb_count: 0,
+      passive_verb_count: 0,
+      first_person_count: (text.match(/\b(I|my|me|mine)\b/gi) || []).length,
+      buzzword_count: 0,
+      passive_ratio: 0,
+      sentence_variety_score: 5,
+    },
+    evidence: {
+      number_count: (text.match(/\d+/g) || []).length,
+      has_concrete_numbers: (text.match(/\d+/g) || []).length > 0,
+      metric_specificity_score: 5,
+    },
+    arc: {
+      has_stakes: text.match(/\b(challenge|problem|difficult|struggle|overcome)\b/i) !== null,
+      has_turning_point: text.match(/\b(realized|learned|discovered|understood)\b/i) !== null,
+      temporal_markers: [],
+    },
+    collaboration: {
+      we_usage_count: (text.match(/\bwe\b/gi) || []).length,
+      credit_given: text.match(/\b(team|together|with)\b/i) !== null,
+    },
+    reflection: {
+      reflection_quality: text.match(/\b(realized|learned|discovered)\b/i) ? 'good' : 'superficial',
+    },
+  };
+}
+
+// Keep the OLD implementation ONLY as fallback when server is completely down
+async function OLD_analyzePIQEntry_Fallback() {
   try {
     // Health check
     let healthCheckPassed = false;

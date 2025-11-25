@@ -40,6 +40,7 @@ interface EditorViewProps {
   initialScore: number;
   isAnalyzing?: boolean;
   onRequestReanalysis?: () => void;
+  hasAnalysisResult?: boolean; // Whether analysis has been run at least once
   versionHistory?: Array<{ text: string; timestamp: number; score: number }>;
   onUndo?: () => void;
   onRedo?: () => void;
@@ -57,6 +58,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   initialScore,
   isAnalyzing = false,
   onRequestReanalysis,
+  hasAnalysisResult = false,
   versionHistory = [],
   onUndo,
   onRedo,
@@ -192,7 +194,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 {onRequestReanalysis && !isAnalyzing && (
                   <Button variant="outline" size="sm" onClick={onRequestReanalysis}>
                     <Sparkles className="w-3 h-3 mr-1" />
-                    Re-analyze
+                    {hasAnalysisResult ? 'Re-analyze' : 'Analyze'}
                   </Button>
                 )}
               </div>

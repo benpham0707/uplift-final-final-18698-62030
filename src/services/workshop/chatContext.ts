@@ -340,16 +340,17 @@ function buildAnalysisContext(
     };
   }
 
-  const categories = analysisResult.analysis.categories.map(cat => {
-    const percentage = (cat.score / cat.maxScore) * 100;
+  // Use rubricDimensionDetails from backend (not analysis.categories)
+  const categories = (analysisResult.rubricDimensionDetails || []).map(dim => {
+    const percentage = (dim.final_score / 10) * 100;
     return {
-      name: cat.category,
-      score: cat.score,
-      maxScore: cat.maxScore,
+      name: dim.dimension_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      score: dim.final_score,
+      maxScore: 10,
       percentage,
       status: getStatusForPercentage(percentage),
-      comments: cat.comments || [],
-      suggestions: cat.suggestions || [],
+      comments: dim.evidence?.weaknesses || [],
+      suggestions: dim.evidence?.strengths || [],
     };
   });
 
@@ -368,7 +369,7 @@ function buildAnalysisContext(
     initialNqi: initialScore,
     delta: currentScore - initialScore,
     tier: getScoreTier(currentScore),
-    label: analysisResult.analysis.reader_impression_label,
+    label: analysisResult.analysis?.reader_impression_label || 'In Progress',
     categories,
     weakCategories,
     authenticity: {

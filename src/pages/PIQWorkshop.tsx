@@ -1,12 +1,14 @@
-// @ts-nocheck
 /**
- * PIQ Narrative Workshop - Pure Frontend Demo
- * 
- * 100% frontend implementation with mock data - NO backend calls.
- * Cloned UI/UX from ExtracurricularWorkshopFinal.tsx
+ * PIQ Narrative Workshop - Full Backend Integration
+ *
+ * Integrated with full surgical workshop backend including:
+ * - Voice Fingerprint (4 dimensions)
+ * - Experience Fingerprint (anti-convergence system)
+ * - 12-Dimension Rubric Analysis
+ * - Workshop Items with surgical fixes
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -16,12 +18,37 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ArrowLeft, Loader2, RefreshCcw, Target, TrendingUp, TrendingDown, Minus, AlertTriangle, History, XCircle, CheckCircle, PenTool, Info } from 'lucide-react';
 import GradientText from '@/components/ui/GradientText';
 
-// UI Components (NO backend imports)
+// UI Components
 import { EditorView } from '@/components/portfolio/extracurricular/workshop/views/EditorView';
 import { RubricDimensionCard } from '@/components/portfolio/extracurricular/workshop/RubricDimensionCard';
 import type { RubricDimension, WritingIssue, EditSuggestion } from '@/components/portfolio/extracurricular/workshop/types';
 import ContextualWorkshopChat from '@/components/portfolio/extracurricular/workshop/components/ContextualWorkshopChat';
 import { DraftVersionHistory } from '@/components/portfolio/extracurricular/workshop/DraftVersionHistory';
+
+// PIQ Prompt Selector
+import { PIQPromptSelector, UC_PIQ_PROMPTS } from '@/components/portfolio/piq/workshop/PIQPromptSelector';
+
+// Backend Integration
+import { analyzePIQEntry } from '@/services/piqWorkshopAnalysisService';
+import type { AnalysisResult } from '@/components/portfolio/extracurricular/workshop/backendTypes';
+
+// Storage Services
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  hasRecentAutoSave,
+  cacheAnalysisResult,
+  getCachedAnalysisResult,
+  createVersionSnapshot,
+  formatSaveTime,
+  type PIQWorkshopCache,
+  type DraftVersion as StorageDraftVersion
+} from '@/services/piqWorkshop/storageService';
+import {
+  saveVersionToCloud,
+  loadVersionsFromCloud,
+  type CloudVersion
+} from '@/services/piqWorkshop/supabaseService';
 
 // ============================================================================
 // MOCK DATA - Hardcoded for demonstration
@@ -261,21 +288,293 @@ export default function PIQWorkshop() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [expandedDimensionId, setExpandedDimensionId] = useState<string | null>(null);
   const initialScoreRef = useRef<number>(73);
-  
+
+  // NEW: Full Backend Integration State
+  const [selectedPromptId, setSelectedPromptId] = useState<string | null>('piq1'); // Default to PIQ #1
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Caching & Save State
+  const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
+  const [showResumeSessionBanner, setShowResumeSessionBanner] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Extract active issues from dimensions
   const activeIssues = dimensions.flatMap(d => d.issues).filter(i => i.status !== 'fixed');
 
   // ============================================================================
-  // MOCK ANALYSIS (Simulated delay, no API call)
+  // COMPUTED VALUES (must be before useEffect hooks)
   // ============================================================================
 
-  const performMockAnalysis = useCallback(async () => {
+  const currentScore = analysisResult?.analysis?.narrative_quality_index || 73;
+  const initialScore = initialScoreRef.current;
+
+  // ============================================================================
+  // REAL BACKEND ANALYSIS - Full Surgical Workshop
+  // ============================================================================
+
+  const performFullAnalysis = useCallback(async () => {
+    console.log('🔍 performFullAnalysis called');
+    console.log('   Current draft length:', currentDraft.length);
+    console.log('   Selected prompt:', selectedPromptId);
+    if (!selectedPromptId) {
+      console.warn('No prompt selected - cannot analyze');
+      return;
+    }
+
     setIsAnalyzing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-    setIsAnalyzing(false);
-    setNeedsReanalysis(false);
-    // In real app would update scores - for demo, keep same
+    try {
+      const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+      if (!selectedPrompt) {
+        throw new Error('Invalid prompt selection');
+      }
+
+      // Check if analysis is cached for this exact text
+      const cachedResult = getCachedAnalysisResult(currentDraft, selectedPromptId);
+
+      let result: AnalysisResult;
+
+      if (cachedResult) {
+        console.log('✅ Using cached analysis result - skipping API call');
+        result = cachedResult;
+      } else {
+        console.log('🔄 No cache found - calling backend analysis (100+ seconds)');
+        // Call FULL surgical workshop backend (100+ seconds)
+        result = await analyzePIQEntry(
+          currentDraft,
+          selectedPrompt.title,
+          selectedPrompt.prompt,
+          { essayType: 'uc_piq' }
+        );
+
+        // Cache the result
+        cacheAnalysisResult(currentDraft, selectedPromptId, result);
+        console.log('✅ Analysis result cached for future use');
+      }
+
+      console.log('📊 Backend result received - FULL OBJECT:');
+      console.log(JSON.stringify(result, null, 2));
+
+      setAnalysisResult(result);
+
+      console.log('📊 Result properties:');
+      console.log('   - rubricDimensionDetails:', result.rubricDimensionDetails?.length || 0, 'dimensions');
+      console.log('   - workshopItems:', result.workshopItems?.length || 0, 'items');
+      console.log('   - voiceFingerprint type:', typeof result.voiceFingerprint, result.voiceFingerprint ? 'PRESENT' : 'MISSING');
+      console.log('   - experienceFingerprint type:', typeof result.experienceFingerprint, result.experienceFingerprint ? 'PRESENT' : 'MISSING');
+
+      // Transform backend dimensions to UI dimensions
+      if (result.rubricDimensionDetails && result.rubricDimensionDetails.length > 0) {
+        console.log('📝 Transforming dimensions...');
+        console.log('📦 Workshop Items:', result.workshopItems?.length || 0);
+        if (result.workshopItems && result.workshopItems.length > 0) {
+          console.log('🔍 Workshop item categories:', result.workshopItems.map(item => item.rubric_category));
+        }
+
+        const transformedDimensions: RubricDimension[] = result.rubricDimensionDetails.map((dim) => {
+          const status = dim.final_score >= 8 ? 'good' : dim.final_score >= 6 ? 'needs_work' : 'critical';
+
+          // Transform workshop items to issues
+          const issuesForDimension = (result.workshopItems || [])
+            .filter(item => item.rubric_category === dim.dimension_name);
+
+          console.log(`   - ${dim.dimension_name}: ${dim.final_score}/10, ${issuesForDimension.length} issues found`);
+
+          const transformedIssues = issuesForDimension.map((item) => ({
+              id: item.id,
+              dimensionId: dim.dimension_name,
+              title: item.problem,
+              excerpt: item.quote,
+              analysis: item.why_it_matters,
+              impact: `Severity: ${item.severity}`,
+              suggestions: item.suggestions.map((sug) => ({
+                text: sug.text,
+                rationale: sug.rationale,
+                type: sug.type === 'polished_original' ? 'replace' as const :
+                      sug.type === 'voice_amplifier' ? 'replace' as const :
+                      'replace' as const
+              })),
+              status: 'not_fixed' as const,
+              currentSuggestionIndex: 0,
+              expanded: false,
+            }));
+
+          return {
+            id: dim.dimension_name,
+            name: dim.dimension_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            score: dim.final_score,
+            maxScore: 10,
+            status,
+            weight: 10,
+            overview: dim.evidence?.justification || 'Analysis in progress',
+            issues: transformedIssues,
+          };
+        });
+
+        console.log(`✅ Transformed ${transformedDimensions.length} dimensions with ${transformedDimensions.reduce((sum, d) => sum + d.issues.length, 0)} total issues`);
+        console.log('🔄 About to call setDimensions with transformed data...');
+        setDimensions(transformedDimensions);
+        console.log('✅ setDimensions completed successfully');
+
+        // Update initial score ref on first analysis
+        if (initialScoreRef.current === 73 && result.analysis?.narrative_quality_index) {
+          console.log(`📊 Updating initial score from ${initialScoreRef.current} to ${result.analysis.narrative_quality_index}`);
+          initialScoreRef.current = result.analysis.narrative_quality_index;
+        }
+      } else {
+        console.warn('⚠️  No rubricDimensionDetails in result - using mock dimensions');
+        console.log('   Result keys:', Object.keys(result));
+        // Keep mock dimensions if backend doesn't return rubric details
+      }
+
+      setNeedsReanalysis(false);
+      setHasUnsavedChanges(false);
+      console.log('✅ Analysis complete - UI updated');
+    } catch (error) {
+      console.error('❌ Analysis failed:', error);
+      console.error('Full error object:', error);
+      console.error('Error message:', (error as Error).message);
+      console.error('Error stack:', (error as Error).stack);
+
+      // Show alert to user - DO NOT SILENTLY FAIL
+      alert(`Analysis failed! Check console for details.\n\nError: ${(error as Error).message}`);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }, [currentDraft, selectedPromptId]);
+
+  // NO auto-analysis - wait for user to click "Analyze" button
+
+  // ============================================================================
+  // AUTO-SAVE & RESUME SESSION
+  // ============================================================================
+
+  // Resume session on mount
+  useEffect(() => {
+    const { hasAutoSave, promptId, lastSaved } = hasRecentAutoSave();
+
+    if (hasAutoSave && promptId && lastSaved) {
+      setShowResumeSessionBanner(true);
+      console.log(`📦 Found auto-save from ${formatSaveTime(lastSaved)} for prompt ${promptId}`);
+    }
   }, []);
+
+  // Auto-save every 30 seconds
+  useEffect(() => {
+    if (!selectedPromptId) return;
+
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearInterval(autoSaveTimerRef.current);
+    }
+
+    // Set up auto-save timer
+    autoSaveTimerRef.current = setInterval(() => {
+      if (hasUnsavedChanges && currentDraft) {
+        const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+        if (!selectedPrompt) return;
+
+        // Create version snapshot
+        const versionSnapshot = createVersionSnapshot(
+          currentDraft,
+          currentScore,
+          analysisResult || undefined
+        );
+
+        // Build cache object
+        const cache: PIQWorkshopCache = {
+          promptId: selectedPromptId,
+          promptTitle: selectedPrompt.title,
+          currentDraft,
+          lastSaved: Date.now(),
+          analysisResult,
+          versions: [
+            ...draftVersions.map(v => ({
+              id: `v_${v.timestamp}`,
+              text: v.text,
+              timestamp: v.timestamp,
+              score: v.score,
+              wordCount: v.text.trim().split(/\s+/).length,
+              savedToCloud: false
+            })),
+            versionSnapshot
+          ].slice(-10), // Keep last 10 versions
+          autoSaveEnabled: true
+        };
+
+        saveToLocalStorage(cache);
+        setLastSaveTime(new Date());
+        setHasUnsavedChanges(false);
+        console.log('✅ Auto-saved to localStorage');
+      }
+    }, 30000); // 30 seconds
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearInterval(autoSaveTimerRef.current);
+      }
+    };
+  }, [hasUnsavedChanges, currentDraft, selectedPromptId, currentScore, analysisResult, draftVersions]);
+
+  // Resume session handler
+  const handleResumeSession = useCallback(() => {
+    const { promptId } = hasRecentAutoSave();
+    if (!promptId) return;
+
+    const cache = loadFromLocalStorage(promptId);
+    if (!cache) return;
+
+    setCurrentDraft(cache.currentDraft);
+    setSelectedPromptId(cache.promptId);
+    setAnalysisResult(cache.analysisResult);
+    setDraftVersions(cache.versions.map(v => ({
+      text: v.text,
+      timestamp: v.timestamp,
+      score: v.score
+    })));
+    setCurrentVersionIndex(cache.versions.length - 1);
+    setShowResumeSessionBanner(false);
+    setHasUnsavedChanges(false);
+
+    console.log(`✅ Resumed session for ${cache.promptTitle}`);
+  }, []);
+
+  const handleStartFresh = useCallback(() => {
+    setShowResumeSessionBanner(false);
+  }, []);
+
+  // Manual save to cloud
+  const handleSaveToCloud = useCallback(async () => {
+    if (!selectedPromptId || !currentDraft) {
+      console.warn('Cannot save to cloud: missing prompt or draft');
+      return;
+    }
+
+    const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+    if (!selectedPrompt) return;
+
+    // Create version snapshot
+    const versionSnapshot = createVersionSnapshot(
+      currentDraft,
+      currentScore,
+      analysisResult || undefined
+    );
+
+    // Save to cloud
+    const { success, error, versionId } = await saveVersionToCloud(
+      selectedPromptId,
+      selectedPrompt.title,
+      versionSnapshot
+    );
+
+    if (success) {
+      console.log(`✅ Saved version to cloud: ${versionId}`);
+      alert('Version saved to cloud successfully!');
+    } else {
+      console.error('Failed to save to cloud:', error);
+      alert(`Failed to save to cloud: ${error}`);
+    }
+  }, [selectedPromptId, currentDraft, currentScore, analysisResult]);
 
   // ============================================================================
   // HANDLERS (Same as ExtracurricularWorkshopFinal)
@@ -284,23 +583,24 @@ export default function PIQWorkshop() {
   const handleDraftChange = useCallback((newDraft: string) => {
     setCurrentDraft(newDraft);
     setNeedsReanalysis(true);
+    setHasUnsavedChanges(true);
   }, []);
 
   const handleSave = useCallback(() => {
     const newVersion: DraftVersion = {
       text: currentDraft,
       timestamp: Date.now(),
-      score: 73 // Mock score
+      score: analysisResult?.analysis?.narrative_quality_index || 73
     };
     const newVersions = draftVersions.slice(0, currentVersionIndex + 1);
     newVersions.push(newVersion);
     setDraftVersions(newVersions);
     setCurrentVersionIndex(newVersions.length - 1);
-    
+
     if (needsReanalysis) {
-      performMockAnalysis();
+      performFullAnalysis(); // Use REAL backend analysis
     }
-  }, [currentDraft, draftVersions, currentVersionIndex, needsReanalysis, performMockAnalysis]);
+  }, [currentDraft, draftVersions, currentVersionIndex, needsReanalysis, performFullAnalysis, analysisResult]);
 
   const handleUndo = useCallback(() => {
     if (currentVersionIndex > 0) {
@@ -321,8 +621,8 @@ export default function PIQWorkshop() {
   }, [currentVersionIndex, draftVersions]);
 
   const handleRequestReanalysis = useCallback(() => {
-    performMockAnalysis();
-  }, [performMockAnalysis]);
+    performFullAnalysis(); // Use REAL backend analysis
+  }, [performFullAnalysis]);
 
   const toggleDimensionExpand = useCallback((dimensionId: string) => {
     setExpandedDimensionId(prev => prev === dimensionId ? null : dimensionId);
@@ -413,11 +713,8 @@ export default function PIQWorkshop() {
   }, []);
 
   // ============================================================================
-  // COMPUTED
+  // COMPUTED (continued)
   // ============================================================================
-
-  const currentScore = 73;
-  const initialScore = initialScoreRef.current;
   const totalIssues = dimensions.reduce((sum, d) => sum + d.issues.length, 0);
   const fixedIssues = dimensions.reduce((sum, d) => sum + d.issues.filter(i => i.status === 'fixed').length, 0);
   const criticalIssues = dimensions.filter(d => d.status === 'critical').length;
@@ -465,9 +762,14 @@ export default function PIQWorkshop() {
 
   // Generate comprehensive overview paragraph
   const getDetailedOverview = (dims: RubricDimension[], score: number): string => {
-    const critical = dims.filter(d => d.status === 'critical');
-    const needsWork = dims.filter(d => d.status === 'needs_work');
-    const good = dims.filter(d => d.status === 'good').sort((a, b) => b.score - a.score);
+    try {
+      if (!dims || !Array.isArray(dims) || dims.length === 0) {
+        return 'Analysis in progress...';
+      }
+
+      const critical = dims.filter(d => d && d.status === 'critical');
+      const needsWork = dims.filter(d => d && d.status === 'needs_work');
+      const good = dims.filter(d => d && d.status === 'good').sort((a, b) => (b?.score || 0) - (a?.score || 0));
     
     // Build comprehensive narrative paragraph
     let overview = '';
@@ -553,6 +855,10 @@ export default function PIQWorkshop() {
     }
     
     return overview;
+    } catch (error) {
+      console.error('Error in getDetailedOverview:', error);
+      return 'Analysis complete. View detailed breakdown below.';
+    }
   };
 
   // Get actionable insights from actual dimension data
@@ -625,11 +931,53 @@ export default function PIQWorkshop() {
           </Button>
           <div className="text-center">
             <h1 className="text-xl font-bold text-primary">PIQ Narrative Workshop</h1>
-            <p className="text-xs text-muted-foreground">PIQ #{MOCK_PIQ.piqNumber} · {MOCK_PIQ.category}</p>
+            <p className="text-xs text-muted-foreground">
+              PIQ #{MOCK_PIQ.piqNumber} · {MOCK_PIQ.category}
+              {lastSaveTime && (
+                <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+                  • Saved {formatSaveTime(lastSaveTime.getTime())}
+                </span>
+              )}
+            </p>
           </div>
           <div className="w-24" />
         </div>
       </div>
+
+      {/* Resume Session Banner */}
+      {showResumeSessionBanner && (
+        <div className="mx-auto px-4 py-3 bg-blue-50 dark:bg-blue-950/30 border-b border-blue-200 dark:border-blue-800">
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
+            <div className="flex items-center gap-3">
+              <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div>
+                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                  Resume your last session?
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  Draft auto-saved {formatSaveTime(hasRecentAutoSave().lastSaved || Date.now())}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleStartFresh}
+                className="bg-white dark:bg-gray-900"
+              >
+                Start Fresh
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleResumeSession}
+              >
+                Resume
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <div className="relative z-10 mx-auto px-4 py-12 space-y-6">
@@ -854,12 +1202,14 @@ export default function PIQWorkshop() {
                 initialScore={initialScore}
                 isAnalyzing={isAnalyzing}
                 onRequestReanalysis={handleRequestReanalysis}
+                hasAnalysisResult={analysisResult !== null}
                 versionHistory={draftVersions}
                 canUndo={currentVersionIndex > 0}
                 canRedo={currentVersionIndex < draftVersions.length - 1}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
                 onShowHistory={() => setShowVersionHistory(true)}
+                onSaveToCloud={handleSaveToCloud}
               />
             </Card>
 
@@ -874,33 +1224,52 @@ export default function PIQWorkshop() {
               </div>
 
               <div className="space-y-4">
-                {dimensions.map((dimension) => (
-                  <RubricDimensionCard
-                    key={dimension.id}
-                    dimension={dimension}
-                    isExpanded={expandedDimensionId === dimension.id}
-                    onToggleExpand={() => toggleDimensionExpand(dimension.id)}
-                    onToggleIssue={handleToggleIssue}
-                    onApplySuggestion={handleApplySuggestion}
-                    onNextSuggestion={handleNextSuggestion}
-                    onPrevSuggestion={handlePrevSuggestion}
-                  />
-                ))}
+                {dimensions && Array.isArray(dimensions) && dimensions.length > 0 ? (
+                  dimensions.map((dimension) => dimension ? (
+                    <RubricDimensionCard
+                      key={dimension.id}
+                      dimension={dimension}
+                      isExpanded={expandedDimensionId === dimension.id}
+                      onToggleExpand={() => toggleDimensionExpand(dimension.id)}
+                      onToggleIssue={handleToggleIssue}
+                      onApplySuggestion={handleApplySuggestion}
+                      onNextSuggestion={handleNextSuggestion}
+                      onPrevSuggestion={handlePrevSuggestion}
+                    />
+                  ) : null)
+                ) : (
+                  <div className="text-center p-8 text-muted-foreground">
+                    No analysis data yet. Click "Analyze" to get started.
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Right column: Chat */}
-          <div>
+          {/* Right column: PIQ Prompt Selector + Chat */}
+          <div className="space-y-6">
+            {/* PIQ Prompt Selector */}
+            {selectedPromptId && (
+              <PIQPromptSelector
+                selectedPromptId={selectedPromptId}
+                onPromptSelect={(promptId) => {
+                  setSelectedPromptId(promptId);
+                  setNeedsReanalysis(true);
+                  setHasUnsavedChanges(true);
+                }}
+              />
+            )}
+
+            {/* Chat */}
             <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg sticky top-24">
               <ContextualWorkshopChat
                 activity={MOCK_PIQ as any}
                 currentDraft={currentDraft}
-                analysisResult={null}
+                analysisResult={analysisResult}
                 teachingCoaching={null}
                 currentScore={currentScore}
                 initialScore={initialScore}
-                hasUnsavedChanges={needsReanalysis}
+                hasUnsavedChanges={hasUnsavedChanges}
                 needsReanalysis={needsReanalysis}
                 reflectionPromptsMap={new Map()}
                 reflectionAnswers={{}}

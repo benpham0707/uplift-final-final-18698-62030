@@ -241,6 +241,110 @@ export interface CoachingOutput {
 }
 
 // ============================================================================
+// SURGICAL WORKSHOP ADDITIONS (Phase 17+ Integration)
+// ============================================================================
+
+/**
+ * Voice Fingerprint - Student's authentic writing identity
+ */
+export interface VoiceFingerprintData {
+  sentenceStructure?: {
+    pattern: string; // e.g., "Varied - mixes short punchy with complex"
+    example: string; // Actual sentence from essay
+  };
+  vocabulary?: {
+    level: string; // e.g., "Conversational with technical precision"
+    signatureWords: string[]; // Distinctive words they use
+  };
+  pacing?: {
+    speed: string; // e.g., "Quick", "Measured", "Variable"
+    rhythm: string; // e.g., "Staccato", "Flowing"
+  };
+  tone?: {
+    primary: string; // e.g., "Earnest", "Analytical", "Playful"
+    secondary: string; // e.g., "Self-deprecating", "Optimistic"
+  };
+}
+
+/**
+ * Experience Fingerprint - What makes this essay irreplaceable
+ * Anti-Convergence System to prevent generic essays
+ */
+export interface ExperienceFingerprintData {
+  // Uniqueness Dimensions (any of these make essay stand out)
+  unusualCircumstance?: {
+    description: string;
+    whyItMatters: string;
+    specificDetail: string;
+  };
+  unexpectedEmotion?: {
+    emotion: string;
+    trigger: string;
+    counterExpectation: string;
+  };
+  contraryInsight?: {
+    insight: string;
+    againstWhat: string;
+    whyAuthentic: string;
+  };
+  specificSensoryAnchor?: {
+    sensory: string;
+    context: string;
+    emotionalWeight: string;
+  };
+  uniqueRelationship?: {
+    person: string;
+    dynamic: string;
+    unexpectedAspect: string;
+  };
+  culturalSpecificity?: {
+    element: string;
+    connection: string;
+    universalBridge: string;
+  };
+
+  // Anti-Pattern Detection (warns if essay is too generic)
+  antiPatternFlags: {
+    followsTypicalArc: boolean;
+    hasGenericInsight: boolean;
+    hasManufacturedBeat: boolean;
+    hasCrowdPleaser: boolean;
+    warnings: string[];
+  };
+
+  // Divergence Requirements (what to include/avoid to stay unique)
+  divergenceRequirements: {
+    mustInclude: string[];
+    mustAvoid: string[];
+    uniqueAngle: string;
+    authenticTension: string;
+  };
+
+  // Quality Anchors (preserve these good elements)
+  qualityAnchors: Array<{
+    sentence: string;
+    whyItWorks: string;
+    preservationPriority: 'critical' | 'high' | 'medium';
+  }>;
+
+  confidenceScore: number; // 0-10, how unique is this essay
+}
+
+/**
+ * Rubric Dimension with full detail (raw + final scores + evidence)
+ */
+export interface DimensionScoreDetail {
+  dimension_name: string;
+  raw_score: number; // 0-10, before adjustments
+  final_score: number; // 0-10, after interaction rules
+  evidence: {
+    justification: string; // Why this score
+    strengths: string[];
+    weaknesses: string[];
+  };
+}
+
+// ============================================================================
 // ANALYSIS RESULT (Complete output from engine)
 // ============================================================================
 
@@ -257,6 +361,24 @@ export interface AnalysisResult {
     stage4_ms: number;
     total_ms: number;
   };
+
+  // SURGICAL WORKSHOP ADDITIONS (Full integration)
+  voiceFingerprint?: VoiceFingerprintData;
+  experienceFingerprint?: ExperienceFingerprintData;
+  rubricDimensionDetails?: DimensionScoreDetail[]; // 12 dimensions with full detail
+  workshopItems?: Array<{
+    id: string;
+    rubric_category: string;
+    severity: 'critical' | 'warning' | 'optimization';
+    quote: string;
+    problem: string;
+    why_it_matters: string;
+    suggestions: Array<{
+      text: string;
+      rationale: string;
+      type: 'polished_original' | 'voice_amplifier' | 'divergent_strategy';
+    }>;
+  }>;
 }
 
 export interface ExtractedFeatures {

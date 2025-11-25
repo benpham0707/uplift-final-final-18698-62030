@@ -91,6 +91,55 @@ function findBestMatch(essayText: string, quote: string): { startIndex: number, 
  * Converts a full Rubric Analysis into precise Locators for the Workshop UI.
  * This ensures the Surgical Editor works on the EXACT issues identified by the 13-dimension rubric.
  */
+/**
+ * Build compelling problem description with storytelling
+ */
+function buildProblemDescription(dim: DimensionScoreResult): string {
+  const score = dim.final_score;
+  const name = dim.dimension_name;
+  const weaknesses = dim.evidence?.weaknesses || [];
+
+  if (score < 3) {
+    return `Your essay is missing the foundational elements of ${name}. ${weaknesses[0] || 'This dimension needs significant development to meet college admissions standards.'}`;
+  } else if (score < 5) {
+    return `This dimension (${name}) is holding your essay back. ${weaknesses[0] || 'Without strengthening this area, your essay won\'t compete with top applicants.'}`;
+  } else if (score < 7) {
+    return `You're close, but ${name} needs polish to reach elite tier. ${weaknesses[0] || 'Small improvements here will significantly elevate your essay\'s impact.'}`;
+  }
+
+  return `${name} scored ${score}/10. ${weaknesses[0] || 'There\'s room for improvement.'}`;
+}
+
+/**
+ * Build why-it-matters explanation with depth and encouragement
+ */
+function buildWhyItMatters(dim: DimensionScoreResult): string {
+  const justification = dim.evidence?.justification || '';
+  const name = dim.dimension_name.replace(/_/g, ' ');
+  const score = dim.final_score;
+
+  // Create impactful explanation
+  let impact = `Here's why ${name} matters: `;
+
+  if (justification) {
+    impact += justification;
+  } else {
+    // Fallback explanations by dimension
+    impact += `This dimension affects how admissions officers perceive your narrative depth and authenticity. `;
+  }
+
+  // Add encouraging context based on score
+  if (score < 4) {
+    impact += ` Right now, this is a critical gap that could cost you admission at selective schools. But the good news? Our surgical suggestions below show you exactly how to fix it.`;
+  } else if (score < 6) {
+    impact += ` Improving this from ${score} to 8+ could be the difference between a competitive essay and one that commands attention.`;
+  } else {
+    impact += ` You're in the competitive range, but reaching 8-9 here would put you in the elite tier that stands out to admissions officers.`;
+  }
+
+  return impact;
+}
+
 export function mapRubricToLocators(
   rubricResult: RubricScoringResult,
   essayText: string
@@ -106,8 +155,10 @@ export function mapRubricToLocators(
     if (dim.final_score < 4) severity = 'critical';
     else if (dim.final_score < 6) severity = 'warning';
 
+    let createdLocator = false;
+
     // Map evidence quotes to locations in text
-    if (dim.evidence && dim.evidence.quotes) {
+    if (dim.evidence && dim.evidence.quotes && dim.evidence.quotes.length > 0) {
       dim.evidence.quotes.forEach(quote => {
         // Clean quote for searching (remove quotes, extra whitespace)
         const cleanQuote = quote.replace(/^["']|["']$/g, '').trim();
@@ -124,10 +175,28 @@ export function mapRubricToLocators(
             issueType: 'rubric_gap',
             severity,
             rubricCategory: dim.dimension_name,
-            problem: `This section scored ${dim.final_score}/10 in ${dim.dimension_name}.`,
-            whyItMatters: dim.evidence.justification || `Improvement needed in ${dim.dimension_name} to reach elite standards.`
+            problem: buildProblemDescription(dim),
+            whyItMatters: buildWhyItMatters(dim)
           });
+          createdLocator = true;
         }
+      });
+    }
+
+    // CRITICAL: If no locator was created from quotes, create a generic one
+    // EVERY low-scoring dimension MUST have at least one workshop item
+    if (!createdLocator) {
+      // Use first paragraph or first 200 chars as quote
+      const quote = essayText.substring(0, Math.min(200, essayText.length)).trim();
+      locators.push({
+        quote,
+        startIndex: 0,
+        endIndex: quote.length,
+        issueType: 'rubric_gap',
+        severity,
+        rubricCategory: dim.dimension_name,
+        problem: buildProblemDescription(dim),
+        whyItMatters: buildWhyItMatters(dim)
       });
     }
   });

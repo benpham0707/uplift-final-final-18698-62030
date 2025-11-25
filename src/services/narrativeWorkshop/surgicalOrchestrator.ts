@@ -97,15 +97,14 @@ export async function runSurgicalWorkshop(
     stages.locators = Date.now() - t3;
     console.log(`   Found ${allLocators.length} potential issues.`);
 
-    // 4. Prioritization & Filtering
-    // We want the top 5 most critical issues to avoid overwhelming the user.
-    const prioritizedLocators = prioritizeLocators(allLocators);
-    console.log(`   Prioritized top ${prioritizedLocators.length} issues for surgical editing.`);
+    // 4. Generate workshop items for ALL located issues
+    // Don't limit - let the user choose what to work on
+    console.log(`   Generating surgical fixes for all ${allLocators.length} issues...`);
 
     // 5. Surgical Editor (Generate Fixes with Experience Fingerprint)
     console.log('Step 4: Generating Surgical Fixes (with anti-convergence)...');
     const t4 = Date.now();
-    const itemPromises = prioritizedLocators.map(locator =>
+    const itemPromises = allLocators.map(locator =>
       generateSurgicalFixes(
         locator,
         voice,
@@ -170,7 +169,8 @@ function prioritizeLocators(locators: DetectedLocator[]): DetectedLocator[] {
     }
   }
 
-  // 3. Return Top 5
-  return unique.slice(0, 5);
+  // 3. Return Top 12 (one per dimension - don't limit artificially)
+  // IMPORTANT: Every low-scoring dimension should get a workshop item
+  return unique.slice(0, 12);
 }
 

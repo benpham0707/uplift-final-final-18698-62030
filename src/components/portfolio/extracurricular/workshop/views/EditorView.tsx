@@ -27,6 +27,7 @@ import {
   Clock,
   Sparkles,
   FileEdit,
+  Cloud,
 } from 'lucide-react';
 import GradientText from '@/components/ui/GradientText';
 import type { TeachingIssue } from '../teachingTypes';
@@ -40,12 +41,14 @@ interface EditorViewProps {
   initialScore: number;
   isAnalyzing?: boolean;
   onRequestReanalysis?: () => void;
+  hasAnalysisResult?: boolean; // Whether analysis has been run at least once
   versionHistory?: Array<{ text: string; timestamp: number; score: number }>;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
   onShowHistory?: () => void;
+  onSaveToCloud?: () => void; // Manual save to cloud
 }
 
 export const EditorView: React.FC<EditorViewProps> = ({
@@ -57,12 +60,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
   initialScore,
   isAnalyzing = false,
   onRequestReanalysis,
+  hasAnalysisResult = false,
   versionHistory = [],
   onUndo,
   onRedo,
   canUndo = false,
   canRedo = false,
   onShowHistory,
+  onSaveToCloud,
 }) => {
   const [localDraft, setLocalDraft] = useState(currentDraft);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -151,6 +156,17 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   <Save className="w-4 h-4 mr-2" />
                   Save Draft
                 </Button>
+                {onSaveToCloud && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onSaveToCloud}
+                    title="Save version to cloud for cross-device access"
+                  >
+                    <Cloud className="w-4 h-4 mr-2" />
+                    Save to Cloud
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -192,7 +208,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 {onRequestReanalysis && !isAnalyzing && (
                   <Button variant="outline" size="sm" onClick={onRequestReanalysis}>
                     <Sparkles className="w-3 h-3 mr-1" />
-                    Re-analyze
+                    {hasAnalysisResult ? 'Re-analyze' : 'Analyze'}
                   </Button>
                 )}
               </div>

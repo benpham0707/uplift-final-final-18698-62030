@@ -32,7 +32,7 @@ export const PIQCarouselNav: React.FC<PIQCarouselNavProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-0.5">
       {/* Navigation row with pipes */}
       <div className="flex items-center justify-center gap-3 w-full">
         <Button
@@ -59,7 +59,7 @@ export const PIQCarouselNav: React.FC<PIQCarouselNavProps> = ({
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="max-w-xs text-xs">{currentPrompt?.title}</p>
+                <p className="max-w-xs text-xs">{currentPrompt?.prompt}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

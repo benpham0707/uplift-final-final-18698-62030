@@ -37,18 +37,17 @@ CREATE TABLE public.academic_journey (
 );
 CREATE TABLE public.credit_transactions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
+  user_id text NOT NULL,
   amount integer NOT NULL,
   type text NOT NULL CHECK (type = ANY (ARRAY['subscription_grant'::text, 'addon_purchase'::text, 'usage'::text, 'bonus'::text])),
   description text,
   stripe_payment_id text,
   created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT credit_transactions_pkey PRIMARY KEY (id),
-  CONSTRAINT credit_transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  CONSTRAINT credit_transactions_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.devices (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
+  user_id text NOT NULL,
   ua text,
   os text,
   browser text,
@@ -56,8 +55,77 @@ CREATE TABLE public.devices (
   country text,
   last_seen timestamp with time zone NOT NULL DEFAULT now(),
   revoked_at timestamp with time zone,
-  CONSTRAINT devices_pkey PRIMARY KEY (id),
-  CONSTRAINT devices_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  CONSTRAINT devices_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.essay_analysis_reports (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  essay_id uuid NOT NULL,
+  rubric_version text NOT NULL DEFAULT 'v1.0.0'::text,
+  analysis_depth USER-DEFINED NOT NULL DEFAULT 'standard'::analysis_depth,
+  essay_quality_index numeric NOT NULL CHECK (essay_quality_index >= 0::numeric AND essay_quality_index <= 100::numeric),
+  impression_label USER-DEFINED NOT NULL,
+  dimension_scores jsonb NOT NULL CHECK (jsonb_typeof(dimension_scores) = 'array'::text),
+  weights jsonb NOT NULL CHECK (jsonb_typeof(weights) = 'object'::text),
+  flags ARRAY DEFAULT '{}'::text[],
+  prioritized_levers ARRAY DEFAULT '{}'::text[],
+  elite_pattern_profile jsonb,
+  token_usage jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  voice_fingerprint jsonb,
+  experience_fingerprint jsonb,
+  workshop_items jsonb,
+  full_analysis_result jsonb,
+  CONSTRAINT essay_analysis_reports_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.essay_coaching_plans (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  essay_id uuid NOT NULL,
+  analysis_report_id uuid,
+  goal_statement text NOT NULL,
+  coaching_depth USER-DEFINED NOT NULL DEFAULT 'standard'::analysis_depth,
+  outline_variants jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(outline_variants) = 'array'::text),
+  micro_edits jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(micro_edits) = 'array'::text),
+  rewrites_by_style jsonb NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(rewrites_by_style) = 'object'::text),
+  elicitation_prompts jsonb NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(elicitation_prompts) = 'object'::text),
+  guardrails ARRAY DEFAULT '{}'::text[],
+  word_budget_guidance text,
+  school_alignment_todo ARRAY,
+  token_usage jsonb,
+  accepted boolean DEFAULT false,
+  student_feedback text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT essay_coaching_plans_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.essay_revision_history (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  essay_id uuid NOT NULL,
+  version integer NOT NULL CHECK (version > 0),
+  draft_content text NOT NULL,
+  change_summary text,
+  source text,
+  coaching_plan_id uuid,
+  word_count integer,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT essay_revision_history_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.essays (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id text NOT NULL,
+  profile_id uuid,
+  essay_type USER-DEFINED NOT NULL,
+  prompt_text text,
+  max_words integer NOT NULL DEFAULT 650 CHECK (max_words > 0),
+  target_school text,
+  draft_original text NOT NULL,
+  draft_current text,
+  version integer NOT NULL DEFAULT 1 CHECK (version > 0),
+  context_constraints text,
+  intended_major text,
+  submitted_at timestamp with time zone,
+  locked boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT essays_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.experiences_activities (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -180,7 +248,7 @@ CREATE TABLE public.portfolio_analytics_history (
 );
 CREATE TABLE public.profiles (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL UNIQUE,
+  user_id text NOT NULL UNIQUE,
   user_context USER-DEFINED NOT NULL,
   status USER-DEFINED NOT NULL DEFAULT 'initial'::profile_status,
   goals jsonb NOT NULL DEFAULT '{"primaryGoal": "exploring_options", "desiredOutcomes": [], "timelineUrgency": "flexible"}'::jsonb,
@@ -202,20 +270,18 @@ CREATE TABLE public.profiles (
   credits integer NOT NULL DEFAULT 0,
   stripe_customer_id text,
   subscription_status text DEFAULT 'none'::text CHECK (subscription_status = ANY (ARRAY['active'::text, 'canceled'::text, 'past_due'::text, 'none'::text])),
-  CONSTRAINT profiles_pkey PRIMARY KEY (id),
-  CONSTRAINT profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  CONSTRAINT profiles_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.subscriptions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
+  user_id text NOT NULL,
   stripe_subscription_id text NOT NULL UNIQUE,
   status text NOT NULL,
   current_period_end timestamp with time zone,
   cancel_at_period_end boolean DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT subscriptions_pkey PRIMARY KEY (id),
-  CONSTRAINT subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  CONSTRAINT subscriptions_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.support_network (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

@@ -1,9 +1,12 @@
 /**
  * Workshop Analysis Edge Function
  *
- * Runs the full surgical workshop analysis on the backend where Claude API calls are allowed.
- * This edge function wraps the surgicalOrchestrator to enable frontend access.
+ * Runs the full surgical workshop analysis with QUALITY VALIDATION.
+ * Each suggestion is validated for authenticity, voice, and teaching quality.
+ * Retries with specific feedback if validation fails.
  */
+
+import { generateWorkshopItemWithValidation } from './validator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -329,19 +332,11 @@ Return ONLY valid JSON with this structure:
       console.log(`📊 Score calibration: ${originalNQI} -> ${rubricAnalysis.narrative_quality_index}`);
     }
 
-    // Stage 4: Surgical Workshop Items (Issues & Suggestions)
-    const workshopResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
-        temperature: 0.8,
-        system: `You are a surgical essay editor. Identify specific issues in the essay and provide 3 types of surgical fixes:
+    // Stage 4: Surgical Workshop Items with VALIDATION (3 parallel batches, 4 items each)
+    // Each item validated for authenticity, retried up to 3x with specific feedback
+    console.log('🔧 Stage 4: Generating 12 workshop items with quality validation...');
+
+    const baseSystemPrompt = `You are a surgical essay editor. Identify specific issues in the essay and provide 3 types of surgical fixes:
 
 1. polished_original: Minimal edits preserving voice
 2. voice_amplifier: Heightens student's existing voice patterns
@@ -383,36 +378,48 @@ Return ONLY valid JSON with this structure:
       ]
     }
   ]
-}`,
-        messages: [
-          {
-            role: 'user',
-            content: `Identify surgical fixes for this essay:\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}\n\nRubric Analysis:\n${JSON.stringify(rubricAnalysis, null, 2)}`
-          }
-        ]
-      })
-    });
+}`;
 
-    if (!workshopResponse.ok) {
-      const errorText = await workshopResponse.text();
-      console.error('Workshop items API error:', errorText);
-      throw new Error(`Workshop items generation failed: ${workshopResponse.status}`);
-    }
+    // Generate 12 items in 3 parallel batches (4 items each) with validation
+    console.log('   🔄 Running 3 parallel batches (4 items each)...');
 
-    const workshopResult = await workshopResponse.json();
-    const workshopText = workshopResult.content[0].text;
+    const [batch1Items, batch2Items, batch3Items] = await Promise.all([
+      // Batch 1: 4 critical items
+      Promise.all([
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt)
+      ]),
 
-    let workshopData;
-    try {
-      const jsonMatch = workshopText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      const jsonString = jsonMatch ? jsonMatch[1].trim() : workshopText.trim();
-      workshopData = JSON.parse(jsonString);
-    } catch (e) {
-      console.error('Failed to parse workshop JSON:', workshopText);
-      workshopData = { workshopItems: [] };
-    }
+      // Batch 2: 4 high priority items
+      Promise.all([
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt)
+      ]),
 
-    console.log('✅ Workshop items complete');
+      // Batch 3: 4 medium/polish items
+      Promise.all([
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
+        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt)
+      ])
+    ]);
+
+    // Filter out null items (validation failures) and combine
+    const allItems = [...batch1Items, ...batch2Items, ...batch3Items].filter(item => item !== null);
+
+    const workshopData = {
+      workshopItems: allItems
+    };
+
+    console.log(`✅ Workshop items complete: ${workshopData.workshopItems.length} validated items`);
+    console.log(`   - Batch 1: ${batch1Items.filter(i => i !== null).length}/4 items passed validation`);
+    console.log(`   - Batch 2: ${batch2Items.filter(i => i !== null).length}/4 items passed validation`);
+    console.log(`   - Batch 3: ${batch3Items.filter(i => i !== null).length}/4 items passed validation`);
 
     // Assemble final result
     const finalResult = {

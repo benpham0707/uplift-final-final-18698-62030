@@ -27,6 +27,7 @@ export async function analyzePIQEntry(
     depth?: 'quick' | 'standard' | 'comprehensive';
     skip_coaching?: boolean;
     essayType?: 'personal_statement' | 'uc_piq' | 'why_us' | 'supplemental' | 'activity_essay';
+    include_strategic_analysis?: boolean;
   } = {}
 ): Promise<AnalysisResult> {
   console.log('='.repeat(80));
@@ -76,7 +77,7 @@ export async function analyzePIQEntry(
     console.log('');
 
     // Transform edge function result to AnalysisResult format
-    const analysisResult: AnalysisResult = {
+    let analysisResult: AnalysisResult = {
       analysis: {
         narrative_quality_index: data.analysis.narrative_quality_index,
         overall_strengths: data.analysis.overall_strengths || [],
@@ -89,6 +90,31 @@ export async function analyzePIQEntry(
       categories: {}, // Legacy field - not used
     };
 
+    // Stage 5: Strategic Constraints Analysis (ADDITIVE - runs in parallel, non-blocking)
+    if (options.include_strategic_analysis !== false) {
+      console.log('🎯 Initiating strategic constraints analysis (Stage 5)...');
+      const strategicAnalysisPromise = fetchStrategicConstraints(
+        essayText,
+        promptText,
+        promptTitle,
+        analysisResult
+      );
+
+      // Don't await - let it run in parallel with UI rendering
+      strategicAnalysisPromise
+        .then(strategicData => {
+          if (strategicData) {
+            console.log('✅ Strategic constraints analysis complete');
+            console.log(`   Efficiency Score: ${strategicData.wordCountAnalysis?.efficiency_score}/10`);
+            console.log(`   Topic Verdict: ${strategicData.topicViability?.verdict}`);
+            console.log(`   Balance Recommendation: ${strategicData.strategicBalance?.recommendation}`);
+          }
+        })
+        .catch(err => {
+          console.warn('⚠️  Strategic constraints analysis failed (non-critical):', err.message);
+        });
+    }
+
     return analysisResult;
 
   } catch (error) {
@@ -98,6 +124,60 @@ export async function analyzePIQEntry(
 
     // THROW THE ERROR - DO NOT FALL BACK
     throw new Error(`PIQ workshop analysis failed: ${(error as Error).message}`);
+  }
+}
+
+/**
+ * Stage 5: Strategic Constraints Analysis
+ *
+ * Fetches strategic guidance on word efficiency, balance, and topic viability.
+ * This runs NON-BLOCKING and enhances workshop items without modifying core analysis.
+ */
+async function fetchStrategicConstraints(
+  essayText: string,
+  promptText: string,
+  promptTitle: string,
+  baseAnalysis: AnalysisResult
+): Promise<any | null> {
+  try {
+    const wordCount = essayText.trim().split(/\s+/).filter(Boolean).length;
+
+    console.log('🎯 Calling strategic-constraints edge function...');
+    const startTime = Date.now();
+
+    const { data, error } = await supabase.functions.invoke('strategic-constraints', {
+      body: {
+        essayText,
+        currentWordCount: wordCount,
+        targetWordCount: 350,
+        promptText,
+        promptTitle,
+        workshopItems: baseAnalysis.workshopItems || [],
+        rubricDimensionDetails: baseAnalysis.rubricDimensionDetails || [],
+        voiceFingerprint: baseAnalysis.voiceFingerprint,
+        experienceFingerprint: baseAnalysis.experienceFingerprint,
+        analysis: baseAnalysis.analysis,
+      }
+    });
+
+    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    if (error) {
+      console.error(`❌ Strategic constraints error (${duration}s):`, error);
+      return null; // Graceful degradation
+    }
+
+    if (!data || !data.success) {
+      console.warn(`⚠️  Strategic constraints returned error (${duration}s):`, data?.error);
+      return null; // Graceful degradation
+    }
+
+    console.log(`✅ Strategic constraints complete in ${duration}s`);
+    return data;
+
+  } catch (error) {
+    console.error('❌ Strategic constraints exception:', error);
+    return null; // Graceful degradation - don't break main analysis
   }
 }
 

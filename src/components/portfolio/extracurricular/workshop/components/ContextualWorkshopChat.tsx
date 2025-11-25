@@ -38,11 +38,29 @@ import {
   type ChatRecommendation,
 } from '@/services/workshop/chatService';
 
+// PIQ Chat imports
+import { buildPIQChatContext, PIQChatContext } from '@/services/piqWorkshop/piqChatContext';
+import {
+  sendPIQChatMessage,
+  createPIQWelcomeMessage,
+  getPIQConversationStarters,
+  getCachedConversation as getPIQCachedConversation,
+  cacheConversation as cachePIQConversation,
+} from '@/services/piqWorkshop/piqChatService';
+
 // ============================================================================
 // PROPS
 // ============================================================================
 
 interface ContextualWorkshopChatProps {
+  // Mode switching
+  mode?: 'extracurricular' | 'piq'; // Default: 'extracurricular'
+
+  // PIQ-specific props (required when mode='piq')
+  piqPromptId?: string;
+  piqPromptText?: string;
+  piqPromptTitle?: string;
+
   // Core context
   activity: ExtracurricularItem;
   currentDraft: string;
@@ -55,7 +73,7 @@ interface ContextualWorkshopChatProps {
   hasUnsavedChanges: boolean;
   needsReanalysis: boolean;
 
-  // Reflection state
+  // Reflection state (extracurricular only)
   reflectionPromptsMap: Map<string, ReflectionPromptSet>;
   reflectionAnswers: Record<string, Record<string, string>>;
 
@@ -70,6 +88,10 @@ interface ContextualWorkshopChatProps {
 // ============================================================================
 
 export default function ContextualWorkshopChat({
+  mode = 'extracurricular', // Default to extracurricular
+  piqPromptId,
+  piqPromptText,
+  piqPromptTitle,
   activity,
   currentDraft,
   analysisResult,
@@ -105,24 +127,36 @@ export default function ContextualWorkshopChat({
 
   // Load cached conversation or create welcome message
   useEffect(() => {
-    const cached = getCachedConversation(activity.id);
+    const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity.id;
+    const cached = mode === 'piq' ? getPIQCachedConversation(cacheKey) : getCachedConversation(cacheKey);
 
     if (cached && cached.length > 0) {
       setChatMessages(cached);
     } else if (analysisResult) {
       // Create welcome message once analysis is ready
-      const context = buildContextObject();
-      const welcome = createWelcomeMessage(context);
-      setChatMessages([welcome]);
+      if (mode === 'piq' && piqPromptId && piqPromptText && piqPromptTitle) {
+        const context = buildPIQContextObject();
+        const welcome = createPIQWelcomeMessage(context);
+        setChatMessages([welcome]);
+      } else {
+        const context = buildContextObject();
+        const welcome = createWelcomeMessage(context);
+        setChatMessages([welcome]);
+      }
     }
-  }, [activity.id, analysisResult]);
+  }, [activity.id, analysisResult, mode, piqPromptId]);
 
   // Cache conversation on changes
   useEffect(() => {
     if (chatMessages.length > 0) {
-      cacheConversation(activity.id, chatMessages);
+      const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity.id;
+      if (mode === 'piq') {
+        cachePIQConversation(cacheKey, chatMessages);
+      } else {
+        cacheConversation(cacheKey, chatMessages);
+      }
     }
-  }, [chatMessages, activity.id]);
+  }, [chatMessages, activity.id, mode, piqPromptId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -155,6 +189,27 @@ export default function ContextualWorkshopChat({
     );
   };
 
+  const buildPIQContextObject = (): PIQChatContext => {
+    if (!piqPromptId || !piqPromptText || !piqPromptTitle) {
+      throw new Error('PIQ mode requires promptId, promptText, and promptTitle');
+    }
+
+    return buildPIQChatContext(
+      piqPromptId,
+      piqPromptText,
+      piqPromptTitle,
+      currentDraft,
+      analysisResult,
+      {
+        currentScore,
+        initialScore,
+        hasUnsavedChanges,
+        needsReanalysis,
+        versionHistory: [], // PIQWorkshop should pass this
+      }
+    );
+  };
+
   // ============================================================================
   // MESSAGE HANDLING
   // ============================================================================
@@ -177,27 +232,40 @@ export default function ContextualWorkshopChat({
     setIsLoading(true);
 
     try {
-      // Build context
-      const context = buildContextObject();
+      if (mode === 'piq' && piqPromptId && piqPromptText && piqPromptTitle) {
+        // PIQ mode
+        const context = buildPIQContextObject();
 
-      // Send to backend
-      const response = await sendChatMessage({
-        userMessage: userMessage.content,
-        context,
-        conversationHistory: chatMessages,
-        options: {
-          tone: 'mentor',
-          includeRecommendations: true,
-        },
-      });
+        const response = await sendPIQChatMessage({
+          userMessage: userMessage.content,
+          context,
+          conversationHistory: chatMessages,
+        });
 
-      // Add assistant message
-      setChatMessages((prev) => [...prev, response.message]);
+        // Add assistant message
+        setChatMessages((prev) => [...prev, response.message]);
+      } else {
+        // Extracurricular mode
+        const context = buildContextObject();
 
-      // Update recommendations
-      if (response.recommendations && response.recommendations.length > 0) {
-        setRecommendations(response.recommendations);
-        setCurrentRecommendationIndex(0); // Reset to first recommendation
+        const response = await sendChatMessage({
+          userMessage: userMessage.content,
+          context,
+          conversationHistory: chatMessages,
+          options: {
+            tone: 'mentor',
+            includeRecommendations: true,
+          },
+        });
+
+        // Add assistant message
+        setChatMessages((prev) => [...prev, response.message]);
+
+        // Update recommendations (extracurricular only)
+        if (response.recommendations && response.recommendations.length > 0) {
+          setRecommendations(response.recommendations);
+          setCurrentRecommendationIndex(0);
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -209,7 +277,7 @@ export default function ContextualWorkshopChat({
         content:
           error instanceof Error
             ? `Error: ${error.message}. Please check the console for details.`
-            : "I'm having trouble connecting right now. Please make sure the backend server is running (npm run dev:full) and try again.",
+            : "I'm having trouble connecting right now. Please try again.",
         timestamp: Date.now(),
       };
 
@@ -330,7 +398,9 @@ export default function ContextualWorkshopChat({
 
   const conversationStarters =
     chatMessages.length === 1 && analysisResult
-      ? getConversationStarters(buildContextObject())
+      ? mode === 'piq' && piqPromptId && piqPromptText && piqPromptTitle
+        ? getPIQConversationStarters(buildPIQContextObject())
+        : getConversationStarters(buildContextObject())
       : [];
 
   // ============================================================================

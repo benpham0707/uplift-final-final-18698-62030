@@ -1042,14 +1042,18 @@ export default function PIQWorkshop() {
 
   // Scroll to specific dimension in rubric
   const scrollToDimension = (dimensionId: string) => {
-    const element = document.getElementById(`dimension-${dimensionId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
-      setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
-      }, 2000);
-    }
+    setExpandedDimensionId(dimensionId);
+    // Wait for expansion to render/animate slightly
+    setTimeout(() => {
+      const element = document.getElementById(`dimension-${dimensionId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+        setTimeout(() => {
+          element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+        }, 2000);
+      }
+    }, 100);
   };
 
   // State for expandable dimension sections
@@ -1365,7 +1369,7 @@ export default function PIQWorkshop() {
                 <span className="text-sm font-medium text-muted-foreground">Quick navigate:</span>
                 
                 {/* Critical Badge */}
-                <TooltipProvider>
+                <TooltipProvider delayDuration={750}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -1390,12 +1394,16 @@ export default function PIQWorkshop() {
                         <div className="space-y-1">
                           <p className="font-semibold text-xs mb-2">Critical Dimensions:</p>
                           {criticalDimensions.map((dim) => (
-                            <div key={dim.id} className="text-xs">
-                              <span className="font-medium">• {dim.name}</span> ({dim.score}/{dim.maxScore})
+                            <button
+                              key={dim.id}
+                              onClick={() => scrollToDimension(dim.id)}
+                              className="w-full text-left text-xs hover:bg-muted/50 rounded p-1 transition-colors group"
+                            >
+                              <span className="font-medium group-hover:underline underline-offset-2 decoration-red-300 dark:decoration-red-700">• {dim.name}</span> ({dim.score}/{dim.maxScore})
                               {dim.issues.length > 0 && (
                                 <p className="text-muted-foreground ml-3 mt-0.5">{dim.issues[0].title}</p>
                               )}
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </TooltipContent>
@@ -1404,7 +1412,7 @@ export default function PIQWorkshop() {
                 </TooltipProvider>
 
                 {/* Needs Work Badge */}
-                <TooltipProvider>
+                <TooltipProvider delayDuration={750}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -1429,12 +1437,16 @@ export default function PIQWorkshop() {
                         <div className="space-y-1">
                           <p className="font-semibold text-xs mb-2">Needs Work Dimensions:</p>
                           {needsWorkDimensions.map((dim) => (
-                            <div key={dim.id} className="text-xs">
-                              <span className="font-medium">• {dim.name}</span> ({dim.score}/{dim.maxScore})
+                            <button
+                              key={dim.id}
+                              onClick={() => scrollToDimension(dim.id)}
+                              className="w-full text-left text-xs hover:bg-muted/50 rounded p-1 transition-colors group"
+                            >
+                              <span className="font-medium group-hover:underline underline-offset-2 decoration-amber-300 dark:decoration-amber-700">• {dim.name}</span> ({dim.score}/{dim.maxScore})
                               {dim.issues.length > 0 && (
                                 <p className="text-muted-foreground ml-3 mt-0.5">{dim.issues[0].title}</p>
                               )}
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </TooltipContent>
@@ -1443,7 +1455,7 @@ export default function PIQWorkshop() {
                 </TooltipProvider>
 
                 {/* Strong Badge */}
-                <TooltipProvider>
+                <TooltipProvider delayDuration={750}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -1468,9 +1480,13 @@ export default function PIQWorkshop() {
                         <div className="space-y-1">
                           <p className="font-semibold text-xs mb-2">Strong Dimensions:</p>
                           {goodDimensions.slice(0, 5).map((dim) => (
-                            <div key={dim.id} className="text-xs">
-                              <span className="font-medium">• {dim.name}</span> ({dim.score}/{dim.maxScore})
-                            </div>
+                            <button
+                              key={dim.id}
+                              onClick={() => scrollToDimension(dim.id)}
+                              className="w-full text-left text-xs hover:bg-muted/50 rounded p-1 transition-colors group"
+                            >
+                              <span className="font-medium group-hover:underline underline-offset-2 decoration-emerald-300 dark:decoration-emerald-700">• {dim.name}</span> ({dim.score}/{dim.maxScore})
+                            </button>
                           ))}
                           {goodDimensions.length > 5 && (
                             <p className="text-xs text-muted-foreground italic">+{goodDimensions.length - 5} more...</p>
@@ -1556,16 +1572,17 @@ export default function PIQWorkshop() {
               <div className="space-y-4">
                 {dimensions && Array.isArray(dimensions) && dimensions.length > 0 ? (
                   dimensions.map((dimension) => dimension ? (
-                    <RubricDimensionCard
-                      key={dimension.id}
-                      dimension={dimension}
-                      isExpanded={expandedDimensionId === dimension.id}
-                      onToggleExpand={() => toggleDimensionExpand(dimension.id)}
-                      onToggleIssue={handleToggleIssue}
-                      onApplySuggestion={handleApplySuggestion}
-                      onNextSuggestion={handleNextSuggestion}
-                      onPrevSuggestion={handlePrevSuggestion}
-                    />
+                    <div id={`dimension-${dimension.id}`} key={dimension.id}>
+                      <RubricDimensionCard
+                        dimension={dimension}
+                        isExpanded={expandedDimensionId === dimension.id}
+                        onToggleExpand={() => toggleDimensionExpand(dimension.id)}
+                        onToggleIssue={handleToggleIssue}
+                        onApplySuggestion={handleApplySuggestion}
+                        onNextSuggestion={handleNextSuggestion}
+                        onPrevSuggestion={handlePrevSuggestion}
+                      />
+                    </div>
                   ) : null)
                 ) : (
                   <div className="text-center p-8 text-muted-foreground">
@@ -1579,8 +1596,12 @@ export default function PIQWorkshop() {
           {/* Right column: PIQ Prompt Selector + Chat */}
           <div className="space-y-6">
             {/* Chat */}
-            <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg sticky top-28">
+            <Card className="sticky top-28 p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
               <ContextualWorkshopChat
+                mode="piq"
+                piqPromptId={selectedPromptId}
+                piqPromptText={UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId)?.prompt || ''}
+                piqPromptTitle={UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId)?.title || ''}
                 activity={MOCK_PIQ as any}
                 currentDraft={currentDraft}
                 analysisResult={analysisResult}

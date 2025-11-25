@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.narrative-overview]
 verify_jwt = false
+
+[functions.strategic-constraints]
+verify_jwt = false

@@ -1,760 +1,1048 @@
-# PIQ Workshop: Save, Caching, and Versioning System - Implementation Plan
+# PLAN: PIQ Workshop Quality Enhancement - Strategic Constraints System
 
 ## Executive Summary
 
-The PIQ Workshop currently has a **fundamentally broken save and versioning system**. While the analysis backend works correctly, users cannot reliably persist their work across sessions or devices. This plan addresses critical database infrastructure issues, implements proper save flows, and builds a complete versioning system.
+**Goal**: Address 3 critical UX issues discovered through extensive user testing while maintaining current quality and system performance.
+
+**Approach**: Add a new **Strategic Constraints Analyzer** as Stage 5 - a separate, lightweight API call that enhances workshop suggestions with word-count awareness, intellectual depth assessment, and topic viability evaluation.
+
+**Key Principle**: **NEVER COMPROMISE QUALITY**. Add intelligence on top of existing system without modifying proven Stages 1-4.
 
 ---
 
-## Current System Analysis
+## Problem Analysis
 
-### What Works ✅
-- **Analysis Engine**: Full 4-stage surgical workshop analysis (voice fingerprint, experience fingerprint, 12-dimension rubric, workshop items)
-- **Local Caching**: Analysis results cached in localStorage for 7 days
-- **Auto-save Timer**: Triggers every 30 seconds when there are unsaved changes
-- **UI/UX**: Score display, dimension cards, workshop chat, editor interface
+### Problem 1: Word Count Inefficiency ⚠️
+**Issue**: System suggests flowery, longer replacements ignoring 350-word PIQ limit
+- Suggestions often expand text rather than compress (e.g., 50-word passage → 80-word suggestion)
+- Doesn't recognize opportunities for concise, efficient writing
+- Students can't implement suggestions without exceeding word limit
 
-### Critical Issues ❌
+**Example**:
+```
+Original (15 words): "I started a club to help the environment. We did beach cleanups every month."
 
-#### 1. **Missing Database Table** (BLOCKING)
-- Code references `piq_essay_versions` table that doesn't exist in the database
-- All cloud saves fail with "relation 'piq_essay_versions' does not exist" error
-- No persistent storage across devices or sessions
+Suggestion (28 words): "When I founded the Environmental Action Club, I felt a deep calling to protect our coastal ecosystems. Our monthly beach cleanups became a ritual of community stewardship and ecological responsibility."
 
-#### 2. **Save Button Not Working**
-- `handleSave()` only updates local state
-- No database inserts
-- No analysis result persistence
-- Triggers re-analysis but doesn't save the results
+Problem: +13 words of flowery language that eats into precious word budget
+```
 
-#### 3. **Versioning Not Persisting**
-- Versions stored only in React state + localStorage (max 10 versions)
-- No cloud backup of version history
-- Cannot view version history after browser clear
-- No comparison between versions
+**Root Cause**: Workshop stage doesn't consider word budget or efficiency trade-offs
 
-#### 4. **Analysis Results Not Saved to Database**
-- Analysis results cached locally but never inserted into `essay_analysis_reports` table
-- Loss of historical analysis data
-- Cannot track improvement over time
+**Impact**: High-quality suggestions that are impractical to implement
 
-#### 5. **Authentication Mismatch**
-- Code uses `supabase.auth.getUser()` but project uses Clerk authentication
-- Recent commit: "Fix frontend using Supabase token instead of Clerk token" indicates known issue
-- All Supabase calls will fail authentication
+### Problem 2: Over-emphasis on Storytelling/Imagery ⚠️
+**Issue**: Heavy focus on sensory details and narrative imagery everywhere
+- Not all sections need deep imagery
+- Missing opportunities for intellectual depth, achievements, insights
+- Doesn't recognize when to trade description for accomplishment mentions
+- Essays become overly descriptive but miss showcasing academic/intellectual potential
 
-#### 6. **Auto-save Not Triggering Re-analysis**
-- Auto-save correctly doesn't trigger analysis ✅
-- But manually clicking "Save" should save to database (currently doesn't)
+**Example**:
+```
+Original: "Through this project, I learned how to analyze water quality data and present findings to policymakers."
+
+Suggestion: "The cool glass beakers clinked as I carefully measured pH levels. The fluorescent lab lights hummed above as I meticulously recorded each data point in my weathered notebook..."
+
+Problem: Trades intellectual demonstration for sensory description. Admissions wants to see analytical skills, not lab aesthetics.
+```
+
+**Root Cause**: Rubric dimensions weight narrative/emotional elements heavily across all sections
+
+**Impact**: Essays showcase storytelling ability but not academic/intellectual capability
+
+### Problem 3: No Topic Viability Assessment ⚠️
+**Issue**: System doesn't evaluate if essay topic is substantive enough
+- Can produce well-written essays about shallow/trivial topics
+- No guidance on whether topic demonstrates academic potential
+- Missing suggestions for better topic alternatives
+
+**Example**:
+```
+Topic: "I learned organization by organizing my desk"
+
+System produces: Well-written, vivid essay about desk organization with great imagery and narrative flow.
+
+Problem: Topic is too shallow/trivial to differentiate student or showcase capabilities. System doesn't catch this.
+```
+
+**Root Cause**: No stage evaluates topic merit or college admissions value
+
+**Impact**: Polished essays that don't showcase student capabilities
 
 ---
 
 ## Solution Architecture
 
-### Three-Tier Storage System
+### Core Principle: Additive Enhancement
+- ✅ **Keep existing 4-stage pipeline intact** (Voice, Experience, Rubric, Workshop)
+- ✅ **Add new Stage 5: Strategic Constraints Analyzer**
+- ✅ Run as **separate, non-blocking API call** (like narrative-overview)
+- ✅ Post-processes workshop items with constraints awareness
+- ✅ **NO CHANGES** to proven Stages 1-4
+
+### System Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    1. REACT STATE (Immediate)                    │
-│  currentDraft, analysisResult, dimensions, draftVersions         │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                    EXISTING PIPELINE (PROVEN)                     │
+├──────────────────────────────────────────────────────────────────┤
+│ Stage 1: Voice Fingerprint (15s)                    │
+│ Stage 2: Experience Fingerprint (15s)  [PARALLEL]  │ 30s total
+│ Stage 3: Rubric Analysis (40s)                                   │
+│ Stage 4: Workshop Items × 12 (54s)                               │
+├──────────────────────────────────────────────────────────────────┤
+│                  Total: ~124s (PROVEN QUALITY)                    │
+└──────────────────────────────────────────────────────────────────┘
                               ↓
-┌─────────────────────────────────────────────────────────────────┐
-│            2. LOCALSTORAGE (Auto-save every 30s)                 │
-│  - Quick resume on refresh                                       │
-│  - Keep last 10 versions                                         │
-│  - Cache analysis results (7 days)                               │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│           3. SUPABASE CLOUD (Manual "Save" button)               │
-│  - essays table: current draft                                   │
-│  - essay_revision_history: full version history                  │
-│  - essay_analysis_reports: analysis snapshots                    │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                 Stage 5: Strategic Constraints                    │
+│                  (NEW - Additive Enhancement)                     │
+├──────────────────────────────────────────────────────────────────┤
+│ • Word efficiency analysis                                        │
+│ • Intellectual depth vs imagery balance                           │
+│ • Topic viability assessment                                      │
+│ • Strategic replacement recommendations                           │
+├──────────────────────────────────────────────────────────────────┤
+│                       Time: ~20-25s                               │
+│                   Cost: ~$0.020 per essay                         │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Database Schema Design
+## Detailed Design
 
-### Option A: Use Existing Tables (RECOMMENDED)
+### Stage 5: Strategic Constraints Analyzer
 
-**Rationale**: The existing `essay_revision_history` table already provides versioning functionality. We should use it instead of creating a separate `piq_essay_versions` table.
+**Purpose**: Enhance workshop suggestions with strategic constraints awareness
 
-#### Tables to Use:
-
-**1. `essays` table** (already exists)
-```sql
--- Store current PIQ draft
-- essay_type = 'uc_piq'
-- prompt_text = selected PIQ prompt
-- draft_original = initial draft
-- draft_current = current working draft
-- version = auto-incremented on update (via trigger)
+**Input**:
+```typescript
+interface StrategicAnalysisRequest {
+  essayText: string;
+  currentWordCount: number;
+  targetWordCount: 350; // UC PIQ limit
+  promptText: string;
+  promptTitle: string;
+  workshopItems: WorkshopItem[]; // All 12 items from Stage 4
+  rubricDimensionDetails: RubricDimension[];
+  voiceFingerprint: any;
+  experienceFingerprint: any;
+  analysis: {
+    narrative_quality_index: number;
+    overall_strengths: string[];
+    overall_weaknesses: string[];
+  };
+}
 ```
 
-**2. `essay_revision_history` table** (already exists)
-```sql
--- Automatically populated by trigger when essay.draft_current changes
-- essay_id
-- version (incremented)
-- draft_content (snapshot)
-- word_count
-- created_at
+**Output**:
+```typescript
+interface StrategicAnalysisResult {
+  success: boolean;
+
+  // 1. Word Count Analysis
+  wordCountAnalysis: {
+    current: number;
+    target: 350;
+    available_budget: number; // Words remaining
+    efficiency_score: number; // 0-10 (how efficiently essay uses words)
+    bloat_areas: Array<{
+      section: string; // Which part of essay
+      word_count: number;
+      potential_savings: number; // Words that could be cut
+      why_bloated: string;
+    }>;
+    compression_opportunities: Array<{
+      technique: "remove_redundancy" | "condense_imagery" | "tighten_transitions";
+      where: string;
+      estimated_savings: number;
+      example: string;
+    }>;
+  };
+
+  // 2. Strategic Balance Assessment
+  strategicBalance: {
+    imagery_density: number; // 0-10 (how much sensory/narrative detail)
+    intellectual_depth: number; // 0-10 (analytical/conceptual content)
+    achievement_presence: number; // 0-10 (concrete accomplishments mentioned)
+    insight_quality: number; // 0-10 (depth of reflections)
+    recommendation: "increase_depth" | "increase_achievements" | "reduce_imagery" | "balanced";
+    imbalance_severity: "critical" | "moderate" | "minor" | "none";
+    specific_gaps: Array<{
+      type: "missing_achievements" | "excessive_description" | "shallow_insights";
+      where: string;
+      impact: string;
+      suggestion: string;
+    }>;
+  };
+
+  // 3. Topic Viability Evaluation
+  topicViability: {
+    substantiveness_score: number; // 0-10
+    academic_potential_score: number; // 0-10 (showcases intellectual ability)
+    differentiation_score: number; // 0-10 (unique/memorable)
+    verdict: "strong" | "adequate" | "weak" | "reconsider";
+    concerns: string[]; // If topic is problematic
+    strengths: string[]; // What works about topic
+    alternative_angles: Array<{
+      suggestion: string;
+      why_better: string;
+      example: string;
+    }>;
+  };
+
+  // 4. Enhanced Workshop Items (Metadata added to each item)
+  enhancedWorkshopItems: Array<{
+    original_item_id: string;
+    efficiency_assessment: {
+      word_delta: number; // Net word change (+/- words)
+      efficiency_rating: "expands" | "neutral" | "compresses";
+      implementable_with_budget: boolean; // Can user afford this change?
+      alternative_if_too_long?: string; // More concise version if needed
+    };
+    strategic_value: {
+      adds_depth: boolean; // Does this increase intellectual depth?
+      adds_achievements: boolean; // Does this showcase accomplishments?
+      reduces_fluff: boolean; // Does this cut unnecessary words?
+      priority_adjustment: number; // -2 to +2 (adjust item priority)
+      strategic_note: string; // Context for why priority changed
+    };
+  }>;
+
+  // 5. Overarching Strategic Recommendations
+  strategicRecommendations: Array<{
+    type: "compression" | "depth_over_imagery" | "add_achievements" | "topic_reframe";
+    priority: "critical" | "high" | "medium" | "low";
+    title: string;
+    description: string;
+    where_to_apply: string; // Which section of essay
+    why_matters: string;
+    estimated_word_impact: number; // +/- words
+    example_implementation?: string;
+  }>;
+
+  meta: {
+    analysis_time_ms: number;
+    model_used: string;
+    version: "1.0";
+  };
+}
 ```
 
-**3. `essay_analysis_reports` table** (already exists)
-```sql
--- Store analysis results linked to essay
-- essay_id
-- essay_quality_index (maps to narrative_quality_index)
-- dimension_scores (JSONB: store full rubricDimensionDetails)
-- flags (store workshop items)
-- created_at
+---
+
+## Prompt Engineering
+
+### System Prompt for Strategic Analyzer
+
+```typescript
+const STRATEGIC_ANALYZER_PROMPT = `You are a strategic college admissions essay consultant specializing in UC Personal Insight Question (PIQ) optimization.
+
+CONTEXT:
+- Word Limit: 350 words (STRICT - cannot exceed)
+- Genre: UC Personal Insight Questions
+- Purpose: Demonstrate academic potential, achievements, intellectual depth, and personal qualities
+- Audience: UC admissions officers reading 80+ essays per day
+
+CRITICAL UNDERSTANDING:
+UC PIQs are NOT creative writing exercises. They are strategic demonstrations of:
+1. Academic capability and intellectual curiosity
+2. Concrete achievements and measurable impact
+3. Personal qualities relevant to college success
+4. Unique perspectives and experiences
+
+CONSTRAINTS TO EVALUATE:
+
+═══════════════════════════════════════════════════════════════
+1. WORD EFFICIENCY ANALYSIS
+═══════════════════════════════════════════════════════════════
+
+Analyze how efficiently the essay uses its 350-word budget:
+
+A) Identify BLOAT (words not earning their space):
+   - Flowery adjectives that don't add meaning ("truly magnificent")
+   - Redundant phrases ("I learned and discovered")
+   - Excessive transitions ("Furthermore, moreover, additionally")
+   - Over-description of mundane details
+   - Vague generalities that could be cut
+
+B) Calculate WORD BUDGET for implementing suggestions:
+   - Current word count vs 350-word limit
+   - For EACH workshop item, estimate net word delta
+   - Flag items that would push essay over limit
+   - Prioritize compression suggestions when budget is tight
+
+C) Identify COMPRESSION OPPORTUNITIES:
+   - Where could 3 sentences become 1 without losing impact?
+   - Which sensory details could be implied rather than stated?
+   - What background context is unnecessary?
+
+CRITICAL RULE: If essay is 300+ words, prioritize COMPRESSION over expansion suggestions.
+
+═══════════════════════════════════════════════════════════════
+2. STRATEGIC BALANCE ASSESSMENT
+═══════════════════════════════════════════════════════════════
+
+Evaluate the essay's strategic balance across four dimensions:
+
+A) IMAGERY DENSITY (0-10)
+   - How much space devoted to sensory description?
+   - Is imagery adding depth or just taking space?
+   - Where is imagery essential vs unnecessary?
+
+B) INTELLECTUAL DEPTH (0-10)
+   - Does essay showcase analytical thinking?
+   - Are there conceptual insights or just surface observations?
+   - Does it demonstrate academic curiosity/capability?
+
+C) ACHIEVEMENT PRESENCE (0-10)
+   - Are concrete accomplishments quantified? (numbers, metrics, outcomes)
+   - Does essay demonstrate impact and leadership?
+   - Are achievements specific and verifiable?
+
+D) INSIGHT QUALITY (0-10)
+   - Are reflections substantive or generic?
+   - Do insights show maturity and self-awareness?
+   - Are conclusions earned through narrative?
+
+IDENTIFY IMBALANCES:
+- If imagery > 7 but intellectual_depth < 5: "excessive_description"
+- If achievement_presence < 4: "missing_accomplishments"
+- If insight_quality < 5: "shallow_reflections"
+
+RECOMMENDATION FRAMEWORK:
+- Imagery 8+ but Depth 5-: Trade description for analysis
+- Achievement 4- but Imagery 7+: Trade story for impact metrics
+- Insight 5- in any essay: Deepen reflections, avoid clichés
+
+═══════════════════════════════════════════════════════════════
+3. TOPIC VIABILITY EVALUATION
+═══════════════════════════════════════════════════════════════
+
+Assess whether the essay topic is substantive enough for UC admissions:
+
+A) SUBSTANTIVENESS (0-10)
+   - Is topic meaningful and significant?
+   - Does it demonstrate genuine challenges or growth?
+   - Or is it trivial/superficial? (e.g., "organizing my desk")
+
+B) ACADEMIC POTENTIAL (0-10)
+   - Does topic showcase intellectual capability?
+   - Can student demonstrate analytical thinking through this topic?
+   - Does it reveal academic interests or curiosity?
+
+C) DIFFERENTIATION (0-10)
+   - Is topic unique or overdone?
+   - Will it stand out among thousands of essays?
+   - Does it reveal something memorable about student?
+
+VERDICTS:
+- "strong" (8+ across all): Topic is excellent, proceed
+- "adequate" (6-7 average): Topic works, minor reframing suggested
+- "weak" (4-5 average): Topic needs significant reframing
+- "reconsider" (<4 average): Topic is too shallow, suggest pivot
+
+RED FLAGS (auto "weak" or "reconsider"):
+- Topic is about routine task (organizing, studying, etc.)
+- Topic lacks genuine challenge or stakes
+- Topic doesn't showcase any academic/intellectual capability
+- Topic is pure description with no analysis or insight
+- Topic is cliché (sports injury, immigrant story without depth)
+
+ALTERNATIVE ANGLES:
+If topic is weak, suggest how to reframe or pivot:
+- Add intellectual dimension (what complex problem did this help you solve?)
+- Connect to academic interests (how did this spark curiosity?)
+- Focus on unique aspect (what unusual angle exists?)
+- Scale up impact (what systemic change resulted?)
+
+═══════════════════════════════════════════════════════════════
+4. WORKSHOP ITEM ENHANCEMENT
+═══════════════════════════════════════════════════════════════
+
+For EACH of the 12 workshop items from Stage 4, provide strategic metadata:
+
+A) EFFICIENCY ASSESSMENT:
+   - Estimate net word delta for implementing suggestion
+   - Flag if implementable within remaining word budget
+   - If too long, provide more concise alternative
+
+B) STRATEGIC VALUE:
+   - Does suggestion add intellectual depth? (yes/no)
+   - Does suggestion showcase achievements? (yes/no)
+   - Does suggestion reduce unnecessary words? (yes/no)
+   - Should priority be adjusted based on constraints? (-2 to +2)
+
+C) PRIORITY ADJUSTMENTS:
+   +2: Critical for constraints (compression when budget tight, depth when imagery heavy)
+   +1: Helpful for balance
+    0: Neutral
+   -1: Less urgent given constraints
+   -2: Deprioritize (expansion when budget tight, more imagery when already heavy)
+
+═══════════════════════════════════════════════════════════════
+5. STRATEGIC RECOMMENDATIONS
+═══════════════════════════════════════════════════════════════
+
+Provide 3-5 overarching strategic recommendations:
+
+TYPES:
+- "compression": Where to cut words while maintaining impact
+- "depth_over_imagery": Where to trade sensory detail for intellectual content
+- "add_achievements": Where to quantify impact and showcase accomplishments
+- "topic_reframe": How to reframe topic to be more substantial
+
+PRIORITIZATION:
+- "critical": Must address (topic too shallow, way over word count, missing achievements entirely)
+- "high": Strongly recommended (significant imbalance, efficiency issues)
+- "medium": Helpful improvement
+- "low": Nice-to-have refinement
+
+FORMAT:
+Each recommendation must include:
+- Where to apply (specific section)
+- Why it matters (impact on admissions value)
+- Estimated word impact (+/- X words)
+- Concrete example of implementation
+
+═══════════════════════════════════════════════════════════════
+CRITICAL RULES
+═══════════════════════════════════════════════════════════════
+
+1. UC PIQs are demonstrations of FIT and POTENTIAL, not creative writing
+2. Every word must earn its place - no flowery filler allowed
+3. Achievements > Descriptions when word budget is tight
+4. Intellectual insights > Sensory details for academic positioning
+5. Topic must be substantive enough to showcase meaningful capabilities
+6. When essay is 300+ words, PRIORITIZE compression over expansion
+7. Balance imagery, depth, achievements, and insights strategically
+8. Catch shallow topics before student submits
+
+Return comprehensive JSON analysis with actionable strategic guidance that respects the 350-word constraint while maximizing essay impact.`;
 ```
-
-#### New Fields Needed:
-
-Add to `essay_analysis_reports`:
-```sql
-ALTER TABLE essay_analysis_reports
-ADD COLUMN voice_fingerprint JSONB,
-ADD COLUMN experience_fingerprint JSONB,
-ADD COLUMN workshop_items JSONB,
-ADD COLUMN full_analysis_result JSONB;
-```
-
-### Option B: Create New PIQ-Specific Table
-
-Only if we need PIQ-specific features not covered by existing schema:
-
-```sql
-CREATE TABLE piq_essay_versions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id),
-  prompt_id TEXT NOT NULL,  -- 'piq1', 'piq2', etc.
-  prompt_title TEXT NOT NULL,
-  essay_text TEXT NOT NULL,
-  word_count INTEGER NOT NULL,
-  analysis_snapshot JSONB,
-  narrative_quality_index NUMERIC(5,2),
-  version_number INTEGER NOT NULL,
-  is_current BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_piq_versions_user_prompt ON piq_essay_versions(user_id, prompt_id);
-CREATE INDEX idx_piq_versions_current ON piq_essay_versions(user_id, prompt_id, is_current) WHERE is_current = TRUE;
-```
-
-**Decision**: Use **Option A** (existing tables) to reduce complexity and leverage existing infrastructure.
 
 ---
 
 ## Implementation Plan
 
-### Phase 1: Database Infrastructure (CRITICAL - Must be first)
+### Phase 1: Create Strategic Analyzer Edge Function
 
-#### Task 1.1: Add Missing Columns to `essay_analysis_reports`
-```sql
-ALTER TABLE essay_analysis_reports
-ADD COLUMN voice_fingerprint JSONB,
-ADD COLUMN experience_fingerprint JSONB,
-ADD COLUMN workshop_items JSONB,
-ADD COLUMN full_analysis_result JSONB;
-```
+**File**: `supabase/functions/strategic-constraints/index.ts`
 
-#### Task 1.2: Fix Authentication Integration
-- **Problem**: Code uses Supabase Auth, but app uses Clerk
-- **Solution**: Create helper function to get Clerk user ID and use it for Supabase RLS
+**Responsibilities**:
+1. Accept full workshop analysis context
+2. Evaluate word efficiency of each workshop suggestion
+3. Assess imagery/depth/achievement balance
+4. Evaluate topic viability
+5. Return enhanced metadata + strategic recommendations
 
-**File**: `src/services/auth/clerkSupabaseAdapter.ts` (NEW)
-```typescript
-/**
- * Adapter to bridge Clerk auth with Supabase RLS
- */
-export async function getCurrentUserId(): Promise<string | null> {
-  // Get Clerk user ID
-  const { userId } = useAuth(); // Clerk hook
+**API Specification**:
+- **Endpoint**: `strategic-constraints`
+- **Method**: POST
+- **Timeout**: 60 seconds
+- **Model**: Claude Sonnet 4
+- **Max Tokens**: 6144 (need room for comprehensive analysis)
+- **Temperature**: 0.7
 
-  // Map to Supabase user_id (may need user mapping table)
-  return userId;
-}
-
-export async function getSupabaseAuthHeaders(): Promise<{ 'Authorization': string }> {
-  // Get Clerk JWT token
-  const { getToken } = useAuth();
-  const token = await getToken({ template: 'supabase' });
-
-  return { 'Authorization': `Bearer ${token}` };
+**Request Body**:
+```json
+{
+  "essayText": "string",
+  "currentWordCount": 347,
+  "targetWordCount": 350,
+  "promptText": "string",
+  "promptTitle": "string",
+  "workshopItems": [],
+  "rubricDimensionDetails": [],
+  "voiceFingerprint": {},
+  "experienceFingerprint": {},
+  "analysis": {}
 }
 ```
 
-#### Task 1.3: Update Supabase Service to Use Clerk Auth
-**File**: `src/services/piqWorkshop/supabaseService.ts`
-
-Replace all instances of:
-```typescript
-const { data: { user } } = await supabase.auth.getUser();
-```
-
-With:
-```typescript
-const userId = await getCurrentUserId();
-if (!userId) {
-  return { success: false, error: 'User not authenticated' };
+**Response**:
+```json
+{
+  "success": true,
+  "wordCountAnalysis": {},
+  "strategicBalance": {},
+  "topicViability": {},
+  "enhancedWorkshopItems": [],
+  "strategicRecommendations": [],
+  "meta": {
+    "analysis_time_ms": 21450,
+    "model_used": "claude-sonnet-4-20250514",
+    "version": "1.0"
+  }
 }
 ```
 
-#### Task 1.4: Create Database Migration Script
-**File**: `supabase/migrations/2025-11-25_add_piq_analysis_fields.sql`
+### Phase 2: Integrate Into Workshop Pipeline
 
----
+**Modify**: `src/services/piqWorkshopAnalysisService.ts`
 
-### Phase 2: Save Flow Implementation
-
-#### Task 2.1: Create PIQ Database Service
-**File**: `src/services/piqWorkshop/piqDatabaseService.ts` (NEW)
-
-Functions to implement:
 ```typescript
-/**
- * Save or update PIQ essay in database
- */
-export async function saveOrUpdatePIQEssay(
-  promptId: string,
+export async function analyzePIQEntry(
+  essayText: string,
+  promptTitle: string,
   promptText: string,
-  currentDraft: string,
-  analysisResult: AnalysisResult | null
-): Promise<{ success: boolean; essayId?: string; error?: string }>
+  options: AnalysisOptions = {}
+): Promise<AnalysisResult> {
+  // Stage 1-4: Existing analysis (UNCHANGED)
+  const result = await callWorkshopAnalysisEdgeFunction({
+    essayText,
+    promptText,
+    promptTitle,
+    essayType: options.essayType || 'uc_piq'
+  });
 
-/**
- * Save analysis result to database
- */
-export async function saveAnalysisReport(
-  essayId: string,
-  analysisResult: AnalysisResult
-): Promise<{ success: boolean; reportId?: string; error?: string }>
+  // Stage 5: Strategic Constraints (NEW - NON-BLOCKING)
+  const strategicAnalysis = await fetchStrategicConstraints({
+    essayText,
+    currentWordCount: essayText.trim().split(/\s+/).length,
+    targetWordCount: 350,
+    promptText,
+    promptTitle,
+    workshopItems: result.workshopItems,
+    rubricDimensionDetails: result.rubricDimensionDetails,
+    voiceFingerprint: result.voiceFingerprint,
+    experienceFingerprint: result.experienceFingerprint,
+    analysis: result.analysis
+  }).catch(err => {
+    console.warn('⚠️  Strategic analysis failed, using basic fallback:', err);
+    return null; // Graceful degradation
+  });
 
-/**
- * Load PIQ essay and latest analysis from database
- */
-export async function loadPIQEssay(
-  promptId: string
-): Promise<{
-  success: boolean;
-  essay?: Essay;
-  analysis?: AnalysisResult;
-  error?: string
-}>
+  // Merge strategic metadata into workshop items
+  const enhancedItems = strategicAnalysis
+    ? mergeStrategicGuidance(result.workshopItems, strategicAnalysis.enhancedWorkshopItems)
+    : result.workshopItems;
 
-/**
- * Get version history for PIQ essay
- */
-export async function getVersionHistory(
-  essayId: string
-): Promise<{ success: boolean; versions?: EssayVersion[]; error?: string }>
-```
-
-#### Task 2.2: Fix `handleSave()` in PIQWorkshop.tsx
-
-**Current code** (line 638-652):
-```typescript
-const handleSave = useCallback(() => {
-  const newVersion: DraftVersion = {
-    text: currentDraft,
-    timestamp: Date.now(),
-    score: analysisResult?.analysis?.narrative_quality_index || 73
+  return {
+    ...result,
+    workshopItems: enhancedItems,
+    strategicAnalysis: strategicAnalysis || undefined,
   };
-  const newVersions = draftVersions.slice(0, currentVersionIndex + 1);
-  newVersions.push(newVersion);
-  setDraftVersions(newVersions);
-  setCurrentVersionIndex(newVersions.length - 1);
+}
 
-  if (needsReanalysis) {
-    performFullAnalysis();
-  }
-}, [currentDraft, draftVersions, currentVersionIndex, needsReanalysis, performFullAnalysis, analysisResult]);
-```
+async function fetchStrategicConstraints(request: StrategicAnalysisRequest): Promise<StrategicAnalysisResult | null> {
+  const SUPABASE_URL = 'https://zclaplpkuvxkrdwsgrul.supabase.co';
+  const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-**New implementation**:
-```typescript
-const handleSave = useCallback(async () => {
-  // 1. Update local state (keep existing logic)
-  const newVersion: DraftVersion = {
-    text: currentDraft,
-    timestamp: Date.now(),
-    score: analysisResult?.analysis?.narrative_quality_index || 73
-  };
-  const newVersions = draftVersions.slice(0, currentVersionIndex + 1);
-  newVersions.push(newVersion);
-  setDraftVersions(newVersions);
-  setCurrentVersionIndex(newVersions.length - 1);
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/strategic-constraints`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${ANON_KEY}`,
+    },
+    body: JSON.stringify(request),
+  });
 
-  // 2. Save to database
-  if (!selectedPromptId) return;
-
-  const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
-  if (!selectedPrompt) return;
-
-  setSaveStatus('saving');
-
-  // Save essay to database
-  const { success, essayId, error } = await saveOrUpdatePIQEssay(
-    selectedPromptId,
-    selectedPrompt.prompt,
-    currentDraft,
-    analysisResult
-  );
-
-  if (!success) {
-    console.error('Failed to save essay:', error);
-    setSaveStatus('error');
-    setLastSaveError(error);
-    return;
+  if (!response.ok) {
+    throw new Error(`Strategic analysis failed: ${response.status}`);
   }
 
-  // Save analysis result if present
-  if (analysisResult && essayId) {
-    await saveAnalysisReport(essayId, analysisResult);
-  }
+  const result = await response.json();
+  return result.success ? result : null;
+}
 
-  setSaveStatus('saved');
-  setLastSaveTime(new Date());
-  setHasUnsavedChanges(false);
-
-  // 3. Re-analyze if needed (but don't trigger auto-save during analysis)
-  if (needsReanalysis) {
-    await performFullAnalysis();
-  }
-}, [currentDraft, selectedPromptId, analysisResult, needsReanalysis]);
-```
-
-#### Task 2.3: Update `performFullAnalysis()` to Auto-Save Results
-
-After analysis completes, automatically save to database:
-
-```typescript
-// Add to performFullAnalysis() after setAnalysisResult(result)
-if (currentEssayId) {
-  await saveAnalysisReport(currentEssayId, result);
-  console.log('✅ Analysis result auto-saved to database');
+function mergeStrategicGuidance(
+  originalItems: WorkshopItem[],
+  enhancedMetadata: EnhancedWorkshopItem[]
+): WorkshopItem[] {
+  return originalItems.map((item, idx) => ({
+    ...item,
+    strategicMeta: enhancedMetadata[idx] || null,
+  }));
 }
 ```
 
-#### Task 2.4: Add Save Status Indicators
+### Phase 3: Update UI to Display Strategic Guidance
 
-Add state for save status:
-```typescript
-const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-const [lastSaveError, setLastSaveError] = useState<string | null>(null);
-```
+#### 3.1: Word-Delta Badges on Workshop Items
 
-Update header to show status:
+**File**: `src/components/portfolio/extracurricular/workshop/AccordionWorkshop.tsx`
+
 ```tsx
-{saveStatus === 'saving' && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
-{saveStatus === 'saved' && <CheckCircle className="w-4 h-4 text-green-500" />}
-{saveStatus === 'error' && (
+{item.strategicMeta?.efficiency_assessment && (
+  <Badge
+    variant={
+      item.strategicMeta.efficiency_assessment.efficiency_rating === 'compresses'
+        ? 'success'
+        : item.strategicMeta.efficiency_assessment.efficiency_rating === 'expands'
+        ? 'warning'
+        : 'secondary'
+    }
+    className="ml-2"
+  >
+    {item.strategicMeta.efficiency_assessment.word_delta > 0 ? '+' : ''}
+    {item.strategicMeta.efficiency_assessment.word_delta} words
+  </Badge>
+)}
+
+{item.strategicMeta?.efficiency_assessment?.implementable_with_budget === false && (
   <Tooltip>
     <TooltipTrigger>
-      <XCircle className="w-4 h-4 text-red-500" />
+      <AlertCircle className="w-4 h-4 text-amber-500 ml-1" />
     </TooltipTrigger>
-    <TooltipContent>{lastSaveError}</TooltipContent>
+    <TooltipContent>
+      <p>May exceed word limit. See alternative below.</p>
+    </TooltipContent>
   </Tooltip>
 )}
 ```
 
----
+#### 3.2: Topic Viability Alert
 
-### Phase 3: Versioning System
+**File**: `src/pages/PIQWorkshop.tsx`
 
-#### Task 3.1: Create Version History Component
-**File**: `src/components/portfolio/piq/workshop/PIQVersionHistory.tsx` (NEW)
-
-Features:
-- Display all versions from `essay_revision_history`
-- Show score for each version (from `essay_analysis_reports` at that timestamp)
-- Visual diff between versions
-- Restore previous version
-- Compare any two versions side-by-side
-- Filter by score improvement/decline
-
-#### Task 3.2: Integrate Version History into UI
-
-Add "Version History" button to PIQWorkshop:
 ```tsx
-<Button
-  variant="outline"
-  onClick={() => setShowVersionHistory(true)}
-  className="gap-2"
->
-  <History className="w-4 h-4" />
-  Version History ({versionCount})
-</Button>
-```
-
-#### Task 3.3: Implement Version Comparison
-
-Show score delta between versions:
-```tsx
-<div className="flex items-center gap-2">
-  <span>Version {version.version_number}</span>
-  <Badge variant={scoreDelta > 0 ? 'success' : 'destructive'}>
-    {scoreDelta > 0 ? '+' : ''}{scoreDelta} points
-  </Badge>
-</div>
-```
-
-#### Task 3.4: Version Restore Flow
-
-When user restores a version:
-1. Load version content from `essay_revision_history`
-2. Set as `currentDraft`
-3. Create new version in history (don't delete newer versions)
-4. Mark as `needsReanalysis`
-5. Show banner: "Restored version X from [date]"
-
----
-
-### Phase 4: Auto-Save Improvements
-
-#### Task 4.1: Fix Auto-Save to Not Trigger Re-Analysis ✅
-**Already correct** - auto-save timer only saves to localStorage, doesn't call `performFullAnalysis()`
-
-#### Task 4.2: Add Debounced Local Save
-
-Replace 30-second timer with debounced save (save 2 seconds after user stops typing):
-
-```typescript
-const debouncedSave = useMemo(
-  () => debounce(() => {
-    if (!selectedPromptId || !currentDraft) return;
-
-    const cache: PIQWorkshopCache = {
-      promptId: selectedPromptId,
-      promptTitle: selectedPrompt.title,
-      currentDraft,
-      lastSaved: Date.now(),
-      analysisResult,
-      versions: [...],
-      autoSaveEnabled: true
-    };
-
-    saveToLocalStorage(cache);
-    setLastSaveTime(new Date());
-    console.log('✅ Auto-saved (debounced)');
-  }, 2000),
-  [selectedPromptId, currentDraft, analysisResult]
-);
-
-// Trigger on draft change
-useEffect(() => {
-  if (hasUnsavedChanges) {
-    debouncedSave();
-  }
-}, [currentDraft, hasUnsavedChanges, debouncedSave]);
-```
-
-#### Task 4.3: Keep 30-Second Cloud Backup
-
-Keep the 30-second timer for cloud saves (optional):
-
-```typescript
-// Optional: Auto-save to cloud every 30 seconds in addition to localStorage
-autoSaveTimerRef.current = setInterval(async () => {
-  if (hasUnsavedChanges && currentDraft && enableCloudAutoSave) {
-    await saveOrUpdatePIQEssay(selectedPromptId, promptText, currentDraft, analysisResult);
-    console.log('✅ Auto-saved to cloud');
-  }
-}, 30000);
-```
-
----
-
-### Phase 5: Load Flow & Resume Session
-
-#### Task 5.1: Load from Database on Mount
-
-```typescript
-useEffect(() => {
-  async function loadInitialData() {
-    if (!selectedPromptId) return;
-
-    // Try loading from database first
-    const { success, essay, analysis } = await loadPIQEssay(selectedPromptId);
-
-    if (success && essay) {
-      setCurrentDraft(essay.draft_current || essay.draft_original);
-      if (analysis) {
-        setAnalysisResult(analysis);
-        // Transform to UI dimensions...
-      }
-      console.log('✅ Loaded from database');
-      return;
-    }
-
-    // Fallback to localStorage
-    const cache = loadFromLocalStorage(selectedPromptId);
-    if (cache) {
-      setCurrentDraft(cache.currentDraft);
-      setAnalysisResult(cache.analysisResult);
-      console.log('✅ Loaded from localStorage');
-    }
-  }
-
-  loadInitialData();
-}, [selectedPromptId]);
-```
-
-#### Task 5.2: Resume Session Banner
-
-Update banner to prioritize database over localStorage:
-```tsx
-{showResumeSessionBanner && (
-  <div className="banner">
-    <p>Found draft from {formatTime}</p>
-    <Button onClick={handleResumeFromCloud}>Resume from Cloud</Button>
-    <Button onClick={handleResumeFromLocal}>Resume Local</Button>
-    <Button onClick={handleStartFresh}>Start Fresh</Button>
-  </div>
+{strategicAnalysis?.topicViability && (
+  strategicAnalysis.topicViability.verdict === 'weak' ||
+  strategicAnalysis.topicViability.verdict === 'reconsider'
+) && (
+  <Alert variant="warning" className="mb-6">
+    <AlertCircle className="h-4 w-4" />
+    <AlertTitle>Topic Concern</AlertTitle>
+    <AlertDescription>
+      <p className="mb-2">{strategicAnalysis.topicViability.concerns.join(' ')}</p>
+      {strategicAnalysis.topicViability.alternative_angles.length > 0 && (
+        <div className="mt-3">
+          <p className="font-semibold mb-1">Consider reframing:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            {strategicAnalysis.topicViability.alternative_angles.map((alt, idx) => (
+              <li key={idx}>
+                <strong>{alt.suggestion}</strong>: {alt.why_better}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </AlertDescription>
+  </Alert>
 )}
 ```
 
----
+#### 3.3: Strategic Guidance Panel (NEW Component)
 
-### Phase 6: Remove "Save to Cloud" Button
+**File**: `src/components/portfolio/piq/workshop/StrategicGuidancePanel.tsx`
 
-#### Task 6.1: Remove `handleSaveToCloud` Function
-**File**: `src/pages/PIQWorkshop.tsx` (line 596-626)
+```tsx
+interface StrategicGuidancePanelProps {
+  wordCountAnalysis: WordCountAnalysis;
+  strategicBalance: StrategicBalance;
+  strategicRecommendations: StrategicRecommendation[];
+  wordBudget: number;
+}
 
-Delete the `handleSaveToCloud` callback entirely.
+export function StrategicGuidancePanel({
+  wordCountAnalysis,
+  strategicBalance,
+  strategicRecommendations,
+  wordBudget
+}: StrategicGuidancePanelProps) {
+  return (
+    <Card className="p-6">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Lightbulb className="w-5 h-5 text-yellow-500" />
+        Strategic Guidance
+      </h3>
 
-#### Task 6.2: Remove `onSaveToCloud` Prop from EditorView
-**File**: `src/pages/PIQWorkshop.tsx` (line 1268)
+      {/* Word Budget Status */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium">Word Budget</span>
+          <Badge variant={wordBudget < 20 ? 'destructive' : wordBudget < 50 ? 'warning' : 'success'}>
+            {wordBudget} words remaining
+          </Badge>
+        </div>
+        <Progress value={(wordCountAnalysis.current / 350) * 100} className="h-2" />
+        {wordBudget < 20 && (
+          <p className="text-xs text-amber-600 mt-1">
+            Word budget is tight. Prioritize compression suggestions.
+          </p>
+        )}
+      </div>
 
-Remove: `onSaveToCloud={handleSaveToCloud}`
+      {/* Strategic Balance */}
+      <div className="mb-6">
+        <h4 className="text-sm font-semibold mb-3">Balance Assessment</h4>
+        <div className="space-y-2">
+          <BalanceBar label="Imagery/Description" value={strategicBalance.imagery_density} />
+          <BalanceBar label="Intellectual Depth" value={strategicBalance.intellectual_depth} />
+          <BalanceBar label="Achievements" value={strategicBalance.achievement_presence} />
+          <BalanceBar label="Insight Quality" value={strategicBalance.insight_quality} />
+        </div>
+        {strategicBalance.imbalance_severity !== 'none' && (
+          <Alert variant="default" className="mt-3">
+            <AlertDescription className="text-sm">
+              {strategicBalance.recommendation === 'increase_depth' && (
+                'Consider trading some descriptive imagery for intellectual analysis.'
+              )}
+              {strategicBalance.recommendation === 'increase_achievements' && (
+                'Add concrete accomplishments and measurable impact to strengthen essay.'
+              )}
+              {strategicBalance.recommendation === 'reduce_imagery' && (
+                'Essay is heavy on description. Consider more concise, efficient writing.'
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
 
-#### Task 6.3: Update EditorView Component
-**File**: `src/components/portfolio/extracurricular/workshop/views/EditorView.tsx`
+      {/* Strategic Recommendations */}
+      <div>
+        <h4 className="text-sm font-semibold mb-3">Top Recommendations</h4>
+        <div className="space-y-3">
+          {strategicRecommendations.slice(0, 3).map((rec, idx) => (
+            <div key={idx} className="border-l-2 border-blue-500 pl-3 py-2">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant={rec.priority === 'critical' ? 'destructive' : 'default'} size="sm">
+                  {rec.priority}
+                </Badge>
+                <span className="text-sm font-medium">{rec.title}</span>
+                {rec.estimated_word_impact !== 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    ({rec.estimated_word_impact > 0 ? '+' : ''}{rec.estimated_word_impact} words)
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{rec.description}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                <strong>Where:</strong> {rec.where_to_apply}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
 
-Remove any UI rendering of "Save to Cloud" button.
+function BalanceBar({ label, value }: { label: string; value: number }) {
+  const getColor = (val: number) => {
+    if (val >= 7) return 'bg-green-500';
+    if (val >= 5) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
 
-#### Task 6.4: Update supabaseService.ts
-**File**: `src/services/piqWorkshop/supabaseService.ts`
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs mb-1">
+        <span>{label}</span>
+        <span className="font-medium">{value}/10</span>
+      </div>
+      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className={`h-full ${getColor(value)} transition-all`}
+          style={{ width: `${(value / 10) * 100}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+```
 
-Delete or deprecate the old cloud-specific functions:
-- `saveVersionToCloud()` (replace with new service)
-- `loadVersionsFromCloud()` (replace with new service)
+#### 3.4: Update Workshop Item Priority
 
----
+**Automatically adjust item order based on strategic priority adjustments:**
 
-## Testing Plan
+```typescript
+// Sort workshop items by adjusted priority
+const sortedItems = [...workshopItems].sort((a, b) => {
+  const priorityA = (a.strategicMeta?.strategic_value?.priority_adjustment || 0);
+  const priorityB = (b.strategicMeta?.strategic_value?.priority_adjustment || 0);
 
-### Test Cases
-
-#### 1. Save Flow
-- [ ] User edits essay → clicks Save → essay saved to database
-- [ ] User clicks Save with analysis → analysis saved to `essay_analysis_reports`
-- [ ] User clicks Save without analysis → only essay saved
-- [ ] Save status indicator shows "Saving..." → "Saved"
-- [ ] Save failure shows error message
-
-#### 2. Auto-Save
-- [ ] User types → auto-save triggers after 2 seconds
-- [ ] Auto-save does NOT trigger re-analysis
-- [ ] Auto-save updates localStorage
-- [ ] Auto-save shows timestamp in UI
-
-#### 3. Analysis & Save
-- [ ] User clicks Analyze → analysis runs → results auto-saved to database
-- [ ] Analysis result cached in localStorage
-- [ ] Analysis result linked to essay in `essay_analysis_reports`
-
-#### 4. Versioning
-- [ ] Each save creates new version in `essay_revision_history`
-- [ ] Version history shows all versions with timestamps
-- [ ] Version history shows score for each version
-- [ ] User can restore previous version
-- [ ] Restoring version creates new version (doesn't overwrite)
-
-#### 5. Load/Resume
-- [ ] User refreshes page → data loaded from database
-- [ ] User switches devices → data loaded from database
-- [ ] User sees resume banner if draft exists
-- [ ] Resume banner prioritizes cloud over local
-
-#### 6. Authentication
-- [ ] Clerk user can save essays
-- [ ] Clerk user can only see their own essays
-- [ ] Supabase RLS enforces user isolation
-
----
-
-## Success Criteria
-
-### Must Have (MVP)
-1. ✅ Save button saves to database
-2. ✅ Analysis results persisted to database
-3. ✅ Version history accessible and restorable
-4. ✅ Auto-save works without triggering re-analysis
-5. ✅ Authentication works with Clerk
-6. ✅ Data persists across sessions/devices
-
-### Should Have
-1. ✅ Version comparison UI
-2. ✅ Score tracking over versions
-3. ✅ Save status indicators
-4. ✅ Resume session banner
-
-### Nice to Have
-1. Version tagging/notes
-2. Export version history
-3. Share version with others
-4. Batch operations on versions
-
----
-
-## Risk Assessment
-
-### High Risk
-1. **Authentication integration** - Clerk → Supabase mapping may be complex
-   - Mitigation: Create adapter layer, test thoroughly
-2. **Data migration** - Existing localStorage data needs migration
-   - Mitigation: Keep localStorage as fallback, gradual migration
-
-### Medium Risk
-1. **Performance** - Saving on every analysis may be slow
-   - Mitigation: Async saves, optimistic UI updates
-2. **Version bloat** - Many versions may slow queries
-   - Mitigation: Archive old versions, pagination
-
-### Low Risk
-1. **UI changes** - Removing "Save to Cloud" button
-   - Mitigation: Simple removal, low impact
-
----
-
-## Implementation Timeline
-
-### Day 1: Database & Auth (4-6 hours)
-- [ ] Task 1.1: Add columns to `essay_analysis_reports`
-- [ ] Task 1.2: Create Clerk-Supabase adapter
-- [ ] Task 1.3: Update supabaseService.ts
-- [ ] Task 1.4: Create and run migration
-
-### Day 2: Save Flow (6-8 hours)
-- [ ] Task 2.1: Create piqDatabaseService.ts
-- [ ] Task 2.2: Fix handleSave()
-- [ ] Task 2.3: Update performFullAnalysis()
-- [ ] Task 2.4: Add save status indicators
-- [ ] Testing: Basic save flow
-
-### Day 3: Versioning (6-8 hours)
-- [ ] Task 3.1: Create PIQVersionHistory component
-- [ ] Task 3.2: Integrate into UI
-- [ ] Task 3.3: Implement comparison
-- [ ] Task 3.4: Version restore flow
-- [ ] Testing: Version operations
-
-### Day 4: Auto-Save & Load (4-6 hours)
-- [ ] Task 4.2: Debounced local save
-- [ ] Task 5.1: Load from database on mount
-- [ ] Task 5.2: Resume session banner
-- [ ] Testing: Auto-save and load flows
-
-### Day 5: Cleanup & Polish (4-6 hours)
-- [ ] Task 6: Remove "Save to Cloud" button
-- [ ] Integration testing
-- [ ] Bug fixes
-- [ ] Documentation
-
-**Total Estimated Time: 24-34 hours**
+  // Higher adjustment = higher priority
+  return priorityB - priorityA;
+});
+```
 
 ---
 
-## Open Questions
+## Testing Strategy
 
-1. **Clerk-Supabase Integration**
-   - How is the Clerk user ID mapped to Supabase user_id?
-   - Is there a `user_mappings` table?
-   - Do we need to create Supabase users for Clerk users?
+### Test Suite: Strategic Constraints Analyzer
 
-2. **Existing Data**
-   - Are there users with localStorage data that needs migration?
-   - Should we migrate automatically or prompt users?
+**File**: `tests/test-strategic-constraints.ts`
 
-3. **Essay Ownership**
-   - Can PIQ essays be shared/transferred?
-   - Do counselors need read access?
+```typescript
+/**
+ * Test 1: Word Efficiency - Tight Budget
+ */
+const TEST_TIGHT_BUDGET = {
+  essayText: generateEssay(340), // 340 words (only 10 remaining)
+  expectedBehavior: {
+    compression_suggestions: '>= 3',
+    expansion_items_flagged: true,
+    word_budget_warnings: true,
+    priority_adjustments: 'boost compression, lower expansion'
+  }
+};
 
-4. **Version Limits**
-   - Should we limit versions per essay?
-   - Archive vs delete old versions?
+/**
+ * Test 2: Imagery Overload
+ */
+const TEST_IMAGERY_HEAVY = {
+  essayText: `The sun glinted off the microscope as I peered through the eyepiece.
+              The cool metal felt smooth under my fingertips. The lab smelled of
+              chemicals and possibility...`, // Excessive sensory detail
+  expectedBehavior: {
+    imagery_density: '>= 8',
+    intellectual_depth: '<= 4',
+    balance_recommendation: 'depth_over_imagery',
+    specific_gaps: 'includes excessive_description'
+  }
+};
 
-5. **Performance**
-   - Should we debounce database saves?
-   - Use optimistic updates?
+/**
+ * Test 3: Shallow Topic
+ */
+const TEST_SHALLOW_TOPIC = {
+  essayText: `I learned organization by organizing my desk. First, I sorted my
+              papers by color. Then I arranged my pens. This taught me that
+              organization is important.`,
+  expectedBehavior: {
+    substantiveness_score: '<= 3',
+    academic_potential_score: '<= 2',
+    verdict: 'reconsider',
+    concerns: 'includes "too trivial"',
+    alternative_angles: '>= 2 suggestions'
+  }
+};
+
+/**
+ * Test 4: Ideal Balanced Essay
+ */
+const TEST_BALANCED = {
+  essayText: generateBalancedEssay(300), // Well-balanced, 300 words
+  expectedBehavior: {
+    imagery_density: '5-7',
+    intellectual_depth: '6-8',
+    achievement_presence: '6-8',
+    substantiveness_score: '>= 7',
+    verdict: 'strong',
+    imbalance_severity: 'none' | 'minor'
+  }
+};
+
+/**
+ * Test 5: Missing Achievements
+ */
+const TEST_NO_ACHIEVEMENTS = {
+  essayText: `I started a club. We met every week. We discussed environmental
+              issues. It was meaningful. I grew as a person.`, // All vague, no concrete impact
+  expectedBehavior: {
+    achievement_presence: '<= 3',
+    specific_gaps: 'includes missing_achievements',
+    strategic_recommendations: 'includes add_achievements'
+  }
+};
+```
+
+### Performance Testing
+
+```typescript
+/**
+ * Test 6: Latency Under 30s
+ */
+test('Strategic analysis completes within 30 seconds', async () => {
+  const startTime = Date.now();
+  const result = await fetchStrategicConstraints(TEST_ESSAY);
+  const elapsed = Date.now() - startTime;
+
+  expect(elapsed).toBeLessThan(30000); // 30 seconds
+  expect(result.success).toBe(true);
+});
+
+/**
+ * Test 7: Graceful Degradation
+ */
+test('Main workshop continues if strategic analysis fails', async () => {
+  // Mock strategic analyzer to fail
+  mockStrategicAnalyzerFailure();
+
+  const result = await analyzePIQEntry(essayText, promptTitle, promptText);
+
+  // Main analysis should succeed
+  expect(result.workshopItems.length).toBe(12);
+  expect(result.strategicAnalysis).toBeUndefined();
+
+  // UI should show workshop items without strategic enhancements
+});
+```
 
 ---
 
-## Dependencies
+## Cost Analysis
 
-### Required
-- Clerk authentication already configured
-- Supabase client initialized
-- Database migration tools available
-- Existing essay system tables (`essays`, `essay_revision_history`, `essay_analysis_reports`)
+### Per-Essay Cost Breakdown
 
-### Optional
-- Lodash debounce (for auto-save)
-- diff library (for version comparison)
-- date-fns (for timestamp formatting)
+| Component | Current | With Strategic | Change |
+|-----------|---------|----------------|--------|
+| Voice Fingerprint | $0.015 | $0.015 | - |
+| Experience Fingerprint | $0.018 | $0.018 | - |
+| Rubric Analysis | $0.024 | $0.024 | - |
+| Workshop Items (12) | $0.085 | $0.085 | - |
+| Narrative Overview | $0.012 | $0.012 | - |
+| **Strategic Constraints** | - | **$0.020** | **+new** |
+| **Total** | **$0.154** | **$0.174** | **+13%** |
 
----
+### Value Analysis
 
-## Rollback Plan
+**Cost increase**: +$0.020 per essay (13% increase)
 
-If issues arise during implementation:
+**Benefits delivered**:
+1. ✅ Word efficiency analysis (prevents unusable suggestions)
+2. ✅ Strategic balance assessment (optimizes content mix)
+3. ✅ Topic viability evaluation (catches weak topics early)
+4. ✅ Enhanced workshop items (practical, implementable suggestions)
 
-1. **Phase 1 (Database)**: Revert migration
-   ```sql
-   ALTER TABLE essay_analysis_reports
-   DROP COLUMN voice_fingerprint,
-   DROP COLUMN experience_fingerprint,
-   DROP COLUMN workshop_items,
-   DROP COLUMN full_analysis_result;
-   ```
-
-2. **Phase 2-5 (Code)**: Feature flag to disable new save flow
-   ```typescript
-   const USE_NEW_SAVE_FLOW = false; // Toggle to revert
-   ```
-
-3. **Fallback**: Keep localStorage as primary storage until cloud saves proven stable
+**ROI**:
+- Modest cost increase (13%) for significant UX improvement
+- Addresses 3 major pain points discovered in user testing
+- Maintains 97% gross margin at $5/analysis pricing
+- Creates premium upsell potential ($7-10 for strategic tier)
 
 ---
 
-## Next Steps
+## Risk Mitigation
 
-**Before Implementation:**
-1. ✅ Review this plan with team
-2. ✅ Get approval on architecture decisions
-3. ✅ Clarify Clerk-Supabase auth integration
-4. ✅ Set up test environment
+### Risk 1: Increased Latency ⚠️
+**Concern**: Strategic analysis adds 20-25s to total time
 
-**After Approval:**
-1. Create feature branch: `feature/piq-save-versioning`
-2. Begin Phase 1: Database Infrastructure
-3. Test each phase thoroughly before proceeding
-4. Document any deviations from plan
+**Mitigation**:
+- Run in parallel with narrative-overview (both post-processing)
+- Non-blocking: UI shows workshop items immediately
+- Strategic guidance loads progressively
+- Total time: ~145s (still under 150s timeout)
+
+### Risk 2: Conflicting Guidance ⚠️
+**Concern**: Strategic analysis contradicts Stage 4 suggestions
+
+**Mitigation**:
+- Strategic analyzer only adds metadata, doesn't regenerate
+- Original suggestions remain intact
+- Strategic notes are additive ("Also consider...")
+- UI clearly separates original from strategic enhancement
+
+### Risk 3: Over-complicating UX ⚠️
+**Concern**: Too much information overwhelms users
+
+**Mitigation**:
+- Strategic panel is collapsible/expandable
+- Word-delta badges are subtle indicators
+- Topic viability only shows if verdict is "weak"/"reconsider"
+- Default view shows original workshop unchanged
+
+### Risk 4: Quality Degradation ⚠️
+**Concern**: Adding new stage affects core quality
+
+**Mitigation**:
+- **ZERO CHANGES** to proven Stages 1-4
+- Strategic analyzer is pure enhancement layer
+- Extensive A/B testing before full rollout
+- Easy rollback: remove strategic UI, keep original
+- Feature flag for gradual rollout
 
 ---
 
-## Notes
+## Success Metrics
 
-- This plan assumes existing essay system infrastructure is production-ready
-- Clerk authentication integration details may require adjustment based on actual implementation
-- LocalStorage will remain as a performance cache even after cloud saves implemented
-- Consider adding analytics to track save success rates and performance
+### Primary Metrics
+1. **Implementability**: 80%+ of suggestions implementable within word limit
+2. **Balance Score**: Intellectual depth increases by avg 1.5 points
+3. **Topic Quality**: <5% essays flagged as "weak" (catching edge cases)
+4. **User Satisfaction**: 85%+ find strategic guidance helpful (survey)
+
+### Secondary Metrics
+1. **Compression Identified**: Average 30-50 words of potential savings
+2. **Achievement Gaps**: 60%+ of low-achievement essays flagged
+3. **Recommendation Quality**: Users implement 60%+ of strategic suggestions
+4. **Performance**: <30s latency for strategic analysis
+
+---
+
+## Rollout Plan
+
+### Week 1: Development
+- [ ] Create `strategic-constraints` edge function
+- [ ] Comprehensive prompt engineering with examples
+- [ ] Build test suite (5+ test cases)
+- [ ] Integrate into workshop pipeline
+
+### Week 2: Testing & Iteration
+- [ ] Test with 20+ real essay samples
+- [ ] Verify latency <30s consistently
+- [ ] Validate accuracy of word-delta calculations
+- [ ] A/B test topic viability assessments
+- [ ] Refine prompts based on results
+
+### Week 3: UI Integration
+- [ ] Word-delta badges on workshop items
+- [ ] Topic viability alerts
+- [ ] Strategic guidance panel component
+- [ ] Balance assessment visualization
+- [ ] Polish UX for discoverability
+
+### Week 4: Pilot Launch
+- [ ] Deploy to 10% of users
+- [ ] Monitor engagement metrics
+- [ ] Collect user feedback (surveys/interviews)
+- [ ] Fix bugs, iterate on prompts
+- [ ] Measure impact on essay quality
+
+### Week 5: Full Launch
+- [ ] Roll out to 100% of users
+- [ ] Monitor performance and costs
+- [ ] Track success metrics
+- [ ] Continuous improvement based on data
+
+---
+
+## Approval Checklist
+
+**Before proceeding to implementation, confirm:**
+
+- [ ] ✅ Architecture approved (Stage 5 as additive layer)
+- [ ] ✅ NO modifications to existing Stages 1-4
+- [ ] ✅ Strategic analyzer runs as separate, non-blocking call
+- [ ] ✅ Latency budget acceptable (<30s, total <150s)
+- [ ] ✅ Cost increase acceptable (+$0.020 = 13%)
+- [ ] ✅ UI approach approved (badges + panel + alerts)
+- [ ] ✅ Test strategy comprehensive
+- [ ] ✅ Rollout plan (5 weeks to full launch)
+- [ ] ✅ Risk mitigation strategies in place
+- [ ] ✅ Success metrics defined and measurable
+
+---
+
+## Next Steps After Approval
+
+1. **Create edge function**: `supabase/functions/strategic-constraints/index.ts`
+2. **Prompt engineering**: Write comprehensive system prompt with examples
+3. **Test suite**: Build 5+ test cases covering all scenarios
+4. **Backend integration**: Update `piqWorkshopAnalysisService.ts`
+5. **UI components**: Build 3 new components (panel, badges, alerts)
+6. **End-to-end testing**: Verify full pipeline works
+7. **Deploy & monitor**: Gradual rollout with metrics tracking
+
+**Estimated Timeline**: 5 weeks to production
+**Risk Level**: Low (additive, proven architecture pattern)
+**Expected Impact**: High (addresses all 3 critical UX issues)
+
+---
+
+## Conclusion
+
+This plan comprehensively addresses all three user-reported issues:
+
+1. ✅ **Word efficiency**: Tracks delta, identifies bloat, prioritizes compression
+2. ✅ **Strategic balance**: Assesses imagery vs depth, recommends optimal mix
+3. ✅ **Topic viability**: Evaluates substantiveness, suggests better angles
+
+The solution is **additive-only** (no changes to proven system), **cost-effective** (+13% cost), **performant** (<30s), and **scalable**. The architecture follows the proven pattern of narrative-overview (separate, non-blocking, lightweight).
+
+**Ready for approval to proceed with implementation.**

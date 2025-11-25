@@ -582,3 +582,116 @@ export interface WorkshopState {
   hasUnsavedChanges: boolean;
   lastAnalysisTime?: number;
 }
+
+// ============================================================================
+// STAGE 5: STRATEGIC CONSTRAINTS ANALYSIS (Phase 11+ Enhancement)
+// ============================================================================
+
+/**
+ * Word Count Efficiency Analysis
+ * Identifies bloat, compression opportunities, and word budget management
+ */
+export interface WordCountAnalysis {
+  current: number;
+  target: number;
+  available_budget: number;
+  efficiency_score: number; // 0-10
+
+  bloat_areas: Array<{
+    section: string;
+    word_count: number;
+    potential_savings: number;
+    why_bloated: string;
+  }>;
+
+  compression_opportunities: Array<{
+    technique: 'remove_redundancy' | 'condense_imagery' | 'tighten_transitions' | 'stronger_verbs' | 'cut_obvious';
+    where: string;
+    estimated_savings: number;
+    example: string;
+  }>;
+}
+
+/**
+ * Strategic Balance Assessment
+ * Evaluates balance between imagery, depth, achievements, and insights
+ */
+export interface StrategicBalance {
+  imagery_density: number; // 0-10
+  intellectual_depth: number; // 0-10
+  achievement_presence: number; // 0-10
+  insight_quality: number; // 0-10
+
+  recommendation: 'increase_depth' | 'increase_achievements' | 'reduce_imagery' | 'balanced';
+  imbalance_severity: 'critical' | 'moderate' | 'minor' | 'none';
+  detailed_assessment: string;
+}
+
+/**
+ * Topic Viability Evaluation
+ * Assesses if essay topic is substantive enough for college admissions
+ */
+export interface TopicViability {
+  substantiveness_score: number; // 0-10
+  academic_potential_score: number; // 0-10
+  differentiation_score: number; // 0-10
+
+  verdict: 'strong' | 'adequate' | 'weak' | 'reconsider';
+  concerns: string[];
+  strengths: string[];
+
+  alternative_angles: Array<{
+    suggestion: string;
+    why_better: string;
+    example: string;
+  }>;
+}
+
+/**
+ * Enhanced Workshop Item with strategic metadata
+ */
+export interface EnhancedWorkshopItem {
+  original_item_id: string;
+
+  efficiency_assessment: {
+    word_delta: number; // Estimated word change
+    efficiency_rating: 'expands' | 'neutral' | 'compresses';
+    implementable_with_budget: boolean;
+    alternative_if_too_long?: string;
+  };
+
+  strategic_value: {
+    adds_depth: boolean;
+    adds_achievements: boolean;
+    reduces_fluff: boolean;
+    priority_adjustment: number; // -2 to +2
+    strategic_note: string;
+  };
+}
+
+/**
+ * Strategic Recommendation
+ * High-level guidance on compression, balance, and topic positioning
+ */
+export interface StrategicRecommendation {
+  type: 'compression' | 'depth_over_imagery' | 'add_achievements' | 'topic_reframe';
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  where_to_apply: string;
+  why_matters: string;
+  estimated_word_impact: number;
+  example_implementation?: string;
+}
+
+/**
+ * Complete Strategic Analysis Result (Stage 5 output)
+ */
+export interface StrategicAnalysisResult {
+  success: boolean;
+  wordCountAnalysis: WordCountAnalysis;
+  strategicBalance: StrategicBalance;
+  topicViability: TopicViability;
+  enhancedWorkshopItems: EnhancedWorkshopItem[];
+  strategicRecommendations: StrategicRecommendation[];
+}

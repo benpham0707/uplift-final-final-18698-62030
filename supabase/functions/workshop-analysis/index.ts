@@ -287,6 +287,46 @@ Return ONLY valid JSON with this structure:
 
     console.log('✅ Rubric analysis complete');
 
+    // Apply score calibration curve to make scoring more lenient
+    // This adjusts Claude's naturally harsh scoring to be more student-friendly
+    // while preserving the ceiling for truly exceptional work
+    function calibrateScore(rawScore: number): number {
+      // Gentler scoring curve: modest uplift while preserving top end
+      // Input 0-10 -> Output 0-10
+      // Maps: 0->0, 1->1.5, 2->2.5, 3->3.5, 4->4.5, 5->5.5, 6->6.5, 7->7.5, 8->8.5, 9->9, 10->10
+      if (rawScore === 0) return 0;
+      if (rawScore >= 9) return rawScore; // Preserve 9 and 10 ceiling
+      return rawScore + 0.5; // Add half point to scores 1-8
+    }
+
+    function calibrateNQI(rawNQI: number): number {
+      // More moderate NQI calibration: target ~50 for typical essays
+      // Input 0-100 -> Output 0-100
+      // Maps roughly: 15->42, 25->48, 35->56, 45->62, 55->68, 65->74, 75->82, 85->90, 95->97, 100->100
+      if (rawNQI === 0) return 0;
+      if (rawNQI >= 95) return Math.round(rawNQI * 0.95 + 5); // Gentle compression at top
+      if (rawNQI >= 75) return Math.round(rawNQI * 1.1 - 3);
+      if (rawNQI >= 50) return Math.round(rawNQI * 1.2 - 5);
+      if (rawNQI >= 25) return Math.round(rawNQI * 1.3 - 8);
+      return Math.round(rawNQI * 1.8 + 15); // Modest lift for very low scores
+    }
+
+    // Apply calibration to all dimension scores
+    if (rubricAnalysis.dimensions) {
+      rubricAnalysis.dimensions = rubricAnalysis.dimensions.map((dim: any) => ({
+        ...dim,
+        raw_score: calibrateScore(dim.raw_score),
+        final_score: calibrateScore(dim.final_score),
+      }));
+    }
+
+    // Apply calibration to NQI
+    if (rubricAnalysis.narrative_quality_index) {
+      const originalNQI = rubricAnalysis.narrative_quality_index;
+      rubricAnalysis.narrative_quality_index = calibrateNQI(originalNQI);
+      console.log(`📊 Score calibration: ${originalNQI} -> ${rubricAnalysis.narrative_quality_index}`);
+    }
+
     // Stage 4: Surgical Workshop Items (Issues & Suggestions)
     const workshopResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

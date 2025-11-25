@@ -293,6 +293,8 @@ export default function PIQWorkshop() {
   const [selectedPromptId, setSelectedPromptId] = useState<string | null>('piq1'); // Default to PIQ #1
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [narrativeOverview, setNarrativeOverview] = useState<string | null>(null);
+  const [loadingOverview, setLoadingOverview] = useState(false);
 
   // Caching & Save State
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
@@ -430,6 +432,9 @@ export default function PIQWorkshop() {
       setNeedsReanalysis(false);
       setHasUnsavedChanges(false);
       console.log('✅ Analysis complete - UI updated');
+
+      // Call separate narrative overview endpoint (non-blocking)
+      fetchNarrativeOverview(result);
     } catch (error) {
       console.error('❌ Analysis failed:', error);
       console.error('Full error object:', error);
@@ -444,6 +449,50 @@ export default function PIQWorkshop() {
   }, [currentDraft, selectedPromptId]);
 
   // NO auto-analysis - wait for user to click "Analyze" button
+
+  // ============================================================================
+  // NARRATIVE OVERVIEW - Separate API Call
+  // ============================================================================
+
+  const fetchNarrativeOverview = useCallback(async (analysisData: AnalysisResult) => {
+    setLoadingOverview(true);
+    try {
+      const SUPABASE_URL = 'https://zclaplpkuvxkrdwsgrul.supabase.co';
+      const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/narrative-overview`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          essayText: currentDraft,
+          promptText: UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId)?.prompt || '',
+          voiceFingerprint: analysisData.voiceFingerprint,
+          experienceFingerprint: analysisData.experienceFingerprint,
+          rubricDimensionDetails: analysisData.rubricDimensionDetails,
+          workshopItems: analysisData.workshopItems,
+          narrativeQualityIndex: analysisData.analysis?.narrative_quality_index || 50,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.narrative_overview) {
+          setNarrativeOverview(result.narrative_overview);
+          console.log('✅ Narrative overview loaded');
+        }
+      } else {
+        console.warn('⚠️  Narrative overview failed, using frontend fallback');
+      }
+    } catch (error) {
+      console.error('Failed to fetch narrative overview:', error);
+      // Silently fall back to frontend-generated overview
+    } finally {
+      setLoadingOverview(false);
+    }
+  }, [currentDraft, selectedPromptId]);
 
   // ============================================================================
   // AUTO-SAVE & RESUME SESSION
@@ -760,8 +809,19 @@ export default function PIQWorkshop() {
   const [showAllStrong, setShowAllStrong] = React.useState(false);
   const [showAllNeedsWork, setShowAllNeedsWork] = React.useState(false);
 
-  // Generate comprehensive overview paragraph
+  // Generate narrative-focused, empowering overview
   const getDetailedOverview = (dims: RubricDimension[], score: number): string => {
+    // Use API-generated overview if available
+    if (narrativeOverview) {
+      return narrativeOverview;
+    }
+
+    // Loading state
+    if (loadingOverview && analysisResult) {
+      return 'Generating personalized narrative overview...';
+    }
+
+    // Fallback to frontend-generated overview
     try {
       if (!dims || !Array.isArray(dims) || dims.length === 0) {
         return 'Analysis in progress...';
@@ -770,90 +830,86 @@ export default function PIQWorkshop() {
       const critical = dims.filter(d => d && d.status === 'critical');
       const needsWork = dims.filter(d => d && d.status === 'needs_work');
       const good = dims.filter(d => d && d.status === 'good').sort((a, b) => (b?.score || 0) - (a?.score || 0));
-    
-    // Build comprehensive narrative paragraph
+      const allIssues = dims.flatMap(d => d.issues);
+
     let overview = '';
-    
-    // Current standing with context
-    const tier = score >= 85 ? 'elite tier' : score >= 70 ? 'competitive range' : score >= 55 ? 'developing stage' : 'needs significant work';
-    const tierContext = score >= 85 
-      ? 'which places you among the strongest personal insight essays in the admissions pool'
-      : score >= 70 
-      ? 'which demonstrates solid narrative fundamentals but requires polish to reach the elite tier that commands admissions officers\' attention'
-      : score >= 55
-      ? 'which indicates a foundation to build upon but needs substantial revision across multiple dimensions to reach competitive admissions quality'
-      : 'which indicates fundamental gaps that must be addressed to meet baseline admissions standards';
-    
-    overview += `Your narrative scores ${score}/100, placing it in the ${tier}, ${tierContext}. `;
-    
-    // Strengths highlight with specific examples
+
+    // Lead with understanding their narrative's core strength/intent
     if (good.length > 0) {
-      const topStrengths = good.slice(0, 2);
-      if (topStrengths.length === 1) {
-        overview += `Your strongest dimension is ${topStrengths[0].name} (${topStrengths[0].score}/${topStrengths[0].maxScore}), demonstrating ${topStrengths[0].overview.toLowerCase()} `;
-      } else {
-        overview += `Your strongest dimensions are ${topStrengths[0].name} (${topStrengths[0].score}/${topStrengths[0].maxScore}) and ${topStrengths[1].name} (${topStrengths[1].score}/${topStrengths[1].maxScore}), which show solid narrative craftsmanship. `;
+      const topStrength = good[0];
+      const strengthText = topStrength.overview.split('.')[0].toLowerCase();
+      overview += `Your essay's strongest asset is ${strengthText}. `;
+
+      if (good.length >= 2) {
+        const secondStrength = good[1];
+        overview += `You've also built a solid foundation in ${secondStrength.name.toLowerCase()}, which gives your narrative credibility. `;
       }
-    }
-    
-    // Priority areas with specific guidance
-    if (critical.length > 0) {
-      const criticalNames = critical.map(d => d.name).join(', ');
-      const firstCriticalIssue = critical[0].issues[0];
-      overview += `However, ${criticalNames} ${critical.length === 1 ? 'requires' : 'require'} immediate attention—`;
-      if (firstCriticalIssue) {
-        overview += `specifically, ${firstCriticalIssue.title.toLowerCase()}. `;
-      } else {
-        overview += `these are foundational gaps that limit your entire narrative. `;
-      }
-      overview += `Addressing these critical issues is essential before refining other dimensions. `;
-    } else if (needsWork.length > 0) {
-      const needsWorkNames = needsWork.map(d => d.name).join(', ');
-      const weakest = needsWork.sort((a, b) => a.score - b.score)[0];
-      overview += `To reach ${score >= 70 ? 'excellence and distinction' : 'competitive admissions quality'}, focus on strengthening ${needsWorkNames}. `;
-      if (weakest.issues[0]) {
-        overview += `Start with ${weakest.name} (${weakest.score}/${weakest.maxScore})—${weakest.issues[0].title.toLowerCase()} is the most impactful area for improvement. `;
-      }
-    }
-    
-    // Calculate and communicate potential
-    const weightedPotential = [...critical, ...needsWork].reduce((sum, dim) => {
-      const maxGain = dim.maxScore - dim.score;
-      return sum + (maxGain * (dim.weight / 100));
-    }, 0);
-    const potentialGain = Math.round(weightedPotential * 0.7);
-    
-    if (potentialGain > 0) {
-      const targetScore = score + potentialGain;
-      const cycles = critical.length > 0 ? '3-4' : needsWork.length > 2 ? '2-3' : '1-2';
-      overview += `With focused revision addressing the flagged issues, you could realistically reach ${targetScore}+ within ${cycles} editing cycles. `;
-    }
-    
-    // Pattern detection with actionable insights
-    const allIssues = dims.flatMap(d => d.issues);
-    if (allIssues.length >= 3) {
-      const specificityIssues = allIssues.filter(i => i.title.toLowerCase().includes('specific'));
-      const emotionIssues = allIssues.filter(i => i.title.toLowerCase().includes('emotion') || i.title.toLowerCase().includes('vulnerability'));
-      const transformationIssues = allIssues.filter(i => i.title.toLowerCase().includes('transform') || i.title.toLowerCase().includes('growth'));
-      
-      if (specificityIssues.length >= 2) {
-        overview += `A key pattern across multiple dimensions: your essay needs more concrete specificity—replace general statements with precise names, numbers, dates, and sensory details that make scenes vivid and memorable. `;
-      } else if (emotionIssues.length >= 2) {
-        overview += `A recurring theme: several dimensions need deeper emotional engagement—move beyond describing what happened to showing your internal reactions, vulnerabilities, and the authentic feelings you experienced in those moments. `;
-      } else if (transformationIssues.length >= 2) {
-        overview += `Multiple dimensions indicate insufficient transformation narrative—admissions officers want to see clear before/after contrasts that prove you\'ve genuinely changed through specific behavioral examples. `;
-      }
-    }
-    
-    // Strategic next steps
-    const totalIssues = dims.reduce((sum, d) => sum + d.issues.length, 0);
-    if (totalIssues > 0) {
-      const issueVerb = critical.length > 0 ? 'addressing' : 'refining';
-      overview += `Begin by ${issueVerb} the ${totalIssues} flagged ${totalIssues === 1 ? 'issue' : 'issues'} in the dimension analysis below—each includes AI-suggested revisions that demonstrate exactly how to strengthen your narrative while maintaining your authentic voice.`;
     } else {
-      overview += `Your essay demonstrates impressive consistency across all dimensions. Continue refining based on the detailed rubric feedback to maximize your admissions impact and ensure every sentence serves your narrative\'s strategic purpose.`;
+      overview += `Your essay shows genuine effort and authentic voice. `;
     }
-    
+
+    // What the essay is trying to convey (narrative intent)
+    const hasTransformation = allIssues.some(i => i.title.toLowerCase().includes('transform') || i.title.toLowerCase().includes('growth'));
+    const hasEmotionalDepth = allIssues.some(i => i.title.toLowerCase().includes('emotion') || i.title.toLowerCase().includes('vulnerability'));
+    const hasSpecificity = allIssues.some(i => i.title.toLowerCase().includes('specific') || i.title.toLowerCase().includes('detail'));
+
+    if (score >= 70) {
+      overview += `What you're trying to show—your growth through experience—comes through clearly. `;
+    } else if (score >= 55) {
+      overview += `The core of what you're trying to convey is there, but it needs sharper focus and more vivid storytelling. `;
+    } else {
+      overview += `You have the raw material for a compelling narrative, but right now the story you're trying to tell isn't fully realized on the page. `;
+    }
+
+    // Pattern detection - what would make it more compelling
+    const patterns = [];
+    if (hasSpecificity) patterns.push('specific details');
+    if (hasEmotionalDepth) patterns.push('emotional authenticity');
+    if (hasTransformation) patterns.push('transformation arc');
+
+    if (patterns.length > 0) {
+      overview += `To make this truly compelling, focus on ${patterns.length === 1 ? patterns[0] : patterns.slice(0, -1).join(', ') + ' and ' + patterns[patterns.length - 1]}. `;
+    }
+
+    // Overarching improvements - narrative structure or depth
+    if (critical.length > 0 || needsWork.length >= 3) {
+      // Multiple structural issues
+      const structuralIssues = allIssues.filter(i =>
+        i.title.toLowerCase().includes('arc') ||
+        i.title.toLowerCase().includes('structure') ||
+        i.title.toLowerCase().includes('hook') ||
+        i.title.toLowerCase().includes('climax')
+      );
+
+      if (structuralIssues.length >= 2) {
+        overview += `Your narrative structure needs attention—think about building clear tension, a turning point where something shifts, and a resolution that shows what changed. `;
+      } else if (hasSpecificity) {
+        overview += `Replace broad statements with precise moments: use real names, actual dialogue, specific sensory details that place readers in the scene with you. `;
+      } else if (hasEmotionalDepth) {
+        overview += `Go deeper emotionally—show us not just what happened, but what you felt, what scared you, what surprised you, what you realized in that specific moment. `;
+      } else {
+        overview += `The surgical suggestions below show you exactly where and how to strengthen your narrative. `;
+      }
+    } else if (needsWork.length > 0) {
+      // Good foundation, needs polish
+      overview += `You're close. The improvements needed are targeted and achievable—mostly about elevating specific passages from good to great. `;
+    } else {
+      // Strong essay
+      overview += `You've crafted a strong narrative that accomplishes what you set out to do. `;
+    }
+
+    // Encouraging close with concrete next step
+    if (allIssues.length > 0) {
+      const firstIssue = allIssues[0];
+      if (firstIssue) {
+        overview += `Start with this: ${firstIssue.title.toLowerCase()}. Each workshop item below includes specific revisions that maintain your authentic voice while making your narrative more powerful.`;
+      } else {
+        overview += `The detailed analysis below shows you exactly how to elevate your narrative while keeping your authentic voice intact.`;
+      }
+    } else {
+      overview += `Continue refining the nuances—every word should earn its place in your story.`;
+    }
+
     return overview;
     } catch (error) {
       console.error('Error in getDetailedOverview:', error);
@@ -1213,6 +1269,20 @@ export default function PIQWorkshop() {
               />
             </Card>
 
+            {/* PIQ Prompt Selector - Moved from right column */}
+            {selectedPromptId && (
+              <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
+                <PIQPromptSelector
+                  selectedPromptId={selectedPromptId}
+                  onPromptSelect={(promptId) => {
+                    setSelectedPromptId(promptId);
+                    setNeedsReanalysis(true);
+                    setHasUnsavedChanges(true);
+                  }}
+                />
+              </Card>
+            )}
+
             {/* Rubric dimensions */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -1248,18 +1318,6 @@ export default function PIQWorkshop() {
 
           {/* Right column: PIQ Prompt Selector + Chat */}
           <div className="space-y-6">
-            {/* PIQ Prompt Selector */}
-            {selectedPromptId && (
-              <PIQPromptSelector
-                selectedPromptId={selectedPromptId}
-                onPromptSelect={(promptId) => {
-                  setSelectedPromptId(promptId);
-                  setNeedsReanalysis(true);
-                  setHasUnsavedChanges(true);
-                }}
-              />
-            )}
-
             {/* Chat */}
             <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg sticky top-24">
               <ContextualWorkshopChat

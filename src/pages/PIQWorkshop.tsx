@@ -326,9 +326,9 @@ export default function PIQWorkshop() {
 
   // Scroll-based carousel positioning
   const [scrollY, setScrollY] = useState(0);
-  const SCROLL_THRESHOLD = 150; // Start transition when sticky header engages
-  const TRANSITION_DURATION = 300; // pixels over which to complete the transition
-  const MAX_OFFSET = 120; // max horizontal shift in pixels (positive = shift right)
+  const SCROLL_THRESHOLD = 450; // Start transition when hero section passes and 2-column grid becomes primary
+  const TRANSITION_DURATION = 200; // pixels over which to complete the transition (smoother)
+  const MAX_OFFSET = 220; // shift to center of right column (25% of typical content width)
   
   // Only start transition after threshold, complete over TRANSITION_DURATION pixels
   const scrollProgress = scrollY < SCROLL_THRESHOLD 

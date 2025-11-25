@@ -337,13 +337,19 @@ Return ONLY valid JSON with this structure:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
+        max_tokens: 16384,
         temperature: 0.8,
-        system: `You are a surgical essay editor. Identify specific issues in the essay and provide 3 types of surgical fixes:
+        system: `You are a surgical essay editor. Identify ALL specific issues in the essay (up to 12 maximum) and provide 3 types of surgical fixes for each:
 
 1. polished_original: Minimal edits preserving voice
 2. voice_amplifier: Heightens student's existing voice patterns
 3. divergent_strategy: Bold alternative exploring different angle
+
+IMPORTANT:
+- Identify up to 12 distinct issues (do NOT limit yourself to 5)
+- Focus on the most impactful problems first (critical > high > medium > low)
+- Every low-scoring dimension should get at least one workshop item
+- Don't artificially limit your analysis - list ALL significant issues up to 12
 
 For each issue:
 - Extract exact quote from essay
@@ -385,7 +391,7 @@ Return ONLY valid JSON with this structure:
         messages: [
           {
             role: 'user',
-            content: `Identify surgical fixes for this essay:\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}\n\nRubric Analysis:\n${JSON.stringify(rubricAnalysis, null, 2)}`
+            content: `Identify ALL surgical fixes for this essay (up to 12 maximum):\n\nPrompt: ${requestBody.promptText}\n\nEssay:\n${requestBody.essayText}\n\nRubric Analysis:\n${JSON.stringify(rubricAnalysis, null, 2)}\n\nIMPORTANT: Provide up to 12 workshop items, prioritized by severity. Don't stop at 5 - list all significant issues you find up to the 12-item cap.`
           }
         ]
       })

@@ -143,6 +143,9 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       customer: customerId,
       payment_method_types: ['card'],
       automatic_tax: { enabled: true },
+      customer_update: {
+        address: 'auto',  // Collect and save billing address for tax calculation
+      },
       line_items: [
         {
           price_data: {

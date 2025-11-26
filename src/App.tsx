@@ -24,6 +24,8 @@ import TestTeachingUnitSimple from "./pages/TestTeachingUnitSimple";
 import WorkshopDemo from "./pages/WorkshopDemo";
 import Pricing from "./pages/Pricing";
 import PIQWorkshop from "./pages/PIQWorkshop";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,8 @@ const App = () => (
             <Route path="/workshop-demo" element={<WorkshopDemo />} />
             <Route path="/piq-workshop" element={<PIQWorkshop />} />
             <Route path="/piq-workshop/:piqNumber" element={<PIQWorkshop />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

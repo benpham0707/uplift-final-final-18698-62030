@@ -127,7 +127,9 @@ export default function ContextualWorkshopChat({
 
   // Load cached conversation or create welcome message
   useEffect(() => {
-    const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity.id;
+    const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity?.id;
+    if (!cacheKey) return; // Skip if no valid cache key
+    
     const cached = mode === 'piq' ? getPIQCachedConversation(cacheKey) : getCachedConversation(cacheKey);
 
     if (cached && cached.length > 0) {
@@ -138,25 +140,27 @@ export default function ContextualWorkshopChat({
         const context = buildPIQContextObject();
         const welcome = createPIQWelcomeMessage(context);
         setChatMessages([welcome]);
-      } else {
+      } else if (activity) {
         const context = buildContextObject();
         const welcome = createWelcomeMessage(context);
         setChatMessages([welcome]);
       }
     }
-  }, [activity.id, analysisResult, mode, piqPromptId]);
+  }, [activity?.id, analysisResult, mode, piqPromptId]);
 
   // Cache conversation on changes
   useEffect(() => {
     if (chatMessages.length > 0) {
-      const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity.id;
+      const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity?.id;
+      if (!cacheKey) return; // Skip if no valid cache key
+      
       if (mode === 'piq') {
         cachePIQConversation(cacheKey, chatMessages);
       } else {
         cacheConversation(cacheKey, chatMessages);
       }
     }
-  }, [chatMessages, activity.id, mode, piqPromptId]);
+  }, [chatMessages, activity?.id, mode, piqPromptId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -421,7 +425,7 @@ export default function ContextualWorkshopChat({
           </GradientText>
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          Ask me anything about your {activity.name} narrative
+          Ask me anything about your {mode === 'piq' ? piqPromptTitle || 'PIQ' : activity?.name || 'essay'} narrative
         </p>
       </div>
 

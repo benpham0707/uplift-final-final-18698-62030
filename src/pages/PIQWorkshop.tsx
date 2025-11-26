@@ -124,7 +124,7 @@ export default function PIQWorkshop() {
   const canAnalyze = currentDraft.trim().length >= MIN_ESSAY_LENGTH;
 
   // NEW: Full Backend Integration State
-  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(getPromptIdFromUrl()); // Based on URL param
+  const [selectedPromptId, setSelectedPromptId] = useState<string>(getPromptIdFromUrl()); // Based on URL param
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [narrativeOverview, setNarrativeOverview] = useState<string | null>(null);
@@ -1084,7 +1084,7 @@ export default function PIQWorkshop() {
             }}
           >
             <PIQCarouselNav
-              currentPromptId={selectedPromptId}
+              currentPromptId={selectedPromptId || 'piq1'}
               onPromptChange={setSelectedPromptId}
             />
           </div>

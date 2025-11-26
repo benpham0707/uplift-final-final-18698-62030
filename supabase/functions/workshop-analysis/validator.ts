@@ -206,114 +206,148 @@ export async function validateSuggestion(
 }
 
 /**
- * Generate a workshop item with validation and retry
+ * Generate a batch of workshop items (4 items)
+ * This is the GENERATION step only - validation happens separately
  */
-export async function generateWorkshopItemWithValidation(
+export async function generateWorkshopBatch(
   essayText: string,
   promptText: string,
   rubricAnalysis: any,
   voiceFingerprint: any,
   anthropicApiKey: string,
-  baseSystemPrompt: string
-): Promise<any> {
+  baseSystemPrompt: string,
+  batchNumber: number
+): Promise<any[]> {
 
-  const maxAttempts = 3;
+  console.log(`   🔄 Generating batch ${batchNumber} (4 items)...`);
+
+  // Generate 4 items in one call for efficiency
+  const userPrompt = `Identify the 4 most critical workshop items for this essay:\n\nPrompt: ${promptText}\n\nEssay:\n${essayText}\n\nRubric Analysis:\n${JSON.stringify(rubricAnalysis, null, 2)}\n\n**CRITICAL REQUIREMENTS:**\n- Return EXACTLY 4 distinct workshop items\n- Each item must have 3 suggestions (polished_original, voice_amplifier, divergent_strategy)\n- Focus on the most impactful improvements\n- Ensure each suggestion preserves the student's authentic voice`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': anthropicApiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000, // More tokens for 4 items
+      temperature: 0.8,
+      system: baseSystemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+
+  if (!response.ok) {
+    console.error(`   ❌ Batch ${batchNumber} generation failed`);
+    return [];
+  }
+
+  const result = await response.json();
+  const content = result.content[0].text;
+
+  // Parse workshop items
+  try {
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    const jsonString = jsonMatch ? jsonMatch[1].trim() : content.trim();
+    const parsed = JSON.parse(jsonString);
+    const items = parsed.workshopItems || [];
+
+    console.log(`   ✅ Batch ${batchNumber}: Generated ${items.length} items`);
+    return items;
+  } catch (e) {
+    console.error(`   ❌ Failed to parse batch ${batchNumber}`);
+    return [];
+  }
+}
+
+/**
+ * Validate and refine a single suggestion with retry
+ * This matches the flow in surgicalEditor_v2.ts
+ */
+export async function validateAndRefineSuggestion(
+  suggestion: any,
+  workshopItem: any,
+  voiceFingerprint: any,
+  anthropicApiKey: string,
+  maxAttempts: number = 3
+): Promise<any | null> {
+
   let attemptNumber = 1;
+  let currentSuggestion = suggestion;
   let lastRetryGuidance = '';
 
   while (attemptNumber <= maxAttempts) {
-    console.log(`   🔄 Generation attempt ${attemptNumber}/${maxAttempts}`);
+    // Validate the suggestion
+    const validation = await validateSuggestion(
+      currentSuggestion.text,
+      currentSuggestion.rationale,
+      workshopItem.quote || '',
+      voiceFingerprint?.tone?.primary || 'authentic',
+      anthropicApiKey,
+      attemptNumber
+    );
 
-    // Build prompt with retry guidance if this is a retry
-    let userPrompt = `Identify 1 critical workshop item for this essay:\n\nPrompt: ${promptText}\n\nEssay:\n${essayText}\n\nRubric Analysis:\n${JSON.stringify(rubricAnalysis, null, 2)}`;
-
-    if (lastRetryGuidance && attemptNumber > 1) {
-      userPrompt = `**PREVIOUS ATTEMPT FAILED VALIDATION:**\n\n${lastRetryGuidance}\n\n---\n\n${userPrompt}\n\n---\n\n**CRITICAL:** Fix all issues mentioned in the validation feedback above.`;
+    if (validation.isValid && validation.qualityScore >= 70) {
+      console.log(`      ✅ Suggestion validated (score: ${validation.qualityScore})`);
+      return currentSuggestion;
     }
 
-    // Generate workshop item
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 3000,
-        temperature: attemptNumber > 1 ? 0.7 : 0.8,
-        system: baseSystemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
+    console.log(`      ⚠️ Validation failed (score: ${validation.qualityScore}, attempt ${attemptNumber}/${maxAttempts})`);
 
-    if (!response.ok) {
-      console.error(`   ❌ Generation attempt ${attemptNumber} failed`);
-      attemptNumber++;
-      continue;
+    if (attemptNumber >= maxAttempts) {
+      console.log(`      ❌ Max attempts reached, skipping suggestion`);
+      return null;
     }
 
-    const result = await response.json();
-    const content = result.content[0].text;
+    // Retry with specific guidance
+    if (validation.retryGuidance) {
+      lastRetryGuidance = validation.retryGuidance;
+    }
 
-    // Parse workshop item
-    let workshopItem;
+    // Regenerate the suggestion with feedback
+    const retryPrompt = `**VALIDATION FEEDBACK:**\n${lastRetryGuidance}\n\n---\n\n**Original Text:** "${workshopItem.quote}"\n\n**Suggestion Type:** ${suggestion.type}\n\n**Student Voice:** ${voiceFingerprint?.tone?.primary || 'authentic'}\n\n**Task:** Regenerate this suggestion fixing ALL the issues mentioned above. Return ONLY JSON:\n{\n  "text": "improved suggestion text",\n  "rationale": "educational rationale (30+ words)"\n}`;
+
     try {
-      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      const jsonString = jsonMatch ? jsonMatch[1].trim() : content.trim();
-      const parsed = JSON.parse(jsonString);
-      workshopItem = parsed.workshopItems?.[0] || parsed;
-    } catch (e) {
-      console.error(`   ❌ Failed to parse attempt ${attemptNumber}`);
-      attemptNumber++;
-      continue;
-    }
+      const retryResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 800,
+          temperature: 0.7,
+          system: VALIDATION_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: retryPrompt }]
+        })
+      });
 
-    if (!workshopItem || !workshopItem.suggestions) {
-      console.error(`   ❌ No suggestions in attempt ${attemptNumber}`);
-      attemptNumber++;
-      continue;
-    }
+      if (retryResponse.ok) {
+        const retryResult = await retryResponse.json();
+        const retryContent = retryResult.content[0].text;
+        const jsonMatch = retryContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        const jsonString = jsonMatch ? jsonMatch[1].trim() : retryContent.trim();
+        const refined = JSON.parse(jsonString);
 
-    // Validate each suggestion
-    const validatedSuggestions = [];
-    for (const suggestion of workshopItem.suggestions) {
-      const validation = await validateSuggestion(
-        suggestion.text,
-        suggestion.rationale,
-        workshopItem.quote || essayText.substring(0, 200),
-        voiceFingerprint?.tone?.primary || 'authentic',
-        anthropicApiKey,
-        attemptNumber
-      );
+        currentSuggestion = {
+          type: suggestion.type,
+          text: refined.text,
+          rationale: refined.rationale
+        };
 
-      if (validation.isValid && validation.qualityScore >= 70) {
-        console.log(`   ✅ Suggestion validated (score: ${validation.qualityScore})`);
-        validatedSuggestions.push(suggestion);
-      } else {
-        console.log(`   ⚠️ Suggestion failed validation (score: ${validation.qualityScore}, ${validation.failures.length} issues)`);
-
-        // Store retry guidance
-        if (validation.retryGuidance) {
-          lastRetryGuidance = validation.retryGuidance;
-        }
+        console.log(`      🔄 Retry ${attemptNumber}: Regenerated suggestion`);
       }
+    } catch (error) {
+      console.error(`      ❌ Retry ${attemptNumber} failed:`, error);
     }
 
-    // If we have at least one valid suggestion, return the item
-    if (validatedSuggestions.length > 0) {
-      return {
-        ...workshopItem,
-        suggestions: validatedSuggestions
-      };
-    }
-
-    // Otherwise retry
     attemptNumber++;
   }
 
-  // All attempts failed - return null to skip this item
-  console.warn('   ⚠️ All validation attempts failed for this item');
   return null;
 }

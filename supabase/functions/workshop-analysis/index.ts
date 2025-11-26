@@ -6,7 +6,7 @@
  * Retries with specific feedback if validation fails.
  */
 
-import { generateWorkshopItemWithValidation } from './validator.ts';
+import { generateWorkshopBatch, validateAndRefineSuggestion } from './validator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -380,46 +380,61 @@ Return ONLY valid JSON with this structure:
   ]
 }`;
 
-    // Generate 12 items in 3 parallel batches (4 items each) with validation
-    console.log('   🔄 Running 3 parallel batches (4 items each)...');
+    // STEP 1: Generate 12 items in 3 parallel batches (4 items each)
+    console.log('   🔄 Step 1: Generating 12 items in 3 parallel batches...');
 
     const [batch1Items, batch2Items, batch3Items] = await Promise.all([
-      // Batch 1: 4 critical items
-      Promise.all([
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt)
-      ]),
-
-      // Batch 2: 4 high priority items
-      Promise.all([
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt)
-      ]),
-
-      // Batch 3: 4 medium/polish items
-      Promise.all([
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt),
-        generateWorkshopItemWithValidation(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt)
-      ])
+      generateWorkshopBatch(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt, 1),
+      generateWorkshopBatch(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt, 2),
+      generateWorkshopBatch(requestBody.essayText, requestBody.promptText, rubricAnalysis, voiceFingerprint, anthropicApiKey, baseSystemPrompt, 3)
     ]);
 
-    // Filter out null items (validation failures) and combine
-    const allItems = [...batch1Items, ...batch2Items, ...batch3Items].filter(item => item !== null);
+    const allGeneratedItems = [...batch1Items, ...batch2Items, ...batch3Items];
+    console.log(`   ✅ Generated ${allGeneratedItems.length} items total`);
+
+    // STEP 2: Validate and refine each suggestion in each item
+    console.log('   🔄 Step 2: Validating and refining suggestions...');
+
+    const validatedItems = [];
+    for (const item of allGeneratedItems) {
+      if (!item || !item.suggestions) continue;
+
+      console.log(`   📝 Processing item: "${item.quote?.substring(0, 50)}..."`);
+
+      // Validate each of the 3 suggestions for this item
+      const validatedSuggestions = [];
+      for (const suggestion of item.suggestions) {
+        const validated = await validateAndRefineSuggestion(
+          suggestion,
+          item,
+          voiceFingerprint,
+          anthropicApiKey,
+          3 // maxAttempts
+        );
+
+        if (validated) {
+          validatedSuggestions.push(validated);
+        }
+      }
+
+      // Only keep items that have at least 1 valid suggestion
+      if (validatedSuggestions.length > 0) {
+        validatedItems.push({
+          ...item,
+          suggestions: validatedSuggestions
+        });
+        console.log(`   ✅ Item validated with ${validatedSuggestions.length}/3 suggestions`);
+      } else {
+        console.log(`   ⚠️ Item skipped (no valid suggestions)`);
+      }
+    }
 
     const workshopData = {
-      workshopItems: allItems
+      workshopItems: validatedItems
     };
 
     console.log(`✅ Workshop items complete: ${workshopData.workshopItems.length} validated items`);
-    console.log(`   - Batch 1: ${batch1Items.filter(i => i !== null).length}/4 items passed validation`);
-    console.log(`   - Batch 2: ${batch2Items.filter(i => i !== null).length}/4 items passed validation`);
-    console.log(`   - Batch 3: ${batch3Items.filter(i => i !== null).length}/4 items passed validation`);
+    console.log(`   - Total suggestions validated: ${validatedItems.reduce((sum, item) => sum + item.suggestions.length, 0)}`);
 
     // Assemble final result
     const finalResult = {

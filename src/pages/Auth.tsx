@@ -9,6 +9,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Hide Clerk's built-in footer links */}
+      <style>{`
+        .cl-footerAction {
+          display: none !important;
+        }
+      `}</style>
       <div className="flex-1 flex items-center justify-center px-4 py-12 relative">
         
         {/* Back Button */}

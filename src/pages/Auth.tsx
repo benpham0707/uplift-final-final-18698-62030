@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SignIn } from '@clerk/clerk-react';
+import { SignIn, SignUp } from '@clerk/clerk-react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const Auth = () => {
+  const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in');
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="flex-1 flex items-center justify-center px-4 py-12 relative">
@@ -21,12 +24,57 @@ const Auth = () => {
           {/* Left Column - Auth Form */}
           <motion.div 
             layout
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-md mx-auto w-full flex justify-center"
-                            >
-             <SignIn />
+            className="max-w-md mx-auto w-full flex flex-col items-center"
+          >
+            <AnimatePresence mode="wait">
+              {mode === 'sign-in' ? (
+                <motion.div
+                  key="sign-in"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="w-full flex flex-col items-center"
+                >
+                  <SignIn 
+                    routing="hash"
+                    forceRedirectUrl="/dashboard"
+                  />
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Don't have an account?{' '}
+                    <button
+                      onClick={() => setMode('sign-up')}
+                      className="text-primary font-medium hover:underline transition-colors"
+                    >
+                      Sign up
+                    </button>
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="sign-up"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="w-full flex flex-col items-center"
+                >
+                  <SignUp 
+                    routing="hash"
+                    forceRedirectUrl="/dashboard"
+                  />
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Already have an account?{' '}
+                    <button
+                      onClick={() => setMode('sign-in')}
+                      className="text-primary font-medium hover:underline transition-colors"
+                    >
+                      Sign in
+                    </button>
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
           {/* Right Column - Visual */}

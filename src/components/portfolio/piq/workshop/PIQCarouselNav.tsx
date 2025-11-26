@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -7,28 +8,40 @@ import GradientText from '@/components/ui/GradientText';
 
 interface PIQCarouselNavProps {
   currentPromptId: string;
-  onPromptChange: (promptId: string) => void;
+  onPromptChange?: (promptId: string) => void;
+  /** If true, use URL navigation instead of callback */
+  useRoutes?: boolean;
 }
 
 export const PIQCarouselNav: React.FC<PIQCarouselNavProps> = ({
   currentPromptId,
-  onPromptChange
+  onPromptChange,
+  useRoutes = true
 }) => {
+  const navigate = useNavigate();
   const currentIndex = UC_PIQ_PROMPTS.findIndex(p => p.id === currentPromptId);
   const currentPrompt = UC_PIQ_PROMPTS[currentIndex];
 
+  const handleNavigate = (prompt: typeof UC_PIQ_PROMPTS[0]) => {
+    if (useRoutes) {
+      navigate(`/piq-workshop/${prompt.number}`);
+    } else if (onPromptChange) {
+      onPromptChange(prompt.id);
+    }
+  };
+
   const handlePrevious = () => {
     const prevIndex = currentIndex > 0 ? currentIndex - 1 : UC_PIQ_PROMPTS.length - 1;
-    onPromptChange(UC_PIQ_PROMPTS[prevIndex].id);
+    handleNavigate(UC_PIQ_PROMPTS[prevIndex]);
   };
 
   const handleNext = () => {
     const nextIndex = currentIndex < UC_PIQ_PROMPTS.length - 1 ? currentIndex + 1 : 0;
-    onPromptChange(UC_PIQ_PROMPTS[nextIndex].id);
+    handleNavigate(UC_PIQ_PROMPTS[nextIndex]);
   };
 
   const handleDotClick = (index: number) => {
-    onPromptChange(UC_PIQ_PROMPTS[index].id);
+    handleNavigate(UC_PIQ_PROMPTS[index]);
   };
 
   return (

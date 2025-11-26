@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -282,6 +282,18 @@ interface DraftVersion {
 
 export default function PIQWorkshop() {
   const navigate = useNavigate();
+  const { piqNumber } = useParams<{ piqNumber?: string }>();
+
+  // Convert URL param to prompt ID (e.g., "1" -> "piq1")
+  const getPromptIdFromUrl = (): string => {
+    if (piqNumber) {
+      const num = parseInt(piqNumber);
+      if (num >= 1 && num <= 8) {
+        return `piq${num}`;
+      }
+    }
+    return 'piq1'; // Default to PIQ 1
+  };
 
   // ============================================================================
   // AUTHENTICATION
@@ -315,7 +327,7 @@ export default function PIQWorkshop() {
   const initialScoreRef = useRef<number>(73);
 
   // NEW: Full Backend Integration State
-  const [selectedPromptId, setSelectedPromptId] = useState<string | null>('piq1'); // Default to PIQ #1
+  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(getPromptIdFromUrl()); // Based on URL param
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [narrativeOverview, setNarrativeOverview] = useState<string | null>(null);
@@ -763,6 +775,15 @@ export default function PIQWorkshop() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Sync selectedPromptId when URL changes
+  useEffect(() => {
+    const newPromptId = getPromptIdFromUrl();
+    if (newPromptId !== selectedPromptId) {
+      setSelectedPromptId(newPromptId);
+      setNeedsReanalysis(true);
+    }
+  }, [piqNumber]);
 
   // Manual save to cloud
   const handleSaveToCloud = useCallback(async () => {

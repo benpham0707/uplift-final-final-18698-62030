@@ -55,6 +55,7 @@ const App = () => (
             <Route path="/test-simple" element={<TestTeachingUnitSimple />} />
             <Route path="/workshop-demo" element={<WorkshopDemo />} />
             <Route path="/piq-workshop" element={<PIQWorkshop />} />
+            <Route path="/piq-workshop/:piqNumber" element={<PIQWorkshop />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

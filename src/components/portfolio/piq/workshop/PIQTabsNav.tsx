@@ -2,10 +2,11 @@
  * PIQ Tabs Navigation
  * 
  * Horizontal scrollable tabs showing all 8 UC PIQ prompts.
- * Makes it easy to switch between questions with a single click.
+ * Each tab navigates to a separate page (/piq-workshop/1, /piq-workshop/2, etc.)
  */
 
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ChevronLeft, ChevronRight, FileText, Check, Pencil } from 'lucide-react';
@@ -14,9 +15,11 @@ import { UC_PIQ_PROMPTS } from './PIQPromptSelector';
 
 interface PIQTabsNavProps {
   currentPromptId: string;
-  onPromptChange: (promptId: string) => void;
+  onPromptChange?: (promptId: string) => void;
   /** Optional: map of promptId to essay status for showing completion indicators */
   essayStatus?: Record<string, 'empty' | 'draft' | 'complete'>;
+  /** If true, use URL navigation instead of callback */
+  useRoutes?: boolean;
   className?: string;
 }
 
@@ -24,11 +27,22 @@ export const PIQTabsNav: React.FC<PIQTabsNavProps> = ({
   currentPromptId,
   onPromptChange,
   essayStatus = {},
+  useRoutes = true,
   className,
 }) => {
+  const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+
+  // Handle tab click - either navigate to URL or call callback
+  const handleTabClick = (prompt: typeof UC_PIQ_PROMPTS[0]) => {
+    if (useRoutes) {
+      navigate(`/piq-workshop/${prompt.number}`);
+    } else if (onPromptChange) {
+      onPromptChange(prompt.id);
+    }
+  };
 
   // Check if we need scroll arrows
   const checkScroll = () => {
@@ -126,7 +140,7 @@ export const PIQTabsNav: React.FC<PIQTabsNavProps> = ({
                 <TooltipTrigger asChild>
                   <button
                     data-active={isActive}
-                    onClick={() => onPromptChange(prompt.id)}
+                    onClick={() => handleTabClick(prompt)}
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0",
                       isActive

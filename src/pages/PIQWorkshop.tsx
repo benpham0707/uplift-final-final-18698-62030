@@ -28,6 +28,7 @@ import { DraftVersionHistory } from '@/components/portfolio/extracurricular/work
 // PIQ Prompt Selector
 import { PIQPromptSelector, UC_PIQ_PROMPTS } from '@/components/portfolio/piq/workshop/PIQPromptSelector';
 import { PIQCarouselNav } from '@/components/portfolio/piq/workshop/PIQCarouselNav';
+import { PIQTabsNav } from '@/components/portfolio/piq/workshop/PIQTabsNav';
 
 // Backend Integration
 import { analyzePIQEntry } from '@/services/piqWorkshopAnalysisService';
@@ -1238,7 +1239,8 @@ export default function PIQWorkshop() {
 
       {/* Sticky header */}
       <div className="sticky top-0 z-50 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
-        <div className="mx-auto px-4 py-4 flex items-center justify-between gap-4 relative">
+        {/* Main header row */}
+        <div className="mx-auto px-4 py-3 flex items-center justify-between gap-4 relative">
           {/* Left: Back button */}
           <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
@@ -1299,6 +1301,14 @@ export default function PIQWorkshop() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* PIQ Tabs Navigation - shows all 8 PIQs */}
+        <div className="px-4 py-2 border-t border-border/50 bg-muted/30">
+          <PIQTabsNav
+            currentPromptId={selectedPromptId || 'piq1'}
+            onPromptChange={setSelectedPromptId}
+          />
         </div>
       </div>
 

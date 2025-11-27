@@ -1331,7 +1331,7 @@ export default function PIQWorkshop() {
       {/* Sticky PIQ header */}
       <div className="sticky top-16 z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
         {/* Main header row */}
-        <div className="mx-auto px-4 py-2 flex items-center justify-center gap-4">
+        <div className="mx-auto px-4 py-3 flex items-center justify-center gap-4">
           {/* Center: PIQ Carousel Navigation - static positioning */}
           <div className="flex-1 flex justify-center">
             <PIQCarouselNav
@@ -1673,12 +1673,17 @@ export default function PIQWorkshop() {
 
             {/* Rubric dimensions */}
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-primary">11-Dimension Analysis</h2>
-                <Badge variant="outline" className="gap-2">
-                  <Target className="w-3 h-3" />
-                  {dimensions.length} Categories
-                </Badge>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/10 dark:bg-blue-400/10 ring-1 ring-blue-500/20">
+                  <Target className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <GradientText
+                  className="text-2xl font-bold"
+                  colors={["#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#2563eb"]}
+                  animationSpeed={8}
+                >
+                  11-Dimension Analysis
+                </GradientText>
               </div>
 
               <div className="space-y-4">

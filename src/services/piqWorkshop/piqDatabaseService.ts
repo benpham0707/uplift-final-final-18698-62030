@@ -55,9 +55,9 @@ export interface PIQVersion {
   draft_content: string;
   word_count: number;
   change_summary?: string;
-  source: 'student' | 'coach_suggestion' | 'system_auto';
+  source: 'student' | 'coach_suggestion' | 'system_auto' | 'analyze' | 'save_draft';
   created_at: string;
-  score?: number; // Joined from analysis report
+  score?: number; // Joined from analysis report - undefined for 'save_draft' versions
 }
 
 export interface SaveEssayResult {
@@ -557,6 +557,90 @@ export async function getCurrentEssayId(
 }
 
 // =============================================================================
+// VERSION HISTORY FUNCTIONS
+// =============================================================================
+
+export interface SaveVersionResult {
+  success: boolean;
+  versionId?: string;
+  versionNumber?: number;
+  error?: string;
+}
+
+/**
+ * Save a version entry to the essay_revision_history table
+ * This creates a snapshot of the essay at a point in time.
+ * 
+ * @param clerkToken - JWT token from Clerk
+ * @param userId - Clerk user ID
+ * @param essayId - Essay ID from essays table
+ * @param draftContent - The essay content to save
+ * @param source - 'analyze' for analyzed versions, 'save_draft' for quick saves
+ */
+export async function saveVersionToHistory(
+  clerkToken: string,
+  userId: string,
+  essayId: string,
+  draftContent: string,
+  source: 'analyze' | 'save_draft'
+): Promise<SaveVersionResult> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    // Get the next version number for this essay
+    const { data: latestVersion, error: versionError } = await supabase
+      .from('essay_revision_history')
+      .select('version')
+      .eq('essay_id', essayId)
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (versionError) {
+      console.error('Error getting latest version:', versionError);
+      // Continue with version 1 if we can't get latest
+    }
+
+    const nextVersion = (latestVersion?.version || 0) + 1;
+
+    // Insert the new version
+    const { data: newVersion, error: insertError } = await supabase
+      .from('essay_revision_history')
+      .insert({
+        essay_id: essayId,
+        version: nextVersion,
+        draft_content: draftContent,
+        source: source,
+        word_count: draftContent.trim().split(/\s+/).filter(w => w.length > 0).length
+      })
+      .select('id, version')
+      .single();
+
+    if (insertError) {
+      console.error('Error inserting version:', insertError);
+      return { success: false, error: insertError.message };
+    }
+
+    console.log(`✅ Saved version ${nextVersion} to history (source: ${source})`);
+    return {
+      success: true,
+      versionId: newVersion.id,
+      versionNumber: newVersion.version
+    };
+
+  } catch (error) {
+    console.error('Unexpected error in saveVersionToHistory:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+// =============================================================================
 // CHAT MESSAGE FUNCTIONS
 // =============================================================================
 
@@ -588,7 +672,7 @@ export async function saveChatMessages(
   clerkToken: string,
   userId: string,
   essayId: string,
-  messages: Array<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: number }>
+  messages: Array<{ id: string; role: 'user' | 'assistant' | 'system'; content: string; timestamp: number }>
 ): Promise<SaveChatMessagesResult> {
   try {
     assertAuthenticated(userId);
@@ -732,6 +816,7 @@ export default {
   saveAnalysisReport,
   loadPIQEssay,
   getVersionHistory,
+  saveVersionToHistory,
   deleteVersion,
   getCurrentEssayId,
   saveChatMessages,

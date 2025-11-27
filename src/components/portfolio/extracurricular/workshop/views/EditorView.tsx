@@ -44,7 +44,7 @@ interface EditorViewProps {
   hasAnalysisResult?: boolean; // Whether analysis has been run at least once
   canAnalyze?: boolean; // Whether essay has enough content to analyze
   minCharacters?: number; // Minimum characters required to analyze (default 50)
-  versionHistory?: Array<{ text: string; timestamp: number; score: number }>;
+  versionHistory?: Array<{ text: string; timestamp: number; score?: number }>;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;

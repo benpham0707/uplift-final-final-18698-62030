@@ -52,6 +52,7 @@ import {
   saveAnalysisReport,
   loadPIQEssay,
   getVersionHistory,
+  saveVersionToHistory,
   getCurrentEssayId,
   saveChatMessages,
   loadChatMessages
@@ -77,7 +78,8 @@ const MIN_ESSAY_LENGTH = 50;
 interface DraftVersion {
   text: string;
   timestamp: number;
-  score: number;
+  score?: number; // Optional - undefined for 'save_draft' versions
+  source?: 'analyze' | 'save_draft'; // Optional - 'analyze' has score, 'save_draft' doesn't
 }
 
 export default function PIQWorkshop() {
@@ -417,34 +419,85 @@ export default function PIQWorkshop() {
       }
 
       setNeedsReanalysis(false);
-      setHasUnsavedChanges(false);
       console.log('✅ Analysis complete - UI updated');
 
-      // AUTO-SAVE analysis result to database (NEW)
-      // Use overrideEssayId if provided (fixes race condition when called from handleSave)
-      const effectiveEssayId = overrideEssayId || currentEssayId;
-      if (userId && effectiveEssayId) {
-        console.log('📤 Auto-saving analysis result to database...');
-        console.log('   Using essay ID:', effectiveEssayId);
+      // AUTO-SAVE: Essay, Analysis, Version History, and Chat
+      // This ensures everything persists when user switches PIQs
+      let effectiveEssayId = overrideEssayId || currentEssayId;
+      
+      if (userId) {
         try {
           const token = await getToken({ template: 'supabase' });
           if (token) {
-            const saveResult = await saveAnalysisReport(token, userId, effectiveEssayId, result);
-            if (saveResult.success) {
-              console.log('✅ Analysis auto-saved to database:', saveResult.reportId);
-            } else {
-              console.warn('⚠️  Failed to auto-save analysis:', saveResult.error);
-              // Non-blocking - don't interrupt user flow
+            const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+            
+            // Step 1: Save essay first if no essayId exists
+            if (!effectiveEssayId) {
+              console.log('📤 Saving essay before analysis (first time)...');
+              const essaySaveResult = await saveOrUpdatePIQEssay(
+                token,
+                userId,
+                selectedPromptId,
+                selectedPrompt?.prompt || '',
+                currentDraft,
+                null // new essay
+              );
+              
+              if (essaySaveResult.success && essaySaveResult.essayId) {
+                effectiveEssayId = essaySaveResult.essayId;
+                setCurrentEssayId(essaySaveResult.essayId);
+                console.log('✅ Essay saved:', essaySaveResult.essayId);
+              } else {
+                console.warn('⚠️  Failed to save essay:', essaySaveResult.error);
+              }
             }
+            
+            // Step 2: Save analysis result
+            if (effectiveEssayId) {
+              console.log('📤 Saving analysis result...');
+              const analysisSaveResult = await saveAnalysisReport(token, userId, effectiveEssayId, result);
+              if (analysisSaveResult.success) {
+                console.log('✅ Analysis saved:', analysisSaveResult.reportId);
+              } else {
+                console.warn('⚠️  Failed to save analysis:', analysisSaveResult.error);
+              }
+              
+              // Step 3: Save version to history (source='analyze')
+              console.log('📤 Saving version to history...');
+              const versionResult = await saveVersionToHistory(
+                token,
+                userId,
+                effectiveEssayId,
+                currentDraft,
+                'analyze'
+              );
+              if (versionResult.success) {
+                console.log(`✅ Version ${versionResult.versionNumber} saved to history`);
+              } else {
+                console.warn('⚠️  Failed to save version:', versionResult.error);
+              }
+              
+              // Step 4: Save chat messages if present
+              if (chatMessages.length > 0) {
+                console.log('📤 Saving chat messages...');
+                const chatSaveResult = await saveChatMessages(token, userId, effectiveEssayId, chatMessages);
+                if (chatSaveResult.success) {
+                  console.log(`✅ Chat messages saved (${chatMessages.length} messages)`);
+                } else {
+                  console.warn('⚠️  Failed to save chat:', chatSaveResult.error);
+                }
+              }
+            }
+            
+            setHasUnsavedChanges(false);
+            setLastSaveTime(new Date());
+            
           } else {
-            console.warn('⚠️  No Clerk token available - skipping analysis auto-save');
+            console.warn('⚠️  No Clerk token available - skipping auto-save');
           }
         } catch (error) {
-          console.error('❌ Error getting Clerk token:', error);
+          console.error('❌ Error during auto-save:', error);
         }
-      } else if (userId) {
-        console.log('📝 Essay not saved yet - skipping analysis auto-save');
-        // Analysis will be saved next time user saves the essay
       }
 
       // Call separate narrative overview endpoint (non-blocking)
@@ -460,7 +513,7 @@ export default function PIQWorkshop() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [currentDraft, selectedPromptId, userId, currentEssayId]);
+  }, [currentDraft, selectedPromptId, userId, currentEssayId, chatMessages]);
 
   // NO auto-analysis - wait for user to click "Analyze" button
 
@@ -632,6 +685,28 @@ export default function PIQWorkshop() {
 
               setDimensions(transformedDimensions);
             }
+          }
+
+          // Load version history from database
+          console.log('📥 Loading version history...');
+          const versionResult = await getVersionHistory(token, userId, essay.id);
+          if (versionResult.success && versionResult.versions && versionResult.versions.length > 0) {
+            // Transform database versions to UI format
+            const loadedVersions: DraftVersion[] = versionResult.versions.map(v => ({
+              text: v.draft_content,
+              timestamp: new Date(v.created_at).getTime(),
+              score: v.score, // May be undefined for 'save_draft' versions
+              // Map source to our simplified types (analyze or save_draft)
+              source: (v.source === 'analyze' || v.source === 'save_draft') 
+                ? v.source 
+                : (v.score !== undefined ? 'analyze' : 'save_draft')
+            }));
+            setDraftVersions(loadedVersions);
+            setCurrentVersionIndex(loadedVersions.length - 1);
+            console.log(`✅ Loaded ${loadedVersions.length} versions from history`);
+          } else {
+            // No version history - use current essay as single version
+            console.log('📭 No version history found, using current essay');
           }
 
           // Load chat messages for this essay
@@ -861,19 +936,31 @@ export default function PIQWorkshop() {
         }
       }
 
+      // Save version to history (source='save_draft' - no analysis)
+      if (essayId) {
+        console.log('📤 Saving version to history (draft only)...');
+        const versionResult = await saveVersionToHistory(
+          token,
+          userId,
+          essayId,
+          currentDraft,
+          'save_draft'
+        );
+        if (versionResult.success) {
+          console.log(`✅ Version ${versionResult.versionNumber} saved to history (not reanalyzed)`);
+        } else {
+          console.warn('⚠️  Failed to save version:', versionResult.error);
+        }
+      }
+
       setSaveStatus('saved');
       setLastSaveTime(new Date());
       setHasUnsavedChanges(false);
 
-      console.log('✅ Save complete');
+      console.log('✅ Save complete (draft only - no analysis triggered)');
 
-      // 3. Re-analyze if needed, passing essayId to fix race condition
-      if (needsReanalysis && essayId) {
-        console.log('🔄 Triggering re-analysis after save...');
-        // Pass essayId directly to performFullAnalysis to avoid race condition
-        // where currentEssayId state hasn't updated yet
-        await performFullAnalysis(essayId);
-      }
+      // NOTE: Save Draft does NOT trigger re-analysis
+      // User must click "Analyze" button to run analysis
 
     } catch (error) {
       console.error('❌ Unexpected error during save:', error);
@@ -887,8 +974,6 @@ export default function PIQWorkshop() {
     selectedPromptId,
     userId,
     analysisResult,
-    needsReanalysis,
-    performFullAnalysis,
     chatMessages
   ]);
 
@@ -1629,6 +1714,7 @@ export default function PIQWorkshop() {
             description: v.text,
             timestamp: v.timestamp,
             score: v.score,
+            source: v.source,
             categories: []
           }))}
           currentVersionId={`v${currentVersionIndex}`}

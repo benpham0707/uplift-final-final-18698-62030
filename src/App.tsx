@@ -26,6 +26,7 @@ import Pricing from "./pages/Pricing";
 import PIQWorkshop from "./pages/PIQWorkshop";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/piq-workshop/:piqNumber" element={<RequireVerified><PIQWorkshop /></RequireVerified>} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/settings" element={<RequireVerified><Settings /></RequireVerified>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

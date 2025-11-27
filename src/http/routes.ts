@@ -16,6 +16,7 @@ r.post("/webhooks/clerk", handleClerkWebhook);
 r.post("/billing/checkout", requireAuth, Billing.createCheckoutSession);
 r.post("/billing/webhook", Billing.handleWebhook);
 r.post("/billing/verify-session", requireAuth, Billing.verifySession);
+r.post("/billing/portal", requireAuth, Billing.createPortalSession);
 
 r.post("/assessment/complete", requireAuth, completeAssessment);
 r.post("/personal/complete", requireAuth, completePersonal);

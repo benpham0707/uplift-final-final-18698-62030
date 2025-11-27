@@ -262,6 +262,43 @@ export const verifySession = async (req: Request, res: Response) => {
     }
 }
 
+export const createPortalSession = async (req: Request, res: Response) => {
+    try {
+        if (!isStripeConfigured) {
+            return res.status(503).json({ error: 'Billing not configured' });
+        }
+
+        const userId = (req as any).auth?.userId;
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const { returnUrl } = req.body;
+
+        // Get customer ID from profile
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('stripe_customer_id')
+            .eq('user_id', userId)
+            .single();
+
+        if (!profile?.stripe_customer_id) {
+            return res.status(400).json({ error: 'No billing account found. Please subscribe first.' });
+        }
+
+        // Create Stripe Customer Portal session
+        const session = await stripe.billingPortal.sessions.create({
+            customer: profile.stripe_customer_id,
+            return_url: returnUrl || `${req.headers.origin}/settings`,
+        });
+
+        res.json({ url: session.url });
+    } catch (error: any) {
+        console.error('Error creating portal session:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 async function processCheckoutSession(session: any) {
     const userId = session.metadata?.userId;
     const type = session.metadata?.type;

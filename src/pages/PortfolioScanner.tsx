@@ -1358,7 +1358,7 @@ const PortfolioScanner = () => {
           </div>
         )}
         <PortfolioPathway 
-          onProgressUpdate={isPreviewMode ? undefined : setOverallProgress}
+          onProgressUpdate={isPreviewMode ? () => {} : setOverallProgress}
           currentProgress={overallProgress}
         />
         {/* Hide dock in preview mode since navigation won't work */}

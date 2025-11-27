@@ -8,13 +8,14 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
+import { supabase, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '@/integrations/supabase/client';
 
 /**
  * Create an authenticated Supabase client using Clerk JWT token
+ * Uses the anon key for API access but overrides the Authorization header with the Clerk JWT
  */
 function getAuthenticatedClient(token: string) {
-  return createClient(SUPABASE_URL, token, {
+  return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
       headers: {
         Authorization: `Bearer ${token}`,

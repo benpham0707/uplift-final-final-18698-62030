@@ -88,7 +88,7 @@ interface ContextualWorkshopChatProps {
 
   // External message management (optional - for database persistence)
   externalMessages?: ChatMessage[];
-  onMessagesChange?: (messages: ChatMessage[]) => void;
+  onMessagesChange?: (messages: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => void;
 
   // Version history (for chat context)
   versionHistory?: Array<{ timestamp: number; nqi: number; note?: string }>;
@@ -136,19 +136,12 @@ export default function ContextualWorkshopChat({
   
   // Helper to update messages (handles both internal and external state)
   const updateMessages = (newMessages: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
-    if (typeof newMessages === 'function') {
-      const computed = newMessages(chatMessages);
-      if (onMessagesChange) {
-        onMessagesChange(computed);
-      } else {
-        setInternalMessages(computed);
-      }
+    if (onMessagesChange) {
+      // Pass the function or value directly to the parent setter
+      // This ensures we always work with the latest state in async flows
+      onMessagesChange(newMessages);
     } else {
-      if (onMessagesChange) {
-        onMessagesChange(newMessages);
-      } else {
-        setInternalMessages(newMessages);
-      }
+      setInternalMessages(newMessages);
     }
   };
 

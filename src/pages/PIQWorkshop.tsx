@@ -1329,9 +1329,9 @@ export default function PIQWorkshop() {
       <div className="hero-gradient hero-gradient-fade absolute top-0 left-0 right-0 h-[120vh] pointer-events-none -z-10" />
 
       {/* Sticky PIQ header */}
-      <div className="sticky top-[72px] z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
+      <div className="sticky top-16 z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
         {/* Main header row */}
-        <div className="mx-auto px-4 py-4 flex items-center justify-center gap-4">
+        <div className="mx-auto px-4 py-2 flex items-center justify-center gap-4">
           {/* Center: PIQ Carousel Navigation - static positioning */}
           <div className="flex-1 flex justify-center">
             <PIQCarouselNav
@@ -1390,7 +1390,7 @@ export default function PIQWorkshop() {
         <div className="space-y-6">
           <div className="flex flex-col md:flex-row gap-6 items-start">
             {/* Narrative Quality Index Card - Professional Data-Dense Design */}
-            <Card className="flex-1 p-5">
+            <Card className={`flex-1 p-5 ${!isAnalyzing && !hasAnalysis ? 'hidden' : ''}`}>
               {isAnalyzing ? (
                 /* ENHANCED LOADING STATE */
                 <div className="flex flex-col items-center justify-center py-12 space-y-6 text-center">
@@ -1420,17 +1420,7 @@ export default function PIQWorkshop() {
                     This will finish in 2-3 minutes...
                   </div>
                 </div>
-              ) : !hasAnalysis ? (
-                /* Empty State - Minimal placeholder */
-                <div className="text-center py-6">
-                  <p className="text-muted-foreground text-sm">
-                    {isLoadingFromDatabase 
-                      ? 'Loading your saved essay...'
-                      : 'Click "Analyze" in the editor to see your 11-dimension analysis here.'
-                    }
-                  </p>
-                </div>
-              ) : (
+              ) : hasAnalysis ? (
               /* Analysis Results */
               <>
               {/* Header with Score & Actions */}
@@ -1648,7 +1638,7 @@ export default function PIQWorkshop() {
                 </div>
               </div>
               </>
-              )}
+              ) : null}
             </Card>
           </div>
         </div>
@@ -1707,9 +1697,18 @@ export default function PIQWorkshop() {
                     </div>
                   ) : null)
                 ) : (
-                  <div className="text-center p-8 text-muted-foreground">
-                    No analysis data yet. Click "Analyze" to get started.
-                  </div>
+                  <Card className="p-8 border-dashed border-2 flex flex-col items-center justify-center text-center bg-muted/10">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <Target className="w-6 h-6 text-primary/60" />
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2">Analysis Rubric</h3>
+                    <p className="text-muted-foreground text-sm max-w-[250px] mx-auto">
+                      {isLoadingFromDatabase 
+                        ? 'Loading your saved essay...'
+                        : 'Click "Analyze" in the editor to see your 11-dimension analysis here.'
+                      }
+                    </p>
+                  </Card>
                 )}
               </div>
             </div>

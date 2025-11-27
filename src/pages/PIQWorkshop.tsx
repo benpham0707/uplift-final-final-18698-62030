@@ -1385,7 +1385,7 @@ export default function PIQWorkshop() {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 mx-auto px-4 py-12 space-y-6">
+      <div className="relative z-10 mx-auto px-4 py-4 space-y-6">
         {/* Hero section */}
         <div className="space-y-6">
           <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -1674,12 +1674,12 @@ export default function PIQWorkshop() {
             {/* Rubric dimensions */}
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/10 dark:bg-blue-400/10 ring-1 ring-blue-500/20">
-                  <Target className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 rounded-lg bg-purple-500/10 dark:bg-purple-400/10 ring-1 ring-purple-500/20">
+                  <Target className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <GradientText
                   className="text-2xl font-bold"
-                  colors={["#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#2563eb"]}
+                  colors={["#9333ea", "#a855f7", "#c084fc", "#e9d5ff", "#9333ea"]}
                   animationSpeed={8}
                 >
                   11-Dimension Analysis
@@ -1722,7 +1722,7 @@ export default function PIQWorkshop() {
           {/* Right column: PIQ Prompt Selector + Chat */}
           <div className="space-y-6">
             {/* Chat */}
-            <Card className="sticky top-44 p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
+            <Card className="sticky top-36 p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
               <ContextualWorkshopChat
                 mode="piq"
                 piqPromptId={selectedPromptId}

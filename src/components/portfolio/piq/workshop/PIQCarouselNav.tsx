@@ -108,15 +108,15 @@ export const PIQCarouselNav: React.FC<PIQCarouselNavProps> = ({
           {/* Dropdown trigger with gradient text */}
           <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group">
+              <button className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group whitespace-nowrap">
                 <GradientText 
                   colors={["#a855f7", "#8b5cf6", "#c084fc", "#a78bfa", "#a855f7"]}
-                  className="text-xl font-bold"
+                  className="text-lg font-bold whitespace-nowrap"
                 >
                   PIQ #{currentIndex + 1}: {currentPrompt?.title || 'Leadership experience'}
                 </GradientText>
                 <ChevronDown className={cn(
-                  "w-4 h-4 text-purple-500 transition-transform duration-200",
+                  "w-4 h-4 text-purple-500 transition-transform duration-200 flex-shrink-0",
                   isOpen && "rotate-180"
                 )} />
               </button>

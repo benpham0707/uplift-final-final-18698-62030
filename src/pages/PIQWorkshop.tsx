@@ -1066,9 +1066,9 @@ export default function PIQWorkshop() {
       <div className="hero-gradient hero-gradient-fade absolute top-0 left-0 right-0 h-[120vh] pointer-events-none -z-10" />
 
       {/* Sticky PIQ header */}
-      <div className="sticky top-[68px] z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
+      <div className="sticky top-[72px] z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
         {/* Main header row */}
-        <div className="mx-auto px-4 py-3 flex items-center justify-between gap-4 relative">
+        <div className="mx-auto px-4 py-4 flex items-center justify-between gap-4 relative">
           {/* Left: Back button */}
           <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-2">
             <ArrowLeft className="w-4 h-4" />

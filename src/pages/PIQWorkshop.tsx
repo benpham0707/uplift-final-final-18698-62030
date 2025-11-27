@@ -68,6 +68,10 @@ import { useClerkUserId, useIsAuthenticated } from '@/services/auth/clerkSupabas
 // Navigation
 import Navigation from '@/components/Navigation';
 
+// Credits System
+import { canAnalyzeEssay, deductForEssayAnalysis, CREDIT_COSTS } from '@/services/credits';
+import { InsufficientCreditsModal } from '@/components/credits';
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -144,6 +148,10 @@ export default function PIQWorkshop() {
   // Chat state (for persistence)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
+  // Credits modal state
+  const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
+  const [currentCreditBalance, setCurrentCreditBalance] = useState(0);
+
   // Caching & Save State
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -190,6 +198,19 @@ export default function PIQWorkshop() {
     if (!selectedPromptId) {
       console.warn('No prompt selected - cannot analyze');
       return;
+    }
+
+    // Credit check: Require 5 credits for essay analysis
+    if (userId) {
+      const creditCheck = await canAnalyzeEssay(userId);
+      console.log(`💳 Credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
+      
+      if (!creditCheck.hasEnough) {
+        console.warn(`❌ Insufficient credits: ${creditCheck.currentBalance}/${creditCheck.required}`);
+        setCurrentCreditBalance(creditCheck.currentBalance);
+        setShowInsufficientCreditsModal(true);
+        return;
+      }
     }
 
     setIsAnalyzing(true);
@@ -341,6 +362,17 @@ export default function PIQWorkshop() {
         // Cache the result
         cacheAnalysisResult(currentDraft, selectedPromptId, result);
         console.log('✅ Analysis result cached for future use');
+
+        // Deduct credits for non-cached analysis
+        if (userId) {
+          const selectedPromptForDeduction = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+          const deductResult = await deductForEssayAnalysis(userId, selectedPromptForDeduction?.title);
+          if (deductResult.success) {
+            console.log(`💳 Deducted ${CREDIT_COSTS.ESSAY_ANALYSIS} credits. New balance: ${deductResult.newBalance}`);
+          } else {
+            console.warn('⚠️ Failed to deduct credits:', deductResult.error);
+          }
+        }
       }
 
       console.log('📊 Backend result received - FULL OBJECT:');
@@ -1636,6 +1668,7 @@ export default function PIQWorkshop() {
                 onRedo={handleRedo}
                 onShowHistory={() => setShowVersionHistory(true)}
                 hasUnsavedChanges={hasUnsavedChanges}
+                analysisCreditCost={CREDIT_COSTS.ESSAY_ANALYSIS}
               />
             </Card>
 
@@ -1700,6 +1733,7 @@ export default function PIQWorkshop() {
                   nqi: v.score,
                   note: idx === currentVersionIndex ? 'Current version' : undefined
                 }))}
+                userId={userId}
               />
             </Card>
           </div>
@@ -1722,6 +1756,15 @@ export default function PIQWorkshop() {
           onClose={() => setShowVersionHistory(false)}
         />
       )}
+
+      {/* Insufficient Credits Modal */}
+      <InsufficientCreditsModal
+        isOpen={showInsufficientCreditsModal}
+        onClose={() => setShowInsufficientCreditsModal(false)}
+        currentBalance={currentCreditBalance}
+        requiredCredits={CREDIT_COSTS.ESSAY_ANALYSIS}
+        actionType="analysis"
+      />
     </div>
   );
 }

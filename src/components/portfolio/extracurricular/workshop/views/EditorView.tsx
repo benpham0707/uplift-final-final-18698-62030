@@ -27,9 +27,11 @@ import {
   Clock,
   Sparkles,
   FileEdit,
+  Zap,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import GradientText from '@/components/ui/GradientText';
+import GradientZap from '@/components/ui/GradientZap';
 import type { TeachingIssue } from '../teachingTypes';
 
 interface EditorViewProps {
@@ -51,6 +53,7 @@ interface EditorViewProps {
   canRedo?: boolean;
   onShowHistory?: () => void;
   hasUnsavedChanges?: boolean; // Whether there are unsaved changes (controlled by parent)
+  analysisCreditCost?: number; // Credit cost for analysis (optional, shows badge if provided)
 }
 
 export const EditorView: React.FC<EditorViewProps> = ({
@@ -72,6 +75,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   canRedo = false,
   onShowHistory,
   hasUnsavedChanges = false,
+  analysisCreditCost,
 }) => {
   const [localDraft, setLocalDraft] = useState(currentDraft);
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
@@ -206,22 +210,38 @@ export const EditorView: React.FC<EditorViewProps> = ({
                             size="sm" 
                             onClick={onRequestReanalysis}
                             disabled={!canAnalyze}
+                            className="gap-1.5"
                           >
-                            <Sparkles className="w-3 h-3 mr-1" />
+                            <Sparkles className="w-3 h-3" />
                             {hasAnalysisResult ? 'Re-analyze' : 'Analyze'}
+                            {analysisCreditCost && (
+                              <Badge 
+                                variant="secondary" 
+                                className="ml-1 px-1.5 py-0 text-[10px] font-medium bg-primary/10 text-primary border-primary/20"
+                              >
+                                <Zap className="w-2.5 h-2.5 mr-0.5" />
+                                {analysisCreditCost}
+                              </Badge>
+                            )}
                           </Button>
                         </span>
                       </TooltipTrigger>
-                      {!canAnalyze && (
-                        <TooltipContent>
+                      <TooltipContent>
+                        {!canAnalyze ? (
+                          <>
+                            <p className="text-xs">
+                              {localDraft.trim().length} / {minCharacters} characters
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Write {minCharacters - localDraft.trim().length} more to analyze
+                            </p>
+                          </>
+                        ) : analysisCreditCost ? (
                           <p className="text-xs">
-                            {localDraft.trim().length} / {minCharacters} characters
+                            Uses {analysisCreditCost} credits for full essay analysis
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            Write {minCharacters - localDraft.trim().length} more to analyze
-                          </p>
-                        </TooltipContent>
-                      )}
+                        ) : null}
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}

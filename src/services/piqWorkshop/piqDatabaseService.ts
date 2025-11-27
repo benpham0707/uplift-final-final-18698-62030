@@ -109,11 +109,24 @@ function normalizePromptId(promptId?: string, promptText?: string): string {
 }
 
 /**
+ * Convert score to impression label enum value
+ */
+function getImpressionLabel(score: number): string {
+  if (score >= 90) return 'arresting_deeply_human';
+  if (score >= 80) return 'compelling_clear_voice';
+  if (score >= 70) return 'competent_needs_texture';
+  if (score >= 60) return 'readable_but_generic';
+  return 'template_like_rebuild';
+}
+
+/**
  * Convert AnalysisResult to database format
  */
 function analysisResultToDatabaseFormat(analysisResult: AnalysisResult) {
+  const score = analysisResult.analysis?.narrative_quality_index || 0;
   return {
-    essay_quality_index: analysisResult.analysis?.narrative_quality_index || 0,
+    essay_quality_index: score,
+    impression_label: getImpressionLabel(score),
     rubric_version: 'v1.0.0',
     analysis_depth: 'comprehensive' as const,
     dimension_scores: analysisResult.rubricDimensionDetails || [],
@@ -544,6 +557,173 @@ export async function getCurrentEssayId(
 }
 
 // =============================================================================
+// CHAT MESSAGE FUNCTIONS
+// =============================================================================
+
+export interface ChatMessageDB {
+  id: string;
+  essay_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  message_timestamp: number;
+  created_at: string;
+}
+
+export interface SaveChatMessagesResult {
+  success: boolean;
+  error?: string;
+}
+
+export interface LoadChatMessagesResult {
+  success: boolean;
+  messages?: ChatMessageDB[];
+  error?: string;
+}
+
+/**
+ * Save chat messages to database
+ * This saves all messages in a batch (replaces existing messages for the essay)
+ */
+export async function saveChatMessages(
+  clerkToken: string,
+  userId: string,
+  essayId: string,
+  messages: Array<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: number }>
+): Promise<SaveChatMessagesResult> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    // Verify user owns this essay
+    const { data: essay, error: essayError } = await supabase
+      .from('essays')
+      .select('id')
+      .eq('id', essayId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (essayError || !essay) {
+      return { success: false, error: essayError?.message || 'Essay not found or access denied' };
+    }
+
+    // Delete existing messages for this essay
+    const { error: deleteError } = await supabase
+      .from('essay_chat_messages')
+      .delete()
+      .eq('essay_id', essayId);
+
+    if (deleteError) {
+      console.error('Error deleting old chat messages:', deleteError);
+      // Continue anyway - we'll try to insert new ones
+    }
+
+    // Insert new messages
+    if (messages.length > 0) {
+      const messagesToInsert = messages.map(msg => ({
+        essay_id: essayId,
+        role: msg.role,
+        content: msg.content,
+        message_timestamp: msg.timestamp
+      }));
+
+      const { error: insertError } = await supabase
+        .from('essay_chat_messages')
+        .insert(messagesToInsert);
+
+      if (insertError) {
+        console.error('Error inserting chat messages:', insertError);
+        return { success: false, error: insertError.message };
+      }
+    }
+
+    console.log(`✅ Saved ${messages.length} chat messages for essay ${essayId}`);
+    return { success: true };
+
+  } catch (error) {
+    console.error('Unexpected error in saveChatMessages:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
+ * Load chat messages from database
+ */
+export async function loadChatMessages(
+  clerkToken: string,
+  userId: string,
+  essayId: string
+): Promise<LoadChatMessagesResult> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    const { data: messages, error } = await supabase
+      .from('essay_chat_messages')
+      .select('*')
+      .eq('essay_id', essayId)
+      .order('message_timestamp', { ascending: true });
+
+    if (error) {
+      console.error('Error loading chat messages:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log(`✅ Loaded ${messages?.length || 0} chat messages for essay ${essayId}`);
+    return { success: true, messages: messages as ChatMessageDB[] };
+
+  } catch (error) {
+    console.error('Unexpected error in loadChatMessages:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
+ * Clear all chat messages for an essay
+ */
+export async function clearChatMessages(
+  clerkToken: string,
+  userId: string,
+  essayId: string
+): Promise<SaveChatMessagesResult> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    const { error } = await supabase
+      .from('essay_chat_messages')
+      .delete()
+      .eq('essay_id', essayId);
+
+    if (error) {
+      console.error('Error clearing chat messages:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log(`✅ Cleared chat messages for essay ${essayId}`);
+    return { success: true };
+
+  } catch (error) {
+    console.error('Unexpected error in clearChatMessages:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+// =============================================================================
 // EXPORT ALL FUNCTIONS
 // =============================================================================
 
@@ -553,5 +733,8 @@ export default {
   loadPIQEssay,
   getVersionHistory,
   deleteVersion,
-  getCurrentEssayId
+  getCurrentEssayId,
+  saveChatMessages,
+  loadChatMessages,
+  clearChatMessages
 };

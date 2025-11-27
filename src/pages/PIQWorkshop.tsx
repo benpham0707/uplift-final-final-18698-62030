@@ -52,8 +52,13 @@ import {
   saveAnalysisReport,
   loadPIQEssay,
   getVersionHistory,
-  getCurrentEssayId
+  getCurrentEssayId,
+  saveChatMessages,
+  loadChatMessages
 } from '@/services/piqWorkshop/piqDatabaseService';
+
+// Chat message type
+import type { ChatMessage } from '@/services/workshop/chatService';
 
 // Authentication
 import { useAuth } from '@clerk/clerk-react';
@@ -129,6 +134,9 @@ export default function PIQWorkshop() {
   const [narrativeOverview, setNarrativeOverview] = useState<string | null>(null);
   const [loadingOverview, setLoadingOverview] = useState(false);
 
+  // Chat state (for persistence)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+
   // Caching & Save State
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -160,10 +168,11 @@ export default function PIQWorkshop() {
   // REAL BACKEND ANALYSIS - Full Surgical Workshop
   // ============================================================================
 
-  const performFullAnalysis = useCallback(async () => {
+  const performFullAnalysis = useCallback(async (overrideEssayId?: string) => {
     console.log('🔍 performFullAnalysis called');
     console.log('   Current draft length:', currentDraft.length);
     console.log('   Selected prompt:', selectedPromptId);
+    console.log('   Override essay ID:', overrideEssayId || 'none');
     
     // Guard: Prevent analyzing empty or too-short essays
     if (currentDraft.trim().length < MIN_ESSAY_LENGTH) {
@@ -286,12 +295,15 @@ export default function PIQWorkshop() {
       console.log('✅ Analysis complete - UI updated');
 
       // AUTO-SAVE analysis result to database (NEW)
-      if (userId && currentEssayId) {
+      // Use overrideEssayId if provided (fixes race condition when called from handleSave)
+      const effectiveEssayId = overrideEssayId || currentEssayId;
+      if (userId && effectiveEssayId) {
         console.log('📤 Auto-saving analysis result to database...');
+        console.log('   Using essay ID:', effectiveEssayId);
         try {
           const token = await getToken({ template: 'supabase' });
           if (token) {
-            const saveResult = await saveAnalysisReport(token, userId, currentEssayId, result);
+            const saveResult = await saveAnalysisReport(token, userId, effectiveEssayId, result);
             if (saveResult.success) {
               console.log('✅ Analysis auto-saved to database:', saveResult.reportId);
             } else {
@@ -398,6 +410,7 @@ export default function PIQWorkshop() {
       setNeedsReanalysis(false);
       setHasUnsavedChanges(false);
       setNarrativeOverview(null);
+      setChatMessages([]); // Reset chat when switching PIQs
 
       setIsLoadingFromDatabase(true);
       console.log(`📥 Loading essay from database for prompt: ${selectedPromptId}`);
@@ -493,6 +506,22 @@ export default function PIQWorkshop() {
 
               setDimensions(transformedDimensions);
             }
+          }
+
+          // Load chat messages for this essay
+          console.log('📥 Loading chat messages...');
+          const chatResult = await loadChatMessages(token, userId, essay.id);
+          if (chatResult.success && chatResult.messages && chatResult.messages.length > 0) {
+            const loadedMessages: ChatMessage[] = chatResult.messages.map(msg => ({
+              id: msg.id,
+              role: msg.role,
+              content: msg.content,
+              timestamp: msg.message_timestamp
+            }));
+            setChatMessages(loadedMessages);
+            console.log(`✅ Loaded ${loadedMessages.length} chat messages`);
+          } else {
+            console.log('📭 No chat messages found for this essay');
           }
 
           setLastSaveTime(new Date(essay.updated_at));
@@ -693,22 +722,37 @@ export default function PIQWorkshop() {
         }
       }
 
+      // Save chat messages if present
+      if (chatMessages.length > 0 && essayId) {
+        console.log('📤 Saving chat messages to database...');
+        const chatSaveResult = await saveChatMessages(token, userId, essayId, chatMessages);
+
+        if (!chatSaveResult.success) {
+          console.warn('⚠️  Failed to save chat messages:', chatSaveResult.error);
+          // Non-blocking - chat can be regenerated
+        } else {
+          console.log(`✅ Chat messages saved (${chatMessages.length} messages)`);
+        }
+      }
+
       setSaveStatus('saved');
       setLastSaveTime(new Date());
       setHasUnsavedChanges(false);
 
       console.log('✅ Save complete');
 
+      // 3. Re-analyze if needed, passing essayId to fix race condition
+      if (needsReanalysis && essayId) {
+        console.log('🔄 Triggering re-analysis after save...');
+        // Pass essayId directly to performFullAnalysis to avoid race condition
+        // where currentEssayId state hasn't updated yet
+        await performFullAnalysis(essayId);
+      }
+
     } catch (error) {
       console.error('❌ Unexpected error during save:', error);
       setSaveStatus('error');
       setLastSaveError((error as Error).message);
-    }
-
-    // 3. Re-analyze if needed (but don't trigger auto-save during analysis)
-    if (needsReanalysis) {
-      console.log('🔄 Triggering re-analysis after save...');
-      await performFullAnalysis();
     }
   }, [
     currentDraft,
@@ -718,7 +762,8 @@ export default function PIQWorkshop() {
     userId,
     analysisResult,
     needsReanalysis,
-    performFullAnalysis
+    performFullAnalysis,
+    chatMessages
   ]);
 
   const handleUndo = useCallback(() => {
@@ -1451,6 +1496,8 @@ export default function PIQWorkshop() {
                 reflectionPromptsMap={new Map()}
                 reflectionAnswers={{}}
                 onTriggerReanalysis={handleRequestReanalysis}
+                externalMessages={chatMessages}
+                onMessagesChange={setChatMessages}
               />
             </Card>
           </div>

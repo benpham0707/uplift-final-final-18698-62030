@@ -81,6 +81,10 @@ interface ContextualWorkshopChatProps {
   onToggleCategory?: (categoryKey: string) => void;
   onLoadReflectionPrompts?: (issueId: string) => void;
   onTriggerReanalysis?: () => void;
+
+  // External message management (optional - for database persistence)
+  externalMessages?: ChatMessage[];
+  onMessagesChange?: (messages: ChatMessage[]) => void;
 }
 
 // ============================================================================
@@ -105,12 +109,35 @@ export default function ContextualWorkshopChat({
   onToggleCategory,
   onLoadReflectionPrompts,
   onTriggerReanalysis,
+  externalMessages,
+  onMessagesChange,
 }: ContextualWorkshopChatProps) {
   // ============================================================================
   // STATE
   // ============================================================================
 
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  // Use external messages if provided, otherwise use internal state
+  const [internalMessages, setInternalMessages] = useState<ChatMessage[]>([]);
+  const chatMessages = externalMessages ?? internalMessages;
+  
+  // Helper to update messages (handles both internal and external state)
+  const updateMessages = (newMessages: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
+    if (typeof newMessages === 'function') {
+      const computed = newMessages(chatMessages);
+      if (onMessagesChange) {
+        onMessagesChange(computed);
+      } else {
+        setInternalMessages(computed);
+      }
+    } else {
+      if (onMessagesChange) {
+        onMessagesChange(newMessages);
+      } else {
+        setInternalMessages(newMessages);
+      }
+    }
+  };
+
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<ChatRecommendation[]>([]);
@@ -126,30 +153,52 @@ export default function ContextualWorkshopChat({
   // ============================================================================
 
   // Load cached conversation or create welcome message
+  // Skip if external messages are provided (parent manages state)
   useEffect(() => {
+    // If external messages are provided, don't load from cache
+    if (externalMessages !== undefined) return;
+
     const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity?.id;
     if (!cacheKey) return; // Skip if no valid cache key
     
     const cached = mode === 'piq' ? getPIQCachedConversation(cacheKey) : getCachedConversation(cacheKey);
 
     if (cached && cached.length > 0) {
-      setChatMessages(cached);
+      updateMessages(cached);
     } else if (analysisResult) {
       // Create welcome message once analysis is ready
       if (mode === 'piq' && piqPromptId && piqPromptText && piqPromptTitle) {
         const context = buildPIQContextObject();
         const welcome = createPIQWelcomeMessage(context);
-        setChatMessages([welcome]);
+        updateMessages([welcome]);
       } else if (activity) {
         const context = buildContextObject();
         const welcome = createWelcomeMessage(context);
-        setChatMessages([welcome]);
+        updateMessages([welcome]);
       }
     }
-  }, [activity?.id, analysisResult, mode, piqPromptId]);
+  }, [activity?.id, analysisResult, mode, piqPromptId, externalMessages]);
 
-  // Cache conversation on changes
+  // Create welcome message when external messages are empty but analysis is ready
   useEffect(() => {
+    if (externalMessages !== undefined && externalMessages.length === 0 && analysisResult) {
+      if (mode === 'piq' && piqPromptId && piqPromptText && piqPromptTitle) {
+        const context = buildPIQContextObject();
+        const welcome = createPIQWelcomeMessage(context);
+        updateMessages([welcome]);
+      } else if (activity) {
+        const context = buildContextObject();
+        const welcome = createWelcomeMessage(context);
+        updateMessages([welcome]);
+      }
+    }
+  }, [externalMessages, analysisResult, mode, piqPromptId]);
+
+  // Cache conversation on changes (only if using internal state)
+  useEffect(() => {
+    // Skip caching if external messages are provided (parent handles persistence)
+    if (externalMessages !== undefined) return;
+
     if (chatMessages.length > 0) {
       const cacheKey = mode === 'piq' && piqPromptId ? piqPromptId : activity?.id;
       if (!cacheKey) return; // Skip if no valid cache key
@@ -160,7 +209,7 @@ export default function ContextualWorkshopChat({
         cacheConversation(cacheKey, chatMessages);
       }
     }
-  }, [chatMessages, activity?.id, mode, piqPromptId]);
+  }, [chatMessages, activity?.id, mode, piqPromptId, externalMessages]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -231,7 +280,7 @@ export default function ContextualWorkshopChat({
     };
 
     // Add user message immediately
-    setChatMessages((prev) => [...prev, userMessage]);
+    updateMessages((prev) => [...prev, userMessage]);
     setUserInput('');
     setIsLoading(true);
 
@@ -247,7 +296,7 @@ export default function ContextualWorkshopChat({
         });
 
         // Add assistant message
-        setChatMessages((prev) => [...prev, response.message]);
+        updateMessages((prev) => [...prev, response.message]);
       } else {
         // Extracurricular mode
         const context = buildContextObject();
@@ -263,7 +312,7 @@ export default function ContextualWorkshopChat({
         });
 
         // Add assistant message
-        setChatMessages((prev) => [...prev, response.message]);
+        updateMessages((prev) => [...prev, response.message]);
 
         // Update recommendations (extracurricular only)
         if (response.recommendations && response.recommendations.length > 0) {
@@ -285,7 +334,7 @@ export default function ContextualWorkshopChat({
         timestamp: Date.now(),
       };
 
-      setChatMessages((prev) => [...prev, errorMessage]);
+      updateMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }

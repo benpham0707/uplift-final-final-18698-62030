@@ -85,6 +85,9 @@ interface ContextualWorkshopChatProps {
   // External message management (optional - for database persistence)
   externalMessages?: ChatMessage[];
   onMessagesChange?: (messages: ChatMessage[]) => void;
+
+  // Version history (for chat context)
+  versionHistory?: Array<{ timestamp: number; nqi: number; note?: string }>;
 }
 
 // ============================================================================
@@ -111,6 +114,7 @@ export default function ContextualWorkshopChat({
   onTriggerReanalysis,
   externalMessages,
   onMessagesChange,
+  versionHistory,
 }: ContextualWorkshopChatProps) {
   // ============================================================================
   // STATE
@@ -258,7 +262,7 @@ export default function ContextualWorkshopChat({
         initialScore,
         hasUnsavedChanges,
         needsReanalysis,
-        versionHistory: [], // PIQWorkshop should pass this
+        versionHistory: versionHistory || [], // Use passed version history or empty array
       }
     );
   };

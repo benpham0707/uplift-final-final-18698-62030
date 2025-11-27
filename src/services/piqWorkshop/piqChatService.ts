@@ -12,7 +12,7 @@
  * referencing voice fingerprints and quality anchors in every coaching response.
  */
 
-import { callClaude } from '@/lib/llm/claude';
+import { callPIQChatAPI } from './piqChatApiClient';
 import { PIQChatContext, formatPIQContextForLLM } from './piqChatContext';
 
 // ============================================================================
@@ -443,66 +443,48 @@ export async function sendPIQChatMessage(request: ChatRequest): Promise<ChatResp
   console.log(`User Message: "${userMessage.substring(0, 100)}${userMessage.length > 100 ? '...' : ''}"`);
   console.log(`${'='.repeat(80)}\n`);
 
-  // Format context for LLM
-  const contextBlock = formatPIQContextForLLM(context);
-
-  // Build conversation history
-  const conversationContext = buildConversationContext(conversationHistory);
-
-  // Build full user prompt
-  const fullUserPrompt = buildUserPrompt(userMessage, contextBlock, conversationContext);
-
-  // Call Claude
-  console.log('Calling Claude with PIQ context...');
-  const startTime = Date.now();
-
-  let response;
   try {
-    response = await callClaude(
-      fullUserPrompt,
-      {
-        systemPrompt: SYSTEM_PROMPT,
-        temperature,
+    // Call PIQ Chat API (Supabase edge function)
+    const response = await callPIQChatAPI({
+      userMessage,
+      essayText: context.currentState.draft,
+      promptId: context.piqEssay.promptId,
+      promptText: context.piqEssay.promptText,
+      promptTitle: context.piqEssay.promptTitle,
+      analysisResult: buildAnalysisResultFromContext(context),
+      conversationHistory,
+      options: {
+        currentScore: context.analysis.nqi,
+        initialScore: context.analysis.initialNqi,
+        hasUnsavedChanges: context.currentState.hasUnsavedChanges,
+        needsReanalysis: context.currentState.needsReanalysis,
+        versionHistory: context.history.timeline,
         maxTokens,
-        model: 'claude-sonnet-4-20250514',
-        cacheSystemPrompt: true, // Cache system prompt (saves ~80% tokens)
-      }
-    );
+        temperature,
+      },
+    });
 
-    const duration = Date.now() - startTime;
-    console.log(`✓ Response received (${duration}ms)`);
-    console.log(`  Tokens: ${response.usage.input_tokens} in, ${response.usage.output_tokens} out`);
-    if (response.usage.cache_read_input_tokens) {
-      console.log(`  Cache: ${response.usage.cache_read_input_tokens} tokens read from cache`);
-    }
-    console.log(`  Cost: $${calculateCost(response.usage)}\n`);
+    return response;
   } catch (error) {
-    console.error('❌ Claude API call failed:', error);
+    console.error('❌ PIQ Chat API call failed:', error);
 
     // Return intelligent fallback
-    response = {
+    const fallbackMessage: ChatMessage = {
+      id: `msg-${Date.now()}-fallback`,
+      role: 'assistant',
       content: generateFallbackResponse(userMessage, context),
-      usage: { input_tokens: 0, output_tokens: 0 },
-      stopReason: 'fallback',
+      timestamp: Date.now(),
+    };
+
+    return {
+      message: fallbackMessage,
+      usage: {
+        inputTokens: 0,
+        outputTokens: 0,
+        cost: 0,
+      },
     };
   }
-
-  // Build response message
-  const assistantMessage: ChatMessage = {
-    id: `msg-${Date.now()}`,
-    role: 'assistant',
-    content: response.content as string,
-    timestamp: Date.now(),
-  };
-
-  return {
-    message: assistantMessage,
-    usage: {
-      inputTokens: response.usage.input_tokens,
-      outputTokens: response.usage.output_tokens,
-      cost: calculateCost(response.usage),
-    },
-  };
 }
 
 // ============================================================================
@@ -698,4 +680,42 @@ export function cacheConversation(promptId: string, messages: ChatMessage[]): vo
 
 export function clearCachedConversation(promptId: string): void {
   conversationCache.delete(promptId);
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Build AnalysisResult object from PIQChatContext
+ * (for API call - reverses the context building process)
+ */
+function buildAnalysisResultFromContext(context: PIQChatContext): any {
+  return {
+    nqi: context.analysis.nqi,
+    rubricDimensionDetails: context.analysis.dimensions.map(dim => ({
+      dimension_name: dim.name.toLowerCase().replace(/\s+/g, '_'),
+      final_score: dim.score,
+      evidence: {
+        justification: dim.justification,
+        strengths: dim.strengths,
+        weaknesses: dim.weaknesses,
+      },
+    })),
+    workshopItems: context.analysis.workshopItems.map(item => ({
+      id: item.id,
+      quote: item.quote,
+      problem: item.problem,
+      why_it_matters: item.whyItMatters,
+      severity: item.severity,
+      rubric_category: item.rubricCategory,
+      suggestions: item.suggestions.map(s => ({
+        type: s.type,
+        text: s.text,
+        rationale: s.rationale,
+      })),
+    })),
+    voiceFingerprint: context.voiceFingerprint,
+    experienceFingerprint: context.experienceFingerprint,
+  };
 }

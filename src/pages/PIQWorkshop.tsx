@@ -26,7 +26,7 @@ import ContextualWorkshopChat from '@/components/portfolio/extracurricular/works
 import { DraftVersionHistory } from '@/components/portfolio/extracurricular/workshop/DraftVersionHistory';
 
 // PIQ Prompt Selector
-import { PIQPromptSelector, UC_PIQ_PROMPTS } from '@/components/portfolio/piq/workshop/PIQPromptSelector';
+import { UC_PIQ_PROMPTS } from '@/components/portfolio/piq/workshop/PIQPromptSelector';
 import { PIQCarouselNav } from '@/components/portfolio/piq/workshop/PIQCarouselNav';
 
 // Backend Integration
@@ -1554,20 +1554,6 @@ export default function PIQWorkshop() {
               />
             </Card>
 
-            {/* PIQ Prompt Selector - Moved from right column */}
-            {selectedPromptId && (
-              <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
-                <PIQPromptSelector
-                  selectedPromptId={selectedPromptId}
-                  onPromptSelect={(promptId) => {
-                    setSelectedPromptId(promptId);
-                    setNeedsReanalysis(true);
-                    setHasUnsavedChanges(true);
-                  }}
-                />
-              </Card>
-            )}
-
             {/* Rubric dimensions */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -1624,6 +1610,11 @@ export default function PIQWorkshop() {
                 onTriggerReanalysis={handleRequestReanalysis}
                 externalMessages={chatMessages}
                 onMessagesChange={setChatMessages}
+                versionHistory={draftVersions.map((v, idx) => ({
+                  timestamp: v.timestamp,
+                  nqi: v.score,
+                  note: idx === currentVersionIndex ? 'Current version' : undefined
+                }))}
               />
             </Card>
           </div>

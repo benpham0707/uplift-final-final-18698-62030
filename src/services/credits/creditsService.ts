@@ -7,7 +7,21 @@
  * - Chat message: 1 credit
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { createClient } from '@supabase/supabase-js';
+import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
+
+/**
+ * Create an authenticated Supabase client using Clerk JWT token
+ */
+function getAuthenticatedClient(token: string) {
+  return createClient(SUPABASE_URL, token, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+}
 
 // ============================================================================
 // CONSTANTS
@@ -48,10 +62,14 @@ export interface CreditCheckResult {
 
 /**
  * Get the current credit balance for a user
+ * @param userId - Clerk user ID
+ * @param token - Optional Clerk JWT token for authenticated requests
  */
-export async function getCredits(userId: string): Promise<number> {
+export async function getCredits(userId: string, token?: string): Promise<number> {
   try {
-    const { data, error } = await supabase
+    const client = token ? getAuthenticatedClient(token) : supabase;
+    
+    const { data, error } = await client
       .from('profiles')
       .select('credits')
       .eq('user_id', userId)
@@ -76,12 +94,16 @@ export async function getCredits(userId: string): Promise<number> {
 
 /**
  * Check if user has enough credits for an action
+ * @param userId - Clerk user ID
+ * @param requiredAmount - Number of credits needed
+ * @param token - Optional Clerk JWT token for authenticated requests
  */
 export async function hasEnoughCredits(
   userId: string,
-  requiredAmount: number
+  requiredAmount: number,
+  token?: string
 ): Promise<CreditCheckResult> {
-  const currentBalance = await getCredits(userId);
+  const currentBalance = await getCredits(userId, token);
   const hasEnough = currentBalance >= requiredAmount;
   
   return {
@@ -94,16 +116,20 @@ export async function hasEnoughCredits(
 
 /**
  * Check if user has enough credits for essay analysis (5 credits)
+ * @param userId - Clerk user ID
+ * @param token - Optional Clerk JWT token for authenticated requests
  */
-export async function canAnalyzeEssay(userId: string): Promise<CreditCheckResult> {
-  return hasEnoughCredits(userId, CREDIT_COSTS.ESSAY_ANALYSIS);
+export async function canAnalyzeEssay(userId: string, token?: string): Promise<CreditCheckResult> {
+  return hasEnoughCredits(userId, CREDIT_COSTS.ESSAY_ANALYSIS, token);
 }
 
 /**
  * Check if user has enough credits for chat message (1 credit)
+ * @param userId - Clerk user ID
+ * @param token - Optional Clerk JWT token for authenticated requests
  */
-export async function canSendChatMessage(userId: string): Promise<CreditCheckResult> {
-  return hasEnoughCredits(userId, CREDIT_COSTS.CHAT_MESSAGE);
+export async function canSendChatMessage(userId: string, token?: string): Promise<CreditCheckResult> {
+  return hasEnoughCredits(userId, CREDIT_COSTS.CHAT_MESSAGE, token);
 }
 
 // ============================================================================
@@ -113,16 +139,26 @@ export async function canSendChatMessage(userId: string): Promise<CreditCheckRes
 /**
  * Deduct credits from user's balance and log the transaction
  * Uses atomic update to prevent race conditions
+ * 
+ * @param userId - Clerk user ID
+ * @param amount - Number of credits to deduct
+ * @param type - Type of transaction
+ * @param description - Description for the transaction log
+ * @param token - Clerk JWT token (REQUIRED for authenticated update)
  */
 export async function deductCredits(
   userId: string,
   amount: number,
   type: CreditTransactionType,
-  description: string
+  description: string,
+  token: string
 ): Promise<CreditDeductionResult> {
   try {
+    // Use authenticated client for the update
+    const client = getAuthenticatedClient(token);
+    
     // First, get current balance to check if sufficient
-    const currentBalance = await getCredits(userId);
+    const currentBalance = await getCredits(userId, token);
     
     if (currentBalance < amount) {
       return {
@@ -134,11 +170,12 @@ export async function deductCredits(
 
     const newBalance = currentBalance - amount;
 
-    // Update the credits balance
-    const { error: updateError } = await supabase
+    // Update the credits balance using authenticated client
+    const { error: updateError, count } = await client
       .from('profiles')
       .update({ credits: newBalance })
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .select();
 
     if (updateError) {
       console.error('[Credits] Error updating credits:', updateError);
@@ -150,18 +187,23 @@ export async function deductCredits(
     }
 
     // Log the transaction (negative amount for usage)
-    const { error: transactionError } = await supabase
-      .from('credit_transactions')
-      .insert({
-        user_id: userId,
-        amount: -amount, // Negative because it's a deduction
-        type,
-        description,
-      });
+    // Note: This may fail if credit_transactions table has wrong schema for Clerk
+    try {
+      const { error: transactionError } = await client
+        .from('credit_transactions')
+        .insert({
+          user_id: userId,
+          amount: -amount, // Negative because it's a deduction
+          type,
+          description,
+        });
 
-    if (transactionError) {
-      // Log but don't fail - the deduction succeeded
-      console.warn('[Credits] Failed to log transaction:', transactionError);
+      if (transactionError) {
+        // Log but don't fail - the deduction succeeded
+        console.warn('[Credits] Failed to log transaction:', transactionError);
+      }
+    } catch (txErr) {
+      console.warn('[Credits] Transaction logging skipped:', txErr);
     }
 
     // Dispatch event to update UI components
@@ -187,9 +229,13 @@ export async function deductCredits(
 
 /**
  * Deduct credits for essay analysis (5 credits)
+ * @param userId - Clerk user ID
+ * @param token - Clerk JWT token (REQUIRED)
+ * @param promptTitle - Optional prompt title for description
  */
 export async function deductForEssayAnalysis(
   userId: string,
+  token: string,
   promptTitle?: string
 ): Promise<CreditDeductionResult> {
   const description = promptTitle 
@@ -200,15 +246,20 @@ export async function deductForEssayAnalysis(
     userId,
     CREDIT_COSTS.ESSAY_ANALYSIS,
     'usage',
-    description
+    description,
+    token
   );
 }
 
 /**
  * Deduct credits for chat message (1 credit)
+ * @param userId - Clerk user ID
+ * @param token - Clerk JWT token (REQUIRED)
+ * @param promptTitle - Optional prompt title for description
  */
 export async function deductForChatMessage(
   userId: string,
+  token: string,
   promptTitle?: string
 ): Promise<CreditDeductionResult> {
   const description = promptTitle
@@ -219,7 +270,8 @@ export async function deductForChatMessage(
     userId,
     CREDIT_COSTS.CHAT_MESSAGE,
     'usage',
-    description
+    description,
+    token
   );
 }
 

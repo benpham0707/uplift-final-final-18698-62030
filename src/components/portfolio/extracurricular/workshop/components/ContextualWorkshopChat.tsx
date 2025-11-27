@@ -95,6 +95,7 @@ interface ContextualWorkshopChatProps {
 
   // Credits system (optional - needed for credit checking)
   userId?: string | null;
+  getToken?: (options: { template: string }) => Promise<string | null>;
 }
 
 // ============================================================================
@@ -123,6 +124,7 @@ export default function ContextualWorkshopChat({
   onMessagesChange,
   versionHistory,
   userId,
+  getToken,
 }: ContextualWorkshopChatProps) {
   // ============================================================================
   // STATE
@@ -289,15 +291,18 @@ export default function ContextualWorkshopChat({
     }
 
     // Credit check: Require 1 credit for chat message
-    if (userId) {
-      const creditCheck = await canSendChatMessage(userId);
-      console.log(`💳 Chat credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
-      
-      if (!creditCheck.hasEnough) {
-        console.warn(`❌ Insufficient credits for chat: ${creditCheck.currentBalance}/${creditCheck.required}`);
-        setCurrentCreditBalance(creditCheck.currentBalance);
-        setShowInsufficientCreditsModal(true);
-        return;
+    if (userId && getToken) {
+      const token = await getToken({ template: 'supabase' });
+      if (token) {
+        const creditCheck = await canSendChatMessage(userId, token);
+        console.log(`💳 Chat credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
+        
+        if (!creditCheck.hasEnough) {
+          console.warn(`❌ Insufficient credits for chat: ${creditCheck.currentBalance}/${creditCheck.required}`);
+          setCurrentCreditBalance(creditCheck.currentBalance);
+          setShowInsufficientCreditsModal(true);
+          return;
+        }
       }
     }
 
@@ -328,12 +333,15 @@ export default function ContextualWorkshopChat({
         updateMessages((prev) => [...prev, response.message]);
 
         // Deduct credit after successful response
-        if (userId) {
-          const deductResult = await deductForChatMessage(userId, piqPromptTitle);
-          if (deductResult.success) {
-            console.log(`💳 Deducted ${CREDIT_COSTS.CHAT_MESSAGE} credit. New balance: ${deductResult.newBalance}`);
-          } else {
-            console.warn('⚠️ Failed to deduct chat credit:', deductResult.error);
+        if (userId && getToken) {
+          const token = await getToken({ template: 'supabase' });
+          if (token) {
+            const deductResult = await deductForChatMessage(userId, token, piqPromptTitle);
+            if (deductResult.success) {
+              console.log(`💳 Deducted ${CREDIT_COSTS.CHAT_MESSAGE} credit. New balance: ${deductResult.newBalance}`);
+            } else {
+              console.warn('⚠️ Failed to deduct chat credit:', deductResult.error);
+            }
           }
         }
       } else {
@@ -354,12 +362,15 @@ export default function ContextualWorkshopChat({
         updateMessages((prev) => [...prev, response.message]);
 
         // Deduct credit after successful response
-        if (userId) {
-          const deductResult = await deductForChatMessage(userId, activity?.name);
-          if (deductResult.success) {
-            console.log(`💳 Deducted ${CREDIT_COSTS.CHAT_MESSAGE} credit. New balance: ${deductResult.newBalance}`);
-          } else {
-            console.warn('⚠️ Failed to deduct chat credit:', deductResult.error);
+        if (userId && getToken) {
+          const token = await getToken({ template: 'supabase' });
+          if (token) {
+            const deductResult = await deductForChatMessage(userId, token, activity?.name);
+            if (deductResult.success) {
+              console.log(`💳 Deducted ${CREDIT_COSTS.CHAT_MESSAGE} credit. New balance: ${deductResult.newBalance}`);
+            } else {
+              console.warn('⚠️ Failed to deduct chat credit:', deductResult.error);
+            }
           }
         }
 

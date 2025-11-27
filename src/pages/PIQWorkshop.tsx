@@ -202,14 +202,17 @@ export default function PIQWorkshop() {
 
     // Credit check: Require 5 credits for essay analysis
     if (userId) {
-      const creditCheck = await canAnalyzeEssay(userId);
-      console.log(`💳 Credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
-      
-      if (!creditCheck.hasEnough) {
-        console.warn(`❌ Insufficient credits: ${creditCheck.currentBalance}/${creditCheck.required}`);
-        setCurrentCreditBalance(creditCheck.currentBalance);
-        setShowInsufficientCreditsModal(true);
-        return;
+      const token = await getToken({ template: 'supabase' });
+      if (token) {
+        const creditCheck = await canAnalyzeEssay(userId, token);
+        console.log(`💳 Credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
+        
+        if (!creditCheck.hasEnough) {
+          console.warn(`❌ Insufficient credits: ${creditCheck.currentBalance}/${creditCheck.required}`);
+          setCurrentCreditBalance(creditCheck.currentBalance);
+          setShowInsufficientCreditsModal(true);
+          return;
+        }
       }
     }
 
@@ -365,12 +368,15 @@ export default function PIQWorkshop() {
 
         // Deduct credits for non-cached analysis
         if (userId) {
-          const selectedPromptForDeduction = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
-          const deductResult = await deductForEssayAnalysis(userId, selectedPromptForDeduction?.title);
-          if (deductResult.success) {
-            console.log(`💳 Deducted ${CREDIT_COSTS.ESSAY_ANALYSIS} credits. New balance: ${deductResult.newBalance}`);
-          } else {
-            console.warn('⚠️ Failed to deduct credits:', deductResult.error);
+          const deductToken = await getToken({ template: 'supabase' });
+          if (deductToken) {
+            const selectedPromptForDeduction = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+            const deductResult = await deductForEssayAnalysis(userId, deductToken, selectedPromptForDeduction?.title);
+            if (deductResult.success) {
+              console.log(`💳 Deducted ${CREDIT_COSTS.ESSAY_ANALYSIS} credits. New balance: ${deductResult.newBalance}`);
+            } else {
+              console.warn('⚠️ Failed to deduct credits:', deductResult.error);
+            }
           }
         }
       }
@@ -1734,6 +1740,7 @@ export default function PIQWorkshop() {
                   note: idx === currentVersionIndex ? 'Current version' : undefined
                 }))}
                 userId={userId}
+                getToken={getToken}
               />
             </Card>
           </div>

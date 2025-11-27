@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { MessageCircle, Send, RefreshCw, Loader2, Sparkles, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageCircle, Send, RefreshCw, Loader2, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { ExtracurricularItem } from '@/components/portfolio/extracurricular/ExtracurricularCard';
 import { AnalysisResult } from '../backendTypes';
 import { TeachingCoachingOutput } from '../teachingTypes';
@@ -47,6 +47,10 @@ import {
   getCachedConversation as getPIQCachedConversation,
   cacheConversation as cachePIQConversation,
 } from '@/services/piqWorkshop/piqChatService';
+
+// Credits System
+import { canSendChatMessage, deductForChatMessage, CREDIT_COSTS } from '@/services/credits';
+import { InsufficientCreditsModal } from '@/components/credits';
 
 // ============================================================================
 // PROPS
@@ -88,6 +92,10 @@ interface ContextualWorkshopChatProps {
 
   // Version history (for chat context)
   versionHistory?: Array<{ timestamp: number; nqi: number; note?: string }>;
+
+  // Credits system (optional - needed for credit checking)
+  userId?: string | null;
+  getToken?: (options: { template: string }) => Promise<string | null>;
 }
 
 // ============================================================================
@@ -115,6 +123,8 @@ export default function ContextualWorkshopChat({
   externalMessages,
   onMessagesChange,
   versionHistory,
+  userId,
+  getToken,
 }: ContextualWorkshopChatProps) {
   // ============================================================================
   // STATE
@@ -147,6 +157,10 @@ export default function ContextualWorkshopChat({
   const [recommendations, setRecommendations] = useState<ChatRecommendation[]>([]);
   const [currentRecommendationIndex, setCurrentRecommendationIndex] = useState(0);
   const [currentStarterIndex, setCurrentStarterIndex] = useState(0);
+
+  // Credits modal state
+  const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
+  const [currentCreditBalance, setCurrentCreditBalance] = useState(0);
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
@@ -276,6 +290,22 @@ export default function ContextualWorkshopChat({
       return;
     }
 
+    // Credit check: Require 1 credit for chat message
+    if (userId && getToken) {
+      const token = await getToken({ template: 'supabase' });
+      if (token) {
+        const creditCheck = await canSendChatMessage(userId, token);
+        console.log(`💳 Chat credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
+        
+        if (!creditCheck.hasEnough) {
+          console.warn(`❌ Insufficient credits for chat: ${creditCheck.currentBalance}/${creditCheck.required}`);
+          setCurrentCreditBalance(creditCheck.currentBalance);
+          setShowInsufficientCreditsModal(true);
+          return;
+        }
+      }
+    }
+
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}-user`,
       role: 'user',
@@ -301,6 +331,19 @@ export default function ContextualWorkshopChat({
 
         // Add assistant message
         updateMessages((prev) => [...prev, response.message]);
+
+        // Deduct credit after successful response
+        if (userId && getToken) {
+          const token = await getToken({ template: 'supabase' });
+          if (token) {
+            const deductResult = await deductForChatMessage(userId, token, piqPromptTitle);
+            if (deductResult.success) {
+              console.log(`💳 Deducted ${CREDIT_COSTS.CHAT_MESSAGE} credit. New balance: ${deductResult.newBalance}`);
+            } else {
+              console.warn('⚠️ Failed to deduct chat credit:', deductResult.error);
+            }
+          }
+        }
       } else {
         // Extracurricular mode
         const context = buildContextObject();
@@ -317,6 +360,19 @@ export default function ContextualWorkshopChat({
 
         // Add assistant message
         updateMessages((prev) => [...prev, response.message]);
+
+        // Deduct credit after successful response
+        if (userId && getToken) {
+          const token = await getToken({ template: 'supabase' });
+          if (token) {
+            const deductResult = await deductForChatMessage(userId, token, activity?.name);
+            if (deductResult.success) {
+              console.log(`💳 Deducted ${CREDIT_COSTS.CHAT_MESSAGE} credit. New balance: ${deductResult.newBalance}`);
+            } else {
+              console.warn('⚠️ Failed to deduct chat credit:', deductResult.error);
+            }
+          }
+        }
 
         // Update recommendations (extracurricular only)
         if (response.recommendations && response.recommendations.length > 0) {
@@ -672,10 +728,27 @@ export default function ContextualWorkshopChat({
             </TooltipProvider>
           </div>
         </div>
-        <p className="text-[11px] text-muted-foreground mt-1">
-          Press Enter to send, Shift+Enter for new line
-        </p>
+        <div className="flex items-center justify-between mt-1">
+          <p className="text-[11px] text-muted-foreground">
+            Press Enter to send, Shift+Enter for new line
+          </p>
+          {userId && (
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <Zap className="w-3 h-3 text-primary/60" />
+              <span>{CREDIT_COSTS.CHAT_MESSAGE} credit per message</span>
+            </p>
+          )}
+        </div>
       </div>
+
+      {/* Insufficient Credits Modal */}
+      <InsufficientCreditsModal
+        isOpen={showInsufficientCreditsModal}
+        onClose={() => setShowInsufficientCreditsModal(false)}
+        currentBalance={currentCreditBalance}
+        requiredCredits={CREDIT_COSTS.CHAT_MESSAGE}
+        actionType="chat"
+      />
     </div>
   );
 }

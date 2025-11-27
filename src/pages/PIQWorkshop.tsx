@@ -52,6 +52,7 @@ import {
   saveAnalysisReport,
   loadPIQEssay,
   getVersionHistory,
+  saveVersionToHistory,
   getCurrentEssayId,
   saveChatMessages,
   loadChatMessages
@@ -67,6 +68,10 @@ import { useClerkUserId, useIsAuthenticated } from '@/services/auth/clerkSupabas
 // Navigation
 import Navigation from '@/components/Navigation';
 
+// Credits System
+import { canAnalyzeEssay, deductForEssayAnalysis, CREDIT_COSTS } from '@/services/credits';
+import { InsufficientCreditsModal } from '@/components/credits';
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -77,7 +82,8 @@ const MIN_ESSAY_LENGTH = 50;
 interface DraftVersion {
   text: string;
   timestamp: number;
-  score: number;
+  score?: number; // Optional - undefined for 'save_draft' versions
+  source?: 'analyze' | 'save_draft'; // Optional - 'analyze' has score, 'save_draft' doesn't
 }
 
 export default function PIQWorkshop() {
@@ -142,21 +148,13 @@ export default function PIQWorkshop() {
   // Chat state (for persistence)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
+  // Credits modal state
+  const [showInsufficientCreditsModal, setShowInsufficientCreditsModal] = useState(false);
+  const [currentCreditBalance, setCurrentCreditBalance] = useState(0);
+
   // Caching & Save State
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Scroll-based carousel positioning
-  const [scrollY, setScrollY] = useState(0);
-  const SCROLL_THRESHOLD = 450; // Start transition when hero section passes and 2-column grid becomes primary
-  const TRANSITION_DURATION = 200; // pixels over which to complete the transition (smoother)
-  const MAX_OFFSET = 360; // shift to center within the AI Essay Coach component (centered in right column)
-  
-  // Only start transition after threshold, complete over TRANSITION_DURATION pixels
-  const scrollProgress = scrollY < SCROLL_THRESHOLD 
-    ? 0 
-    : Math.min((scrollY - SCROLL_THRESHOLD) / TRANSITION_DURATION, 1);
-  const scrollOffset = MAX_OFFSET * scrollProgress; // positive to shift right
 
   // Extract active issues from dimensions
   const activeIssues = dimensions.flatMap(d => d.issues).filter(i => i.status !== 'fixed');
@@ -188,6 +186,22 @@ export default function PIQWorkshop() {
     if (!selectedPromptId) {
       console.warn('No prompt selected - cannot analyze');
       return;
+    }
+
+    // Credit check: Require 5 credits for essay analysis
+    if (userId) {
+      const token = await getToken({ template: 'supabase' });
+      if (token) {
+        const creditCheck = await canAnalyzeEssay(userId, token);
+        console.log(`💳 Credit check: ${creditCheck.currentBalance} credits available, ${creditCheck.required} required`);
+        
+        if (!creditCheck.hasEnough) {
+          console.warn(`❌ Insufficient credits: ${creditCheck.currentBalance}/${creditCheck.required}`);
+          setCurrentCreditBalance(creditCheck.currentBalance);
+          setShowInsufficientCreditsModal(true);
+          return;
+        }
+      }
     }
 
     setIsAnalyzing(true);
@@ -339,6 +353,20 @@ export default function PIQWorkshop() {
         // Cache the result
         cacheAnalysisResult(currentDraft, selectedPromptId, result);
         console.log('✅ Analysis result cached for future use');
+
+        // Deduct credits for non-cached analysis
+        if (userId) {
+          const deductToken = await getToken({ template: 'supabase' });
+          if (deductToken) {
+            const selectedPromptForDeduction = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+            const deductResult = await deductForEssayAnalysis(userId, deductToken, selectedPromptForDeduction?.title);
+            if (deductResult.success) {
+              console.log(`💳 Deducted ${CREDIT_COSTS.ESSAY_ANALYSIS} credits. New balance: ${deductResult.newBalance}`);
+            } else {
+              console.warn('⚠️ Failed to deduct credits:', deductResult.error);
+            }
+          }
+        }
       }
 
       console.log('📊 Backend result received - FULL OBJECT:');
@@ -417,34 +445,85 @@ export default function PIQWorkshop() {
       }
 
       setNeedsReanalysis(false);
-      setHasUnsavedChanges(false);
       console.log('✅ Analysis complete - UI updated');
 
-      // AUTO-SAVE analysis result to database (NEW)
-      // Use overrideEssayId if provided (fixes race condition when called from handleSave)
-      const effectiveEssayId = overrideEssayId || currentEssayId;
-      if (userId && effectiveEssayId) {
-        console.log('📤 Auto-saving analysis result to database...');
-        console.log('   Using essay ID:', effectiveEssayId);
+      // AUTO-SAVE: Essay, Analysis, Version History, and Chat
+      // This ensures everything persists when user switches PIQs
+      let effectiveEssayId = overrideEssayId || currentEssayId;
+      
+      if (userId) {
         try {
           const token = await getToken({ template: 'supabase' });
           if (token) {
-            const saveResult = await saveAnalysisReport(token, userId, effectiveEssayId, result);
-            if (saveResult.success) {
-              console.log('✅ Analysis auto-saved to database:', saveResult.reportId);
-            } else {
-              console.warn('⚠️  Failed to auto-save analysis:', saveResult.error);
-              // Non-blocking - don't interrupt user flow
+            const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+            
+            // Step 1: Save essay first if no essayId exists
+            if (!effectiveEssayId) {
+              console.log('📤 Saving essay before analysis (first time)...');
+              const essaySaveResult = await saveOrUpdatePIQEssay(
+                token,
+                userId,
+                selectedPromptId,
+                selectedPrompt?.prompt || '',
+                currentDraft,
+                null // new essay
+              );
+              
+              if (essaySaveResult.success && essaySaveResult.essayId) {
+                effectiveEssayId = essaySaveResult.essayId;
+                setCurrentEssayId(essaySaveResult.essayId);
+                console.log('✅ Essay saved:', essaySaveResult.essayId);
+              } else {
+                console.warn('⚠️  Failed to save essay:', essaySaveResult.error);
+              }
             }
+            
+            // Step 2: Save analysis result
+            if (effectiveEssayId) {
+              console.log('📤 Saving analysis result...');
+              const analysisSaveResult = await saveAnalysisReport(token, userId, effectiveEssayId, result);
+              if (analysisSaveResult.success) {
+                console.log('✅ Analysis saved:', analysisSaveResult.reportId);
+              } else {
+                console.warn('⚠️  Failed to save analysis:', analysisSaveResult.error);
+              }
+              
+              // Step 3: Save version to history (source='analyze')
+              console.log('📤 Saving version to history...');
+              const versionResult = await saveVersionToHistory(
+                token,
+                userId,
+                effectiveEssayId,
+                currentDraft,
+                'analyze'
+              );
+              if (versionResult.success) {
+                console.log(`✅ Version ${versionResult.versionNumber} saved to history`);
+              } else {
+                console.warn('⚠️  Failed to save version:', versionResult.error);
+              }
+              
+              // Step 4: Save chat messages if present
+              if (chatMessages.length > 0) {
+                console.log('📤 Saving chat messages...');
+                const chatSaveResult = await saveChatMessages(token, userId, effectiveEssayId, chatMessages);
+                if (chatSaveResult.success) {
+                  console.log(`✅ Chat messages saved (${chatMessages.length} messages)`);
+                } else {
+                  console.warn('⚠️  Failed to save chat:', chatSaveResult.error);
+                }
+              }
+            }
+            
+            setHasUnsavedChanges(false);
+            setLastSaveTime(new Date());
+            
           } else {
-            console.warn('⚠️  No Clerk token available - skipping analysis auto-save');
+            console.warn('⚠️  No Clerk token available - skipping auto-save');
           }
         } catch (error) {
-          console.error('❌ Error getting Clerk token:', error);
+          console.error('❌ Error during auto-save:', error);
         }
-      } else if (userId) {
-        console.log('📝 Essay not saved yet - skipping analysis auto-save');
-        // Analysis will be saved next time user saves the essay
       }
 
       // Call separate narrative overview endpoint (non-blocking)
@@ -460,7 +539,7 @@ export default function PIQWorkshop() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [currentDraft, selectedPromptId, userId, currentEssayId]);
+  }, [currentDraft, selectedPromptId, userId, currentEssayId, chatMessages]);
 
   // NO auto-analysis - wait for user to click "Analyze" button
 
@@ -634,6 +713,28 @@ export default function PIQWorkshop() {
             }
           }
 
+          // Load version history from database
+          console.log('📥 Loading version history...');
+          const versionResult = await getVersionHistory(token, userId, essay.id);
+          if (versionResult.success && versionResult.versions && versionResult.versions.length > 0) {
+            // Transform database versions to UI format
+            const loadedVersions: DraftVersion[] = versionResult.versions.map(v => ({
+              text: v.draft_content,
+              timestamp: new Date(v.created_at).getTime(),
+              score: v.score, // May be undefined for 'save_draft' versions
+              // Map source to our simplified types (analyze or save_draft)
+              source: (v.source === 'analyze' || v.source === 'save_draft') 
+                ? v.source 
+                : (v.score !== undefined ? 'analyze' : 'save_draft')
+            }));
+            setDraftVersions(loadedVersions);
+            setCurrentVersionIndex(loadedVersions.length - 1);
+            console.log(`✅ Loaded ${loadedVersions.length} versions from history`);
+          } else {
+            // No version history - use current essay as single version
+            console.log('📭 No version history found, using current essay');
+          }
+
           // Load chat messages for this essay
           console.log('📥 Loading chat messages...');
           const chatResult = await loadChatMessages(token, userId, essay.id);
@@ -738,13 +839,6 @@ export default function PIQWorkshop() {
       }
     };
   }, [hasUnsavedChanges, currentDraft, selectedPromptId, currentScore, analysisResult, draftVersions]);
-
-  // Scroll tracking for carousel positioning
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Sync selectedPromptId when URL changes
   useEffect(() => {
@@ -861,19 +955,31 @@ export default function PIQWorkshop() {
         }
       }
 
+      // Save version to history (source='save_draft' - no analysis)
+      if (essayId) {
+        console.log('📤 Saving version to history (draft only)...');
+        const versionResult = await saveVersionToHistory(
+          token,
+          userId,
+          essayId,
+          currentDraft,
+          'save_draft'
+        );
+        if (versionResult.success) {
+          console.log(`✅ Version ${versionResult.versionNumber} saved to history (not reanalyzed)`);
+        } else {
+          console.warn('⚠️  Failed to save version:', versionResult.error);
+        }
+      }
+
       setSaveStatus('saved');
       setLastSaveTime(new Date());
       setHasUnsavedChanges(false);
 
-      console.log('✅ Save complete');
+      console.log('✅ Save complete (draft only - no analysis triggered)');
 
-      // 3. Re-analyze if needed, passing essayId to fix race condition
-      if (needsReanalysis && essayId) {
-        console.log('🔄 Triggering re-analysis after save...');
-        // Pass essayId directly to performFullAnalysis to avoid race condition
-        // where currentEssayId state hasn't updated yet
-        await performFullAnalysis(essayId);
-      }
+      // NOTE: Save Draft does NOT trigger re-analysis
+      // User must click "Analyze" button to run analysis
 
     } catch (error) {
       console.error('❌ Unexpected error during save:', error);
@@ -887,8 +993,6 @@ export default function PIQWorkshop() {
     selectedPromptId,
     userId,
     analysisResult,
-    needsReanalysis,
-    performFullAnalysis,
     chatMessages
   ]);
 
@@ -1229,20 +1333,9 @@ export default function PIQWorkshop() {
       {/* Sticky PIQ header */}
       <div className="sticky top-[72px] z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b shadow-sm">
         {/* Main header row */}
-        <div className="mx-auto px-4 py-4 flex items-center justify-between gap-4 relative">
-          {/* Left: Back button */}
-          <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-
-          {/* Center: PIQ Carousel Navigation - with dynamic scroll-based positioning */}
-          <div 
-            className="absolute left-1/2 transition-transform duration-300 ease-out"
-            style={{
-              transform: `translateX(calc(-50% + ${scrollOffset}px))`
-            }}
-          >
+        <div className="mx-auto px-4 py-4 flex items-center justify-center gap-4">
+          {/* Center: PIQ Carousel Navigation - static positioning */}
+          <div className="flex-1 flex justify-center">
             <PIQCarouselNav
               currentPromptId={selectedPromptId || 'piq1'}
               onPromptChange={setSelectedPromptId}
@@ -1250,7 +1343,7 @@ export default function PIQWorkshop() {
           </div>
 
           {/* Right: Save Status */}
-          <div className="flex items-center gap-2 min-w-[120px] justify-end ml-auto">
+          <div className="flex items-center gap-2 min-w-[120px] justify-end absolute right-4">
             {saveStatus === 'saving' && (
               <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -1551,6 +1644,7 @@ export default function PIQWorkshop() {
                 onRedo={handleRedo}
                 onShowHistory={() => setShowVersionHistory(true)}
                 hasUnsavedChanges={hasUnsavedChanges}
+                analysisCreditCost={CREDIT_COSTS.ESSAY_ANALYSIS}
               />
             </Card>
 
@@ -1615,6 +1709,8 @@ export default function PIQWorkshop() {
                   nqi: v.score,
                   note: idx === currentVersionIndex ? 'Current version' : undefined
                 }))}
+                userId={userId}
+                getToken={getToken}
               />
             </Card>
           </div>
@@ -1629,6 +1725,7 @@ export default function PIQWorkshop() {
             description: v.text,
             timestamp: v.timestamp,
             score: v.score,
+            source: v.source,
             categories: []
           }))}
           currentVersionId={`v${currentVersionIndex}`}
@@ -1636,6 +1733,15 @@ export default function PIQWorkshop() {
           onClose={() => setShowVersionHistory(false)}
         />
       )}
+
+      {/* Insufficient Credits Modal */}
+      <InsufficientCreditsModal
+        isOpen={showInsufficientCreditsModal}
+        onClose={() => setShowInsufficientCreditsModal(false)}
+        currentBalance={currentCreditBalance}
+        requiredCredits={CREDIT_COSTS.ESSAY_ANALYSIS}
+        actionType="analysis"
+      />
     </div>
   );
 }

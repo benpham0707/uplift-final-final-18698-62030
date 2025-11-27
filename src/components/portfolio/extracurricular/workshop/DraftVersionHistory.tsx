@@ -3,7 +3,8 @@
  * 
  * Simple version history viewer for essay drafts showing:
  * - Timeline of draft versions
- * - Score changes
+ * - Score changes (for analyzed versions)
+ * - "Not Reanalyzed" tag (for quick saves without analysis)
  * - Quick restore functionality
  */
 
@@ -11,13 +12,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X, RotateCcw } from 'lucide-react';
+import { X, RotateCcw, FileEdit, Sparkles } from 'lucide-react';
 
 interface DraftVersion {
   id: string;
   description: string;
   timestamp: number;
-  score: number;
+  score?: number; // Optional - undefined for 'save_draft' versions
+  source?: 'analyze' | 'save_draft'; // Optional - indicates version type
   categories?: Array<{ name: string; score: number }>;
 }
 
@@ -69,6 +71,8 @@ export function DraftVersionHistory({
           <div className="max-w-2xl mx-auto space-y-3">
             {versions.map((version) => {
               const isCurrent = version.id === currentVersionId;
+              const hasScore = version.score !== undefined && version.score !== null;
+              const isAnalyzed = version.source === 'analyze' || hasScore;
 
               return (
                 <Card
@@ -76,27 +80,52 @@ export function DraftVersionHistory({
                   className={`relative p-4 transition-all hover:shadow-md flex items-center gap-6 ${
                     isCurrent
                       ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                      : 'hover:border-primary/50'
+                      : isAnalyzed 
+                        ? 'hover:border-primary/50' 
+                        : 'hover:border-amber-500/50 bg-amber-50/30 dark:bg-amber-950/10'
                   }`}
                 >
-                  {/* Score */}
+                  {/* Score or Not Reanalyzed indicator */}
                   <div className="flex-shrink-0 text-center min-w-[80px]">
-                    <div className="text-4xl font-bold text-foreground">
-                      {version.score}
-                    </div>
-                    <div className="text-sm text-muted-foreground">/100</div>
+                    {hasScore ? (
+                      <>
+                        <div className="text-4xl font-bold text-foreground">
+                          {version.score}
+                        </div>
+                        <div className="text-sm text-muted-foreground">/100</div>
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <FileEdit className="w-6 h-6 text-amber-600 dark:text-amber-400 mb-1" />
+                        <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                          Draft
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Date */}
+                  {/* Date and Type */}
                   <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {isAnalyzed ? (
+                        <Badge variant="secondary" className="text-xs gap-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                          <Sparkles className="w-3 h-3" />
+                          Analyzed
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs gap-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                          <FileEdit className="w-3 h-3" />
+                          Not Reanalyzed
+                        </Badge>
+                      )}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       {new Date(version.timestamp).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric'
                       })}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
+                      {' • '}
                       {new Date(version.timestamp).toLocaleTimeString('en-US', {
                         hour: 'numeric',
                         minute: '2-digit'

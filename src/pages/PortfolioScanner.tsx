@@ -42,7 +42,9 @@ import {
   Check,
   Briefcase,
   RefreshCw,
-  LogOut
+  LogOut,
+  Rocket,
+  Construction
 } from 'lucide-react';
 import Dock from '@/components/Dock';
 // OnboardingFlow removed for V1 - users go directly to portfolio dashboard
@@ -65,15 +67,15 @@ const PortfolioScanner = () => {
   const navigate = useNavigate();
   const [initializing, setInitializing] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [overallProgress, setOverallProgress] = useState(0);
+  const [overallProgress, setOverallProgress] = useState(67); // Mock preview value
   const [activeSection, setActiveSection] = useState('overview');
   const [isPortfolioDropdownOpen, setIsPortfolioDropdownOpen] = useState(false);
   const [isFeaturesDropdownOpen, setIsFeaturesDropdownOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
-  const [aiOverall, setAiOverall] = useState<number | null>(null);
+  const [aiOverall, setAiOverall] = useState<number | null>(7.8); // Mock preview value
   const [aiDetailed, setAiDetailed] = useState<any | null>(null);
-  const [credits, setCredits] = useState<number | null>(null);
+  const [credits, setCredits] = useState<number | null>(600); // Mock preview value
   type MetricId = 'impact' | 'academic' | 'curiosity' | 'story' | 'character';
   const [selectedMetric, setSelectedMetric] = useState<MetricId | null>(null);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
@@ -87,6 +89,19 @@ const PortfolioScanner = () => {
   const activeTweenRef = useRef<any>(null);
   const restoreSnapRef = useRef<null | (() => void)>(null);
   // Navigation handled by global Navigation component
+
+  // Preview mode - show mock data for coming soon state
+  const isPreviewMode = true;
+  
+  // Mock data for attractive preview
+  const mockData = {
+    impact: 8.2,
+    academic: 8.1,
+    curiosity: 7.6,
+    story: 7.8,
+    character: 7.3,
+    progress: 67
+  };
 
   useEffect(() => {
     try {
@@ -329,12 +344,12 @@ const PortfolioScanner = () => {
 
   // Default rubric scores - will be updated from API when available
   const [rubricScores, setRubricScores] = useState({
-    academicExcellence: { score: null as number | null },
-    leadershipPotential: { score: null as number | null },
-    personalGrowth: { score: null as number | null },
-    communityImpact: { score: null as number | null },
-    uniqueValue: { score: null as number | null },
-    futureReadiness: { score: null as number | null }
+    academicExcellence: { score: isPreviewMode ? mockData.academic : null as number | null },
+    leadershipPotential: { score: isPreviewMode ? mockData.impact : null as number | null },
+    personalGrowth: { score: isPreviewMode ? 7.4 : null as number | null },
+    communityImpact: { score: isPreviewMode ? mockData.character : null as number | null },
+    uniqueValue: { score: isPreviewMode ? 7.5 : null as number | null },
+    futureReadiness: { score: isPreviewMode ? mockData.curiosity : null as number | null }
   });
 
   const overallScore = Math.round(
@@ -526,10 +541,10 @@ const PortfolioScanner = () => {
           return;
         }
         setHasCompletedOnboarding(false);
-        setCredits(0);
+        if (!isPreviewMode) setCredits(0);
       } else {
         setHasCompletedOnboarding(data.has_completed_assessment ?? false);
-        setCredits(data.credits ?? 0);
+        if (!isPreviewMode) setCredits(data.credits ?? 0);
       }
       setInitializing(false);
     };
@@ -542,6 +557,8 @@ const PortfolioScanner = () => {
     async function fetchStrength() {
       try {
         if (!user) return;
+        // Skip API fetch in preview mode - use mock data
+        if (isPreviewMode) return;
         setAiLoading(true);
         setAiError(null);
         const { data: { session } } = await supabase.auth.getSession();
@@ -768,11 +785,67 @@ const PortfolioScanner = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
 
+      {/* Coming Soon Banner */}
+      {isPreviewMode && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-2xl">
+          <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden">
+            {/* Gradient accent bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500" />
+            
+            <div className="p-5 pt-6">
+              <div className="flex items-start gap-4">
+                {/* Icon */}
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
+                  <Construction className="h-6 w-6 text-white" />
+                </div>
+                
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    Portfolio Scanner Coming Soon
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-cyan-100 to-purple-100 text-purple-700">
+                      In Development
+                    </span>
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-600 leading-relaxed">
+                    We're building something powerful to analyze your entire portfolio. In the meantime, try our <strong>PIQ Workshop</strong> — it's ready and waiting to help you craft compelling personal insight questions.
+                  </p>
+                  
+                  {/* CTA Button */}
+                  <div className="mt-4 flex items-center gap-3">
+                    <Button 
+                      onClick={() => navigate('/piq-workshop')}
+                      className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
+                    >
+                      <Rocket className="h-4 w-4 mr-2" />
+                      Try PIQ Workshop
+                    </Button>
+                    <span className="text-xs text-gray-500">Free to use</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Preview indicator */}
+              <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-500">
+                <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+                <span>Below is a preview of what's coming — scroll down to explore!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Section with Scores - AcademicPlanner aesthetic */}
       <div id="overview" ref={overviewRef} className="hero-gradient hero-gradient-fade text-white snap-start snap-always">
         <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
+            {isPreviewMode && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-4 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-sm text-white/90">
+                <Sparkles className="h-4 w-4" />
+                <span>Preview Mode</span>
+              </div>
+            )}
             <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
               Portfolio Dashboard
             </h1>
@@ -1278,16 +1351,25 @@ const PortfolioScanner = () => {
 
       {/* Main Content Area */}
       <main className="relative">
+        {/* Preview mode overlay */}
+        {isPreviewMode && (
+          <div className="pointer-events-none absolute inset-0 z-10">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/20" />
+          </div>
+        )}
         <PortfolioPathway 
-          onProgressUpdate={setOverallProgress}
+          onProgressUpdate={isPreviewMode ? undefined : setOverallProgress}
           currentProgress={overallProgress}
         />
-        <Dock 
-          items={dockItems}
-          panelHeight={68}
-          baseItemSize={50}
-          magnification={70}
-        />
+        {/* Hide dock in preview mode since navigation won't work */}
+        {!isPreviewMode && (
+          <Dock 
+            items={dockItems}
+            panelHeight={68}
+            baseItemSize={50}
+            magnification={70}
+          />
+        )}
       </main>
     </div>
   );

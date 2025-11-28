@@ -232,19 +232,32 @@ export async function analyzePIQEntryTwoStep(
     }
 
     console.log(`✅ Phase 19 complete in ${phase19Time.toFixed(1)}s`);
-    console.log(`   Enhanced items: ${phase19Data.enhancedItems?.length || 0}`);
+    console.log(`   Enhanced items from API: ${phase19Data.enhancedItems?.length || 0}`);
+    console.log(`   Workshop items to enhance: ${validatedResult.workshopItems.length}`);
 
     // Merge teaching guidance into workshopItems
-    const teachingEnhancedItems = validatedResult.workshopItems.map(item => {
-      const enhancement = phase19Data.enhancedItems?.find((e: any) => e.id === item.id);
-      if (enhancement) {
+    // Use index-based matching as primary (more reliable than ID matching from AI)
+    const teachingEnhancedItems = validatedResult.workshopItems.map((item, index) => {
+      // Try ID match first
+      let enhancement = phase19Data.enhancedItems?.find((e: any) => e.id === item.id);
+      
+      // Fallback to index-based matching if ID match fails
+      if (!enhancement && phase19Data.enhancedItems?.[index]) {
+        enhancement = phase19Data.enhancedItems[index];
+        console.log(`   ⚠️ Item ${item.id}: ID mismatch, using index ${index} fallback`);
+      }
+      
+      if (enhancement?.teaching) {
         console.log(`   📚 Enhanced item ${item.id} with teaching guidance`);
+        console.log(`      - Problem hook: ${enhancement.teaching.problem?.hook?.substring(0, 50)}...`);
         return {
           ...item,
           teaching: enhancement.teaching,
           teachingDepth: enhancement.teachingDepth,
           estimatedImpact: enhancement.estimatedImpact,
         };
+      } else {
+        console.warn(`   ❌ No teaching found for item ${item.id} (index ${index})`);
       }
       return item;
     });

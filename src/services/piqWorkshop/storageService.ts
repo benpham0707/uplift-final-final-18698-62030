@@ -29,6 +29,8 @@ export interface PIQWorkshopCache {
 const STORAGE_PREFIX = 'piq_workshop_';
 const AUTO_SAVE_KEY = 'piq_autosave';
 const MAX_LOCAL_VERSIONS = 10;
+// Cache version - increment to invalidate old caches (Phase 19 added in v2)
+const ANALYSIS_CACHE_VERSION = 'v2';
 
 /**
  * Generate cache key for a specific prompt
@@ -51,7 +53,8 @@ export function generateAnalysisCacheKey(essayText: string, promptId: string): s
     hash = hash & hash; // Convert to 32bit integer
   }
 
-  return `analysis_${Math.abs(hash).toString(36)}`;
+  // Include version in cache key to invalidate old caches
+  return `analysis_${ANALYSIS_CACHE_VERSION}_${Math.abs(hash).toString(36)}`;
 }
 
 /**
@@ -186,6 +189,15 @@ export function getCachedAnalysisResult(
 
       // Cache valid for 7 days
       if (ageInHours < 24 * 7) {
+        // Safety check: invalidate cache if workshopItems exist but no teaching data
+        // This ensures Phase 19 data is present
+        const workshopItems = cached.result?.workshopItems;
+        if (workshopItems?.length > 0 && !workshopItems[0]?.teaching) {
+          console.log(`⚠️ Cache invalidated: missing teaching data (pre-Phase19 cache)`);
+          localStorage.removeItem(cacheKey);
+          return null;
+        }
+        
         console.log(`✅ Using cached analysis (${ageInHours.toFixed(1)} hours old)`);
         return cached.result;
       }

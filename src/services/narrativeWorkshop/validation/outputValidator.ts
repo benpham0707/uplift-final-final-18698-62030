@@ -60,6 +60,15 @@ Ask yourself: "Could this have ONLY been written by this specific person?"
 
 5. **Missing the Person** - Writing that describes WHAT happened but not WHO this person is. The character, perspective, and voice should come through.
 
+6. **Meta-Setup/Framing Language** - Sentences that frame or announce what's coming instead of delivering direct emotional experience:
+   - "I wondered..." / "I had no idea..." (retrospective framing that tells about suspense)
+   - "...would answer that question in ways I never expected" (preview of impact)
+   - "I finally understood..." (resolution preview)
+   - "(Spoiler: ...)" or similar meta-commentary/fourth wall breaks
+   - "Little did I know..." / "This would change everything" (foreshadowing tells)
+   - These waste space with suspense-building words rather than concrete details
+   - The setup should BE the details, not commentary about the details
+
 **WHAT MAKES WRITING FEEL AUTHENTICALLY HUMAN:**
 
 1. **Specific Details Only They Would Know** - Not just "specific" but revealing of character

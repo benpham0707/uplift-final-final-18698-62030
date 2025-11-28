@@ -499,9 +499,9 @@ export default function ContextualWorkshopChat({
   // ============================================================================
 
   return (
-    <div className="w-full flex flex-col border-2 border-purple-300 dark:border-purple-700 rounded-lg bg-card" style={{ height: '600px' }}>
+    <div className="w-full flex flex-col border-2 border-purple-300 dark:border-purple-700 rounded-lg bg-card relative overflow-hidden" style={{ height: '600px' }}>
       {/* Header */}
-      <div className="p-4 border-b flex-shrink-0">
+      <div className="relative z-20 p-4 bg-card rounded-b-xl shadow-sm flex-shrink-0">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-purple-700" />
           <GradientText
@@ -514,6 +514,8 @@ export default function ContextualWorkshopChat({
         <p className="text-xs text-muted-foreground mt-1">
           Ask me anything about your {mode === 'piq' ? piqPromptTitle || 'PIQ' : activity?.name || 'essay'} narrative
         </p>
+        {/* Gradient Curtain */}
+        <div className="absolute -bottom-6 left-0 right-0 h-6 bg-gradient-to-b from-card to-transparent pointer-events-none" />
       </div>
 
       {/* Messages */}

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.strategic-constraints]
 verify_jwt = false
+
+[functions.teaching-layer]
+verify_jwt = false

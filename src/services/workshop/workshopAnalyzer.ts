@@ -22,6 +22,8 @@ import {
   generateReflectionPromptsWithCache,
   ReflectionPromptSet,
 } from './reflectionPrompts';
+import { TeachingGuidance } from '@/components/portfolio/extracurricular/workshop/backendTypes';
+import { enhanceWithTeachingLayer, isTeachingLayerAvailable } from './teachingLayerService';
 
 // ============================================================================
 // TYPES
@@ -31,6 +33,13 @@ export interface WorkshopIssue extends DetectedIssue {
   teachingExample: TeachingExample | null;   // Best-matched example from corpus
   reflectionPrompts?: ReflectionPromptSet;   // LLM-generated adaptive questions
   priority: number;                          // 1-5, lower = more important
+  // Phase 19 Teaching Layer
+  teaching?: TeachingGuidance;               // Deep teaching guidance (hook + depth)
+  teachingDepth?: 'foundational' | 'craft' | 'polish';
+  estimatedImpact?: {
+    nqiGain: number;
+    dimensionsAffected: string[];
+  };
 }
 
 export interface DimensionScore {
@@ -75,6 +84,7 @@ export interface WorkshopAnalysisOptions {
   maxIssues?: number;                        // Max issues to return (default: 5)
   generateReflectionPrompts?: boolean;       // Generate LLM prompts? (default: true)
   reflectionTone?: 'mentor' | 'coach' | 'curious_friend'; // Tone for prompts
+  enableTeachingLayer?: boolean;             // Phase 19: Deep teaching guidance (default: true)
 }
 
 // ============================================================================
@@ -97,6 +107,7 @@ export async function analyzeForWorkshop(
     maxIssues = 5,
     generateReflectionPrompts: shouldGeneratePrompts = true,
     reflectionTone = 'mentor',
+    enableTeachingLayer: shouldEnableTeaching = true,
   } = options;
 
   console.log(`\n${'='.repeat(80)}`);
@@ -159,6 +170,41 @@ export async function analyzeForWorkshop(
   }
 
   // ============================================================================
+  // STEP 3.5: Phase 19 Teaching Layer (Deep Guidance)
+  // ============================================================================
+
+  let teachingMs = 0;
+  let enhancedIssues = prioritizedIssues;
+
+  if (shouldEnableTeaching && isTeachingLayerAvailable() && prioritizedIssues.length > 0) {
+    console.log('Step 3.5: Phase 19 - Enhancing with teaching layer (LLM)...');
+    const teachingStart = Date.now();
+
+    // Pass full entry and analysis context for rich teaching
+    enhancedIssues = await enhanceWithTeachingLayer(
+      prioritizedIssues,
+      entry,
+      {
+        currentNQI: analysis.report.narrative_quality_index,
+        voiceFingerprint: analysis.fingerprints?.voice,
+        experienceFingerprint: analysis.fingerprints?.experience,
+        rubricDimensionDetails: analysis.report.categories,
+      }
+    );
+
+    teachingMs = Date.now() - teachingStart;
+    console.log(`✓ Teaching guidance added (${teachingMs}ms)`);
+    console.log(`  Items enhanced: ${enhancedIssues.filter(i => i.teaching).length}\n`);
+  } else {
+    const reason = !shouldEnableTeaching
+      ? 'disabled'
+      : !isTeachingLayerAvailable()
+      ? 'not available'
+      : 'no issues';
+    console.log(`Step 3.5: Skipping teaching layer (${reason})\n`);
+  }
+
+  // ============================================================================
   // STEP 4: Build dimension scores
   // ============================================================================
 
@@ -180,13 +226,13 @@ export async function analyzeForWorkshop(
     overallScore: analysis.report.narrative_quality_index,
     scoreTier: getScoreTier(analysis.report.narrative_quality_index),
     readerImpression: analysis.report.reader_impression_label,
-    topIssues: prioritizedIssues,
+    topIssues: enhancedIssues,
     allIssues,
     dimensions,
     quickSummary: generateQuickSummary(
       analysis.report.narrative_quality_index,
       getScoreTier(analysis.report.narrative_quality_index),
-      prioritizedIssues.length
+      enhancedIssues.length
     ),
     analysisId: analysis.report.id || `workshop-${Date.now()}`,
     timestamp: new Date().toISOString(),
@@ -194,7 +240,7 @@ export async function analyzeForWorkshop(
       analysisMs,
       teachingExamplesMs: enrichMs,
       reflectionPromptsMs: promptsMs,
-      totalMs,
+      totalMs: totalMs + teachingMs,
     },
   };
 

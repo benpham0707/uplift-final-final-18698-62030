@@ -1,0 +1,38 @@
+{
+  "enhancedItems": [
+    {
+      "id": "opening_001",
+      "teaching": {
+        "problem": {
+          "hook": "Your Foucault opening is brilliant... and that's exactly the problem.",
+          "description": "You open with Foucault's power theory before we meet YOU. Smart move intellectually - shows you can handle complex ideas. But here's the trap: admissions readers scan the first 40 words to decide 'invest or skim.' By word 23, before they reach 'I founded the debate club,' they've already filed this as 'smart kid, academic writing' instead of 'compelling human story.' You have understated confidence and analytical precision - that's gold. But theory-first buries it. Lead with the human moment, then drop the philosophy. Same smarts, better sequencing.",
+          "whyItMatters": {
+            "preview": "First impressions determine everything. You're losing readers before they meet YOU.",
+            "fullExplanation": "UC readers process 50+ PIQs per hour in November-December. First 30 seconds? They decide: 'invest mode' (lean in, connect) or 'scanning mode' (skim for competence). Academic openings trigger scan mode - signals homework, not human story. You get ~40 words to make them care about YOU. After that, they'll follow anywhere - even into Foucault. But theory-first wastes your most valuable real estate. This isn't dumbing down. It's strategic sequencing for how brains actually process story."
+          }
+        },
+        "craftPrinciple": {
+          "hook": "Elite narrative writers follow one rule: make them care about YOU before you make them think.",
+          "fullTeaching": "Pixar to Pulitzer winners - they all follow 'emotional anchor first, ideas second.' Brain science: we process story in sequence. First: whose story? (character). Then: why care? (emotion). Only then: complex ideas. Watch any documentary - it never opens with historical context. It opens with a face. 'Here's Maria at 3am.' THEN immigration policy. The person makes the abstract urgent. Lead with theory? You're asking analytical brain before emotional brain. Creates distance. They evaluate, not connect. Flip it - person first, idea second - same content becomes magnetic. It's not what you say, it's the order.",
+          "realWorldExample": "Your debate club story has the perfect structure already - you just need to reverse it. Instead of 'Foucault said X, then I founded a club,' try 'I founded a club (human moment), which turned out to be a living example of Foucault's power theories (intellectual framework).' Same intelligence, better sequencing."
+        },
+        "applicationStrategy": {
+          "quickStart": "Circle every sentence in your PIQ that starts with credentials or theory. Ask: 'Have I made them care about ME yet?'",
+          "deepDive": "Quick process: (1) Number every sentence. (2) Highlight anything starting with achievements, credentials, theory, or abstract concepts. (3) Ask: 'Does the reader know me as a PERSON yet?' If no = 'impressive before human.' (4) Find your first human moment (emotion, action, vulnerability). Move it to sentence 1-2. (5) Layer achievements AFTER humanity. Test: Read first 40 words aloud - curious about a person or sounds like a resume? This works for all PIQs, personal statements, supplementals.",
+          "transferability": "This 'human-first' principle applies everywhere: scholarship essays, college interviews, even LinkedIn profiles. Lead with the moment that shows who you are, then demonstrate what you've done. Once people connect with your humanity, they're invested in your achievements."
+        },
+        "changeMagnitude": "moderate",
+        "magnitudeGuidance": "Keep all your brilliant insights. Just flip the order - human moment first, then theory. Same content, magnetic delivery.",
+        "personalNote": "You handle complex theory with understated confidence - that's rare. This isn't about hiding your intellect. It's about amplifying it by grounding it in lived experience. You're not dumbing down. You're being strategically sophisticated."
+      },
+      "teachingDepth": "foundational",
+      "estimatedImpact": {
+        "nqiGain": 12,
+        "dimensionsAffected": [
+          "opening_power_scene_entry",
+          "narrative_arc_stakes"
+        ]
+      }
+    }
+  ]
+}

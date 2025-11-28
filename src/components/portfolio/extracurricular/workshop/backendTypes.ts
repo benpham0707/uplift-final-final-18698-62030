@@ -413,6 +413,65 @@ export interface ValidationSummary {
   validation_time_seconds: number;
 }
 
+// ============================================================================
+// PHASE 19 TEACHING LAYER (Deep Guidance with Progressive Disclosure)
+// ============================================================================
+
+/**
+ * Phase 19 Teaching Guidance - Transformative teaching that makes students feel seen
+ * Uses progressive disclosure: Hook → View More → Full Depth
+ */
+export interface TeachingGuidance {
+  problem: {
+    hook: string; // 80-120 chars - attention-grabbing opener shown by default
+    description: string; // 400-600 chars - full depth analysis (shown on expand)
+    whyItMatters: {
+      preview: string; // 100-150 chars - hook (shown by default)
+      fullExplanation: string; // 300-500 chars - complete strategic analysis (shown on expand)
+    };
+  };
+  craftPrinciple: {
+    hook: string; // 80-120 chars - "here's the magic" (shown by default)
+    fullTeaching: string; // 400-600 chars - complete principle (shown on expand)
+    realWorldExample: string; // 200-300 chars - concrete example (shown on expand)
+  };
+  applicationStrategy: {
+    quickStart: string; // 100-150 chars - immediate action (shown by default)
+    deepDive: string; // 400-600 chars - comprehensive process (shown on expand)
+    transferability: string; // 200-300 chars - how to apply everywhere (shown on expand)
+  };
+  changeMagnitude: 'surgical' | 'moderate' | 'structural';
+  magnitudeGuidance: string; // 100-150 chars
+  personalNote: string; // 150-250 chars - makes them feel seen/special
+}
+
+/**
+ * Workshop Item with Phase 19 Teaching Enhancement
+ */
+export interface WorkshopItemWithTeaching {
+  id: string;
+  rubric_category: string;
+  severity: 'critical' | 'warning' | 'optimization';
+  quote: string;
+  problem: string;
+  why_it_matters: string;
+  suggestions: Array<{
+    text: string;
+    rationale: string;
+    type: 'polished_original' | 'voice_amplifier' | 'divergent_strategy';
+    fingerprint_connection: string;
+    validation?: ValidationResult;
+  }>;
+
+  // Phase 19 Teaching Layer (added by teaching-layer edge function)
+  teaching?: TeachingGuidance;
+  teachingDepth?: 'foundational' | 'craft' | 'polish';
+  estimatedImpact?: {
+    nqiGain: number;
+    dimensionsAffected: string[];
+  };
+}
+
 export interface ExtractedFeatures {
   word_count: number;
   voice: {

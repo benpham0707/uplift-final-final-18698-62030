@@ -39,6 +39,7 @@ import {
   generateReflectionPromptsWithCache,
 } from '@/services/workshop/reflectionPrompts';
 import { ExperienceEntry } from '@/core/types/experience';
+import { TeachingGuidanceCard } from './TeachingGuidanceCard';
 
 // ============================================================================
 // TYPES
@@ -307,6 +308,13 @@ export const TeachingUnitCardIntegrated: React.FC<TeachingUnitCardIntegratedProp
           </div>
         </div>
       </div>
+
+      {/* PHASE 19 TEACHING LAYER */}
+      {issue.teaching && (
+        <div className="pt-2 border-t-2 border-dashed border-border">
+          <TeachingGuidanceCard teaching={issue.teaching} />
+        </div>
+      )}
 
       {/* REFLECTION PROMPTS */}
       <div className="space-y-3 pt-2 border-t-2 border-dashed border-border">

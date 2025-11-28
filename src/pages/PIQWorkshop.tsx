@@ -717,7 +717,18 @@ export default function PIQWorkshop() {
           // Load analysis if available
           if (analysis) {
             console.log(`✅ Loaded analysis from database: NQI ${analysis.analysis?.narrative_quality_index}`);
-            setAnalysisResult(analysis);
+            
+            // Check if this is pre-Phase19 analysis (no teaching data)
+            const hasTeachingData = analysis.workshopItems?.some(item => item.teaching);
+            console.log(`📚 Teaching data check: ${hasTeachingData ? 'HAS teaching' : 'MISSING teaching'}`);
+            
+            if (!hasTeachingData && analysis.workshopItems?.length > 0) {
+              console.log('⚠️ Loaded analysis missing teaching data - needs re-analysis for Phase 19');
+              // Still load the analysis but flag it as needing upgrade
+              setAnalysisResult({ ...analysis, needsTeachingUpgrade: true } as any);
+            } else {
+              setAnalysisResult(analysis);
+            }
 
             // Update initial version with actual score
             if (analysis.analysis?.narrative_quality_index) {
@@ -1544,6 +1555,43 @@ export default function PIQWorkshop() {
                 </div>
                 <Progress value={progressPercent} className="h-2" />
               </div>
+
+              {/* Upgrade Analysis Banner - shown when analysis lacks Phase 19 teaching data */}
+              {(analysisResult as any)?.needsTeachingUpgrade && (
+                <div className="mb-4 pb-4 border-b">
+                  <div className="flex items-center justify-between gap-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-center gap-3">
+                      <RefreshCcw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      <div>
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                          Enhanced teaching guidance available
+                        </p>
+                        <p className="text-xs text-amber-600 dark:text-amber-400">
+                          Re-analyze to get deeper insights and explanations
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // Clear the analysis and trigger fresh analysis
+                        setAnalysisResult(null);
+                        setDimensions([]);
+                        // Clear localStorage cache for this prompt
+                        const cacheKey = `analysis_v3_${selectedPromptId}`;
+                        localStorage.removeItem(cacheKey);
+                        // Trigger re-analysis
+                        performFullAnalysis();
+                      }}
+                      className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/50"
+                    >
+                      <RefreshCcw className="w-4 h-4 mr-2" />
+                      Upgrade Analysis
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {/* Compact Category Quick Links */}
               <div className="flex items-center gap-3 flex-wrap">

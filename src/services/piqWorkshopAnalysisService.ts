@@ -217,9 +217,17 @@ export async function analyzePIQEntryTwoStep(
 
     // Graceful degradation: If Phase 19 fails, return Phase 18 results
     if (phase19Error || !phase19Data?.success) {
-      console.warn('⚠️  Phase 19 failed, proceeding with Phase 18 results only');
-      console.warn('   Error:', phase19Error?.message || phase19Data?.error);
+      console.error('❌ Phase 19 FAILED - Detailed diagnostics:');
+      console.error('   Error object:', phase19Error);
+      console.error('   Error message:', phase19Error?.message);
+      console.error('   Response success:', phase19Data?.success);
+      console.error('   Response error:', phase19Data?.error);
+      console.error('   Workshop items sent:', validatedResult.workshopItems.length);
+      console.error('   Enhanced items received:', phase19Data?.enhancedItems?.length || 0);
       console.warn('   User will see suggestions without deep teaching guidance');
+      
+      // Notify UI that teaching is unavailable
+      callbacks.onProgress?.('⚠️ Deep teaching guidance unavailable - showing basic guidance');
       
       console.log('='.repeat(80));
       console.log(`✅ TWO-STEP ANALYSIS COMPLETE (Phase 19 skipped)`);

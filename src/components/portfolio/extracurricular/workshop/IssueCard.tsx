@@ -170,7 +170,17 @@ export const IssueCard: React.FC<IssueCardProps> = ({
             </div>
           )}
 
-          {/* Phase 19 Teaching Layer - Replaces old problem/impact sections */}
+        {/* Phase 19 Teaching Layer - Replaces old problem/impact sections */}
+          {(() => {
+            console.log('🔍 IssueCard teaching check:', { 
+              issueId: issue.id, 
+              hasTeaching: !!issue.teaching,
+              teachingKeys: issue.teaching ? Object.keys(issue.teaching) : 'none',
+              fallbackAnalysis: issue.analysis?.substring(0, 50),
+              fallbackImpact: issue.impact?.substring(0, 50)
+            });
+            return null;
+          })()}
           {issue.teaching ? (
             <div className="mb-4">
               <TeachingGuidanceCard teaching={issue.teaching} />

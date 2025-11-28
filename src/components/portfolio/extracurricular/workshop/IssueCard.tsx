@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { WritingIssue } from './types';
 import { SuggestionCarousel } from './SuggestionCarousel';
 import { TeachingGuidanceCard } from './TeachingGuidanceCard';
-import { ChevronDown, ChevronUp, CheckCircle2, Circle, Loader2, Quote, AlertOctagon, Lightbulb } from 'lucide-react';
+import { ChevronDown, ChevronUp, CheckCircle2, Circle, Loader2 } from 'lucide-react';
 
 interface IssueCardProps {
   issue: WritingIssue;
@@ -12,6 +13,61 @@ interface IssueCardProps {
   onNextSuggestion: (issueId: string) => void;
   onPrevSuggestion: (issueId: string) => void;
 }
+
+/**
+ * Fallback Teaching Section with Progressive Disclosure
+ * Shows analysis + impact with fade effect and "View more" button
+ */
+const FallbackTeachingSection: React.FC<{ analysis?: string; impact?: string }> = ({ analysis, impact }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Combine analysis and impact into one flowing text
+  const fullContent = [analysis, impact].filter(Boolean).join(' ');
+  
+  if (!fullContent) return null;
+  
+  const needsTruncation = fullContent.length > 200;
+  
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        Why This Matters
+      </p>
+      
+      <div className="relative">
+        <div className={`text-sm text-foreground/80 leading-relaxed ${!isExpanded && needsTruncation ? 'line-clamp-3' : ''}`}>
+          {fullContent}
+        </div>
+        
+        {/* Fade overlay when collapsed */}
+        {!isExpanded && needsTruncation && (
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        )}
+      </div>
+      
+      {needsTruncation && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-xs text-primary hover:text-primary/80 p-0 h-auto font-medium"
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp className="w-3 h-3 mr-1" />
+              View less
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-3 h-3 mr-1" />
+              View more
+            </>
+          )}
+        </Button>
+      )}
+    </div>
+  );
+};
 
 export const IssueCard: React.FC<IssueCardProps> = ({
   issue,
@@ -116,30 +172,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
               <TeachingGuidanceCard teaching={issue.teaching} />
             </div>
           ) : (
-            <>
-              {/* Fallback to old sections if teaching not available */}
-              {issue.analysis && (
-                <div>
-                  <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1">
-                    The Problem
-                  </p>
-                  <p className="text-sm text-muted-foreground pl-3 border-l-2 border-red-300 dark:border-red-800">
-                    {issue.analysis}
-                  </p>
-                </div>
-              )}
-
-              {issue.impact && (
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-primary mb-1">
-                    Why It Matters
-                  </p>
-                  <p className="text-sm text-muted-foreground pl-3 border-l-2 border-primary/30">
-                    {issue.impact}
-                  </p>
-                </div>
-              )}
-            </>
+            <FallbackTeachingSection analysis={issue.analysis} impact={issue.impact} />
           )}
 
           <div className="pt-4 border-t">

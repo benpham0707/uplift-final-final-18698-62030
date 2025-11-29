@@ -231,8 +231,8 @@ const Settings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+              <div className="flex items-center gap-4 flex-1">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <User className="h-6 w-6 text-primary" />
                 </div>
@@ -320,7 +320,7 @@ const Settings = () => {
         {/* Credits & History Section */}
         <Card>
           <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <GradientZap className="h-5 w-5" />
                 Credits & Usage
@@ -376,8 +376,8 @@ const Settings = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             {/* Sign Out */}
-            <div className="flex items-center justify-between p-3 rounded-lg border">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 p-3 rounded-lg border">
+              <div className="flex-1">
                 <p className="font-medium text-sm">Sign Out</p>
                 <p className="text-xs text-muted-foreground">
                   Sign out of your account on this device.
@@ -390,8 +390,8 @@ const Settings = () => {
             </div>
 
             {/* Delete Account */}
-            <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 p-3 rounded-lg border border-destructive/30 bg-destructive/5">
+              <div className="flex-1">
                 <p className="font-medium text-sm text-destructive">Delete Account</p>
                 <p className="text-xs text-muted-foreground">
                   Permanently delete your account and all data.

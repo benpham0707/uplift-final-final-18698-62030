@@ -77,6 +77,16 @@ CREATE TABLE public.essay_analysis_reports (
   full_analysis_result jsonb,
   CONSTRAINT essay_analysis_reports_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.essay_chat_messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  essay_id uuid NOT NULL,
+  role text NOT NULL CHECK (role = ANY (ARRAY['user'::text, 'assistant'::text])),
+  content text NOT NULL,
+  message_timestamp bigint NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT essay_chat_messages_pkey PRIMARY KEY (id),
+  CONSTRAINT essay_chat_messages_essay_id_fkey FOREIGN KEY (essay_id) REFERENCES public.essays(id)
+);
 CREATE TABLE public.essay_coaching_plans (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   essay_id uuid NOT NULL,

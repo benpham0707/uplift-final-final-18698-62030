@@ -66,11 +66,6 @@ interface EnhancedWorkshopItem {
       implementationGuide: string;      // 400-600 chars - specific techniques & mechanics
       narrativePurposeAndAngles: string; // 300-400 chars - function + alternative approaches
     };
-    suggestionRationales: Array<{
-      suggestionIndex: number;   // Which suggestion (0, 1, or 2)
-      suggestionText: string;    // The actual suggestion text from Phase 17
-      whyThisWorks: string;      // 750-850 chars - HS-friendly, segmented explanation (3-4 paragraphs with \n\n)
-    }>;
     changeMagnitude: 'surgical' | 'moderate' | 'structural';
     magnitudeGuidance: string;
     personalNote: string;        // 150-250 chars - makes them feel seen/special
@@ -268,81 +263,6 @@ ALL fields must meet these minimums (more is better):
 
 ---
 
-## SUGGESTION-SPECIFIC RATIONALES (NEW!)
-
-Each workshop item has 3 suggestions from Phase 17. You MUST generate a deep, specific rationale for each one.
-
-**Structure (example):**
-"suggestionRationales": [
-  {
-    "suggestionIndex": 0,
-    "suggestionText": "The actual suggestion text from Phase 17",
-    "whyThisWorks": "~800 chars - segmented, high-school-friendly explanation with paragraph breaks"
-  },
-  {
-    "suggestionIndex": 1,
-    "suggestionText": "The second suggestion text",
-    "whyThisWorks": "~800 chars - segmented differently from suggestion 1, teaches different principle"
-  },
-  {
-    "suggestionIndex": 2,
-    "suggestionText": "The third suggestion text",
-    "whyThisWorks": "~800 chars - segmented differently from suggestions 1 & 2, teaches different principle"
-  }
-]
-
-**Requirements for "whyThisWorks" (~800 chars each):**
-
-1. **TARGET LENGTH: 750-850 characters** - More room to explain clearly for high school students
-2. **SEGMENTED STRUCTURE** - Break into 3-4 short paragraphs using double line breaks (\n\n)
-3. **HIGH SCHOOL FRIENDLY LANGUAGE** - Clear, conversational, no jargon. Explain concepts simply like talking to a smart friend.
-4. **PROGRESSIVE DISCLOSURE** - Start with what, then why, then impact
-5. **EASY TO SCAN** - Each paragraph = one focused idea
-6. **SPECIFIC TO THAT SUGGESTION** - Don't repeat the same rationale
-
-**Tone Guidelines for High School Students:**
-- Use "you" and "your" to make it personal
-- Avoid academic jargon - say "makes readers care" instead of "creates narrative tension"
-- Use comparisons and metaphors they relate to
-- Be encouraging and validate their intelligence
-- Explain WHY writing techniques work (don't just name them)
-
-**Segmentation Pattern (choose what fits the suggestion):**
-
-Pattern A: What This Does → Why It Works → The Writing Trick → What Readers Feel
-Pattern B: Your Voice → The Technique Explained → Why Readers Connect
-Pattern C: The Bold Move → Why Taking Risks Works → How to Know It's Good → The Payoff
-
-**Example (polished_original suggestion - Pattern A):**
-> "This version keeps your exact meaning but makes it way more specific. You wrote 'I spent hours debugging' - which definitely shows you worked hard. But this version ('3am, sixth failed compile') turns that vague 'hours' into a moment we can actually picture. Instead of hearing about your work, we're watching it happen.
->
-> Here's the trick: when you add specific numbers ('sixth failed compile') and time details ('3am'), you prove your dedication without having to say 'I was dedicated.' The details do the work for you. It's like showing someone a photo instead of describing it - they trust what they can see. '3am' tells us you're committed without you having to use words like 'hardworking' or 'persistent.'
->
-> Why this connects with readers: Our brains believe specific details more than general claims. When someone says 'I worked really hard,' it can feel like they're trying to impress us. But when they say 'sixth failed compile at 3am,' we think 'okay, that actually happened.' The specificity makes it real. Plus, this keeps your natural, understated voice - you're not bragging, you're just showing evidence. And that makes you sound authentic and trustworthy."
-
-**Example (voice_amplifier suggestion - Pattern B):**
-> "This suggestion is all about leaning into what already makes your writing YOU. I noticed you have this conversational, honest way of writing - you use phrases like 'turns out' and 'honestly' naturally. This edit amplifies that casual, real-person voice instead of trying to make you sound more formal.
->
-> The technique here is using sentence fragments ('Six failed compiles. Then breakthrough.') - which technically isn't 'proper' grammar, but sounds exactly like how your brain actually works through problems. You think in quick, honest observations, and this captures that. The casual opening ('Turns out...') sounds like you're telling a story to a friend over lunch, not writing an essay for evaluation. It's authentic to how YOU think and talk.
->
-> Here's why this matters: admissions officers read tens of thousands of super-polished essays. When they find one that sounds like an actual human being - not a student trying to sound impressive - it stands out. They're not looking for perfect grammar; they're looking for 'who is this person?' Your natural voice is your superpower. This version sounds like a real person discovering something, and that's way more interesting than someone performing perfectly. Authentic beats polished every time."
-
-**Example (divergent_strategy suggestion - Pattern C):**
-> "This is the bold move - starting with what you DIDN'T know instead of jumping straight to what you learned. Most students try to hide their confusion or make it seem like they were always smart about this topic. This version does the opposite: it puts your gap in knowledge right up front ('I didn't know what opportunity cost meant').
->
-> Why starting with 'I didn't know' actually works: it makes readers curious about how you got from confusion to success. They'll think, 'Wait, how does someone who doesn't understand a basic concept end up founding a whole club about it?' That question pulls them into your story. And the specific honesty ('I'd been making economic decisions without the vocabulary') is way more interesting than fake confidence. It shows you're intellectually humble and self-aware - you can admit when you didn't know something, which makes readers trust you more.
->
-> The big payoff: your line 'That gap - between living something and naming it' takes your personal confusion and turns it into a bigger insight about how learning actually works. You're not just saying 'I learned economics.' You're revealing something true about knowledge itself - that you can DO something before you can NAME it. This is a risky move because admitting you didn't know something could make you look weak, but YOUR essay has the credibility to pull it off. You clearly figured it out AND took action (founded the club), so the contrast between 'didn't know the term' and 'founded a club' creates a powerful transformation story."
-
-**CRITICAL FORMATTING:**
-- Use \n\n (double line break) between paragraphs for readability
-- Each paragraph should be 200-250 chars max (more space for clarity)
-- 3-4 paragraphs total per rationale
-- All three rationales must be DIFFERENT - teach different writing principles
-- Write like you're explaining to a smart high school friend - clear, encouraging, specific
-
----
-
 ## OUTPUT JSON STRUCTURE
 
 Return ONLY valid JSON:
@@ -369,23 +289,6 @@ Return ONLY valid JSON:
           "implementationGuide": "400-600 chars specific techniques and mechanics",
           "narrativePurposeAndAngles": "300-400 chars function + alternative approaches"
         },
-        "suggestionRationales": [
-          {
-            "suggestionIndex": 0,
-            "suggestionText": "Copy suggestion text from Phase 17",
-            "whyThisWorks": "750-850 chars - clear, HS-friendly, segmented explanation with \n\n breaks"
-          },
-          {
-            "suggestionIndex": 1,
-            "suggestionText": "Copy suggestion text from Phase 17",
-            "whyThisWorks": "750-850 chars - different principle from suggestion 0, HS-friendly"
-          },
-          {
-            "suggestionIndex": 2,
-            "suggestionText": "Copy suggestion text from Phase 17",
-            "whyThisWorks": "750-850 chars - different principle from suggestions 0 & 1, HS-friendly"
-          }
-        ],
         "changeMagnitude": "surgical" | "moderate" | "structural",
         "magnitudeGuidance": "100-150 chars setting expectations",
         "personalNote": "150-250 chars make them feel special"
@@ -410,8 +313,7 @@ Return ONLY valid JSON:
 5. **MAKE THEM FEEL SPECIAL** - They should finish reading feeling empowered and intelligent
 6. **CHARACTER MINIMUMS ARE SACRED** - Never go below the minimum counts
 7. **WARMTH + SOPHISTICATION** - Be encouraging AND intellectually rigorous, but ACCESSIBLE
-8. **THREE UNIQUE RATIONALES** - Each suggestion gets its own 750-850 char rationale explaining a DIFFERENT writing principle
-9. **HIGH SCHOOL FRIENDLY** - Clear, conversational language. No jargon. Explain like talking to a smart friend.
+8. **HIGH SCHOOL FRIENDLY** - Clear, conversational language. No jargon. Explain like talking to a smart friend.
 
 Your goal: They should close this and think "Wow, this system really gets me and my essay. I feel like I just learned something that will help me forever."`;
 
@@ -463,26 +365,15 @@ Follow the exact structure defined in the system prompt with these character req
    - implementationGuide: 400-600 chars (specific techniques, word counts, what to include/cut, quality checkpoints)
    - narrativePurposeAndAngles: 300-400 chars (function in their arc + 1-2 alternative narrative approaches with when to use each)
 
-4. **Suggestion-Specific Rationales** - MUST GENERATE 3 RATIONALES (one per suggestion):
-   - For suggestion 0 (polished_original): 750-850 chars explaining why this polished version works
-   - For suggestion 1 (voice_amplifier): 750-850 chars explaining why this voice-forward version works
-   - For suggestion 2 (divergent_strategy): 750-850 chars explaining why this bold approach works
-   - Each rationale must be DIFFERENT and explain a unique writing principle
-   - Use HIGH SCHOOL FRIENDLY language - clear, conversational, no jargon
-   - Segment into 3-4 paragraphs with \n\n breaks (each paragraph 200-250 chars)
-   - Write like explaining to a smart friend - encouraging, specific, validates their intelligence
-   - Reference the student's voice, their essay content, and the specific craft behind that approach
+4. **Personal Note**: 150-250 chars (make them feel SEEN and SPECIAL - validate their strengths)
 
-5. **Personal Note**: 150-250 chars (make them feel SEEN and SPECIAL - validate their strengths)
-
-6. **Magnitude Guidance**: 100-150 chars (honest expectations: surgical/moderate/structural)
+5. **Magnitude Guidance**: 100-150 chars (honest expectations: surgical/moderate/structural)
 
 CRITICAL:
 - Validate before correcting. Make them feel their intelligence and effort are recognized.
 - Teach the "why" behind the magic in terms high schoolers naturally understand.
-- Generate 3 UNIQUE rationales - don't repeat the same explanation for all suggestions.
-- Each rationale should be 750-850 characters, segmented into 3-4 digestible paragraphs.
-- Use clear, encouraging language that makes complex writing concepts accessible.`;
+- Use clear, encouraging language that makes complex writing concepts accessible.
+- Focus on the PROBLEM and CRAFT PRINCIPLES - suggestion rationales are handled separately!`;
 }
 
 // ============================================================================

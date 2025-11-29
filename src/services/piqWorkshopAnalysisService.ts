@@ -281,20 +281,81 @@ export async function analyzePIQEntryTwoStep(
       return item;
     });
 
-    const finalResult: AnalysisResult = {
+    // Notify UI that Phase 19 is complete - teaching guidance now available!
+    callbacks.onPhase19Complete?.({
       ...validatedResult,
       workshopItems: teachingEnhancedItems,
+    });
+
+    // ========================================================================
+    // PHASE 20: Generate Suggestion Rationales (separate, focused request)
+    // ========================================================================
+
+    console.log('📝 PHASE 20: Generating suggestion rationales...');
+    const phase20Start = Date.now();
+
+    // Call suggestion-rationales function for EACH workshop item
+    const phase20Enhanced = await Promise.all(
+      teachingEnhancedItems.map(async (item, index) => {
+        try {
+          const { data: rationaleData, error: rationaleError } = await supabase.functions.invoke(
+            'suggestion-rationales',
+            {
+              body: {
+                suggestions: item.suggestions.map((s, i) => ({
+                  index: i,
+                  text: s.text,
+                  type: s.type || (i === 0 ? 'polished_original' : i === 1 ? 'voice_amplifier' : 'divergent_strategy'),
+                })),
+                issueContext: {
+                  title: item.title,
+                  excerpt: item.quote,
+                  category: item.rubric_category,
+                },
+              },
+            }
+          );
+
+          if (rationaleError || !rationaleData?.success) {
+            console.warn(`   ⚠️ Phase 20 failed for item ${item.id}:`, rationaleError?.message);
+            return item; // Return without rationales
+          }
+
+          // Merge rationales into teaching
+          if (item.teaching && rationaleData.rationales) {
+            console.log(`   ✅ Generated ${rationaleData.rationales.length} rationales for item ${index + 1}`);
+            return {
+              ...item,
+              teaching: {
+                ...item.teaching,
+                suggestionRationales: rationaleData.rationales,
+              },
+            };
+          }
+
+          return item;
+        } catch (err) {
+          console.warn(`   ❌ Phase 20 error for item ${item.id}:`, err);
+          return item; // Return without rationales
+        }
+      })
+    );
+
+    const phase20Time = (Date.now() - phase20Start) / 1000;
+    console.log(`✅ Phase 20 complete in ${phase20Time.toFixed(1)}s`);
+
+    const finalResult: AnalysisResult = {
+      ...validatedResult,
+      workshopItems: phase20Enhanced,
     };
 
-    // Notify UI that Phase 19 is complete - teaching guidance now available!
-    callbacks.onPhase19Complete?.(finalResult);
-
     console.log('='.repeat(80));
-    console.log(`✅ THREE-STEP ANALYSIS COMPLETE`);
+    console.log(`✅ FOUR-STEP ANALYSIS COMPLETE`);
     console.log(`   Phase 17: ${phase17Time.toFixed(1)}s`);
     console.log(`   Phase 18: ${phase18Time.toFixed(1)}s`);
     console.log(`   Phase 19: ${phase19Time.toFixed(1)}s`);
-    console.log(`   Total: ${(phase17Time + phase18Time + phase19Time).toFixed(1)}s`);
+    console.log(`   Phase 20: ${phase20Time.toFixed(1)}s`);
+    console.log(`   Total: ${(phase17Time + phase18Time + phase19Time + phase20Time).toFixed(1)}s`);
     console.log('='.repeat(80));
 
     return finalResult;

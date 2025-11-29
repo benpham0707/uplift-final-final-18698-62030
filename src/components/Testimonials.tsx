@@ -24,6 +24,51 @@ const testimonials = [
     text: "I finished my draft at 1 AM and needed eyes on it. My counselor was asleep, obviously. Uplift caught that I used the word 'passion' six times and gave me better synonyms instantly.",
     classYear: "Class of 2028",
     gradient: "from-amber-400 to-orange-500"
+  },
+  {
+    text: "The scanner flagged that I didn't mention my part-time job at all. I didn't think flipping burgers mattered, but it helped me write about time management and responsibility.",
+    classYear: "Class of 2029",
+    gradient: "from-emerald-400 to-teal-500"
+  },
+  {
+    text: "I was stuck on the 'Creative Side' prompt for weeks. The brainstorming tool asked me about my sketches in my margins, and suddenly I had my whole essay mapped out.",
+    classYear: "Class of 2028",
+    gradient: "from-pink-400 to-rose-500"
+  },
+  {
+    text: "My school doesn't really have college counselors. Uplift explained what 'Intellectual Vitality' actually means in plain English so I could write about my history obsession properly.",
+    classYear: "Class of 2029",
+    gradient: "from-cyan-400 to-blue-500"
+  },
+  {
+    text: "I was scared to write about my family situation. The feedback was super gentle but honest about how to share it without it sounding like a 'sob story'. It felt safe.",
+    classYear: "Class of 2028",
+    gradient: "from-violet-400 to-purple-500"
+  },
+  {
+    text: "It caught a huge red flag in my essay where I sounded really arrogant about a group project. It suggested a way to rephrase it to sound more collaborative. Saved me.",
+    classYear: "Class of 2029",
+    gradient: "from-red-400 to-orange-500"
+  },
+  {
+    text: "I'm a transfer student and wasn't sure if my high school stuff still counted. The tool clarified exactly what to include and what to drop. Huge relief.",
+    classYear: "Class of 2028",
+    gradient: "from-teal-400 to-green-500"
+  },
+  {
+    text: "The 'Show, Don't Tell' advice is usually so vague. Uplift highlighted exactly where I was 'telling' and gave me an example of how to 'show' it with my own story.",
+    classYear: "Class of 2029",
+    gradient: "from-indigo-400 to-blue-500"
+  },
+  {
+    text: "I had 50 words to cut. I was going to cut the best part. Uplift suggested cutting the fluff in the intro instead, and it made the whole essay punchier.",
+    classYear: "Class of 2028",
+    gradient: "from-yellow-400 to-amber-500"
+  },
+  {
+    text: "Honestly, just having a place to paste my messy first draft without judgment was the best part. It helped me get over my writer's block instantly.",
+    classYear: "Class of 2029",
+    gradient: "from-fuchsia-400 to-pink-500"
   }
 ];
 

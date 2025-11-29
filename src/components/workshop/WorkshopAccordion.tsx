@@ -47,13 +47,17 @@ export function WorkshopAccordion({ items }: WorkshopAccordionProps) {
                 <h4 className="font-medium text-destructive flex items-center gap-2">
                   ⚠️ The Issue
                 </h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.problem}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.teaching?.problem?.explanation || item.problem || 'Issue detected'}
+                </p>
               </div>
               <div className="space-y-2 bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-md border border-blue-100 dark:border-blue-900/20">
                 <h4 className="font-medium text-blue-600 dark:text-blue-400 flex items-center gap-2">
                   💡 Why it matters
                 </h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.why_it_matters}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.teaching?.problem?.whyItMatters || item.why_it_matters || 'This will improve your essay'}
+                </p>
               </div>
             </div>
 

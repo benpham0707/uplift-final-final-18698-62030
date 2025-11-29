@@ -170,7 +170,9 @@ export const TeachingUnitCard: React.FC<TeachingUnitCardProps> = ({
                   {issue.category}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-2">{issue.problem}</p>
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {issue.teaching?.problem?.explanation || issue.problem || 'Issue detected'}
+              </p>
             </div>
           </div>
           {isExpanded ? (
@@ -201,10 +203,14 @@ export const TeachingUnitCard: React.FC<TeachingUnitCardProps> = ({
               <AlertCircle className="w-4 h-4" />
               The Problem
             </h5>
-            <p className="text-sm text-foreground/90 mb-3">{issue.problem}</p>
+            <p className="text-sm text-foreground/90 mb-3">
+              {issue.teaching?.problem?.explanation || issue.problem || 'Issue detected'}
+            </p>
 
             <h6 className="font-semibold text-xs text-foreground mb-1">Why It Matters:</h6>
-            <p className="text-sm text-foreground/80">{issue.why_matters}</p>
+            <p className="text-sm text-foreground/80">
+              {issue.teaching?.problem?.whyItMatters || issue.why_matters || 'Improving this will strengthen your essay'}
+            </p>
           </div>
 
           {/* 3. TEACHING EXAMPLE */}

@@ -54,24 +54,33 @@ export const IssueCard: React.FC<IssueCardProps> = ({
   }
 
   if (!issue.expanded) {
+    // Get preview text from Phase 19 teaching or fallback
+    const previewText = issue.teaching?.problem?.hook ||
+                       issue.teaching?.problem?.explanation?.substring(0, 100) ||
+                       issue.analysis?.substring(0, 100) ||
+                       'Click to view details';
+
     return (
       <Card
         className="border-l-4 border-l-primary p-3 cursor-pointer hover:bg-accent/50 transition-all"
         onClick={onToggle}
       >
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-2 flex-1 min-w-0">
             <StatusIcon className={`w-4 h-4 ${
               issue.status === 'not_fixed' ? 'text-red-500' : 'text-yellow-500'
-            } ${issue.status === 'in_progress' ? 'animate-spin' : ''} flex-shrink-0`} />
-            <div className="min-w-0 flex-1">
+            } ${issue.status === 'in_progress' ? 'animate-spin' : ''} flex-shrink-0 mt-0.5`} />
+            <div className="min-w-0 flex-1 space-y-1">
               <h4 className="font-medium text-sm">{issue.title}</h4>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                {previewText}
+              </p>
+              <p className="text-xs text-muted-foreground/60">
                 {issue.suggestions.length} suggestion{issue.suggestions.length !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
-          <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+          <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
         </div>
       </Card>
     );

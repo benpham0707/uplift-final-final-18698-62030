@@ -67,9 +67,23 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
         </p>
       </div>
 
-      {teaching ? (
+      {teaching && teaching.suggestionRationales && teaching.suggestionRationales[currentIndex] ? (
+        // Phase 19 per-suggestion deep rationale (~800 chars, HS-friendly, segmented)
+        <div className="pl-3 border-l-2 border-green-400/50">
+          <p className="text-xs font-semibold text-green-500 mb-1 uppercase tracking-wide">
+            Why This Works
+          </p>
+          <div className="text-sm text-muted-foreground leading-relaxed space-y-2">
+            {teaching.suggestionRationales[currentIndex].whyThisWorks.split('\n\n').map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))}
+          </div>
+        </div>
+      ) : teaching ? (
+        // Fallback: Full teaching guidance card if no per-suggestion rationales
         <TeachingGuidanceCard teaching={teaching} mode="solution" />
       ) : (
+        // Fallback: Phase 17 generic rationale
         <div className="pl-3 border-l-2 border-green-400/50">
           <p className="text-xs font-semibold text-green-500 mb-1 uppercase tracking-wide">
             Why This Works

@@ -436,10 +436,15 @@ export interface TeachingGuidance {
     realWorldExample: string; // 200-300 chars - concrete example (shown on expand)
   };
   applicationStrategy: {
-    quickStart: string; // 100-150 chars - immediate action (shown by default)
-    deepDive: string; // 400-600 chars - comprehensive process (shown on expand)
-    transferability: string; // 200-300 chars - how to apply everywhere (shown on expand)
+    whatMakesGoodExample: string; // 150-250 chars - criteria for excellence
+    implementationGuide: string; // 400-600 chars - specific techniques & mechanics
+    narrativePurposeAndAngles: string; // 300-400 chars - function + alternative approaches
   };
+  suggestionRationales?: Array<{
+    suggestionIndex: number; // Which suggestion (0, 1, or 2)
+    suggestionText: string; // The actual suggestion text from Phase 17
+    whyThisWorks: string; // 750-850 chars - HS-friendly, segmented explanation (3-4 paragraphs with \n\n)
+  }>;
   changeMagnitude: 'surgical' | 'moderate' | 'structural';
   magnitudeGuidance: string; // 100-150 chars
   personalNote: string; // 150-250 chars - makes them feel seen/special

@@ -56,20 +56,20 @@ export const TeachingGuidanceCard: React.FC<TeachingGuidanceCardProps> = ({
   // Build Why This Works content (raw)
   const buildRawSolutionContent = (expanded: boolean) => {
     const parts: string[] = [];
-    
+
     // Preview parts (always shown)
     if (teaching.craftPrinciple?.hook) parts.push(teaching.craftPrinciple.hook);
-    if (teaching.applicationStrategy?.quickStart) parts.push(teaching.applicationStrategy.quickStart);
-    
+    if (teaching.applicationStrategy?.whatMakesGoodExample) parts.push(teaching.applicationStrategy.whatMakesGoodExample);
+
     if (expanded) {
       // Expanded parts
       if (teaching.craftPrinciple?.fullTeaching) parts.push('\n\n' + teaching.craftPrinciple.fullTeaching);
       if (teaching.craftPrinciple?.realWorldExample) parts.push('\n\nExample: ' + teaching.craftPrinciple.realWorldExample);
-      if (teaching.applicationStrategy?.deepDive) parts.push('\n\n' + teaching.applicationStrategy.deepDive);
-      if (teaching.applicationStrategy?.transferability) parts.push('\n\n' + teaching.applicationStrategy.transferability);
+      if (teaching.applicationStrategy?.implementationGuide) parts.push('\n\n' + teaching.applicationStrategy.implementationGuide);
+      if (teaching.applicationStrategy?.narrativePurposeAndAngles) parts.push('\n\n' + teaching.applicationStrategy.narrativePurposeAndAngles);
       if (teaching.personalNote) parts.push('\n\nNote: ' + teaching.personalNote);
     }
-    
+
     return parts.join(' ');
   };
 
@@ -84,15 +84,15 @@ export const TeachingGuidanceCard: React.FC<TeachingGuidanceCardProps> = ({
   
   // Check if there is actually more content to show (based on mode)
   // We approximate this by checking if raw content has enough length or if split occurred
-  const hasMoreContent = mode === 'full' 
+  const hasMoreContent = mode === 'full'
     ? (teaching.problem?.description || teaching.problem?.whyItMatters?.fullExplanation ||
        teaching.craftPrinciple?.fullTeaching || teaching.craftPrinciple?.realWorldExample ||
-       teaching.applicationStrategy?.deepDive || teaching.applicationStrategy?.transferability ||
+       teaching.applicationStrategy?.implementationGuide || teaching.applicationStrategy?.narrativePurposeAndAngles ||
        teaching.personalNote)
     : mode === 'problem'
     ? (teaching.problem?.description || teaching.problem?.whyItMatters?.fullExplanation)
     : (teaching.craftPrinciple?.fullTeaching || teaching.craftPrinciple?.realWorldExample ||
-       teaching.applicationStrategy?.deepDive || teaching.applicationStrategy?.transferability ||
+       teaching.applicationStrategy?.implementationGuide || teaching.applicationStrategy?.narrativePurposeAndAngles ||
        teaching.personalNote);
 
   const showProblem = (mode === 'full' || mode === 'problem') && problemContent;

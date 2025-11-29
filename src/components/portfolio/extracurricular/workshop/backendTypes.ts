@@ -209,6 +209,9 @@ export interface CoachingIssue {
   why_it_matters: string; // LEGACY - use teaching.problem.whyItMatters instead
   from_draft?: string; // Excerpt if applicable
 
+  // Phase 19 Teaching Layer (added when available)
+  teaching?: TeachingGuidance;
+
   suggested_fixes: Array<{
     text: string; // Actual suggested text
     rationale: string; // LEGACY - use teaching.suggestionRationales instead

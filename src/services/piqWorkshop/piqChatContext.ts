@@ -69,6 +69,30 @@ export interface PIQChatContext {
       whyItMatters: string;
       severity: 'critical' | 'warning' | 'optimization';
       rubricCategory: string;
+      teaching?: {
+        problem?: {
+          hook?: string;
+          description?: string;
+          whyItMatters?: {
+            preview?: string;
+            fullExplanation?: string;
+          };
+        };
+        craftPrinciple?: {
+          hook?: string;
+          fullTeaching?: string;
+          realWorldExample?: string;
+        };
+        applicationStrategy?: {
+          whatMakesGoodExample?: string;
+          implementationGuide?: string;
+          narrativePurposeAndAngles?: string;
+        };
+        personalNote?: string;
+        suggestionRationales?: Array<{
+          whyThisWorks: string;
+        }>;
+      };
       suggestions: Array<{
         type: 'polished_original' | 'voice_amplifier' | 'divergent_strategy';
         text: string;
@@ -281,15 +305,16 @@ function buildAnalysisContext(
     };
   });
 
-  // Map workshopItems
-  const workshopItems = (analysisResult.workshopItems || []).map(item => ({
+  // Map workshopItems - cast to any to handle dynamic Phase 17/19 fields
+  const workshopItems = (analysisResult.workshopItems || []).map((item: any) => ({
     id: item.id,
     quote: item.quote,
     problem: item.problem,
     whyItMatters: item.why_it_matters,
-    severity: item.severity,
+    severity: item.severity || 'warning' as const,
     rubricCategory: item.rubric_category,
-    suggestions: item.suggestions.map(s => ({
+    teaching: item.teaching,
+    suggestions: item.suggestions.map((s: any) => ({
       type: s.type,
       text: s.text,
       rationale: s.rationale,

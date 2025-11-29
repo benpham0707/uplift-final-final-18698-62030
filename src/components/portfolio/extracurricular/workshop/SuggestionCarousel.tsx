@@ -70,8 +70,8 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
       {teaching ? (
         <TeachingGuidanceCard teaching={teaching} mode="solution" />
       ) : (
-        <div className="pl-3 border-l-2 border-primary/30">
-          <p className="text-xs font-semibold text-primary mb-1">
+        <div className="pl-3 border-l-2 border-green-400/50">
+          <p className="text-xs font-semibold text-green-500 mb-1 uppercase tracking-wide">
             Why This Works
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">

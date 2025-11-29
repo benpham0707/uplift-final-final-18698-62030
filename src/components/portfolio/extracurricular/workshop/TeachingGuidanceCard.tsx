@@ -102,8 +102,8 @@ export const TeachingGuidanceCard: React.FC<TeachingGuidanceCardProps> = ({
     <div className="space-y-4">
       {/* Section 1: The Problem */}
       {showProblem && (
-        <div className="pl-3 border-l-2 border-rose-400/50 space-y-2">
-          <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">
+        <div className="pl-3 border-l-2 border-red-400/50 space-y-2">
+          <p className="text-xs font-semibold text-red-500 uppercase tracking-wide">
             The Problem
           </p>
           <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
@@ -114,8 +114,8 @@ export const TeachingGuidanceCard: React.FC<TeachingGuidanceCardProps> = ({
 
       {/* Section 2: Why This Works */}
       {showSolution && (
-        <div className="pl-3 border-l-2 border-emerald-400/50 space-y-2">
-          <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wide">
+        <div className="pl-3 border-l-2 border-green-400/50 space-y-2">
+          <p className="text-xs font-semibold text-green-500 uppercase tracking-wide">
             Why This Works
           </p>
           <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">

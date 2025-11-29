@@ -33,8 +33,8 @@ const FallbackTeachingSection: React.FC<{ analysis?: string; impact?: string }> 
   const needsTruncation = fullContent.length > 200;
   
   return (
-    <div className="space-y-2">
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+    <div className="pl-3 border-l-2 border-red-400/50 space-y-2">
+      <p className="text-xs font-semibold text-red-500 uppercase tracking-wide">
         The Problem
       </p>
       

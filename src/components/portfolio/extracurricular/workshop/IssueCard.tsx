@@ -54,10 +54,10 @@ export const IssueCard: React.FC<IssueCardProps> = ({
   }
 
   if (!issue.expanded) {
-    // Get preview text from Phase 19 teaching or fallback
+    // Get preview text from Phase 19 teaching.problem.hook or fallback
     const previewText = issue.teaching?.problem?.hook ||
-                       issue.teaching?.problem?.explanation?.substring(0, 100) ||
-                       issue.analysis?.substring(0, 100) ||
+                       issue.teaching?.problem?.description?.substring(0, 120) ||
+                       issue.analysis?.substring(0, 120) ||
                        'Click to view details';
 
     return (
@@ -72,7 +72,7 @@ export const IssueCard: React.FC<IssueCardProps> = ({
             } ${issue.status === 'in_progress' ? 'animate-spin' : ''} flex-shrink-0 mt-0.5`} />
             <div className="min-w-0 flex-1 space-y-1">
               <h4 className="font-medium text-sm">{issue.title}</h4>
-              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+              <p className="text-sm font-semibold text-muted-foreground line-clamp-2 leading-relaxed">
                 {previewText}
               </p>
               <p className="text-xs text-muted-foreground/60">

@@ -107,7 +107,7 @@ export function transformIssueToInsight(
     }
   );
 
-  const problemText = issue.teaching?.problem?.explanation || issue.problem || 'Writing issue detected';
+  const problemText = issue.teaching?.problem?.description || issue.problem || 'Writing issue detected';
   return {
     id: `insight-${dimensionScore.name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     dimension: dimensionScore.name as RubricCategory,
@@ -218,7 +218,7 @@ function generatePatternAnalysis(
       ? `Appears in ~${Math.round((totalOccurrences / sentenceCount) * 100)}% of sentences`
       : `${totalOccurrences} instances found`;
 
-  const problemText = issue.teaching?.problem?.explanation || issue.problem || 'Issue detected';
+  const problemText = issue.teaching?.problem?.description || issue.problem || 'Issue detected';
   return {
     patternType: matchedPatternType,
     occurrenceCount: totalOccurrences,
@@ -597,7 +597,7 @@ function generateChatPrompt(
 } {
   const dimensionName = getDimensionDisplayName(dimension);
   const quoteSummary = quotes.length > 0 ? quotes[0].text.substring(0, 100) : 'this section';
-  const problemText = issue.teaching?.problem?.explanation || issue.problem || 'this writing issue';
+  const problemText = issue.teaching?.problem?.description || issue.problem || 'this writing issue';
 
   // Generate pre-filled prompt
   const prefilledPrompt = `Help me improve the ${dimensionName} in my extracurricular essay.

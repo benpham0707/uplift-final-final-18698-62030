@@ -2,9 +2,18 @@
  * PIQ Workshop Storage Service
  *
  * Handles local storage caching, auto-save, and version management
+ * 
+ * Version 2 additions:
+ * - Dual key support: essay:{essayId}:draft (new) + piq_workshop_{promptId} (legacy)
+ * - Local recovery detection
+ * - Server timestamp comparison
  */
 
 import type { AnalysisResult } from '@/components/portfolio/extracurricular/workshop/backendTypes';
+
+// =============================================================================
+// TYPES
+// =============================================================================
 
 export interface DraftVersion {
   id: string;
@@ -26,17 +35,55 @@ export interface PIQWorkshopCache {
   autoSaveEnabled: boolean;
 }
 
+/** New format for local draft storage */
+export interface LocalDraft {
+  essayId: string | null;
+  promptId: string;
+  content: string;
+  savedAt: number; // Unix timestamp
+  lastServerTimestamp?: string; // ISO string for comparison
+  wordCount: number;
+}
+
+/** Result of checking for local recovery */
+export interface LocalRecoveryResult {
+  hasRecovery: boolean;
+  localDraft?: LocalDraft;
+  isNewerThanServer: boolean;
+  timeDifferenceMs?: number;
+}
+
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+
 const STORAGE_PREFIX = 'piq_workshop_';
+const DRAFT_PREFIX = 'essay:';
+const DRAFT_SUFFIX = ':draft';
 const AUTO_SAVE_KEY = 'piq_autosave';
 const MAX_LOCAL_VERSIONS = 10;
 // Cache version - increment to invalidate old caches (Phase 19 teaching fix in v3)
 const ANALYSIS_CACHE_VERSION = 'v3';
+// Minimum time difference to consider local draft as "newer" (30 seconds)
+const RECOVERY_THRESHOLD_MS = 30 * 1000;
+
+// =============================================================================
+// KEY GENERATORS
+// =============================================================================
 
 /**
- * Generate cache key for a specific prompt
+ * Generate cache key for a specific prompt (legacy format)
  */
-function getCacheKey(promptId: string): string {
+function getLegacyCacheKey(promptId: string): string {
   return `${STORAGE_PREFIX}${promptId}`;
+}
+
+/**
+ * Generate draft key for a specific essay (new format)
+ * Format: essay:{essayId}:draft
+ */
+function getDraftKey(essayId: string): string {
+  return `${DRAFT_PREFIX}${essayId}${DRAFT_SUFFIX}`;
 }
 
 /**
@@ -57,12 +104,207 @@ export function generateAnalysisCacheKey(essayText: string, promptId: string): s
   return `analysis_${ANALYSIS_CACHE_VERSION}_${Math.abs(hash).toString(36)}`;
 }
 
+// =============================================================================
+// NEW LOCAL DRAFT FUNCTIONS (v2)
+// =============================================================================
+
+/**
+ * Save a local draft to localStorage
+ * Saves to both new (essay:{essayId}:draft) and legacy (piq_workshop_{promptId}) formats
+ */
+export function saveLocalDraft(
+  essayId: string | null,
+  promptId: string,
+  content: string,
+  lastServerTimestamp?: string
+): void {
+  try {
+    const now = Date.now();
+    const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+
+    const localDraft: LocalDraft = {
+      essayId,
+      promptId,
+      content,
+      savedAt: now,
+      lastServerTimestamp,
+      wordCount,
+    };
+
+    // Save to new format if we have an essay ID
+    if (essayId) {
+      const newKey = getDraftKey(essayId);
+      localStorage.setItem(newKey, JSON.stringify(localDraft));
+      console.log(`💾 Saved local draft (new format): ${newKey}`);
+    }
+
+    // Also save to legacy format for backward compatibility
+    const legacyKey = getLegacyCacheKey(promptId);
+    const existingLegacy = localStorage.getItem(legacyKey);
+    let legacyCache: PIQWorkshopCache;
+
+    if (existingLegacy) {
+      legacyCache = JSON.parse(existingLegacy);
+      legacyCache.currentDraft = content;
+      legacyCache.lastSaved = now;
+    } else {
+      legacyCache = {
+        promptId,
+        promptTitle: '',
+        currentDraft: content,
+        lastSaved: now,
+        analysisResult: null,
+        versions: [],
+        autoSaveEnabled: true,
+      };
+    }
+
+    localStorage.setItem(legacyKey, JSON.stringify(legacyCache));
+    localStorage.setItem(AUTO_SAVE_KEY, legacyKey);
+
+  } catch (error) {
+    console.error('Failed to save local draft:', error);
+  }
+}
+
+/**
+ * Get a local draft by essay ID (new format)
+ */
+export function getLocalDraftByEssayId(essayId: string): LocalDraft | null {
+  try {
+    const key = getDraftKey(essayId);
+    const data = localStorage.getItem(key);
+    if (!data) return null;
+    return JSON.parse(data) as LocalDraft;
+  } catch (error) {
+    console.error('Failed to get local draft by essay ID:', error);
+    return null;
+  }
+}
+
+/**
+ * Get a local draft by prompt ID (legacy format, extracts from PIQWorkshopCache)
+ */
+export function getLocalDraftByPromptId(promptId: string): LocalDraft | null {
+  try {
+    const key = getLegacyCacheKey(promptId);
+    const data = localStorage.getItem(key);
+    if (!data) return null;
+    
+    const cache = JSON.parse(data) as PIQWorkshopCache;
+    if (!cache.currentDraft) return null;
+
+    return {
+      essayId: null,
+      promptId: cache.promptId,
+      content: cache.currentDraft,
+      savedAt: cache.lastSaved,
+      wordCount: cache.currentDraft.trim().split(/\s+/).filter(Boolean).length,
+    };
+  } catch (error) {
+    console.error('Failed to get local draft by prompt ID:', error);
+    return null;
+  }
+}
+
+/**
+ * Check if there's a local draft that should be recovered
+ * Compares local draft timestamp with server timestamp
+ * 
+ * @param essayId - The essay ID to check
+ * @param promptId - The prompt ID to check (fallback)
+ * @param serverTimestamp - The server's last updated timestamp (ISO string)
+ */
+export function checkLocalRecovery(
+  essayId: string | null,
+  promptId: string,
+  serverTimestamp?: string
+): LocalRecoveryResult {
+  try {
+    // Try new format first if we have an essay ID
+    let localDraft: LocalDraft | null = null;
+    
+    if (essayId) {
+      localDraft = getLocalDraftByEssayId(essayId);
+    }
+    
+    // Fall back to legacy format
+    if (!localDraft) {
+      localDraft = getLocalDraftByPromptId(promptId);
+    }
+
+    if (!localDraft || !localDraft.content) {
+      return { hasRecovery: false, isNewerThanServer: false };
+    }
+
+    // If no server timestamp provided, assume local is newer
+    if (!serverTimestamp) {
+      return {
+        hasRecovery: true,
+        localDraft,
+        isNewerThanServer: true,
+      };
+    }
+
+    // Compare timestamps
+    const serverTime = new Date(serverTimestamp).getTime();
+    const localTime = localDraft.savedAt;
+    const timeDiff = localTime - serverTime;
+
+    // Local is considered newer if it's at least RECOVERY_THRESHOLD_MS ahead
+    const isNewer = timeDiff > RECOVERY_THRESHOLD_MS;
+
+    return {
+      hasRecovery: isNewer,
+      localDraft: isNewer ? localDraft : undefined,
+      isNewerThanServer: isNewer,
+      timeDifferenceMs: timeDiff,
+    };
+
+  } catch (error) {
+    console.error('Error checking local recovery:', error);
+    return { hasRecovery: false, isNewerThanServer: false };
+  }
+}
+
+/**
+ * Clear local draft after successful sync
+ */
+export function clearLocalDraft(essayId: string): void {
+  try {
+    const key = getDraftKey(essayId);
+    localStorage.removeItem(key);
+    console.log(`🗑️ Cleared local draft: ${key}`);
+  } catch (error) {
+    console.error('Failed to clear local draft:', error);
+  }
+}
+
+/**
+ * Clear both old and new format drafts for a prompt
+ */
+export function clearAllLocalDrafts(essayId: string | null, promptId: string): void {
+  try {
+    if (essayId) {
+      clearLocalDraft(essayId);
+    }
+    clearCache(promptId);
+  } catch (error) {
+    console.error('Failed to clear all local drafts:', error);
+  }
+}
+
+// =============================================================================
+// LEGACY FUNCTIONS (maintained for backward compatibility)
+// =============================================================================
+
 /**
  * Save current state to localStorage (auto-save)
+ * @deprecated Use saveLocalDraft instead for new code
  */
 export function saveToLocalStorage(cache: PIQWorkshopCache): void {
   try {
-    const key = getCacheKey(cache.promptId);
+    const key = getLegacyCacheKey(cache.promptId);
 
     // Limit versions in localStorage to MAX_LOCAL_VERSIONS
     const limitedVersions = cache.versions.slice(-MAX_LOCAL_VERSIONS);
@@ -87,7 +329,7 @@ export function saveToLocalStorage(cache: PIQWorkshopCache): void {
  */
 export function loadFromLocalStorage(promptId: string): PIQWorkshopCache | null {
   try {
-    const key = getCacheKey(promptId);
+    const key = getLegacyCacheKey(promptId);
     const data = localStorage.getItem(key);
 
     if (!data) return null;
@@ -136,13 +378,17 @@ export function hasRecentAutoSave(): { hasAutoSave: boolean; promptId?: string; 
  */
 export function clearCache(promptId: string): void {
   try {
-    const key = getCacheKey(promptId);
+    const key = getLegacyCacheKey(promptId);
     localStorage.removeItem(key);
     console.log(`✅ Cleared cache: ${key}`);
   } catch (error) {
     console.error('Failed to clear cache:', error);
   }
 }
+
+// =============================================================================
+// ANALYSIS CACHING
+// =============================================================================
 
 /**
  * Cache analysis result
@@ -209,6 +455,10 @@ export function getCachedAnalysisResult(
     return null;
   }
 }
+
+// =============================================================================
+// VERSION SNAPSHOT UTILITIES
+// =============================================================================
 
 /**
  * Create a new version snapshot

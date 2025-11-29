@@ -27,6 +27,13 @@ import ContextualWorkshopChat from '@/components/portfolio/extracurricular/works
 import { DraftVersionHistory } from '@/components/portfolio/extracurricular/workshop/DraftVersionHistory';
 import { RandomizingScore } from '@/components/portfolio/piq/workshop/RandomizingScore';
 
+// New Version History System (v2)
+import { VersionHistoryDrawer } from '@/components/portfolio/extracurricular/workshop/VersionHistoryDrawer';
+import { SaveStatusIndicator } from '@/components/portfolio/extracurricular/workshop/SaveStatusIndicator';
+import { LocalRecoveryBanner } from '@/components/portfolio/extracurricular/workshop/LocalRecoveryBanner';
+import { AutosaveManager, type AutosaveState } from '@/services/piqWorkshop/autosaveService';
+import { checkLocalRecovery, saveLocalDraft, clearAllLocalDrafts } from '@/services/piqWorkshop/storageService';
+
 // PIQ Prompt Selector
 import { UC_PIQ_PROMPTS } from '@/components/portfolio/piq/workshop/PIQPromptSelector';
 import { PIQCarouselNav } from '@/components/portfolio/piq/workshop/PIQCarouselNav';
@@ -55,6 +62,11 @@ import {
   loadPIQEssay,
   getVersionHistory,
   saveVersion,
+  saveMilestoneVersion,
+  saveAnalysisVersion,
+  saveAutosaveVersion,
+  restoreVersion,
+  type PIQVersion,
 } from '@/services/piqWorkshop/piqDatabaseService';
 
 // Stub functions for missing imports (will be implemented in future)
@@ -124,6 +136,30 @@ export default function PIQWorkshop() {
   const [lastSaveError, setLastSaveError] = useState<string | null>(null);
   const [isLoadingFromDatabase, setIsLoadingFromDatabase] = useState(false);
   const [showResumeSessionBanner, setShowResumeSessionBanner] = useState(false);
+
+  // Version History System v2
+  const [showVersionHistoryDrawer, setShowVersionHistoryDrawer] = useState(false);
+  const [dbVersionHistory, setDbVersionHistory] = useState<PIQVersion[]>([]);
+  const [isLoadingVersionHistory, setIsLoadingVersionHistory] = useState(false);
+  const [versionHistoryError, setVersionHistoryError] = useState<string | null>(null);
+  
+  // Autosave State
+  const [autosaveState, setAutosaveState] = useState<AutosaveState>({
+    status: 'idle',
+    lastSavedAt: null,
+    lastError: null,
+    hasUnsavedChanges: false,
+  });
+  const autosaveManagerRef = useRef<AutosaveManager | null>(null);
+  
+  // Local Recovery State
+  const [showLocalRecovery, setShowLocalRecovery] = useState(false);
+  const [localRecoveryData, setLocalRecoveryData] = useState<{
+    content: string;
+    savedAt: number;
+    wordCount: number;
+  } | null>(null);
+  const [isRestoringLocal, setIsRestoringLocal] = useState(false);
 
   const [currentDraft, setCurrentDraft] = useState('');
   const [draftVersions, setDraftVersions] = useState<DraftVersion[]>([]);
@@ -873,7 +909,88 @@ export default function PIQWorkshop() {
     }
   }, [isLoadingFromDatabase, currentEssayId]);
 
-  // Auto-save every 30 seconds
+  // Initialize AutosaveManager
+  useEffect(() => {
+    if (!userId || !selectedPromptId) return;
+
+    const selectedPrompt = UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId);
+    if (!selectedPrompt) return;
+
+    // Create autosave manager
+    const manager = new AutosaveManager({
+      essayId: currentEssayId,
+      userId,
+      getToken: () => getToken({ template: 'supabase' }),
+      promptText: selectedPrompt.prompt,
+      promptId: selectedPromptId,
+      onStatusChange: setAutosaveState,
+      initialContent: currentDraft,
+      config: {
+        debounceMs: 5000, // 5 seconds after last keystroke
+        retryIntervalMs: 30000, // Retry every 30 seconds when offline
+      },
+    });
+
+    autosaveManagerRef.current = manager;
+
+    return () => {
+      manager.destroy();
+      autosaveManagerRef.current = null;
+    };
+  }, [userId, selectedPromptId, getToken]);
+
+  // Update autosave manager when essay ID changes
+  useEffect(() => {
+    if (autosaveManagerRef.current && currentEssayId) {
+      autosaveManagerRef.current.setEssayId(currentEssayId);
+    }
+  }, [currentEssayId]);
+
+  // Check for local recovery on mount
+  useEffect(() => {
+    if (!selectedPromptId) return;
+
+    const checkRecovery = async () => {
+      // Get server timestamp if we have an essay loaded
+      let serverTimestamp: string | undefined;
+      if (currentEssayId && userId) {
+        try {
+          const token = await getToken({ template: 'supabase' });
+          if (token) {
+            const result = await loadPIQEssay(
+              token,
+              userId,
+              selectedPromptId,
+              UC_PIQ_PROMPTS.find(p => p.id === selectedPromptId)?.prompt || ''
+            );
+            if (result.success && result.essay) {
+              serverTimestamp = result.essay.updated_at;
+            }
+          }
+        } catch (error) {
+          console.error('Error getting server timestamp for recovery check:', error);
+        }
+      }
+
+      const recovery = checkLocalRecovery(currentEssayId, selectedPromptId, serverTimestamp);
+      
+      if (recovery.hasRecovery && recovery.localDraft) {
+        console.log('🔍 Local recovery available:', recovery);
+        setLocalRecoveryData({
+          content: recovery.localDraft.content,
+          savedAt: recovery.localDraft.savedAt,
+          wordCount: recovery.localDraft.wordCount,
+        });
+        setShowLocalRecovery(true);
+      }
+    };
+
+    // Only check on initial load
+    const timer = setTimeout(checkRecovery, 1000);
+    return () => clearTimeout(timer);
+  }, [selectedPromptId]);
+
+  // Legacy auto-save to localStorage every 30 seconds (keeping for backward compatibility)
   useEffect(() => {
     if (!selectedPromptId) return;
 
@@ -918,8 +1035,7 @@ export default function PIQWorkshop() {
 
         saveToLocalStorage(cache);
         setLastSaveTime(new Date());
-        setHasUnsavedChanges(false);
-        console.log('✅ Auto-saved to localStorage');
+        console.log('✅ Auto-saved to localStorage (legacy)');
       }
     }, 30000); // 30 seconds
 
@@ -948,7 +1064,122 @@ export default function PIQWorkshop() {
     setCurrentDraft(newDraft);
     setNeedsReanalysis(true);
     setHasUnsavedChanges(true);
+    
+    // Trigger autosave manager
+    if (autosaveManagerRef.current) {
+      autosaveManagerRef.current.onContentChange(newDraft);
+    }
   }, []);
+
+  // Handle editor blur for immediate autosave
+  const handleEditorBlur = useCallback(async () => {
+    if (autosaveManagerRef.current) {
+      await autosaveManagerRef.current.onBlur();
+    }
+  }, []);
+
+  // Load version history from database
+  const loadVersionHistory = useCallback(async () => {
+    if (!currentEssayId || !userId) return;
+
+    setIsLoadingVersionHistory(true);
+    setVersionHistoryError(null);
+
+    try {
+      const token = await getToken({ template: 'supabase' });
+      if (!token) {
+        setVersionHistoryError('Authentication required');
+        return;
+      }
+
+      const result = await getVersionHistory(token, userId, currentEssayId);
+      if (result.success && result.versions) {
+        setDbVersionHistory(result.versions);
+      } else {
+        setVersionHistoryError(result.error || 'Failed to load version history');
+      }
+    } catch (error) {
+      setVersionHistoryError((error as Error).message);
+    } finally {
+      setIsLoadingVersionHistory(false);
+    }
+  }, [currentEssayId, userId, getToken]);
+
+  // Handle opening version history drawer
+  const handleOpenVersionHistory = useCallback(() => {
+    setShowVersionHistoryDrawer(true);
+    loadVersionHistory();
+  }, [loadVersionHistory]);
+
+  // Handle restoring a version from the drawer
+  const handleRestoreFromDrawer = useCallback(async (versionId: string, content: string) => {
+    if (!currentEssayId || !userId) return;
+
+    try {
+      const token = await getToken({ template: 'supabase' });
+      if (!token) return;
+
+      // Save current content as autosave first, then restore
+      const result = await restoreVersion(
+        token,
+        userId,
+        currentEssayId,
+        versionId,
+        currentDraft
+      );
+
+      if (result.success && result.restoredContent) {
+        setCurrentDraft(result.restoredContent);
+        setNeedsReanalysis(true);
+        setHasUnsavedChanges(false);
+        
+        // Refresh version history
+        await loadVersionHistory();
+      }
+    } catch (error) {
+      console.error('Failed to restore version:', error);
+    }
+  }, [currentEssayId, userId, currentDraft, getToken, loadVersionHistory]);
+
+  // Handle local recovery restore
+  const handleLocalRecoveryRestore = useCallback(async () => {
+    if (!localRecoveryData) return;
+
+    setIsRestoringLocal(true);
+    try {
+      setCurrentDraft(localRecoveryData.content);
+      setNeedsReanalysis(true);
+      setHasUnsavedChanges(true);
+      
+      // Trigger immediate autosave
+      if (autosaveManagerRef.current) {
+        autosaveManagerRef.current.onContentChange(localRecoveryData.content);
+        await autosaveManagerRef.current.forceSave();
+      }
+
+      // Clear recovery banner
+      setShowLocalRecovery(false);
+      setLocalRecoveryData(null);
+      
+      // Clear local storage
+      if (currentEssayId) {
+        clearAllLocalDrafts(currentEssayId, selectedPromptId);
+      }
+    } finally {
+      setIsRestoringLocal(false);
+    }
+  }, [localRecoveryData, currentEssayId, selectedPromptId]);
+
+  // Handle dismissing local recovery
+  const handleLocalRecoveryDismiss = useCallback(() => {
+    setShowLocalRecovery(false);
+    setLocalRecoveryData(null);
+    
+    // Clear local storage
+    if (currentEssayId) {
+      clearAllLocalDrafts(currentEssayId, selectedPromptId);
+    }
+  }, [currentEssayId, selectedPromptId]);
 
   const handleSave = useCallback(async () => {
     console.log('💾 handleSave called');
@@ -1434,39 +1665,9 @@ export default function PIQWorkshop() {
 
           {/* Right: Save Status */}
           <div className="flex items-center gap-2 min-w-[120px] justify-end absolute right-4">
-            {saveStatus === 'saving' && (
-              <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Saving...</span>
-              </div>
-            )}
-            {saveStatus === 'saved' && lastSaveTime && (
-              <div className="flex flex-col items-end gap-0.5">
-                <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Saved</span>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {formatSaveTime(lastSaveTime.getTime())}
-                </span>
-              </div>
-            )}
-            {saveStatus === 'error' && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 cursor-help">
-                      <XCircle className="w-4 h-4" />
-                      <span>Error</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-xs">{lastSaveError || 'Failed to save'}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            {!isAuthenticated && (
+            {isAuthenticated ? (
+              <SaveStatusIndicator state={autosaveState} />
+            ) : (
               <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
                 <AlertTriangle className="w-4 h-4" />
                 <span>Sign in to save</span>
@@ -1776,6 +1977,18 @@ export default function PIQWorkshop() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left column: Editor + Rubric */}
           <div className="space-y-6">
+            {/* Local Recovery Banner */}
+            {showLocalRecovery && localRecoveryData && (
+              <LocalRecoveryBanner
+                isVisible={showLocalRecovery}
+                localSavedAt={localRecoveryData.savedAt}
+                wordCount={localRecoveryData.wordCount}
+                onRestore={handleLocalRecoveryRestore}
+                onDismiss={handleLocalRecoveryDismiss}
+                isRestoring={isRestoringLocal}
+              />
+            )}
+
             {/* Editor */}
             <Card className="p-6 bg-gradient-to-br from-background/95 via-background/90 to-pink-50/80 dark:from-background/95 dark:via-background/90 dark:to-pink-950/20 backdrop-blur-xl border shadow-lg">
             <EditorView
@@ -1794,7 +2007,7 @@ export default function PIQWorkshop() {
                 canRedo={currentVersionIndex < draftVersions.length - 1}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
-                onShowHistory={() => setShowVersionHistory(true)}
+                onShowHistory={handleOpenVersionHistory}
                 hasUnsavedChanges={hasUnsavedChanges}
                 analysisCreditCost={CREDIT_COSTS.ESSAY_ANALYSIS}
               />
@@ -1883,7 +2096,18 @@ export default function PIQWorkshop() {
         </div>
       </div>
 
-      {/* Version history modal */}
+      {/* Version History Drawer (v2) */}
+      <VersionHistoryDrawer
+        isOpen={showVersionHistoryDrawer}
+        onClose={() => setShowVersionHistoryDrawer(false)}
+        versions={dbVersionHistory}
+        currentVersionId={dbVersionHistory[0]?.id}
+        onRestore={handleRestoreFromDrawer}
+        isLoading={isLoadingVersionHistory}
+        error={versionHistoryError || undefined}
+      />
+
+      {/* Legacy Version history modal (fallback) */}
       {showVersionHistory && (
         <DraftVersionHistory
           versions={draftVersions.map((v, idx) => ({

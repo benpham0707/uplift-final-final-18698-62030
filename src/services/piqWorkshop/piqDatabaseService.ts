@@ -7,6 +7,12 @@
  *
  * IMPORTANT: All functions require a Clerk JWT token to authenticate requests
  * The token is obtained via: await getToken({ template: 'supabase' })
+ * 
+ * Version History System (v2):
+ * - Three version types: autosave, milestone, analysis
+ * - Direct score storage on versions
+ * - Labels for milestone versions
+ * - Soft delete support
  */
 
 import type { AnalysisResult } from '@/components/portfolio/extracurricular/workshop/backendTypes';
@@ -42,13 +48,20 @@ export interface PIQAnalysisReport {
   weights: any; // JSONB
   flags: string[];
   prioritized_levers: string[];
-  voice_fingerprint: any; // JSONB - NEW
-  experience_fingerprint: any; // JSONB - NEW
-  workshop_items: any; // JSONB - NEW
-  full_analysis_result: any; // JSONB - NEW (complete AnalysisResult for archival)
+  voice_fingerprint: any; // JSONB
+  experience_fingerprint: any; // JSONB
+  workshop_items: any; // JSONB
+  full_analysis_result: any; // JSONB (complete AnalysisResult for archival)
   created_at: string;
 }
 
+/** Version source types - matches version_source_type enum in database */
+export type VersionSourceType = 'autosave' | 'milestone' | 'analysis';
+
+/**
+ * PIQ Version - represents a single version in the revision history
+ * Updated for v2 version history system
+ */
 export interface PIQVersion {
   id: string;
   essay_id: string;
@@ -56,9 +69,21 @@ export interface PIQVersion {
   draft_content: string;
   word_count: number;
   change_summary?: string;
-  source: 'student' | 'coach_suggestion' | 'system_auto' | 'analyze' | 'save_draft';
+  /** Version type: autosave, milestone, or analysis */
+  created_by: VersionSourceType;
+  /** Label for milestone versions (e.g., "Before counselor feedback") */
+  label?: string;
+  /** Parent version ID for diffing (optional) */
+  parent_version_id?: string;
+  /** Score at time of save (for analysis versions, or if manually set) */
+  score?: number;
+  /** Dimension scores breakdown (for analysis versions) */
+  dimension_scores?: any;
+  /** Link to analysis report (for analysis versions) */
+  analysis_report_id?: string;
+  /** Soft delete flag */
+  is_deleted: boolean;
   created_at: string;
-  score?: number; // Joined from analysis report - undefined for 'save_draft' versions
 }
 
 export interface SaveEssayResult {
@@ -86,6 +111,41 @@ export interface VersionHistoryResult {
   versions?: PIQVersion[];
   error?: string;
 }
+
+export interface SaveVersionResult {
+  success: boolean;
+  versionId?: string;
+  versionNumber?: number;
+  error?: string;
+}
+
+/** Options for saving a version */
+export interface SaveVersionOptions {
+  /** Type of version being saved */
+  createdBy: VersionSourceType;
+  /** Label for milestone versions */
+  label?: string;
+  /** Parent version ID for diffing */
+  parentVersionId?: string;
+  /** Score to store (for analysis versions) */
+  score?: number;
+  /** Dimension scores breakdown */
+  dimensionScores?: any;
+  /** Link to analysis report */
+  analysisReportId?: string;
+  /** Change summary/description */
+  changeSummary?: string;
+}
+
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+
+/** Minimum character difference to trigger a new autosave version */
+const AUTOSAVE_MIN_CHAR_DIFF = 20;
+
+/** Minimum time between autosaves in milliseconds (10 minutes) */
+const AUTOSAVE_MIN_INTERVAL_MS = 10 * 60 * 1000;
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -168,6 +228,13 @@ function databaseFormatToAnalysisResult(report: PIQAnalysisReport): AnalysisResu
     performance: {},
   };
   return reconstructed as AnalysisResult;
+}
+
+/**
+ * Calculate character difference between two strings
+ */
+function getCharDiff(oldContent: string, newContent: string): number {
+  return Math.abs(newContent.length - oldContent.length);
 }
 
 // =============================================================================
@@ -432,6 +499,7 @@ export async function loadPIQEssay(
 
 /**
  * Get version history for a PIQ essay
+ * Returns non-deleted versions sorted by created_at desc
  *
  * @param clerkToken - JWT token from Clerk's getToken({ template: 'supabase' })
  * @param userId - Clerk user ID (required for RLS)
@@ -469,11 +537,13 @@ export async function getVersionHistory(
       };
     }
 
-    // Get all revision history
+    // Get all non-deleted revision history
+    // Score is now stored directly on the version, no need for joins
     const { data: versions, error: versionsError } = await supabase
       .from('essay_revision_history')
       .select('*')
       .eq('essay_id', essayId)
+      .eq('is_deleted', false)
       .order('created_at', { ascending: false });
 
     if (versionsError) {
@@ -481,28 +551,26 @@ export async function getVersionHistory(
       return { success: false, error: versionsError.message };
     }
 
-    // For each version, try to find corresponding analysis report
-    const versionsWithScores: PIQVersion[] = await Promise.all(
-      (versions || []).map(async (version) => {
-        // Find analysis report created around the same time
-        const { data: report } = await supabase
-          .from('essay_analysis_reports')
-          .select('essay_quality_index')
-          .eq('essay_id', essayId)
-          .gte('created_at', version.created_at)
-          .order('created_at', { ascending: true })
-          .limit(1)
-          .maybeSingle();
+    // Map to PIQVersion type
+    const mappedVersions: PIQVersion[] = (versions || []).map(v => ({
+      id: v.id,
+      essay_id: v.essay_id,
+      version: v.version,
+      draft_content: v.draft_content,
+      word_count: v.word_count,
+      change_summary: v.change_summary,
+      created_by: v.created_by,
+      label: v.label,
+      parent_version_id: v.parent_version_id,
+      score: v.score,
+      dimension_scores: v.dimension_scores,
+      analysis_report_id: v.analysis_report_id,
+      is_deleted: v.is_deleted,
+      created_at: v.created_at,
+    }));
 
-        return {
-          ...version,
-          score: report?.essay_quality_index
-        } as PIQVersion;
-      })
-    );
-
-    console.log(`✅ Loaded ${versionsWithScores.length} versions for essay ${essayId}`);
-    return { success: true, versions: versionsWithScores };
+    console.log(`✅ Loaded ${mappedVersions.length} versions for essay ${essayId}`);
+    return { success: true, versions: mappedVersions };
 
   } catch (error) {
     console.error('Unexpected error in getVersionHistory:', error);
@@ -510,28 +578,67 @@ export async function getVersionHistory(
   }
 }
 
+/**
+ * Get the latest version for an essay
+ * Used for autosave dedup logic
+ */
+export async function getLatestVersion(
+  clerkToken: string,
+  userId: string,
+  essayId: string
+): Promise<{ success: boolean; version?: PIQVersion; error?: string }> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    const { data: version, error } = await supabase
+      .from('essay_revision_history')
+      .select('*')
+      .eq('essay_id', essayId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error getting latest version:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, version: version as PIQVersion | undefined };
+
+  } catch (error) {
+    console.error('Unexpected error in getLatestVersion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
 // =============================================================================
-// VERSION MANAGEMENT
+// VERSION MANAGEMENT - NEW API
 // =============================================================================
 
 /**
- * Save a new version to revision history
+ * Save a new version to revision history (generic)
+ * This is the base function used by specialized save functions
  *
  * @param clerkToken - JWT token from Clerk's getToken({ template: 'supabase' })
  * @param userId - Clerk user ID (required for RLS)
  * @param essayId - Essay ID from essays table
  * @param draftContent - Content of this version
- * @param source - What triggered this save
- * @param changeSummary - Optional description of changes
+ * @param options - Version options (type, label, score, etc.)
  */
 export async function saveVersion(
   clerkToken: string,
   userId: string,
   essayId: string,
   draftContent: string,
-  source: PIQVersion['source'],
-  changeSummary?: string
-): Promise<{ success: boolean; versionId?: string; error?: string }> {
+  options: SaveVersionOptions
+): Promise<SaveVersionResult> {
   try {
     assertAuthenticated(userId);
 
@@ -552,7 +659,7 @@ export async function saveVersion(
     const newVersionNumber = (essay?.version || 0) + 1;
     const wordCount = draftContent.split(/\s+/).filter(Boolean).length;
 
-    // Insert new version
+    // Insert new version with all new fields
     const { data: version, error: insertError } = await supabase
       .from('essay_revision_history')
       .insert({
@@ -560,8 +667,14 @@ export async function saveVersion(
         version: newVersionNumber,
         draft_content: draftContent,
         word_count: wordCount,
-        change_summary: changeSummary,
-        source
+        change_summary: options.changeSummary,
+        created_by: options.createdBy,
+        label: options.label,
+        parent_version_id: options.parentVersionId,
+        score: options.score,
+        dimension_scores: options.dimensionScores,
+        analysis_report_id: options.analysisReportId,
+        is_deleted: false,
       })
       .select()
       .single();
@@ -577,8 +690,8 @@ export async function saveVersion(
       .update({ version: newVersionNumber })
       .eq('id', essayId);
 
-    console.log(`✅ Version ${newVersionNumber} saved for essay ${essayId}`);
-    return { success: true, versionId: version.id };
+    console.log(`✅ Version ${newVersionNumber} (${options.createdBy}) saved for essay ${essayId}`);
+    return { success: true, versionId: version.id, versionNumber: newVersionNumber };
 
   } catch (error) {
     console.error('Unexpected error in saveVersion:', error);
@@ -587,19 +700,205 @@ export async function saveVersion(
 }
 
 /**
+ * Save an autosave version with dedup logic
+ * Only creates a new version if:
+ * - Content changed by more than AUTOSAVE_MIN_CHAR_DIFF characters, OR
+ * - Last autosave was more than AUTOSAVE_MIN_INTERVAL_MS ago
+ *
+ * @param clerkToken - JWT token
+ * @param userId - Clerk user ID
+ * @param essayId - Essay ID
+ * @param draftContent - Content to save
+ * @returns SaveVersionResult with skipped=true if deduped
+ */
+export async function saveAutosaveVersion(
+  clerkToken: string,
+  userId: string,
+  essayId: string,
+  draftContent: string
+): Promise<SaveVersionResult & { skipped?: boolean }> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    // Get the latest version for dedup check
+    const { data: latestVersion } = await supabase
+      .from('essay_revision_history')
+      .select('draft_content, created_at, created_by')
+      .eq('essay_id', essayId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // Dedup logic: skip if content hasn't changed enough AND it's too recent
+    if (latestVersion) {
+      const charDiff = getCharDiff(latestVersion.draft_content || '', draftContent);
+      const timeSinceLastSave = Date.now() - new Date(latestVersion.created_at).getTime();
+      
+      // Only check dedup for autosave versions
+      if (
+        latestVersion.created_by === 'autosave' &&
+        charDiff < AUTOSAVE_MIN_CHAR_DIFF &&
+        timeSinceLastSave < AUTOSAVE_MIN_INTERVAL_MS
+      ) {
+        console.log(`⏭️ Autosave skipped (charDiff: ${charDiff}, timeSince: ${Math.round(timeSinceLastSave / 1000)}s)`);
+        return { success: true, skipped: true };
+      }
+
+      // Also skip if content is exactly the same
+      if (latestVersion.draft_content === draftContent) {
+        console.log('⏭️ Autosave skipped (content unchanged)');
+        return { success: true, skipped: true };
+      }
+    }
+
+    // Save the autosave version
+    const result = await saveVersion(clerkToken, userId, essayId, draftContent, {
+      createdBy: 'autosave',
+      parentVersionId: latestVersion?.id,
+    });
+
+    return result;
+
+  } catch (error) {
+    console.error('Unexpected error in saveAutosaveVersion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
+ * Save a milestone version (user-triggered "Save Milestone")
+ * Always creates a new version, even if content hasn't changed
+ *
+ * @param clerkToken - JWT token
+ * @param userId - Clerk user ID
+ * @param essayId - Essay ID
+ * @param draftContent - Content to save
+ * @param label - Optional label (e.g., "Before counselor feedback")
+ */
+export async function saveMilestoneVersion(
+  clerkToken: string,
+  userId: string,
+  essayId: string,
+  draftContent: string,
+  label?: string
+): Promise<SaveVersionResult> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    // Get the latest version for parent reference
+    const { data: latestVersion } = await supabase
+      .from('essay_revision_history')
+      .select('id')
+      .eq('essay_id', essayId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // Save the milestone version
+    const result = await saveVersion(clerkToken, userId, essayId, draftContent, {
+      createdBy: 'milestone',
+      label: label,
+      parentVersionId: latestVersion?.id,
+      changeSummary: label ? `Milestone: ${label}` : 'Milestone saved',
+    });
+
+    return result;
+
+  } catch (error) {
+    console.error('Unexpected error in saveMilestoneVersion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
+ * Save an analysis version (triggered by Analyze button)
+ * Creates a new version with score and dimension scores attached
+ *
+ * @param clerkToken - JWT token
+ * @param userId - Clerk user ID
+ * @param essayId - Essay ID
+ * @param draftContent - Content that was analyzed
+ * @param score - Overall score from analysis
+ * @param dimensionScores - Dimension breakdown from analysis
+ * @param analysisReportId - ID of the analysis report (optional)
+ */
+export async function saveAnalysisVersion(
+  clerkToken: string,
+  userId: string,
+  essayId: string,
+  draftContent: string,
+  score: number,
+  dimensionScores?: any,
+  analysisReportId?: string
+): Promise<SaveVersionResult> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    // Get the latest version for parent reference
+    const { data: latestVersion } = await supabase
+      .from('essay_revision_history')
+      .select('id')
+      .eq('essay_id', essayId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // Save the analysis version
+    const result = await saveVersion(clerkToken, userId, essayId, draftContent, {
+      createdBy: 'analysis',
+      parentVersionId: latestVersion?.id,
+      score: score,
+      dimensionScores: dimensionScores,
+      analysisReportId: analysisReportId,
+      changeSummary: `Analyzed (Score: ${score})`,
+    });
+
+    return result;
+
+  } catch (error) {
+    console.error('Unexpected error in saveAnalysisVersion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
  * Restore a previous version
+ * Creates an autosave of current content first, then updates essay
  *
  * @param clerkToken - JWT token from Clerk's getToken({ template: 'supabase' })
  * @param userId - Clerk user ID (required for RLS)
  * @param essayId - Essay ID from essays table
  * @param versionId - Version ID to restore
+ * @param currentContent - Current content to save as autosave before restore
  */
 export async function restoreVersion(
   clerkToken: string,
   userId: string,
   essayId: string,
-  versionId: string
-): Promise<{ success: boolean; error?: string }> {
+  versionId: string,
+  currentContent?: string
+): Promise<{ success: boolean; restoredContent?: string; error?: string }> {
   try {
     assertAuthenticated(userId);
 
@@ -621,6 +920,11 @@ export async function restoreVersion(
       return { success: false, error: versionError?.message || 'Version not found' };
     }
 
+    // Save current content as autosave before restoring (if provided)
+    if (currentContent && currentContent !== version.draft_content) {
+      await saveAutosaveVersion(clerkToken, userId, essayId, currentContent);
+    }
+
     // Update essay with restored content
     const { error: updateError } = await supabase
       .from('essays')
@@ -636,21 +940,69 @@ export async function restoreVersion(
       return { success: false, error: updateError.message };
     }
 
-    // Save a new version marking the restore
-    await saveVersion(
-      clerkToken,
-      userId,
-      essayId,
-      version.draft_content,
-      'system_auto',
-      `Restored from version ${versionId}`
-    );
+    // Create a new version marking the restore
+    await saveVersion(clerkToken, userId, essayId, version.draft_content, {
+      createdBy: 'autosave',
+      changeSummary: `Restored from version ${versionId}`,
+    });
 
     console.log(`✅ Restored version ${versionId} for essay ${essayId}`);
-    return { success: true };
+    return { success: true, restoredContent: version.draft_content };
 
   } catch (error) {
     console.error('Unexpected error in restoreVersion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
+ * Soft delete a version
+ * Sets is_deleted = true instead of actually deleting
+ */
+export async function softDeleteVersion(
+  clerkToken: string,
+  userId: string,
+  essayId: string,
+  versionId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    assertAuthenticated(userId);
+
+    if (!verifyClerkToken(clerkToken)) {
+      return { success: false, error: 'Invalid authentication token' };
+    }
+
+    const supabase = getAuthenticatedSupabaseClient(clerkToken);
+
+    // Verify user owns this essay
+    const { data: essay, error: essayError } = await supabase
+      .from('essays')
+      .select('id')
+      .eq('id', essayId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (essayError || !essay) {
+      return { success: false, error: 'Essay not found or access denied' };
+    }
+
+    // Soft delete the version
+    const { error: updateError } = await supabase
+      .from('essay_revision_history')
+      .update({ is_deleted: true })
+      .eq('id', versionId)
+      .eq('essay_id', essayId);
+
+    if (updateError) {
+      console.error('Error soft deleting version:', updateError);
+      return { success: false, error: updateError.message };
+    }
+
+    console.log(`✅ Soft deleted version ${versionId}`);
+    return { success: true };
+
+  } catch (error) {
+    console.error('Unexpected error in softDeleteVersion:', error);
     return { success: false, error: (error as Error).message };
   }
 }

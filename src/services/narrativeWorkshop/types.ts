@@ -614,12 +614,43 @@ export interface VoiceFingerprint {
 export interface WorkshopItem {
   id: string;
   rubric_category: string; // "Selectivity"
-  severity: 'critical' | 'warning' | 'optimization';
+  severity?: 'critical' | 'warning' | 'optimization';
   quote: string; // "I worked hard"
   
-  // Contextual Education
-  problem: string; // "Lacks metrics."
-  why_it_matters: string; // "Credibility signal."
+  // Contextual Education (may be deprecated in favor of teaching.problem)
+  problem?: string; // "Lacks metrics."
+  why_it_matters?: string; // "Credibility signal."
+  
+  // Phase 19 Teaching Layer (added by teaching-layer edge function)
+  teaching?: {
+    problem?: {
+      hook?: string;
+      description?: string;
+      whyItMatters?: {
+        preview?: string;
+        fullExplanation?: string;
+      };
+    };
+    craftPrinciple?: {
+      hook?: string;
+      fullTeaching?: string;
+      realWorldExample?: string;
+    };
+    applicationStrategy?: {
+      whatMakesGoodExample?: string;
+      implementationGuide?: string;
+      narrativePurposeAndAngles?: string;
+    };
+    personalNote?: string;
+    suggestionRationales?: Array<{
+      whyThisWorks: string;
+    }>;
+  };
+  teachingDepth?: 'foundational' | 'craft' | 'polish';
+  estimatedImpact?: {
+    nqiGain: number;
+    dimensionsAffected: string[];
+  };
   
   // The Fixes
   suggestions: Array<{

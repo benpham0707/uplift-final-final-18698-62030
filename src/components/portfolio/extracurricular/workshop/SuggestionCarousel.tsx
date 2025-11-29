@@ -1,10 +1,10 @@
 // @ts-nocheck - Legacy workshop file with type mismatches
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Wand2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 import { SuggestedFix, TeachingGuidance } from './types';
 import { NavigationControls } from '../../NavigationControls';
-import { TeachingGuidanceCard } from './TeachingGuidanceCard';
+import { ThemedPillButton } from '@/components/ui/ThemedPillButton';
 
 interface SuggestionCarouselProps {
   suggestions: SuggestedFix[];
@@ -83,6 +83,7 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
           total={suggestions.length}
           onPrev={onPrev}
           onNext={onNext}
+          variant="purple"
         />
       </div>
 
@@ -110,22 +111,14 @@ export const SuggestionCarousel: React.FC<SuggestionCarouselProps> = ({
           }
         </div>
 
-        <button
+        <ThemedPillButton
+          variant="green"
+          isExpanded={isExpanded}
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 border border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-sm transition-all text-xs font-medium text-purple-900 dark:text-purple-100"
+          className="mt-2"
         >
-          {isExpanded ? (
-            <>
-              Show less
-              <ChevronUp className="w-3 h-3" />
-            </>
-          ) : (
-            <>
-              View more
-              <ChevronDown className="w-3 h-3" />
-            </>
-          )}
-        </button>
+          {isExpanded ? 'Show less' : 'View more'}
+        </ThemedPillButton>
       </div>
 
       {currentSuggestion.teaching_example && (

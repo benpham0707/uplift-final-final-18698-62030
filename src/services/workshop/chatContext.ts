@@ -410,7 +410,7 @@ function buildTeachingContext(teachingCoaching: TeachingCoachingOutput | null) {
     title: issue.problem?.title || 'Issue',
     category: issue.category,
     severity: issue.severity,
-    fromDraft: issue.problem?.from_draft || ''',
+    fromDraft: issue.problem?.from_draft || '',
     problem: issue.problem?.description || 'Issue detected',
     whyMatters: issue.principle?.why_officers_care || 'Improve essay',
     impactOnScore: issue.problem?.impact_on_score || 'medium',

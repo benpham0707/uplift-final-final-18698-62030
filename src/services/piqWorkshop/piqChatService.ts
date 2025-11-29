@@ -710,6 +710,7 @@ function buildAnalysisResultFromContext(context: PIQChatContext): any {
       why_it_matters: item.whyItMatters,
       severity: item.severity,
       rubric_category: item.rubricCategory,
+      teaching: item.teaching,
       suggestions: item.suggestions.map(s => ({
         type: s.type,
         text: s.text,

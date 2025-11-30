@@ -67,8 +67,8 @@ interface VersionHistoryDrawerProps {
   versions: PIQVersion[];
   /** Currently loaded version ID (to mark as "Current") */
   currentVersionId?: string;
-  /** Callback when user restores a version */
-  onRestore: (versionId: string, content: string) => Promise<void>;
+  /** Callback when user restores a version (passes full version object for score/analysis restoration) */
+  onRestore: (version: PIQVersion) => Promise<void>;
   /** Whether currently loading versions */
   isLoading?: boolean;
   /** Optional error message */
@@ -360,7 +360,8 @@ export function VersionHistoryDrawer({
 
     setIsRestoring(true);
     try {
-      await onRestore(selectedVersion.id, selectedVersion.draft_content);
+      // Pass full version object so parent can restore score/dimensions too
+      await onRestore(selectedVersion);
       setShowRestoreConfirm(false);
       onClose();
     } catch (error) {

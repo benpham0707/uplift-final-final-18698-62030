@@ -1158,7 +1158,7 @@ export default function PIQWorkshop() {
   }, [loadVersionHistory]);
 
   // Handle restoring a version from the drawer
-  const handleRestoreFromDrawer = useCallback(async (versionId: string, content: string) => {
+  const handleRestoreFromDrawer = useCallback(async (version: PIQVersion) => {
     if (!currentEssayId || !userId) return;
 
     try {
@@ -1170,14 +1170,65 @@ export default function PIQWorkshop() {
         token,
         userId,
         currentEssayId,
-        versionId,
+        version.id,
         currentDraft
       );
 
       if (result.success && result.restoredContent) {
+        // Restore the essay content
         setCurrentDraft(result.restoredContent);
-        setNeedsReanalysis(true);
         setHasUnsavedChanges(false);
+        
+        // If the version has analysis data (score & dimensions), restore that too
+        if (version.score !== undefined && version.score !== null && version.score > 0) {
+          console.log(`📊 Restoring analysis state from version: score=${version.score}`);
+          
+          // Restore the score
+          setCurrentScore(version.score);
+          initialScoreRef.current = version.score;
+          
+          // Restore dimension scores if available
+          if (version.dimension_scores && Array.isArray(version.dimension_scores)) {
+            console.log(`📊 Restoring ${version.dimension_scores.length} dimensions`);
+            
+            // Transform dimension_scores back to the format expected by the UI
+            const restoredDimensions = version.dimension_scores.map((d: any) => ({
+              id: d.id || d.name?.toLowerCase().replace(/\s+/g, '_') || 'unknown',
+              name: d.name || 'Unknown Dimension',
+              score: d.score || 0,
+              maxScore: d.maxScore || d.max_score || 10,
+              percentage: d.percentage || (d.score / (d.maxScore || d.max_score || 10)) * 100,
+              feedback: d.feedback || '',
+              status: d.status || (d.percentage >= 70 ? 'good' : d.percentage >= 40 ? 'needs_work' : 'critical'),
+              issues: d.issues || [],
+            }));
+            
+            setDimensions(restoredDimensions);
+          }
+          
+          // Restore the analysis result object for the coach
+          if (version.dimension_scores) {
+            const restoredAnalysisResult: AnalysisResult = {
+              nqi: version.score,
+              tier: version.score >= 85 ? 'Elite' : version.score >= 70 ? 'Strong' : version.score >= 55 ? 'Competitive' : 'Developing',
+              dimensions: version.dimension_scores,
+              analysis_id: version.analysis_report_id || '',
+            };
+            setAnalysisResult(restoredAnalysisResult);
+          }
+          
+          // Clear chat so it regenerates with restored score
+          setChatMessages([]);
+          
+          // Mark that we have analysis (no need to re-analyze)
+          setNeedsReanalysis(false);
+        } else {
+          // Version without analysis - needs re-analysis
+          setNeedsReanalysis(true);
+          setAnalysisResult(null);
+          setDimensions([]);
+          setChatMessages([]);
+        }
         
         // Refresh version history
         await loadVersionHistory();
@@ -1382,6 +1433,8 @@ export default function PIQWorkshop() {
   }, [currentVersionIndex, draftVersions]);
 
   const handleRequestReanalysis = useCallback(() => {
+    // Clear chat messages so a new welcome message is generated with the new score
+    setChatMessages([]);
     // Force re-analysis when user explicitly clicks - bypass cache to get fresh results
     performFullAnalysis(undefined, true);
   }, [performFullAnalysis]);

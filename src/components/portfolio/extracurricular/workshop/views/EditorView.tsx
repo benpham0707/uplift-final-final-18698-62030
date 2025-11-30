@@ -172,9 +172,18 @@ export const EditorView: React.FC<EditorViewProps> = ({
               <div className="flex items-center gap-3">
                 <div>
                   <p className="text-xs text-muted-foreground mb-0.5">Current Score</p>
-                  <p className="text-2xl font-bold text-primary">{currentScore}</p>
+                  {/* Don't show score while analyzing - wait until complete */}
+                  {isAnalyzing ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent" />
+                      <span className="text-lg text-muted-foreground">Analyzing...</span>
+                    </div>
+                  ) : (
+                    <p className="text-2xl font-bold text-primary">{currentScore}</p>
+                  )}
                 </div>
-                {scoreChange !== 'unchanged' && (
+                {/* Only show score change when not analyzing */}
+                {!isAnalyzing && scoreChange !== 'unchanged' && (
                   <div className="flex items-center gap-1.5">
                     {scoreChange === 'improved' ? (
                       <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
@@ -196,12 +205,6 @@ export const EditorView: React.FC<EditorViewProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                {isAnalyzing && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent" />
-                    Analyzing...
-                  </div>
-                )}
                 {onRequestReanalysis && !isAnalyzing && (
                   <TooltipProvider>
                     <Tooltip>

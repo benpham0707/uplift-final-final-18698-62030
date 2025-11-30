@@ -649,6 +649,9 @@ export default function PIQWorkshop() {
               }
             }
             
+            // Clear localStorage after successful database save (both formats)
+            clearAllLocalDrafts(effectiveEssayId, selectedPromptId);
+            
             setHasUnsavedChanges(false);
             setLastSaveTime(new Date());
             
@@ -1404,6 +1407,9 @@ export default function PIQWorkshop() {
         }
       }
 
+      // Clear localStorage after successful database save (both formats)
+      clearAllLocalDrafts(essayId || null, selectedPromptId);
+      
       setSaveStatus('saved');
       setLastSaveTime(new Date());
       setHasUnsavedChanges(false);

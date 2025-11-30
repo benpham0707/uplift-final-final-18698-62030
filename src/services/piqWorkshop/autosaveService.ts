@@ -11,7 +11,7 @@
  */
 
 import { saveAutosaveVersion, saveOrUpdatePIQEssay } from './piqDatabaseService';
-import { saveLocalDraft, clearLocalDraft } from './storageService';
+import { saveLocalDraft, clearAllLocalDrafts } from './storageService';
 
 // =============================================================================
 // TYPES
@@ -369,10 +369,8 @@ export class AutosaveManager {
       this.lastSavedAt = new Date();
       this.lastError = null;
       
-      // Clear local backup after successful save
-      if (this.essayId) {
-        clearLocalDraft(this.essayId);
-      }
+      // Clear local backup after successful save (both new and legacy formats)
+      clearAllLocalDrafts(this.essayId, this.promptId);
       
       this.cancelRetryTimer();
       this.updateStatus('saved');
